@@ -412,6 +412,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     );
 
     await _ref.read(sessionRepositoryProvider).insert(session);
+    await _ref.read(workoutLogRepositoryProvider).logDay(_todayString());
     _ref.invalidate(sessionsAsyncProvider);
   }
 

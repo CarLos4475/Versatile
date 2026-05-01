@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../view_models/home_view_model.dart';
 import '../widgets/session_card.dart';
@@ -17,16 +18,32 @@ class HomeScreen extends ConsumerWidget {
     final state = ref.watch(homeProvider);
     final now = DateTime.now();
     const weekdays = [
-      'Monday', 'Tuesday', 'Wednesday', 'Thursday',
-      'Friday', 'Saturday', 'Sunday'
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
     ];
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
 
-    final firstRoutine =
-        state.routines.isNotEmpty ? state.routines.first : null;
+    final firstRoutine = state.routines.isNotEmpty
+        ? state.routines.first
+        : null;
 
     return Scaffold(
       backgroundColor: AppColors.bgApp,
@@ -87,13 +104,22 @@ class HomeScreen extends ConsumerWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: StatCard(
-                        label: 'Streak',
-                        value: '${state.streak}',
-                        unit: 'days',
+                        label: 'Avg time',
+                        value: '${state.avgTimeMins}',
+                        unit: 'min',
                         accent: true,
                       ),
                     ),
                   ],
+                ),
+              ),
+
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 22),
+                child: _ActivityGrid(
+                  workoutDays: state.workoutDays,
+                  sessionCount: state.sessions.length,
                 ),
               ),
 
@@ -118,7 +144,9 @@ class HomeScreen extends ConsumerWidget {
                       Text(
                         '${state.sessions.length} total',
                         style: const TextStyle(
-                            fontSize: 13, color: AppColors.ink400),
+                          fontSize: 13,
+                          color: AppColors.ink400,
+                        ),
                       ),
                     ],
                   ),
@@ -127,24 +155,201 @@ class HomeScreen extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 22),
                   child: Column(
-                    children: state.sessions.take(4).map((s) => Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: SessionCard(
-                            session: s,
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    SessionDetailScreen(session: s),
+                    children: state.sessions
+                        .take(4)
+                        .map(
+                          (s) => Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: SessionCard(
+                              session: s,
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      SessionDetailScreen(session: s),
+                                ),
                               ),
                             ),
                           ),
-                        )).toList(),
+                        )
+                        .toList(),
                   ),
                 ),
               ],
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ActivityGrid extends StatelessWidget {
+  const _ActivityGrid({required this.workoutDays, required this.sessionCount});
+
+  final Set<String> workoutDays;
+  final int sessionCount;
+
+  static const _months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  static const _dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  static const int _numWeeks = 29;
+  static const double _cell = 8;
+  static const double _gap = 2;
+  static const double _slot = _cell + _gap;
+
+  String _fmt(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final currentMonday = today.subtract(Duration(days: today.weekday - 1));
+    final gridStart = currentMonday.subtract(
+      Duration(days: 7 * (_numWeeks - 1)),
+    );
+
+    final weeks = List.generate(
+      _numWeeks,
+      (w) => gridStart.add(Duration(days: 7 * w)),
+    );
+
+    return GlassContainer(
+      radius: 20,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'ACTIVITY',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.06,
+              color: AppColors.ink400,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            '$sessionCount sessions in the last 30 days',
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w400,
+              letterSpacing: -0.4,
+              color: AppColors.ink900,
+              height: 1.1,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Fixed-width weekday label column
+              SizedBox(
+                width: 22,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: _slot + 2), // month row + gap
+                    ..._dayLabels.map(
+                      (label) => SizedBox(
+                        height: _slot,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            label,
+                            style: const TextStyle(
+                              fontSize: 7,
+                              color: AppColors.ink400,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 2),
+              // Fixed-width week columns
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: weeks.asMap().entries.map((entry) {
+                  final w = entry.key;
+                  final monday = entry.value;
+                  final showMonth =
+                      w == 0 || monday.month != weeks[w - 1].month;
+
+                  return SizedBox(
+                    width: _slot,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Month label
+                        SizedBox(
+                          height: _slot,
+                          child: showMonth
+                              ? Text(
+                                  _months[monday.month - 1],
+                                  style: const TextStyle(
+                                    fontSize: 7,
+                                    color: AppColors.ink400,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  overflow: TextOverflow.visible,
+                                  softWrap: false,
+                                )
+                              : null,
+                        ),
+                        const SizedBox(height: 2),
+                        // 7 day cells
+                        ...List.generate(7, (d) {
+                          final day = monday.add(Duration(days: d));
+                          final isFuture = day.isAfter(today);
+                          final trained =
+                              !isFuture && workoutDays.contains(_fmt(day));
+                          return Container(
+                            width: _cell,
+                            height: _cell,
+                            margin: const EdgeInsets.only(bottom: _gap),
+                            decoration: BoxDecoration(
+                              color: isFuture
+                                  ? Colors.transparent
+                                  : trained
+                                  ? AppColors.accentDeep
+                                  : const Color(0x0F000000),
+                              borderRadius: BorderRadius.circular(2),
+                              border: isFuture
+                                  ? null
+                                  : Border.all(
+                                      color: trained
+                                          ? Colors.transparent
+                                          : const Color(0x14000000),
+                                      width: 0.5,
+                                    ),
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -201,24 +406,28 @@ class _HeroCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(children: [
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(
-                      color: Colors.white, shape: BoxShape.circle),
-                ),
-                const SizedBox(width: 6),
-                const Text(
-                  "NEXT WORKOUT",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.06,
+              Row(
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                ),
-              ]),
+                  const SizedBox(width: 6),
+                  const Text(
+                    "NEXT WORKOUT",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.06,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 10),
               Text(
                 routineName,
@@ -234,16 +443,16 @@ class _HeroCard extends StatelessWidget {
               Text(
                 '$exerciseCount exercises · ~$estimatedMin min',
                 style: const TextStyle(
-                    fontSize: 13,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400),
+                  fontSize: 13,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
               const SizedBox(height: 18),
               GestureDetector(
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) =>
-                        ActiveWorkoutScreen(routineId: routineId),
+                    builder: (_) => ActiveWorkoutScreen(routineId: routineId),
                   ),
                 ),
                 child: Container(
@@ -252,7 +461,9 @@ class _HeroCard extends StatelessWidget {
                     color: Colors.white.withOpacity(0.18),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                        color: Colors.white.withOpacity(0.3), width: 0.5),
+                      color: Colors.white.withOpacity(0.3),
+                      width: 0.5,
+                    ),
                   ),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -262,9 +473,10 @@ class _HeroCard extends StatelessWidget {
                       Text(
                         'Start workout',
                         style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600),
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
@@ -313,8 +525,11 @@ class _EmptyHeroCard extends StatelessWidget {
             SizedBox(height: 18),
             Row(
               children: [
-                Icon(Icons.add_circle_outline,
-                    size: 16, color: AppColors.accentDeep),
+                Icon(
+                  Icons.add_circle_outline,
+                  size: 16,
+                  color: AppColors.accentDeep,
+                ),
                 SizedBox(width: 6),
                 Text(
                   'Create routine',

@@ -17,7 +17,7 @@ class DatabaseHelper {
     final filePath = p.join(dbPath, 'versatile.db');
     return openDatabase(
       filePath,
-      version: 3,
+      version: 4,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onConfigure: (db) async => db.execute('PRAGMA foreign_keys = ON'),
@@ -47,6 +47,11 @@ class DatabaseHelper {
       await db.execute("UPDATE exercises SET muscle='Biceps' WHERE id='ex-15'");
       await db.execute("UPDATE exercises SET muscle='Other' WHERE muscle='Arms'");
       await db.execute("UPDATE exercises SET muscle='Other' WHERE muscle='Legs'");
+    }
+    if (oldVersion < 4) {
+      await db.execute(
+        'CREATE TABLE IF NOT EXISTS workout_log (date TEXT PRIMARY KEY)',
+      );
     }
   }
 
@@ -126,6 +131,10 @@ class DatabaseHelper {
         value TEXT NOT NULL
       )
     ''');
+
+    await db.execute(
+      'CREATE TABLE workout_log (date TEXT PRIMARY KEY)',
+    );
 
     await _seed(db);
   }

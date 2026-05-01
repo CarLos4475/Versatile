@@ -14,31 +14,39 @@ class SessionsAsyncNotifier extends AsyncNotifier<List<Session>> {
 
 final sessionsAsyncProvider =
     AsyncNotifierProvider<SessionsAsyncNotifier, List<Session>>(
-  SessionsAsyncNotifier.new,
-);
+      SessionsAsyncNotifier.new,
+    );
 
 class HomeState {
   final List<Session> sessions;
   final List<Routine> routines;
   final int weekSessions;
   final double weekVolume;
-  final int streak;
+  final int avgTimeMins;
   final String userName;
+  final Set<String> workoutDays;
 
   const HomeState({
     required this.sessions,
     required this.routines,
     this.weekSessions = 0,
     this.weekVolume = 0,
-    this.streak = 0,
+    this.avgTimeMins = 0,
     this.userName = 'there',
+    this.workoutDays = const {},
   });
 }
+
+final workoutLogDaysProvider = FutureProvider<Set<String>>((ref) async {
+  ref.watch(sessionsAsyncProvider);
+  return ref.read(workoutLogRepositoryProvider).getDays(84);
+});
 
 final homeProvider = Provider<HomeState>((ref) {
   final sessions = ref.watch(sessionsAsyncProvider).value ?? [];
   final routines = ref.watch(routinesProvider).value ?? [];
   final userName = ref.watch(userNameProvider).value ?? 'there';
+  final loggedDays = ref.watch(workoutLogDaysProvider).value ?? {};
 
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
@@ -49,24 +57,23 @@ final homeProvider = Provider<HomeState>((ref) {
     return !d.isBefore(weekStart);
   }).toList();
 
-  int streak = 0;
-  for (int i = 0; i < 365; i++) {
-    final check = today.subtract(Duration(days: i));
-    final dateStr =
-        '${check.year}-${check.month.toString().padLeft(2, '0')}-${check.day.toString().padLeft(2, '0')}';
-    if (sessions.any((s) => s.date == dateStr)) {
-      streak++;
-    } else if (i > 0) {
-      break;
-    }
-  }
+  final avgTimeMins = weekSessions.isEmpty
+      ? 0
+      : (weekSessions.fold(0, (s, x) => s + x.durationMin) /
+                weekSessions.length)
+            .round();
+
+  // combine workout_log dates with recent session dates for full coverage
+  final sessionDates = sessions.map((s) => s.date).toSet();
+  final allWorkoutDays = {...loggedDays, ...sessionDates};
 
   return HomeState(
     sessions: sessions,
     routines: routines,
     weekSessions: weekSessions.length,
     weekVolume: weekSessions.fold(0.0, (s, x) => s + x.volumeKg),
-    streak: streak,
+    avgTimeMins: avgTimeMins,
     userName: userName,
+    workoutDays: allWorkoutDays,
   );
 });
