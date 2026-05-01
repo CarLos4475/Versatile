@@ -9,7 +9,9 @@ import '../../../shared/widgets/screen_header.dart';
 import '../view_models/exercises_view_model.dart';
 
 const _kMuscles = [
-  'Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core',
+  'Chest', 'Back', 'Shoulders',
+  'Biceps', 'Triceps', 'Forearms',
+  'Core', 'Quadriceps', 'Hamstrings', 'Glutes', 'Calves', 'Other',
 ];
 
 const _kEquipment = [

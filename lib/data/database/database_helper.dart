@@ -17,7 +17,7 @@ class DatabaseHelper {
     final filePath = p.join(dbPath, 'versatile.db');
     return openDatabase(
       filePath,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onConfigure: (db) async => db.execute('PRAGMA foreign_keys = ON'),
@@ -37,6 +37,16 @@ class DatabaseHelper {
           value TEXT NOT NULL
         )
       ''');
+    }
+    if (oldVersion < 3) {
+      await db.execute("UPDATE exercises SET muscle='Quadriceps' WHERE id='ex-7'");
+      await db.execute("UPDATE exercises SET muscle='Hamstrings' WHERE id='ex-8'");
+      await db.execute("UPDATE exercises SET muscle='Quadriceps' WHERE id='ex-9'");
+      await db.execute("UPDATE exercises SET muscle='Biceps' WHERE id='ex-13'");
+      await db.execute("UPDATE exercises SET muscle='Triceps' WHERE id='ex-14'");
+      await db.execute("UPDATE exercises SET muscle='Biceps' WHERE id='ex-15'");
+      await db.execute("UPDATE exercises SET muscle='Other' WHERE muscle='Arms'");
+      await db.execute("UPDATE exercises SET muscle='Other' WHERE muscle='Legs'");
     }
   }
 
@@ -128,15 +138,15 @@ class DatabaseHelper {
       {'id': 'ex-4',  'name': 'Pull-Up',                'muscle': 'Back',      'equipment': 'Bodyweight', 'is_custom': 0, 'is_unilateral': 0},
       {'id': 'ex-5',  'name': 'Barbell Row',            'muscle': 'Back',      'equipment': 'Barbell',    'is_custom': 0, 'is_unilateral': 0},
       {'id': 'ex-6',  'name': 'Lat Pulldown',           'muscle': 'Back',      'equipment': 'Cable',      'is_custom': 0, 'is_unilateral': 0},
-      {'id': 'ex-7',  'name': 'Squat',                  'muscle': 'Legs',      'equipment': 'Barbell',    'is_custom': 0, 'is_unilateral': 0},
-      {'id': 'ex-8',  'name': 'Romanian Deadlift',      'muscle': 'Legs',      'equipment': 'Barbell',    'is_custom': 0, 'is_unilateral': 0},
-      {'id': 'ex-9',  'name': 'Leg Press',              'muscle': 'Legs',      'equipment': 'Machine',    'is_custom': 0, 'is_unilateral': 0},
-      {'id': 'ex-10', 'name': 'Overhead Press',         'muscle': 'Shoulders', 'equipment': 'Barbell',    'is_custom': 0, 'is_unilateral': 0},
-      {'id': 'ex-11', 'name': 'Lateral Raise',          'muscle': 'Shoulders', 'equipment': 'Dumbbell',   'is_custom': 0, 'is_unilateral': 1},
-      {'id': 'ex-12', 'name': 'Face Pull',              'muscle': 'Shoulders', 'equipment': 'Cable',      'is_custom': 0, 'is_unilateral': 0},
-      {'id': 'ex-13', 'name': 'Bicep Curl',             'muscle': 'Arms',      'equipment': 'Dumbbell',   'is_custom': 0, 'is_unilateral': 1},
-      {'id': 'ex-14', 'name': 'Tricep Pushdown',        'muscle': 'Arms',      'equipment': 'Cable',      'is_custom': 0, 'is_unilateral': 0},
-      {'id': 'ex-15', 'name': 'Hammer Curl',            'muscle': 'Arms',      'equipment': 'Dumbbell',   'is_custom': 0, 'is_unilateral': 1},
+      {'id': 'ex-7',  'name': 'Squat',                  'muscle': 'Quadriceps', 'equipment': 'Barbell',    'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-8',  'name': 'Romanian Deadlift',      'muscle': 'Hamstrings', 'equipment': 'Barbell',    'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-9',  'name': 'Leg Press',              'muscle': 'Quadriceps', 'equipment': 'Machine',    'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-10', 'name': 'Overhead Press',         'muscle': 'Shoulders',  'equipment': 'Barbell',    'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-11', 'name': 'Lateral Raise',          'muscle': 'Shoulders',  'equipment': 'Dumbbell',   'is_custom': 0, 'is_unilateral': 1},
+      {'id': 'ex-12', 'name': 'Face Pull',              'muscle': 'Shoulders',  'equipment': 'Cable',      'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-13', 'name': 'Bicep Curl',             'muscle': 'Biceps',     'equipment': 'Dumbbell',   'is_custom': 0, 'is_unilateral': 1},
+      {'id': 'ex-14', 'name': 'Tricep Pushdown',        'muscle': 'Triceps',    'equipment': 'Cable',      'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-15', 'name': 'Hammer Curl',            'muscle': 'Biceps',     'equipment': 'Dumbbell',   'is_custom': 0, 'is_unilateral': 1},
       {'id': 'ex-16', 'name': 'Plank',                  'muscle': 'Core',      'equipment': 'Bodyweight', 'is_custom': 0, 'is_unilateral': 0},
       {'id': 'ex-17', 'name': 'Hanging Leg Raise',      'muscle': 'Core',      'equipment': 'Bodyweight', 'is_custom': 0, 'is_unilateral': 0},
       {'id': 'ex-c1', 'name': 'Landmine Press',         'muscle': 'Shoulders', 'equipment': 'Barbell',    'is_custom': 1, 'is_unilateral': 0},

@@ -62,33 +62,34 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   _OnboardPage(
                     icon: Icons.fitness_center,
                     title: 'Welcome to\nVersatile',
-                    body: 'Your personal gym tracker.\nSimple, powerful, private.',
+                    body:
+                        'Your personal gym tracker.\nSimple, powerful, private.',
                     onNext: _next,
                     isFirst: true,
                   ),
                   _OnboardPage(
                     icon: Icons.show_chart,
                     title: 'Track\nevery rep',
-                    body: 'Log sets, weight and reps. Watch your progress build over time.',
+                    body:
+                        'Log sets, weight and reps. Watch your progress build over time.',
                     onNext: _next,
                   ),
                   _OnboardPage(
                     icon: Icons.format_list_bulleted,
                     title: 'Build your\nroutines',
-                    body: 'Create custom workouts, reorder exercises and stay consistent.',
+                    body:
+                        'Create custom workouts, reorder exercises and stay consistent.',
                     onNext: _next,
                   ),
                   _OnboardPage(
                     icon: Icons.lock_outline,
                     title: '100% local.\nZero tracking.',
-                    body: 'No internet. No account. No payment. No data ever leaves your device.',
+                    body:
+                        'No internet. No account. No payment. No data ever leaves your device.',
                     onNext: _next,
                     highlightBody: true,
                   ),
-                  _NamePage(
-                    controller: _nameCtrl,
-                    onFinish: _finish,
-                  ),
+                  _NamePage(controller: _nameCtrl, onFinish: _finish),
                 ],
               ),
             ),
@@ -131,7 +132,11 @@ class _OnboardPage extends StatelessWidget {
             height: 72,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFE08866), Color(0xFFD97757), Color(0xFFB85432)],
+                colors: [
+                  Color(0xFFE08866),
+                  Color(0xFFD97757),
+                  Color(0xFFB85432),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -164,8 +169,7 @@ class _OnboardPage extends StatelessWidget {
               fontSize: 16,
               color: highlightBody ? AppColors.ink700 : AppColors.ink500,
               height: 1.5,
-              fontWeight:
-                  highlightBody ? FontWeight.w500 : FontWeight.w400,
+              fontWeight: highlightBody ? FontWeight.w500 : FontWeight.w400,
             ),
           ),
           const SizedBox(height: 48),
@@ -234,7 +238,11 @@ class _NamePage extends StatelessWidget {
             height: 72,
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFE08866), Color(0xFFD97757), Color(0xFFB85432)],
+                colors: [
+                  Color(0xFFE08866),
+                  Color(0xFFD97757),
+                  Color(0xFFB85432),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -247,8 +255,11 @@ class _NamePage extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Icon(Icons.waving_hand_outlined,
-                color: Colors.white, size: 32),
+            child: const Icon(
+              Icons.waving_hand_outlined,
+              color: Colors.white,
+              size: 32,
+            ),
           ),
           const SizedBox(height: 36),
           const Text(

@@ -23,3 +23,10 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/assets/Piernas/
+    - assets/assets/Torso/pecho/
+    - assets/assets/Torso/espalda/
+    - assets/assets/Torso/hombro/
+    - assets/assets/Torso/core/
+    - assets/assets/Torso/brazos/

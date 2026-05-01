@@ -50,7 +50,9 @@ class _ExercisePickerScreenState
   Widget build(BuildContext context) {
     final allExercises = ref.watch(exercisesAsyncProvider).value ?? [];
     const muscleGroups = [
-      'All', 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core'
+      'All', 'Chest', 'Back', 'Shoulders',
+      'Biceps', 'Triceps', 'Forearms',
+      'Core', 'Quadriceps', 'Hamstrings', 'Glutes', 'Calves', 'Other',
     ];
 
     final filtered = allExercises.where((e) {

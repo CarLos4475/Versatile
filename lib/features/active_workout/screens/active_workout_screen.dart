@@ -66,13 +66,25 @@ class _WorkoutBody extends ConsumerStatefulWidget {
 class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
   bool _finishing = false;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(activeWorkoutRoutineIdProvider.notifier).state =
+          widget.routineId;
+    });
+  }
+
   Future<void> _finish() async {
     if (_finishing) return;
     setState(() => _finishing = true);
     final notifier =
         ref.read(activeWorkoutProvider(widget.routineId).notifier);
     await notifier.finishWorkout();
-    if (mounted) Navigator.of(context).pop();
+    if (mounted) {
+      ref.read(activeWorkoutRoutineIdProvider.notifier).state = null;
+      Navigator.of(context).pop();
+    }
   }
 
   @override

@@ -428,6 +428,8 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
   }
 }
 
+final activeWorkoutRoutineIdProvider = StateProvider<String?>((ref) => null);
+
 final activeWorkoutProvider = StateNotifierProvider.autoDispose
     .family<ActiveWorkoutNotifier, ActiveWorkoutState, String>(
   (ref, routineId) => ActiveWorkoutNotifier(routineId, ref),

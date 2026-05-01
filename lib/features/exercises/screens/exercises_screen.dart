@@ -10,7 +10,9 @@ import '../view_models/exercises_view_model.dart';
 import 'add_exercise_screen.dart';
 
 const _kMuscleGroups = [
-  'All', 'Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core'
+  'All', 'Chest', 'Back', 'Shoulders',
+  'Biceps', 'Triceps', 'Forearms',
+  'Core', 'Quadriceps', 'Hamstrings', 'Glutes', 'Calves', 'Other',
 ];
 
 class ExercisesScreen extends ConsumerWidget {
@@ -280,18 +282,39 @@ class _ExerciseRow extends StatelessWidget {
 
   Color get _muscleColor {
     return switch (exercise.muscle) {
-      'Chest' => AppColors.accent,
-      'Back' => AppColors.accentDeep,
-      'Legs' => AppColors.accentSoft,
-      'Shoulders' => const Color(0xFFB48C64),
-      'Arms' => const Color(0xFFC8825A),
-      'Core' => const Color(0xFF9B7850),
+      'Chest'      => AppColors.accent,
+      'Back'       => AppColors.accentDeep,
+      'Shoulders'  => const Color(0xFFB48C64),
+      'Core'       => const Color(0xFF9B7850),
+      'Biceps'     => const Color(0xFFC8825A),
+      'Triceps'    => const Color(0xFFB56E40),
+      'Forearms'   => const Color(0xFF8A6E54),
+      'Quadriceps' => AppColors.accentSoft,
+      'Hamstrings' => const Color(0xFFCB8A6A),
+      'Glutes'     => const Color(0xFFD99060),
+      'Calves'     => const Color(0xFFC07A50),
       _ => AppColors.ink400,
     };
   }
 
+  String? get _muscleAsset => switch (exercise.muscle) {
+    'Chest'      => 'assets/assets/Torso/pecho/pecho_color_edit_24348292703575.png',
+    'Back'       => 'assets/assets/Torso/espalda/back_color_edit_24399873717629.png',
+    'Shoulders'  => 'assets/assets/Torso/hombro/shoulder_color_edit_24371924634300.png',
+    'Core'       => 'assets/assets/Torso/core/core_color_edit_24429990449916.png',
+    'Biceps'     => 'assets/assets/Torso/brazos/biceps_color_edit_24552237308231.png',
+    'Triceps'    => 'assets/assets/Torso/brazos/triceps_color_edit_24483943284283.png',
+    'Forearms'   => 'assets/assets/Torso/brazos/forearm_color_edit_24515208562924.png',
+    'Quadriceps' => 'assets/assets/Piernas/cuadriceps_color.png',
+    'Hamstrings' => 'assets/assets/Piernas/femoral_color_edit_24685232753002.png',
+    'Glutes'     => 'assets/assets/Piernas/glutes_color_edit_24667069897276.png',
+    'Calves'     => 'assets/assets/Piernas/calf_color_edit_24747730293097.png',
+    _ => null,
+  };
+
   @override
   Widget build(BuildContext context) {
+    final asset = _muscleAsset;
     return GlassContainer(
       radius: 14,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -304,8 +327,12 @@ class _ExerciseRow extends StatelessWidget {
               color: _muscleColor.withOpacity(0.15),
               borderRadius: BorderRadius.circular(11),
             ),
-            child:
-                Icon(Icons.fitness_center, size: 18, color: _muscleColor),
+            child: asset != null
+                ? Padding(
+                    padding: const EdgeInsets.all(7),
+                    child: Image.asset(asset, fit: BoxFit.contain),
+                  )
+                : Icon(Icons.fitness_center, size: 18, color: _muscleColor),
           ),
           const SizedBox(width: 12),
           Expanded(
