@@ -14,8 +14,72 @@ class ActiveWorkoutScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(activeWorkoutProvider(routineId));
-    final notifier = ref.read(activeWorkoutProvider(routineId).notifier);
+    final initAsync = ref.watch(workoutInitProvider(routineId));
+    return initAsync.when(
+      loading: () => const _LoadingScaffold(),
+      error: (e, _) => Scaffold(
+        backgroundColor: AppColors.bgApp,
+        body: Center(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Text('Could not load workout',
+                style: TextStyle(color: AppColors.ink500)),
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Go back'),
+            ),
+          ]),
+        ),
+      ),
+      data: (_) => _WorkoutBody(routineId: routineId),
+    );
+  }
+}
+
+class _LoadingScaffold extends StatelessWidget {
+  const _LoadingScaffold();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: AppColors.bgApp,
+      body: Center(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          CircularProgressIndicator(color: AppColors.accent, strokeWidth: 2),
+          SizedBox(height: 14),
+          Text('Getting ready…',
+              style: TextStyle(fontSize: 14, color: AppColors.ink400)),
+        ]),
+      ),
+    );
+  }
+}
+
+class _WorkoutBody extends ConsumerStatefulWidget {
+  const _WorkoutBody({required this.routineId});
+  final String routineId;
+
+  @override
+  ConsumerState<_WorkoutBody> createState() => _WorkoutBodyState();
+}
+
+class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
+  bool _finishing = false;
+
+  Future<void> _finish() async {
+    if (_finishing) return;
+    setState(() => _finishing = true);
+    final notifier =
+        ref.read(activeWorkoutProvider(widget.routineId).notifier);
+    await notifier.finishWorkout();
+    if (mounted) Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(activeWorkoutProvider(widget.routineId));
+    final notifier =
+        ref.read(activeWorkoutProvider(widget.routineId).notifier);
 
     return Scaffold(
       backgroundColor: AppColors.bgApp,
@@ -24,7 +88,6 @@ class ActiveWorkoutScreen extends ConsumerWidget {
           children: [
             Column(
               children: [
-                // Top bar
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                   child: GlassContainer(
@@ -69,7 +132,8 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 2),
                               Row(
-                                crossAxisAlignment: CrossAxisAlignment.baseline,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.baseline,
                                 textBaseline: TextBaseline.alphabetic,
                                 children: [
                                   Text(
@@ -80,7 +144,9 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                                       letterSpacing: -0.52,
                                       color: AppColors.ink900,
                                       height: 1,
-                                      fontFeatures: [FontFeature.tabularFigures()],
+                                      fontFeatures: [
+                                        FontFeature.tabularFigures()
+                                      ],
                                     ),
                                   ),
                                   const SizedBox(width: 12),
@@ -88,9 +154,8 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                                     '${state.completedSets}/${state.totalSets} sets'
                                     ' · ${FormatUtils.volume(state.totalVolume)}',
                                     style: const TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.ink500,
-                                    ),
+                                        fontSize: 12,
+                                        color: AppColors.ink500),
                                   ),
                                 ],
                               ),
@@ -119,8 +184,6 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-
-                // Progress bar
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                   child: ClipRRect(
@@ -136,14 +199,13 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
-                // Exercise list
                 Expanded(
                   child: ListView(
                     padding: EdgeInsets.fromLTRB(
-                      16, 0, 16,
+                      16,
+                      0,
+                      16,
                       state.restTimer != null ? 130 : 100,
                     ),
                     children: [
@@ -158,7 +220,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                             index: i,
                             data: e,
                             exercise: ex,
-                            prevSets: const [],
+                            prevSets: e.prevSets,
                             onToggle: () => notifier.toggleExpand(i),
                             onFinishSet: () => notifier.finishSet(i),
                             onWeightChanged: (kg) =>
@@ -169,19 +231,20 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                         );
                       }),
                       GlassButton(
-                        label: 'Finish workout',
+                        label: _finishing
+                            ? 'Saving…'
+                            : 'Finish workout',
                         variant: GlassButtonVariant.glass,
                         size: GlassButtonSize.md,
                         expand: true,
-                        onPressed: () => Navigator.of(context).pop(),
+                        loading: _finishing,
+                        onPressed: _finishing ? null : _finish,
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-
-            // Rest timer overlay
             if (state.restTimer != null)
               RestTimerBar(
                 restTimer: state.restTimer!,

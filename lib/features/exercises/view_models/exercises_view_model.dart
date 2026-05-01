@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/seed_data.dart';
+import '../../../core/providers/repository_providers.dart';
 import '../../../domain/entities/exercise.dart';
 
 enum ExercisesTab { all, mine }
@@ -41,9 +41,27 @@ final exercisesProvider =
   (_) => ExercisesNotifier(),
 );
 
+class ExercisesAsyncNotifier extends AsyncNotifier<List<Exercise>> {
+  @override
+  Future<List<Exercise>> build() async {
+    return ref.read(exerciseRepositoryProvider).getAll();
+  }
+
+  Future<void> addExercise(Exercise exercise) async {
+    await ref.read(exerciseRepositoryProvider).insert(exercise);
+    ref.invalidateSelf();
+  }
+}
+
+final exercisesAsyncProvider =
+    AsyncNotifierProvider<ExercisesAsyncNotifier, List<Exercise>>(
+  ExercisesAsyncNotifier.new,
+);
+
 final filteredExercisesProvider = Provider<List<Exercise>>((ref) {
+  final allExercises = ref.watch(exercisesAsyncProvider).value ?? [];
   final state = ref.watch(exercisesProvider);
-  return SeedData.exercises.where((e) {
+  return allExercises.where((e) {
     if (state.tab == ExercisesTab.mine && !e.isCustom) return false;
     if (state.selectedMuscle != 'All' && e.muscle != state.selectedMuscle) {
       return false;

@@ -9,13 +9,7 @@ class SessionDetailScreen extends StatelessWidget {
   const SessionDetailScreen({super.key, required this.session});
   final Session session;
 
-  Color get _accent {
-    return switch (session.routineId) {
-      'r-1' => AppColors.accent,
-      'r-2' => AppColors.accentDeep,
-      _     => AppColors.accentSoft,
-    };
-  }
+  Color get _accent => Color(session.colorValue);
 
   @override
   Widget build(BuildContext context) {

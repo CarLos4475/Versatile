@@ -18,6 +18,7 @@ class Session {
   final String id;
   final String routineId;
   final String routineName;
+  final int colorValue;
   final String date; // 'YYYY-MM-DD'
   final int durationMin;
   final double volumeKg;
@@ -27,6 +28,7 @@ class Session {
     required this.id,
     required this.routineId,
     required this.routineName,
+    this.colorValue = 0xFFD97757,
     required this.date,
     required this.durationMin,
     required this.volumeKg,

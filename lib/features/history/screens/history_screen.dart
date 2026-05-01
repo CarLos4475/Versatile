@@ -12,7 +12,8 @@ class HistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(historyProvider);
+    final historyAsync = ref.watch(historyProvider);
+    final histState = historyAsync;
 
     return Scaffold(
       backgroundColor: AppColors.bgApp,
@@ -24,11 +25,11 @@ class HistoryScreen extends ConsumerWidget {
             children: [
               ScreenHeader(
                 title: 'History',
-                subtitle: '${state.sessions.length} sessions completed',
+                subtitle:
+                    '${histState.sessions.length} sessions completed',
               ),
               const SizedBox(height: 16),
 
-              // Summary card
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
                 child: GlassContainer(
@@ -39,32 +40,33 @@ class HistoryScreen extends ConsumerWidget {
                       Expanded(
                         child: _SummaryStat(
                           label: 'Total volume',
-                          value: '32.3',
-                          unit: 'k kg',
+                          value: histState.totalVolume >= 1000
+                              ? (histState.totalVolume / 1000)
+                                  .toStringAsFixed(1)
+                              : histState.totalVolume.toStringAsFixed(0),
+                          unit: histState.totalVolume >= 1000 ? 'k kg' : 'kg',
                         ),
                       ),
                       Container(
-                        width: 0.5,
-                        height: 40,
-                        color: const Color(0x14000000),
-                      ),
+                          width: 0.5,
+                          height: 40,
+                          color: const Color(0x14000000)),
                       Expanded(
                         child: _SummaryStat(
                           label: 'Avg duration',
-                          value: '61',
+                          value: '${histState.avgDuration}',
                           unit: 'min',
                         ),
                       ),
                       Container(
-                        width: 0.5,
-                        height: 40,
-                        color: const Color(0x14000000),
-                      ),
+                          width: 0.5,
+                          height: 40,
+                          color: const Color(0x14000000)),
                       Expanded(
                         child: _SummaryStat(
-                          label: 'PRs hit',
-                          value: '4',
-                          unit: 'this mo',
+                          label: 'Sessions',
+                          value: '${histState.sessions.length}',
+                          unit: 'total',
                         ),
                       ),
                     ],
@@ -74,45 +76,60 @@ class HistoryScreen extends ConsumerWidget {
 
               const SizedBox(height: 20),
 
-              // Grouped session list
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: state.grouped.entries.map((entry) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4, bottom: 8),
-                          child: Text(
-                            entry.key.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.06,
-                              color: AppColors.ink400,
+              if (histState.sessions.isEmpty)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 40),
+                    child: Text(
+                      'No sessions yet.\nFinish your first workout to see history here.',
+                      style:
+                          TextStyle(fontSize: 14, color: AppColors.ink400),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: histState.grouped.entries.map((entry) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.only(left: 4, bottom: 8),
+                            child: Text(
+                              entry.key.toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.06,
+                                color: AppColors.ink400,
+                              ),
                             ),
                           ),
-                        ),
-                        ...entry.value.map((s) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: SessionCard(
-                                session: s,
-                                onTap: () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        SessionDetailScreen(session: s),
+                          ...entry.value.map((s) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: SessionCard(
+                                  session: s,
+                                  onTap: () =>
+                                      Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          SessionDetailScreen(session: s),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            )),
-                        const SizedBox(height: 10),
-                      ],
-                    );
-                  }).toList(),
+                              )),
+                          const SizedBox(height: 10),
+                        ],
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
             ],
           ),
         ),
@@ -162,13 +179,9 @@ class _SummaryStat extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 3),
-              Text(
-                unit,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: AppColors.ink400,
-                ),
-              ),
+              Text(unit,
+                  style: const TextStyle(
+                      fontSize: 11, color: AppColors.ink400)),
             ],
           ),
         ],

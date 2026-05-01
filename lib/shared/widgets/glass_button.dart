@@ -14,6 +14,7 @@ class GlassButton extends StatelessWidget {
     this.onPressed,
     this.leading,
     this.expand = false,
+    this.loading = false,
   });
 
   final String label;
@@ -22,6 +23,7 @@ class GlassButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Widget? leading;
   final bool expand;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -31,21 +33,34 @@ class GlassButton extends StatelessWidget {
       GlassButtonSize.lg => (56.0, 22.0, 16.0, 10.0, 20.0),
     };
 
+    final effectiveLeading = loading
+        ? SizedBox(
+            width: fs,
+            height: fs,
+            child: CircularProgressIndicator(
+              strokeWidth: 1.5,
+              color: variant == GlassButtonVariant.primary
+                  ? Colors.white
+                  : AppColors.accentDeep,
+            ),
+          )
+        : leading;
+
     return SizedBox(
       height: h,
       width: expand ? double.infinity : null,
       child: switch (variant) {
         GlassButtonVariant.primary => _PrimaryButton(
             px: px, fs: fs, gap: gap, r: r,
-            label: label, leading: leading, onPressed: onPressed,
+            label: label, leading: effectiveLeading, onPressed: onPressed,
           ),
         GlassButtonVariant.glass => _GlassVariantButton(
             px: px, fs: fs, gap: gap, r: r,
-            label: label, leading: leading, onPressed: onPressed,
+            label: label, leading: effectiveLeading, onPressed: onPressed,
           ),
         GlassButtonVariant.ghost => _GhostButton(
             px: px, fs: fs, gap: gap, r: r,
-            label: label, leading: leading, onPressed: onPressed,
+            label: label, leading: effectiveLeading, onPressed: onPressed,
           ),
       },
     );

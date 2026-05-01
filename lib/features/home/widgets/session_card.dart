@@ -14,13 +14,7 @@ class SessionCard extends StatelessWidget {
   final Session session;
   final VoidCallback onTap;
 
-  Color get _accentColor {
-    return switch (session.routineId) {
-      'r-1' => AppColors.accent,
-      'r-2' => AppColors.accentDeep,
-      _     => AppColors.accentSoft,
-    };
-  }
+  Color get _accentColor => Color(session.colorValue);
 
   @override
   Widget build(BuildContext context) {

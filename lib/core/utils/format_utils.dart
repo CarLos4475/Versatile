@@ -3,7 +3,8 @@ class FormatUtils {
 
   static String date(String iso) {
     final d = DateTime.parse('${iso}T00:00:00');
-    final today = DateTime(2026, 4, 30);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     final days = today.difference(d).inDays;
     if (days == 0) return 'Today';
     if (days == 1) return 'Yesterday';
