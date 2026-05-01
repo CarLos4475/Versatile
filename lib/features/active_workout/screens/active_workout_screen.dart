@@ -227,6 +227,13 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
                                 notifier.updateWeight(i, kg),
                             onRepsChanged: (reps) =>
                                 notifier.updateReps(i, reps),
+                            onToggleSplit: e.isUnilateral
+                                ? () => notifier.toggleSplitMode(i)
+                                : null,
+                            onLeftWeightChanged: (kg) =>
+                                notifier.updateLeftWeight(i, kg),
+                            onLeftRepsChanged: (reps) =>
+                                notifier.updateLeftReps(i, reps),
                           ),
                         );
                       }),

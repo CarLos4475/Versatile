@@ -4,6 +4,7 @@ class Exercise {
   final String muscle;
   final String equipment;
   final bool isCustom;
+  final bool isUnilateral;
 
   const Exercise({
     required this.id,
@@ -11,5 +12,6 @@ class Exercise {
     required this.muscle,
     required this.equipment,
     this.isCustom = false,
+    this.isUnilateral = false,
   });
 }

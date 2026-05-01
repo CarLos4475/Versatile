@@ -69,6 +69,16 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
     }
   }
 
+  void _onReorder(Routine routine, int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) newIndex--;
+    final exercises = [...routine.exercises];
+    final moved = exercises.removeAt(oldIndex);
+    exercises.insert(newIndex, moved);
+    ref
+        .read(routinesProvider.notifier)
+        .reorderExercises(routine.id, exercises);
+  }
+
   @override
   Widget build(BuildContext context) {
     final routinesAsync = ref.watch(routinesProvider);
@@ -112,93 +122,150 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
           }
         }
 
+        final trailing = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (_editMode)
+              GestureDetector(
+                onTap: _confirmDelete,
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.accentTint,
+                    borderRadius: BorderRadius.circular(12),
+                    border:
+                        Border.all(color: AppColors.glassBorder, width: 0.5),
+                  ),
+                  child: const Icon(Icons.delete_outline,
+                      size: 16, color: AppColors.accentDeep),
+                ),
+              ),
+            GestureDetector(
+              onTap: () => setState(() => _editMode = !_editMode),
+              child: Container(
+                height: 36,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(
+                  color: _editMode
+                      ? AppColors.accentTint
+                      : const Color(0x99FFFCF7),
+                  borderRadius: BorderRadius.circular(12),
+                  border:
+                      Border.all(color: AppColors.glassBorder, width: 0.5),
+                ),
+                child: Center(
+                  child: Text(
+                    _editMode ? 'Done' : 'Edit',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          _editMode ? AppColors.accentDeep : AppColors.ink700,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+
         return Scaffold(
           backgroundColor: AppColors.bgApp,
           body: SafeArea(
-            child: Stack(
+            child: Column(
               children: [
-                SingleChildScrollView(
-                  padding: const EdgeInsets.only(bottom: 140),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ScreenHeader(
-                        title: routine.name,
-                        subtitle: '${routine.exercises.length} exercises',
-                        onBack: () => Navigator.of(context).pop(),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (_editMode)
-                              GestureDetector(
-                                onTap: _confirmDelete,
-                                child: Container(
-                                  width: 36,
-                                  height: 36,
-                                  margin: const EdgeInsets.only(right: 8),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.accentTint,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: AppColors.glassBorder,
-                                        width: 0.5),
-                                  ),
-                                  child: const Icon(Icons.delete_outline,
-                                      size: 16, color: AppColors.accentDeep),
-                                ),
-                              ),
-                            GestureDetector(
-                              onTap: () =>
-                                  setState(() => _editMode = !_editMode),
-                              child: Container(
-                                height: 36,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 14),
-                                decoration: BoxDecoration(
-                                  color: _editMode
-                                      ? AppColors.accentTint
-                                      : const Color(0x99FFFCF7),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                      color: AppColors.glassBorder,
-                                      width: 0.5),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    _editMode ? 'Done' : 'Edit',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: _editMode
-                                          ? AppColors.accentDeep
-                                          : AppColors.ink700,
+                ScreenHeader(
+                  title: routine.name,
+                  subtitle: '${routine.exercises.length} exercises',
+                  onBack: () => Navigator.of(context).pop(),
+                  trailing: trailing,
+                ),
+                const SizedBox(height: 4),
+                Expanded(
+                  child: _editMode
+                      ? ReorderableListView(
+                          padding: const EdgeInsets.fromLTRB(22, 8, 22, 8),
+                          onReorder: (old, neu) =>
+                              _onReorder(routine, old, neu),
+                          children: routine.exercises.asMap().entries
+                              .map((entry) {
+                            final i = entry.key;
+                            final re = entry.value;
+                            final ex = findEx(re.exerciseId);
+                            if (ex == null) {
+                              return SizedBox.shrink(
+                                  key: ValueKey(re.dbId ?? re.exerciseId));
+                            }
+                            return Padding(
+                              key: ValueKey(re.dbId ?? re.exerciseId),
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: GlassContainer(
+                                radius: 16,
+                                padding: const EdgeInsets.all(14),
+                                child: Row(
+                                  children: [
+                                    ReorderableDragStartListener(
+                                      index: i,
+                                      child: const Icon(
+                                        Icons.drag_handle,
+                                        size: 18,
+                                        color: AppColors.ink300,
+                                      ),
                                     ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Padding(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 22),
-                        child: Column(
-                          children: [
-                            ...routine.exercises.asMap().entries.map((entry) {
-                              final i = entry.key;
-                              final re = entry.value;
-                              final ex = findEx(re.exerciseId);
-                              if (ex == null) return const SizedBox.shrink();
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
-                                child: GlassContainer(
-                                  radius: 16,
-                                  padding: const EdgeInsets.all(14),
-                                  child: Row(
-                                    children: [
-                                      Container(
+                                    const SizedBox(width: 10),
+                                    Container(
+                                      width: 28,
+                                      height: 28,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.accentTint,
+                                        borderRadius:
+                                            BorderRadius.circular(8),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          '${i + 1}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColors.accentDeep,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            ex.name,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.ink900,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${re.targetSets} × ${re.targetReps} · ${re.restSeconds}s rest',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: AppColors.ink500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: re.dbId != null
+                                          ? () => ref
+                                              .read(routinesProvider.notifier)
+                                              .removeExercise(
+                                                  routine.id, re.dbId!)
+                                          : null,
+                                      child: Container(
                                         width: 32,
                                         height: 32,
                                         decoration: BoxDecoration(
@@ -206,141 +273,147 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                           borderRadius:
                                               BorderRadius.circular(10),
                                         ),
-                                        child: Center(
-                                          child: Text(
-                                            '${i + 1}',
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColors.accentDeep,
-                                              fontFeatures: [
-                                                FontFeature.tabularFigures()
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              ex.name,
-                                              style: const TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w600,
-                                                color: AppColors.ink900,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              '${re.targetSets} × ${re.targetReps} reps · ${re.restSeconds}s rest',
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                color: AppColors.ink500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      if (_editMode)
-                                        GestureDetector(
-                                          onTap: re.dbId != null
-                                              ? () => ref
-                                                  .read(routinesProvider
-                                                      .notifier)
-                                                  .removeExercise(
-                                                      routine.id, re.dbId!)
-                                              : null,
-                                          child: Container(
-                                            width: 32,
-                                            height: 32,
-                                            decoration: BoxDecoration(
-                                              color: AppColors.accentTint,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: const Icon(
-                                              Icons.delete_outline,
-                                              size: 15,
-                                              color: AppColors.accentDeep,
-                                            ),
-                                          ),
-                                        )
-                                      else
-                                        Container(
-                                          padding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 7, vertical: 3),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0x0A000000),
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          ),
-                                          child: Text(
-                                            ex.muscle,
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              color: AppColors.ink400,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }),
-                            if (_editMode)
-                              GestureDetector(
-                                onTap: () => Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => ExercisePickerScreen(
-                                        routineId: routine.id),
-                                  ),
-                                ),
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.all(14),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: AppColors.accent.withOpacity(0.4),
-                                    ),
-                                    borderRadius: BorderRadius.circular(16),
-                                    color: AppColors.accentTint.withOpacity(0.5),
-                                  ),
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.add,
-                                          size: 18,
-                                          color: AppColors.accentDeep),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        'Add exercise',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
+                                        child: const Icon(
+                                          Icons.delete_outline,
+                                          size: 15,
                                           color: AppColors.accentDeep,
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
+                            );
+                          }).toList(),
+                        )
+                      : ListView(
+                          padding: const EdgeInsets.fromLTRB(22, 8, 22, 8),
+                          children: routine.exercises.asMap().entries
+                              .map((entry) {
+                            final i = entry.key;
+                            final re = entry.value;
+                            final ex = findEx(re.exerciseId);
+                            if (ex == null) return const SizedBox.shrink();
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: GlassContainer(
+                                radius: 16,
+                                padding: const EdgeInsets.all(14),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 32,
+                                      height: 32,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.accentTint,
+                                        borderRadius:
+                                            BorderRadius.circular(10),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          '${i + 1}',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColors.accentDeep,
+                                            fontFeatures: [
+                                              FontFeature.tabularFigures()
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            ex.name,
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.ink900,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            '${re.targetSets} × ${re.targetReps} reps · ${re.restSeconds}s rest',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: AppColors.ink500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 7, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0x0A000000),
+                                        borderRadius:
+                                            BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        ex.muscle,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: AppColors.ink400,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                ),
+                if (_editMode)
+                  Padding(
+                    padding:
+                        const EdgeInsets.fromLTRB(22, 0, 22, 22),
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              ExercisePickerScreen(routineId: routine.id),
+                        ),
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: AppColors.accent.withOpacity(0.4)),
+                          borderRadius: BorderRadius.circular(16),
+                          color: AppColors.accentTint.withOpacity(0.5),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.add,
+                                size: 18, color: AppColors.accentDeep),
+                            SizedBox(width: 8),
+                            Text(
+                              'Add exercise',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.accentDeep,
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
                 if (!_editMode)
-                  Positioned(
-                    left: 22,
-                    right: 22,
-                    bottom: 22,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
                     child: GlassButton(
                       label: 'Start this workout',
                       variant: GlassButtonVariant.primary,

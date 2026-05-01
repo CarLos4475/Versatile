@@ -7,6 +7,7 @@ import '../../routines/view_models/routines_view_model.dart';
 class SessionsAsyncNotifier extends AsyncNotifier<List<Session>> {
   @override
   Future<List<Session>> build() async {
+    await ref.read(sessionRepositoryProvider).deleteOldSessions();
     return ref.read(sessionRepositoryProvider).getAll();
   }
 }
@@ -22,6 +23,7 @@ class HomeState {
   final int weekSessions;
   final double weekVolume;
   final int streak;
+  final String userName;
 
   const HomeState({
     required this.sessions,
@@ -29,12 +31,14 @@ class HomeState {
     this.weekSessions = 0,
     this.weekVolume = 0,
     this.streak = 0,
+    this.userName = 'there',
   });
 }
 
 final homeProvider = Provider<HomeState>((ref) {
   final sessions = ref.watch(sessionsAsyncProvider).value ?? [];
   final routines = ref.watch(routinesProvider).value ?? [];
+  final userName = ref.watch(userNameProvider).value ?? 'there';
 
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
@@ -63,5 +67,6 @@ final homeProvider = Provider<HomeState>((ref) {
     weekSessions: weekSessions.length,
     weekVolume: weekSessions.fold(0.0, (s, x) => s + x.volumeKg),
     streak: streak,
+    userName: userName,
   );
 });

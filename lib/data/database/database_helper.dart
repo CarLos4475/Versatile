@@ -17,10 +17,27 @@ class DatabaseHelper {
     final filePath = p.join(dbPath, 'versatile.db');
     return openDatabase(
       filePath,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
       onConfigure: (db) async => db.execute('PRAGMA foreign_keys = ON'),
     );
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute(
+        'ALTER TABLE exercises ADD COLUMN is_unilateral INTEGER NOT NULL DEFAULT 0',
+      );
+      await db.execute('ALTER TABLE session_sets ADD COLUMN left_kg REAL');
+      await db.execute('ALTER TABLE session_sets ADD COLUMN left_reps INTEGER');
+      await db.execute('''
+        CREATE TABLE settings (
+          key TEXT PRIMARY KEY,
+          value TEXT NOT NULL
+        )
+      ''');
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -30,7 +47,8 @@ class DatabaseHelper {
         name TEXT NOT NULL,
         muscle TEXT NOT NULL,
         equipment TEXT NOT NULL,
-        is_custom INTEGER NOT NULL DEFAULT 0
+        is_custom INTEGER NOT NULL DEFAULT 0,
+        is_unilateral INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -86,7 +104,16 @@ class DatabaseHelper {
         set_index INTEGER NOT NULL,
         kg REAL NOT NULL,
         reps INTEGER NOT NULL,
+        left_kg REAL,
+        left_reps INTEGER,
         FOREIGN KEY (session_exercise_id) REFERENCES session_exercises(id) ON DELETE CASCADE
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
       )
     ''');
 
@@ -95,25 +122,25 @@ class DatabaseHelper {
 
   Future<void> _seed(Database db) async {
     final exercises = [
-      {'id': 'ex-1',  'name': 'Bench Press',           'muscle': 'Chest',     'equipment': 'Barbell',    'is_custom': 0},
-      {'id': 'ex-2',  'name': 'Incline Dumbbell Press', 'muscle': 'Chest',     'equipment': 'Dumbbell',   'is_custom': 0},
-      {'id': 'ex-3',  'name': 'Cable Fly',              'muscle': 'Chest',     'equipment': 'Cable',      'is_custom': 0},
-      {'id': 'ex-4',  'name': 'Pull-Up',                'muscle': 'Back',      'equipment': 'Bodyweight', 'is_custom': 0},
-      {'id': 'ex-5',  'name': 'Barbell Row',            'muscle': 'Back',      'equipment': 'Barbell',    'is_custom': 0},
-      {'id': 'ex-6',  'name': 'Lat Pulldown',           'muscle': 'Back',      'equipment': 'Cable',      'is_custom': 0},
-      {'id': 'ex-7',  'name': 'Squat',                  'muscle': 'Legs',      'equipment': 'Barbell',    'is_custom': 0},
-      {'id': 'ex-8',  'name': 'Romanian Deadlift',      'muscle': 'Legs',      'equipment': 'Barbell',    'is_custom': 0},
-      {'id': 'ex-9',  'name': 'Leg Press',              'muscle': 'Legs',      'equipment': 'Machine',    'is_custom': 0},
-      {'id': 'ex-10', 'name': 'Overhead Press',         'muscle': 'Shoulders', 'equipment': 'Barbell',    'is_custom': 0},
-      {'id': 'ex-11', 'name': 'Lateral Raise',          'muscle': 'Shoulders', 'equipment': 'Dumbbell',   'is_custom': 0},
-      {'id': 'ex-12', 'name': 'Face Pull',              'muscle': 'Shoulders', 'equipment': 'Cable',      'is_custom': 0},
-      {'id': 'ex-13', 'name': 'Bicep Curl',             'muscle': 'Arms',      'equipment': 'Dumbbell',   'is_custom': 0},
-      {'id': 'ex-14', 'name': 'Tricep Pushdown',        'muscle': 'Arms',      'equipment': 'Cable',      'is_custom': 0},
-      {'id': 'ex-15', 'name': 'Hammer Curl',            'muscle': 'Arms',      'equipment': 'Dumbbell',   'is_custom': 0},
-      {'id': 'ex-16', 'name': 'Plank',                  'muscle': 'Core',      'equipment': 'Bodyweight', 'is_custom': 0},
-      {'id': 'ex-17', 'name': 'Hanging Leg Raise',      'muscle': 'Core',      'equipment': 'Bodyweight', 'is_custom': 0},
-      {'id': 'ex-c1', 'name': 'Landmine Press',         'muscle': 'Shoulders', 'equipment': 'Barbell',    'is_custom': 1},
-      {'id': 'ex-c2', 'name': 'Pendlay Row',            'muscle': 'Back',      'equipment': 'Barbell',    'is_custom': 1},
+      {'id': 'ex-1',  'name': 'Bench Press',           'muscle': 'Chest',     'equipment': 'Barbell',    'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-2',  'name': 'Incline Dumbbell Press', 'muscle': 'Chest',     'equipment': 'Dumbbell',   'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-3',  'name': 'Cable Fly',              'muscle': 'Chest',     'equipment': 'Cable',      'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-4',  'name': 'Pull-Up',                'muscle': 'Back',      'equipment': 'Bodyweight', 'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-5',  'name': 'Barbell Row',            'muscle': 'Back',      'equipment': 'Barbell',    'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-6',  'name': 'Lat Pulldown',           'muscle': 'Back',      'equipment': 'Cable',      'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-7',  'name': 'Squat',                  'muscle': 'Legs',      'equipment': 'Barbell',    'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-8',  'name': 'Romanian Deadlift',      'muscle': 'Legs',      'equipment': 'Barbell',    'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-9',  'name': 'Leg Press',              'muscle': 'Legs',      'equipment': 'Machine',    'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-10', 'name': 'Overhead Press',         'muscle': 'Shoulders', 'equipment': 'Barbell',    'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-11', 'name': 'Lateral Raise',          'muscle': 'Shoulders', 'equipment': 'Dumbbell',   'is_custom': 0, 'is_unilateral': 1},
+      {'id': 'ex-12', 'name': 'Face Pull',              'muscle': 'Shoulders', 'equipment': 'Cable',      'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-13', 'name': 'Bicep Curl',             'muscle': 'Arms',      'equipment': 'Dumbbell',   'is_custom': 0, 'is_unilateral': 1},
+      {'id': 'ex-14', 'name': 'Tricep Pushdown',        'muscle': 'Arms',      'equipment': 'Cable',      'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-15', 'name': 'Hammer Curl',            'muscle': 'Arms',      'equipment': 'Dumbbell',   'is_custom': 0, 'is_unilateral': 1},
+      {'id': 'ex-16', 'name': 'Plank',                  'muscle': 'Core',      'equipment': 'Bodyweight', 'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-17', 'name': 'Hanging Leg Raise',      'muscle': 'Core',      'equipment': 'Bodyweight', 'is_custom': 0, 'is_unilateral': 0},
+      {'id': 'ex-c1', 'name': 'Landmine Press',         'muscle': 'Shoulders', 'equipment': 'Barbell',    'is_custom': 1, 'is_unilateral': 0},
+      {'id': 'ex-c2', 'name': 'Pendlay Row',            'muscle': 'Back',      'equipment': 'Barbell',    'is_custom': 1, 'is_unilateral': 0},
     ];
     for (final e in exercises) {
       await db.insert('exercises', e);

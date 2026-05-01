@@ -87,6 +87,24 @@ class RoutineRepository {
     );
   }
 
+  Future<void> reorderExercises(
+      String routineId, List<RoutineExercise> exercises) async {
+    final db = await DatabaseHelper.instance.database;
+    await db.transaction((txn) async {
+      for (var i = 0; i < exercises.length; i++) {
+        final re = exercises[i];
+        if (re.dbId != null) {
+          await txn.update(
+            'routine_exercises',
+            {'sort_order': i},
+            where: 'id = ?',
+            whereArgs: [re.dbId],
+          );
+        }
+      }
+    });
+  }
+
   Future<List<RoutineExercise>> _loadExercises(String routineId) async {
     final db = await DatabaseHelper.instance.database;
     final rows = await db.query(

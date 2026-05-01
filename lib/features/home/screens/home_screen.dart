@@ -37,7 +37,7 @@ class HomeScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ScreenHeader(
-                title: 'Today',
+                title: 'Hello, ${state.userName}',
                 subtitle:
                     '${weekdays[now.weekday - 1]}, ${months[now.month - 1]} ${now.day}',
               ),

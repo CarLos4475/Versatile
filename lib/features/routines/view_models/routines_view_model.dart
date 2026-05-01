@@ -27,6 +27,14 @@ class RoutinesNotifier extends AsyncNotifier<List<Routine>> {
     await ref.read(routineRepositoryProvider).removeExercise(routineId, dbId);
     ref.invalidateSelf();
   }
+
+  Future<void> reorderExercises(
+      String routineId, List<RoutineExercise> exercises) async {
+    await ref
+        .read(routineRepositoryProvider)
+        .reorderExercises(routineId, exercises);
+    ref.invalidateSelf();
+  }
 }
 
 final routinesProvider =

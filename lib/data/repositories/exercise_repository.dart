@@ -23,6 +23,7 @@ class ExerciseRepository {
       'muscle': exercise.muscle,
       'equipment': exercise.equipment,
       'is_custom': exercise.isCustom ? 1 : 0,
+      'is_unilateral': exercise.isUnilateral ? 1 : 0,
     });
   }
 
@@ -38,6 +39,7 @@ class ExerciseRepository {
       muscle: row['muscle'] as String,
       equipment: row['equipment'] as String,
       isCustom: (row['is_custom'] as int) == 1,
+      isUnilateral: (row['is_unilateral'] as int? ?? 0) == 1,
     );
   }
 }

@@ -74,7 +74,37 @@ class HistoryScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 22),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0x0A000000),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: AppColors.glassBorder, width: 0.5),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.info_outline,
+                          size: 14, color: AppColors.ink400),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Sessions are automatically deleted after 30 days.',
+                          style: TextStyle(
+                              fontSize: 12, color: AppColors.ink400),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
 
               if (histState.sessions.isEmpty)
                 const Center(

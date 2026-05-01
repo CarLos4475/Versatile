@@ -136,7 +136,40 @@ class ExercisesScreen extends ConsumerWidget {
                 },
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 32,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 22),
+                children: [
+                  _LateralityChip(
+                    label: 'All',
+                    isActive:
+                        state.laterality == ExerciseLaterality.all,
+                    onTap: () =>
+                        notifier.setLaterality(ExerciseLaterality.all),
+                  ),
+                  const SizedBox(width: 6),
+                  _LateralityChip(
+                    label: 'Bilateral',
+                    isActive:
+                        state.laterality == ExerciseLaterality.bilateral,
+                    onTap: () => notifier
+                        .setLaterality(ExerciseLaterality.bilateral),
+                  ),
+                  const SizedBox(width: 6),
+                  _LateralityChip(
+                    label: 'Unilateral',
+                    isActive:
+                        state.laterality == ExerciseLaterality.unilateral,
+                    onTap: () => notifier
+                        .setLaterality(ExerciseLaterality.unilateral),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
             Expanded(
               child: allAsync.isLoading
                   ? const Center(
@@ -310,6 +343,26 @@ class _ExerciseRow extends StatelessWidget {
                         ),
                       ),
                     ],
+                    if (exercise.isUnilateral) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: const Color(0x14000000),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'UNILATERAL',
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.ink500,
+                            letterSpacing: 0.05,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
                 const SizedBox(height: 1),
@@ -322,6 +375,45 @@ class _ExerciseRow extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _LateralityChip extends StatelessWidget {
+  const _LateralityChip({
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.accentDeep : AppColors.glassBg,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isActive ? Colors.transparent : AppColors.glassBorder,
+            width: 0.5,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isActive ? Colors.white : AppColors.ink700,
+          ),
+        ),
       ),
     );
   }

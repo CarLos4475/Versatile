@@ -17,6 +17,9 @@ class ExerciseCard extends StatelessWidget {
     required this.onFinishSet,
     required this.onWeightChanged,
     required this.onRepsChanged,
+    this.onToggleSplit,
+    this.onLeftWeightChanged,
+    this.onLeftRepsChanged,
   });
 
   final int index;
@@ -27,6 +30,9 @@ class ExerciseCard extends StatelessWidget {
   final VoidCallback onFinishSet;
   final ValueChanged<double> onWeightChanged;
   final ValueChanged<int> onRepsChanged;
+  final VoidCallback? onToggleSplit;
+  final ValueChanged<double>? onLeftWeightChanged;
+  final ValueChanged<int>? onLeftRepsChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +59,7 @@ class ExerciseCard extends StatelessWidget {
             data: data,
             exercise: exercise,
             onToggle: onToggle,
+            onToggleSplit: onToggleSplit,
           ),
           if (data.isExpanded)
             _CardBody(
@@ -61,6 +68,8 @@ class ExerciseCard extends StatelessWidget {
               onFinishSet: onFinishSet,
               onWeightChanged: onWeightChanged,
               onRepsChanged: onRepsChanged,
+              onLeftWeightChanged: onLeftWeightChanged,
+              onLeftRepsChanged: onLeftRepsChanged,
             ),
         ],
       ),
@@ -74,12 +83,14 @@ class _CardHeader extends StatelessWidget {
     required this.data,
     required this.exercise,
     required this.onToggle,
+    this.onToggleSplit,
   });
 
   final int index;
   final ExerciseWorkoutState data;
   final Exercise exercise;
   final VoidCallback onToggle;
+  final VoidCallback? onToggleSplit;
 
   @override
   Widget build(BuildContext context) {
@@ -90,8 +101,11 @@ class _CardHeader extends StatelessWidget {
         decoration: const BoxDecoration(color: Colors.transparent),
         child: Row(
           children: [
-            _IndexBadge(index: index, isDone: data.isDone,
-                hasProgress: data.completedSets.isNotEmpty),
+            _IndexBadge(
+              index: index,
+              isDone: data.isDone,
+              hasProgress: data.completedSets.isNotEmpty,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -118,6 +132,39 @@ class _CardHeader extends StatelessWidget {
                 ],
               ),
             ),
+            if (data.isUnilateral && onToggleSplit != null) ...[
+              GestureDetector(
+                onTap: onToggleSplit,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: data.isSplitMode
+                        ? AppColors.accentTint
+                        : const Color(0x0A000000),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: data.isSplitMode
+                          ? AppColors.accent
+                          : AppColors.glassBorder,
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Text(
+                    'Split',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: data.isSplitMode
+                          ? AppColors.accentDeep
+                          : AppColors.ink400,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+            ],
             AnimatedRotation(
               turns: data.isExpanded ? 0.5 : 0.0,
               duration: const Duration(milliseconds: 250),
@@ -186,6 +233,8 @@ class _CardBody extends StatelessWidget {
     required this.onFinishSet,
     required this.onWeightChanged,
     required this.onRepsChanged,
+    this.onLeftWeightChanged,
+    this.onLeftRepsChanged,
   });
 
   final ExerciseWorkoutState data;
@@ -193,6 +242,8 @@ class _CardBody extends StatelessWidget {
   final VoidCallback onFinishSet;
   final ValueChanged<double> onWeightChanged;
   final ValueChanged<int> onRepsChanged;
+  final ValueChanged<double>? onLeftWeightChanged;
+  final ValueChanged<int>? onLeftRepsChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -206,35 +257,38 @@ class _CardBody extends StatelessWidget {
             height: 14,
           ),
 
-          // Column headers
-          const _ColumnHeaders(),
-          const SizedBox(height: 2),
+          if (!data.isSplitMode) const _ColumnHeaders(),
+          if (!data.isSplitMode) const SizedBox(height: 2),
 
           // Completed sets
           ...data.completedSets.asMap().entries.map((e) => _CompletedSetRow(
                 setIndex: e.key,
                 set: e.value,
+                isSplitMode: data.isSplitMode,
               )),
 
           // Current set + ghost row
           if (!data.isDone && data.currentInput != null) ...[
-            // Ghost row (previous performance)
             if (data.nextSetIndex < prevSets.length)
-              _GhostRow(prevSet: prevSets[data.nextSetIndex])
+              _GhostRow(
+                  prevSet: prevSets[data.nextSetIndex],
+                  isSplitMode: data.isSplitMode)
             else if (prevSets.isNotEmpty)
-              _GhostRow(prevSet: prevSets.last),
+              _GhostRow(
+                  prevSet: prevSets.last, isSplitMode: data.isSplitMode),
 
-            // Active input row
             _ActiveSetRow(
               setIndex: data.nextSetIndex,
               currentInput: data.currentInput!,
+              isSplitMode: data.isSplitMode,
               onFinishSet: onFinishSet,
               onWeightChanged: onWeightChanged,
               onRepsChanged: onRepsChanged,
+              onLeftWeightChanged: onLeftWeightChanged,
+              onLeftRepsChanged: onLeftRepsChanged,
             ),
           ],
 
-          // "Finish set N" shortcut link
           if (!data.isDone)
             GestureDetector(
               onTap: onFinishSet,
@@ -273,10 +327,7 @@ class _ColumnHeaders extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         children: [
-          SizedBox(
-            width: 32,
-            child: Text('SET', style: _headerStyle),
-          ),
+          SizedBox(width: 32, child: Text('SET', style: _headerStyle)),
           SizedBox(width: 8),
           Expanded(child: Text('WEIGHT', style: _headerStyle)),
           SizedBox(width: 8),
@@ -297,9 +348,14 @@ class _ColumnHeaders extends StatelessWidget {
 }
 
 class _CompletedSetRow extends StatelessWidget {
-  const _CompletedSetRow({required this.setIndex, required this.set});
+  const _CompletedSetRow({
+    required this.setIndex,
+    required this.set,
+    required this.isSplitMode,
+  });
   final int setIndex;
   final WorkoutSet set;
+  final bool isSplitMode;
 
   @override
   Widget build(BuildContext context) {
@@ -327,27 +383,57 @@ class _CompletedSetRow extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: Text(
-                '${FormatUtils.weight(set.kg)} kg',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.ink900,
-                  fontFeatures: [FontFeature.tabularFigures()],
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                '${set.reps}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.ink900,
-                  fontFeatures: [FontFeature.tabularFigures()],
-                ),
-              ),
+              child: set.isSplit
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'L  ${FormatUtils.weight(set.leftKg!)} kg × ${set.leftReps}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.ink900,
+                            fontFeatures: [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                        Text(
+                          'R  ${FormatUtils.weight(set.kg)} kg × ${set.reps}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.ink700,
+                            fontFeatures: [FontFeature.tabularFigures()],
+                          ),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${FormatUtils.weight(set.kg)} kg',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.ink900,
+                              fontFeatures: [FontFeature.tabularFigures()],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${set.reps}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.ink900,
+                              fontFeatures: [FontFeature.tabularFigures()],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
             ),
             const SizedBox(width: 8),
             Container(
@@ -369,8 +455,9 @@ class _CompletedSetRow extends StatelessWidget {
 }
 
 class _GhostRow extends StatelessWidget {
-  const _GhostRow({required this.prevSet});
+  const _GhostRow({required this.prevSet, required this.isSplitMode});
   final WorkoutSet prevSet;
+  final bool isSplitMode;
 
   @override
   Widget build(BuildContext context) {
@@ -386,31 +473,46 @@ class _GhostRow extends StatelessWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
                 color: AppColors.ink300,
-                fontFeatures: [FontFeature.tabularFigures()],
               ),
             ),
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              '${FormatUtils.weight(prevSet.kg)} kg',
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.ink300,
-                fontFeatures: [FontFeature.tabularFigures()],
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              '${prevSet.reps}',
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppColors.ink300,
-                fontFeatures: [FontFeature.tabularFigures()],
-              ),
-            ),
+            child: isSplitMode && prevSet.isSplit
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'L  ${FormatUtils.weight(prevSet.leftKg!)} kg × ${prevSet.leftReps}',
+                        style: const TextStyle(
+                            fontSize: 11, color: AppColors.ink300),
+                      ),
+                      Text(
+                        'R  ${FormatUtils.weight(prevSet.kg)} kg × ${prevSet.reps}',
+                        style: const TextStyle(
+                            fontSize: 11, color: AppColors.ink300),
+                      ),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '${FormatUtils.weight(prevSet.kg)} kg',
+                          style: const TextStyle(
+                              fontSize: 11, color: AppColors.ink300),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${prevSet.reps}',
+                          style: const TextStyle(
+                              fontSize: 11, color: AppColors.ink300),
+                        ),
+                      ),
+                    ],
+                  ),
           ),
           const SizedBox(width: 8),
           const SizedBox(width: 36),
@@ -424,16 +526,22 @@ class _ActiveSetRow extends StatelessWidget {
   const _ActiveSetRow({
     required this.setIndex,
     required this.currentInput,
+    required this.isSplitMode,
     required this.onFinishSet,
     required this.onWeightChanged,
     required this.onRepsChanged,
+    this.onLeftWeightChanged,
+    this.onLeftRepsChanged,
   });
 
   final int setIndex;
   final WorkoutSet currentInput;
+  final bool isSplitMode;
   final VoidCallback onFinishSet;
   final ValueChanged<double> onWeightChanged;
   final ValueChanged<int> onRepsChanged;
+  final ValueChanged<double>? onLeftWeightChanged;
+  final ValueChanged<int>? onLeftRepsChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -465,23 +573,40 @@ class _ActiveSetRow extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: NumberInputWidget(
-                value: currentInput.kg,
-                onDecrement: () =>
-                    onWeightChanged((currentInput.kg - 2.5).clamp(0, 999)),
-                onIncrement: () => onWeightChanged(currentInput.kg + 2.5),
-                suffix: 'kg',
-                isDouble: true,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: NumberInputWidget(
-                value: currentInput.reps,
-                onDecrement: () =>
-                    onRepsChanged((currentInput.reps - 1).clamp(0, 999)),
-                onIncrement: () => onRepsChanged(currentInput.reps + 1),
-              ),
+              child: isSplitMode
+                  ? _SplitInputs(
+                      currentInput: currentInput,
+                      onWeightChanged: onWeightChanged,
+                      onRepsChanged: onRepsChanged,
+                      onLeftWeightChanged:
+                          onLeftWeightChanged ?? (_) {},
+                      onLeftRepsChanged: onLeftRepsChanged ?? (_) {},
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: NumberInputWidget(
+                            value: currentInput.kg,
+                            onDecrement: () => onWeightChanged(
+                                (currentInput.kg - 2.5).clamp(0, 999)),
+                            onIncrement: () =>
+                                onWeightChanged(currentInput.kg + 2.5),
+                            suffix: 'kg',
+                            isDouble: true,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: NumberInputWidget(
+                            value: currentInput.reps,
+                            onDecrement: () => onRepsChanged(
+                                (currentInput.reps - 1).clamp(0, 999)),
+                            onIncrement: () =>
+                                onRepsChanged(currentInput.reps + 1),
+                          ),
+                        ),
+                      ],
+                    ),
             ),
             const SizedBox(width: 8),
             GestureDetector(
@@ -510,6 +635,90 @@ class _ActiveSetRow extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _SplitInputs extends StatelessWidget {
+  const _SplitInputs({
+    required this.currentInput,
+    required this.onWeightChanged,
+    required this.onRepsChanged,
+    required this.onLeftWeightChanged,
+    required this.onLeftRepsChanged,
+  });
+
+  final WorkoutSet currentInput;
+  final ValueChanged<double> onWeightChanged;
+  final ValueChanged<int> onRepsChanged;
+  final ValueChanged<double> onLeftWeightChanged;
+  final ValueChanged<int> onLeftRepsChanged;
+
+  static const _sideStyle = TextStyle(
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    color: AppColors.ink400,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final leftKg = currentInput.leftKg ?? currentInput.kg;
+    final leftReps = currentInput.leftReps ?? currentInput.reps;
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            const SizedBox(width: 14, child: Text('L', style: _sideStyle)),
+            const SizedBox(width: 4),
+            Expanded(
+              child: NumberInputWidget(
+                value: leftKg,
+                onDecrement: () =>
+                    onLeftWeightChanged((leftKg - 2.5).clamp(0, 999)),
+                onIncrement: () => onLeftWeightChanged(leftKg + 2.5),
+                suffix: 'kg',
+                isDouble: true,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Expanded(
+              child: NumberInputWidget(
+                value: leftReps,
+                onDecrement: () =>
+                    onLeftRepsChanged((leftReps - 1).clamp(0, 999)),
+                onIncrement: () => onLeftRepsChanged(leftReps + 1),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            const SizedBox(width: 14, child: Text('R', style: _sideStyle)),
+            const SizedBox(width: 4),
+            Expanded(
+              child: NumberInputWidget(
+                value: currentInput.kg,
+                onDecrement: () => onWeightChanged(
+                    (currentInput.kg - 2.5).clamp(0, 999)),
+                onIncrement: () => onWeightChanged(currentInput.kg + 2.5),
+                suffix: 'kg',
+                isDouble: true,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Expanded(
+              child: NumberInputWidget(
+                value: currentInput.reps,
+                onDecrement: () =>
+                    onRepsChanged((currentInput.reps - 1).clamp(0, 999)),
+                onIncrement: () => onRepsChanged(currentInput.reps + 1),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

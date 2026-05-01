@@ -27,6 +27,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
   final _ctrl = TextEditingController();
   String _muscle = 'Chest';
   String _equipment = 'Barbell';
+  bool _isUnilateral = false;
   bool _saving = false;
 
   @override
@@ -45,6 +46,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
       muscle: _muscle,
       equipment: _equipment,
       isCustom: true,
+      isUnilateral: _isUnilateral,
     );
     await ref.read(exercisesAsyncProvider.notifier).addExercise(exercise);
     if (!mounted) return;
@@ -102,6 +104,70 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
               options: _kEquipment,
               selected: _equipment,
               onSelected: (v) => setState(() => _equipment = v),
+            ),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: GestureDetector(
+                onTap: () => setState(() => _isUnilateral = !_isUnilateral),
+                child: Row(
+                  children: [
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 160),
+                      width: 44,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        color: _isUnilateral
+                            ? AppColors.accentDeep
+                            : AppColors.glassBg,
+                        borderRadius: BorderRadius.circular(13),
+                        border: Border.all(
+                          color: _isUnilateral
+                              ? Colors.transparent
+                              : AppColors.glassBorder,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: AnimatedAlign(
+                        duration: const Duration(milliseconds: 160),
+                        alignment: _isUnilateral
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: Container(
+                          width: 20,
+                          height: 20,
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Unilateral exercise',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.ink900,
+                            ),
+                          ),
+                          Text(
+                            'Track left and right sides separately',
+                            style: TextStyle(
+                                fontSize: 12, color: AppColors.ink400),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
             const Spacer(),
             Padding(

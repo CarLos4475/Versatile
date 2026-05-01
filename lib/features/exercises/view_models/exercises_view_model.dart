@@ -4,26 +4,32 @@ import '../../../domain/entities/exercise.dart';
 
 enum ExercisesTab { all, mine }
 
+enum ExerciseLaterality { all, bilateral, unilateral }
+
 class ExercisesState {
   final String query;
   final String selectedMuscle;
   final ExercisesTab tab;
+  final ExerciseLaterality laterality;
 
   const ExercisesState({
     this.query = '',
     this.selectedMuscle = 'All',
     this.tab = ExercisesTab.all,
+    this.laterality = ExerciseLaterality.all,
   });
 
   ExercisesState copyWith({
     String? query,
     String? selectedMuscle,
     ExercisesTab? tab,
+    ExerciseLaterality? laterality,
   }) {
     return ExercisesState(
       query: query ?? this.query,
       selectedMuscle: selectedMuscle ?? this.selectedMuscle,
       tab: tab ?? this.tab,
+      laterality: laterality ?? this.laterality,
     );
   }
 }
@@ -34,6 +40,8 @@ class ExercisesNotifier extends StateNotifier<ExercisesState> {
   void setQuery(String q) => state = state.copyWith(query: q);
   void setMuscle(String m) => state = state.copyWith(selectedMuscle: m);
   void setTab(ExercisesTab t) => state = state.copyWith(tab: t);
+  void setLaterality(ExerciseLaterality l) =>
+      state = state.copyWith(laterality: l);
 }
 
 final exercisesProvider =
@@ -64,6 +72,12 @@ final filteredExercisesProvider = Provider<List<Exercise>>((ref) {
   return allExercises.where((e) {
     if (state.tab == ExercisesTab.mine && !e.isCustom) return false;
     if (state.selectedMuscle != 'All' && e.muscle != state.selectedMuscle) {
+      return false;
+    }
+    if (state.laterality == ExerciseLaterality.unilateral && !e.isUnilateral) {
+      return false;
+    }
+    if (state.laterality == ExerciseLaterality.bilateral && e.isUnilateral) {
       return false;
     }
     if (state.query.isNotEmpty &&

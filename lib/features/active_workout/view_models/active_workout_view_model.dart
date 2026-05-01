@@ -17,6 +17,8 @@ class ExerciseWorkoutState {
   final List<WorkoutSet> completedSets;
   final WorkoutSet? currentInput;
   final List<WorkoutSet> prevSets;
+  final bool isUnilateral;
+  final bool isSplitMode;
 
   const ExerciseWorkoutState({
     required this.exerciseId,
@@ -27,6 +29,8 @@ class ExerciseWorkoutState {
     this.completedSets = const [],
     this.currentInput,
     this.prevSets = const [],
+    this.isUnilateral = false,
+    this.isSplitMode = false,
   });
 
   bool get isDone => completedSets.length >= targetSets;
@@ -37,6 +41,7 @@ class ExerciseWorkoutState {
     List<WorkoutSet>? completedSets,
     WorkoutSet? currentInput,
     bool clearCurrentInput = false,
+    bool? isSplitMode,
   }) {
     return ExerciseWorkoutState(
       exerciseId: exerciseId,
@@ -48,6 +53,8 @@ class ExerciseWorkoutState {
       currentInput:
           clearCurrentInput ? null : (currentInput ?? this.currentInput),
       prevSets: prevSets,
+      isUnilateral: isUnilateral,
+      isSplitMode: isSplitMode ?? this.isSplitMode,
     );
   }
 }
@@ -168,8 +175,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
   Timer? _restTicker;
 
   static ActiveWorkoutState _buildInitial(String routineId, Ref ref) {
-    final init =
-        ref.read(workoutInitProvider(routineId)).requireValue;
+    final init = ref.read(workoutInitProvider(routineId)).requireValue;
     final prev = init.previousPerformance;
 
     return ActiveWorkoutState(
@@ -185,6 +191,8 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
         final firstPrev = prevSets.isNotEmpty
             ? prevSets.first
             : const WorkoutSet(kg: 0, reps: 8);
+        final isUnilateral = init.exercises
+            .any((e) => e.id == re.exerciseId && e.isUnilateral);
         return ExerciseWorkoutState(
           exerciseId: re.exerciseId,
           targetSets: re.targetSets,
@@ -193,6 +201,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
           isExpanded: i == 0,
           currentInput: WorkoutSet(kg: firstPrev.kg, reps: firstPrev.reps),
           prevSets: prevSets,
+          isUnilateral: isUnilateral,
         );
       }).toList(),
     );
@@ -216,12 +225,51 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     state = state.copyWith(exerciseStates: list);
   }
 
+  void toggleSplitMode(int index) {
+    final list = [...state.exerciseStates];
+    final e = list[index];
+    final newSplit = !e.isSplitMode;
+    WorkoutSet? newInput = e.currentInput;
+    if (newInput != null) {
+      if (newSplit) {
+        newInput = WorkoutSet(
+          kg: newInput.kg,
+          reps: newInput.reps,
+          leftKg: newInput.kg,
+          leftReps: newInput.reps,
+        );
+      } else {
+        newInput = WorkoutSet(kg: newInput.kg, reps: newInput.reps);
+      }
+    }
+    list[index] = ExerciseWorkoutState(
+      exerciseId: e.exerciseId,
+      targetSets: e.targetSets,
+      targetReps: e.targetReps,
+      restSec: e.restSec,
+      isExpanded: e.isExpanded,
+      completedSets: e.completedSets,
+      currentInput: newInput,
+      prevSets: e.prevSets,
+      isUnilateral: e.isUnilateral,
+      isSplitMode: newSplit,
+    );
+    state = state.copyWith(exerciseStates: list);
+  }
+
   void finishSet(int index) {
     final list = [...state.exerciseStates];
     final e = list[index];
     if (e.currentInput == null) return;
 
-    final newCompleted = [...e.completedSets, e.currentInput!];
+    // Mirror right to left for unilateral in symmetric mode
+    var setToSave = e.currentInput!;
+    if (e.isUnilateral && !e.isSplitMode) {
+      setToSave =
+          setToSave.copyWith(leftKg: setToSave.kg, leftReps: setToSave.reps);
+    }
+
+    final newCompleted = [...e.completedSets, setToSave];
     final isDone = newCompleted.length >= e.targetSets;
     final prev = e.prevSets;
     final nextIdx = newCompleted.length;
@@ -231,12 +279,23 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
             ? prev.last
             : const WorkoutSet(kg: 0, reps: 8);
 
-    list[index] = e.copyWith(
-      completedSets: newCompleted,
-      currentInput:
-          isDone ? null : WorkoutSet(kg: nextPrev.kg, reps: nextPrev.reps),
-      clearCurrentInput: isDone,
-    );
+    if (isDone) {
+      list[index] = e.copyWith(
+        completedSets: newCompleted,
+        clearCurrentInput: true,
+      );
+    } else {
+      list[index] = e.copyWith(
+        completedSets: newCompleted,
+        currentInput: WorkoutSet(
+          kg: nextPrev.kg,
+          reps: nextPrev.reps,
+          leftKg: e.isSplitMode ? (nextPrev.leftKg ?? nextPrev.kg) : null,
+          leftReps:
+              e.isSplitMode ? (nextPrev.leftReps ?? nextPrev.reps) : null,
+        ),
+      );
+    }
 
     final exerciseName =
         state.findExercise(e.exerciseId)?.name ?? 'Exercise';
@@ -300,6 +359,24 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     if (e.currentInput == null) return;
     list[index] =
         e.copyWith(currentInput: e.currentInput!.copyWith(reps: reps));
+    state = state.copyWith(exerciseStates: list);
+  }
+
+  void updateLeftWeight(int index, double kg) {
+    final list = [...state.exerciseStates];
+    final e = list[index];
+    if (e.currentInput == null) return;
+    list[index] =
+        e.copyWith(currentInput: e.currentInput!.copyWith(leftKg: kg));
+    state = state.copyWith(exerciseStates: list);
+  }
+
+  void updateLeftReps(int index, int reps) {
+    final list = [...state.exerciseStates];
+    final e = list[index];
+    if (e.currentInput == null) return;
+    list[index] =
+        e.copyWith(currentInput: e.currentInput!.copyWith(leftReps: reps));
     state = state.copyWith(exerciseStates: list);
   }
 

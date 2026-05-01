@@ -50,9 +50,19 @@ class SessionRepository {
           'set_index': j,
           'kg': s.kg,
           'reps': s.reps,
+          'left_kg': s.leftKg,
+          'left_reps': s.leftReps,
         });
       }
     }
+  }
+
+  Future<void> deleteOldSessions() async {
+    final db = await DatabaseHelper.instance.database;
+    final cutoff = DateTime.now().subtract(const Duration(days: 30));
+    final cutoffStr =
+        '${cutoff.year}-${cutoff.month.toString().padLeft(2, '0')}-${cutoff.day.toString().padLeft(2, '0')}';
+    await db.delete('sessions', where: 'date < ?', whereArgs: [cutoffStr]);
   }
 
   Future<Map<String, List<WorkoutSet>>> getPreviousPerformance(
@@ -89,6 +99,10 @@ class SessionRepository {
           .map((s) => WorkoutSet(
                 kg: (s['kg'] as num).toDouble(),
                 reps: s['reps'] as int,
+                leftKg: s['left_kg'] != null
+                    ? (s['left_kg'] as num).toDouble()
+                    : null,
+                leftReps: s['left_reps'] as int?,
               ))
           .toList();
     }
@@ -119,6 +133,10 @@ class SessionRepository {
             .map((s) => WorkoutSet(
                   kg: (s['kg'] as num).toDouble(),
                   reps: s['reps'] as int,
+                  leftKg: s['left_kg'] != null
+                      ? (s['left_kg'] as num).toDouble()
+                      : null,
+                  leftReps: s['left_reps'] as int?,
                 ))
             .toList(),
       ));

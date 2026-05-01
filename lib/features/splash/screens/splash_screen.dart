@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../app.dart';
+import '../../onboarding/onboarding_screen.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scale;
@@ -30,18 +33,23 @@ class _SplashScreenState extends State<SplashScreen>
     );
     _controller.forward();
 
-    Future.delayed(const Duration(milliseconds: 2500), () {
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const MainShell(),
-          transitionsBuilder: (context, anim, secondaryAnimation, child) =>
-              FadeTransition(opacity: anim, child: child),
-          transitionDuration: const Duration(milliseconds: 400),
-        ),
-      );
-    });
+    Future.delayed(const Duration(milliseconds: 2500), _navigate);
+  }
+
+  Future<void> _navigate() async {
+    if (!mounted) return;
+    final settings = ref.read(settingsRepositoryProvider);
+    final onboarded = await settings.isOnboarded();
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondary) =>
+            onboarded ? const MainShell() : const OnboardingScreen(),
+        transitionsBuilder: (context, anim, secondary, child) =>
+            FadeTransition(opacity: anim, child: child),
+        transitionDuration: const Duration(milliseconds: 400),
+      ),
+    );
   }
 
   @override
@@ -56,7 +64,6 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: AppColors.bgFrame,
       body: Stack(
         children: [
-          // Warm radial glow
           Positioned.fill(
             child: DecoratedBox(
               decoration: const BoxDecoration(
@@ -68,8 +75,6 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ),
           ),
-
-          // Center content
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -144,8 +149,6 @@ class _SplashScreenState extends State<SplashScreen>
               ],
             ),
           ),
-
-          // Bottom dots
           Positioned(
             bottom: 60,
             left: 0,
