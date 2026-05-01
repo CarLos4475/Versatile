@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/navigation/app_page_transitions.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../app.dart';
@@ -25,12 +26,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    _scale = Tween<double>(begin: 0.92, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
-    _fade = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    _scale = Tween<double>(
+      begin: 0.92,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+    _fade = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     _controller.forward();
 
     Future.delayed(const Duration(milliseconds: 2500), _navigate);
@@ -42,13 +45,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     final onboarded = await settings.isOnboarded();
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondary) =>
-            onboarded ? const MainShell() : const OnboardingScreen(),
-        transitionsBuilder: (context, anim, secondary, child) =>
-            FadeTransition(opacity: anim, child: child),
-        transitionDuration: const Duration(milliseconds: 400),
-      ),
+      AppRoute(page: onboarded ? const MainShell() : const OnboardingScreen()),
     );
   }
 
@@ -153,10 +150,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             bottom: 60,
             left: 0,
             right: 0,
-            child: FadeTransition(
-              opacity: _fade,
-              child: const _PulseDots(),
-            ),
+            child: FadeTransition(opacity: _fade, child: const _PulseDots()),
           ),
         ],
       ),

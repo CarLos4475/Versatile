@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/services/workout_notification_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/format_utils.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
+import '../../../shared/widgets/motion.dart';
 import '../view_models/active_workout_view_model.dart';
 import '../widgets/exercise_card.dart';
 import '../widgets/rest_timer_bar.dart';
 
 class ActiveWorkoutScreen extends ConsumerWidget {
-  const ActiveWorkoutScreen({super.key, required this.routineId});
+  const ActiveWorkoutScreen({
+    super.key,
+    required this.routineId,
+    this.restoredStartedAt,
+  });
   final String routineId;
+  final DateTime? restoredStartedAt;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,18 +27,26 @@ class ActiveWorkoutScreen extends ConsumerWidget {
       error: (e, _) => Scaffold(
         backgroundColor: AppColors.bgApp,
         body: Center(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Text('Could not load workout',
-                style: TextStyle(color: AppColors.ink500)),
-            const SizedBox(height: 12),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Go back'),
-            ),
-          ]),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Could not load workout',
+                style: TextStyle(color: AppColors.ink500),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Go back'),
+              ),
+            ],
+          ),
         ),
       ),
-      data: (_) => _WorkoutBody(routineId: routineId),
+      data: (_) => _WorkoutBody(
+        routineId: routineId,
+        restoredStartedAt: restoredStartedAt,
+      ),
     );
   }
 }
@@ -44,42 +59,65 @@ class _LoadingScaffold extends StatelessWidget {
     return const Scaffold(
       backgroundColor: AppColors.bgApp,
       body: Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          CircularProgressIndicator(color: AppColors.accent, strokeWidth: 2),
-          SizedBox(height: 14),
-          Text('Getting ready…',
-              style: TextStyle(fontSize: 14, color: AppColors.ink400)),
-        ]),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(color: AppColors.accent, strokeWidth: 2),
+            SizedBox(height: 14),
+            Text(
+              'Getting ready…',
+              style: TextStyle(fontSize: 14, color: AppColors.ink400),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _WorkoutBody extends ConsumerStatefulWidget {
-  const _WorkoutBody({required this.routineId});
+  const _WorkoutBody({required this.routineId, this.restoredStartedAt});
   final String routineId;
+  final DateTime? restoredStartedAt;
 
   @override
   ConsumerState<_WorkoutBody> createState() => _WorkoutBodyState();
 }
 
-class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
+class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
+    with WidgetsBindingObserver {
   bool _finishing = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(activeWorkoutRoutineIdProvider.notifier).state =
           widget.routineId;
+      final notifier =
+          ref.read(activeWorkoutProvider(widget.routineId).notifier);
+      if (widget.restoredStartedAt != null) {
+        notifier.restoreStartTime(widget.restoredStartedAt!);
+      }
+      WorkoutNotificationService.start(
+        startedAt: notifier.workoutStartedAt,
+        routineId: widget.routineId,
+      );
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   Future<void> _finish() async {
     if (_finishing) return;
     setState(() => _finishing = true);
-    final notifier =
-        ref.read(activeWorkoutProvider(widget.routineId).notifier);
+    await WorkoutNotificationService.stop();
+    final notifier = ref.read(activeWorkoutProvider(widget.routineId).notifier);
     await notifier.finishWorkout();
     if (mounted) {
       ref.read(activeWorkoutRoutineIdProvider.notifier).state = null;
@@ -90,8 +128,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(activeWorkoutProvider(widget.routineId));
-    final notifier =
-        ref.read(activeWorkoutProvider(widget.routineId).notifier);
+    final notifier = ref.read(activeWorkoutProvider(widget.routineId).notifier);
 
     return Scaffold(
       backgroundColor: AppColors.bgApp,
@@ -106,10 +143,12 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
                     strong: true,
                     radius: 22,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     child: Row(
                       children: [
-                        GestureDetector(
+                        PressableScale(
                           onTap: () => Navigator.of(context).pop(),
                           child: Container(
                             width: 36,
@@ -118,8 +157,11 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
                               color: const Color(0x0A000000),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(Icons.chevron_left,
-                                size: 18, color: AppColors.ink700),
+                            child: const Icon(
+                              Icons.chevron_left,
+                              size: 18,
+                              color: AppColors.ink700,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -144,8 +186,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
                               ),
                               const SizedBox(height: 2),
                               Row(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.baseline,
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
                                 textBaseline: TextBaseline.alphabetic,
                                 children: [
                                   Text(
@@ -157,7 +198,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
                                       color: AppColors.ink900,
                                       height: 1,
                                       fontFeatures: [
-                                        FontFeature.tabularFigures()
+                                        FontFeature.tabularFigures(),
                                       ],
                                     ),
                                   ),
@@ -166,15 +207,16 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
                                     '${state.completedSets}/${state.totalSets} sets'
                                     ' · ${FormatUtils.volume(state.totalVolume)}',
                                     style: const TextStyle(
-                                        fontSize: 12,
-                                        color: AppColors.ink500),
+                                      fontSize: 12,
+                                      color: AppColors.ink500,
+                                    ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
                         ),
-                        GestureDetector(
+                        PressableScale(
                           onTap: notifier.togglePause,
                           child: Container(
                             width: 36,
@@ -184,9 +226,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
-                              state.isRunning
-                                  ? Icons.pause
-                                  : Icons.play_arrow,
+                              state.isRunning ? Icons.pause : Icons.play_arrow,
                               size: 18,
                               color: AppColors.accentDeep,
                             ),
@@ -206,7 +246,8 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
                           : 0,
                       backgroundColor: const Color(0x0D000000),
                       valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppColors.accent),
+                        AppColors.accent,
+                      ),
                       minHeight: 4,
                     ),
                   ),
@@ -250,9 +291,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
                         );
                       }),
                       GlassButton(
-                        label: _finishing
-                            ? 'Saving…'
-                            : 'Finish workout',
+                        label: _finishing ? 'Saving…' : 'Finish workout',
                         variant: GlassButtonVariant.glass,
                         size: GlassButtonSize.md,
                         expand: true,
@@ -264,12 +303,38 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody> {
                 ),
               ],
             ),
-            if (state.restTimer != null)
-              RestTimerBar(
-                restTimer: state.restTimer!,
-                onSkip: notifier.skipRest,
-                onAddTime: () => notifier.addRestTime(15),
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 14,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 260),
+                reverseDuration: const Duration(milliseconds: 200),
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.15),
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOutCubic,
+                      ),
+                    ),
+                    child: child,
+                  ),
+                ),
+                child: state.restTimer == null
+                    ? const SizedBox.shrink(key: ValueKey('rest-hidden'))
+                    : RestTimerBar(
+                        key: const ValueKey('rest-visible'),
+                        restTimer: state.restTimer!,
+                        onSkip: notifier.skipRest,
+                        onAddTime: () => notifier.addRestTime(15),
+                      ),
               ),
+            ),
           ],
         ),
       ),
@@ -294,9 +359,10 @@ class _PulseDotState extends State<_PulseDot>
       duration: const Duration(milliseconds: 1400),
       vsync: this,
     )..repeat(reverse: true);
-    _anim = Tween<double>(begin: 1.0, end: 0.4).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
-    );
+    _anim = Tween<double>(
+      begin: 1.0,
+      end: 0.4,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
   }
 
   @override

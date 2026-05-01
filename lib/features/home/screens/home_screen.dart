@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/glass_container.dart';
+import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../view_models/home_view_model.dart';
 import '../widgets/session_card.dart';
@@ -62,64 +63,73 @@ class HomeScreen extends ConsumerWidget {
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: firstRoutine != null
-                    ? _HeroCard(
-                        routineId: firstRoutine.id,
-                        routineName: firstRoutine.name,
-                        exerciseCount: firstRoutine.exercises.length,
-                        estimatedMin: firstRoutine.estimatedMinutes,
-                      )
-                    : _EmptyHeroCard(
-                        onCreateRoutine: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const CreateRoutineScreen(),
+                child: FadeSlideIn(
+                  delay: const Duration(milliseconds: 60),
+                  child: firstRoutine != null
+                      ? _HeroCard(
+                          routineId: firstRoutine.id,
+                          routineName: firstRoutine.name,
+                          exerciseCount: firstRoutine.exercises.length,
+                          estimatedMin: firstRoutine.estimatedMinutes,
+                        )
+                      : _EmptyHeroCard(
+                          onCreateRoutine: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const CreateRoutineScreen(),
+                            ),
                           ),
                         ),
-                      ),
+                ),
               ),
 
               const SizedBox(height: 16),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: StatCard(
-                        label: 'This week',
-                        value: state.weekSessions.toString(),
-                        unit: 'sessions',
+                child: FadeSlideIn(
+                  delay: const Duration(milliseconds: 120),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: StatCard(
+                          label: 'This week',
+                          value: state.weekSessions.toString(),
+                          unit: 'sessions',
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: StatCard(
-                        label: 'Volume',
-                        value: state.weekVolume >= 1000
-                            ? (state.weekVolume / 1000).toStringAsFixed(1)
-                            : state.weekVolume.toStringAsFixed(0),
-                        unit: state.weekVolume >= 1000 ? 'k kg' : 'kg',
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: StatCard(
+                          label: 'Volume',
+                          value: state.weekVolume >= 1000
+                              ? (state.weekVolume / 1000).toStringAsFixed(1)
+                              : state.weekVolume.toStringAsFixed(0),
+                          unit: state.weekVolume >= 1000 ? 'k kg' : 'kg',
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: StatCard(
-                        label: 'Avg time',
-                        value: '${state.avgTimeMins}',
-                        unit: 'min',
-                        accent: true,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: StatCard(
+                          label: 'Avg time',
+                          value: '${state.avgTimeMins}',
+                          unit: 'min',
+                          accent: true,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
 
               const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: _ActivityGrid(
-                  workoutDays: state.workoutDays,
-                  sessionCount: state.sessions.length,
+                child: FadeSlideIn(
+                  delay: const Duration(milliseconds: 180),
+                  child: _ActivityGrid(
+                    workoutDays: state.workoutDays,
+                    sessionCount: state.sessions.length,
+                  ),
                 ),
               ),
 
@@ -127,28 +137,31 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 22),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      const Text(
-                        'Recent sessions',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: -0.18,
-                          color: AppColors.ink900,
+                  child: FadeSlideIn(
+                    delay: const Duration(milliseconds: 220),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        const Text(
+                          'Recent sessions',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.18,
+                            color: AppColors.ink900,
+                          ),
                         ),
-                      ),
-                      Text(
-                        '${state.sessions.length} total',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.ink400,
+                        Text(
+                          '${state.sessions.length} total',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.ink400,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -449,7 +462,7 @@ class _HeroCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 18),
-              GestureDetector(
+              PressableScale(
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => ActiveWorkoutScreen(routineId: routineId),
@@ -496,7 +509,7 @@ class _EmptyHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onCreateRoutine,
       child: Container(
         padding: const EdgeInsets.all(22),

@@ -3,6 +3,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/format_utils.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/workout_set.dart';
+import '../../../shared/widgets/motion.dart';
 import '../view_models/active_workout_view_model.dart';
 import 'number_input_widget.dart';
 
@@ -61,16 +62,21 @@ class ExerciseCard extends StatelessWidget {
             onToggle: onToggle,
             onToggleSplit: onToggleSplit,
           ),
-          if (data.isExpanded)
-            _CardBody(
-              data: data,
-              prevSets: prevSets,
-              onFinishSet: onFinishSet,
-              onWeightChanged: onWeightChanged,
-              onRepsChanged: onRepsChanged,
-              onLeftWeightChanged: onLeftWeightChanged,
-              onLeftRepsChanged: onLeftRepsChanged,
-            ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOutCubic,
+            child: data.isExpanded
+                ? _CardBody(
+                    data: data,
+                    prevSets: prevSets,
+                    onFinishSet: onFinishSet,
+                    onWeightChanged: onWeightChanged,
+                    onRepsChanged: onRepsChanged,
+                    onLeftWeightChanged: onLeftWeightChanged,
+                    onLeftRepsChanged: onLeftRepsChanged,
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
@@ -94,7 +100,7 @@ class _CardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onToggle,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -133,12 +139,14 @@ class _CardHeader extends StatelessWidget {
               ),
             ),
             if (data.isUnilateral && onToggleSplit != null) ...[
-              GestureDetector(
+              PressableScale(
                 onTap: onToggleSplit,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: data.isSplitMode
                         ? AppColors.accentTint
@@ -168,8 +176,11 @@ class _CardHeader extends StatelessWidget {
             AnimatedRotation(
               turns: data.isExpanded ? 0.5 : 0.0,
               duration: const Duration(milliseconds: 250),
-              child: const Icon(Icons.keyboard_arrow_down,
-                  size: 18, color: AppColors.ink400),
+              child: const Icon(
+                Icons.keyboard_arrow_down,
+                size: 18,
+                color: AppColors.ink400,
+              ),
             ),
           ],
         ),
@@ -205,8 +216,8 @@ class _IndexBadge extends StatelessWidget {
         color: isDone
             ? null
             : hasProgress
-                ? AppColors.accentTint
-                : const Color(0x0D000000),
+            ? AppColors.accentTint
+            : const Color(0x0D000000),
         borderRadius: BorderRadius.circular(10),
       ),
       child: isDone
@@ -251,31 +262,29 @@ class _CardBody extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
         children: [
-          const Divider(
-            color: Color(0x0F000000),
-            thickness: 0.5,
-            height: 14,
-          ),
+          const Divider(color: Color(0x0F000000), thickness: 0.5, height: 14),
 
           if (!data.isSplitMode) const _ColumnHeaders(),
           if (!data.isSplitMode) const SizedBox(height: 2),
 
           // Completed sets
-          ...data.completedSets.asMap().entries.map((e) => _CompletedSetRow(
-                setIndex: e.key,
-                set: e.value,
-                isSplitMode: data.isSplitMode,
-              )),
+          ...data.completedSets.asMap().entries.map(
+            (e) => _CompletedSetRow(
+              setIndex: e.key,
+              set: e.value,
+              isSplitMode: data.isSplitMode,
+            ),
+          ),
 
           // Current set + ghost row
           if (!data.isDone && data.currentInput != null) ...[
             if (data.nextSetIndex < prevSets.length)
               _GhostRow(
-                  prevSet: prevSets[data.nextSetIndex],
-                  isSplitMode: data.isSplitMode)
+                prevSet: prevSets[data.nextSetIndex],
+                isSplitMode: data.isSplitMode,
+              )
             else if (prevSets.isNotEmpty)
-              _GhostRow(
-                  prevSet: prevSets.last, isSplitMode: data.isSplitMode),
+              _GhostRow(prevSet: prevSets.last, isSplitMode: data.isSplitMode),
 
             _ActiveSetRow(
               setIndex: data.nextSetIndex,
@@ -290,15 +299,18 @@ class _CardBody extends StatelessWidget {
           ],
 
           if (!data.isDone)
-            GestureDetector(
+            PressableScale(
               onTap: onFinishSet,
               child: Padding(
                 padding: const EdgeInsets.only(top: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.check_circle_outline,
-                        size: 13, color: AppColors.accentDeep),
+                    const Icon(
+                      Icons.check_circle_outline,
+                      size: 13,
+                      color: AppColors.accentDeep,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       'Finish set ${data.nextSetIndex + 1}',
@@ -443,8 +455,11 @@ class _CompletedSetRow extends StatelessWidget {
                 color: const Color(0x2E4A8A5A),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Icon(Icons.check,
-                  size: 13, color: AppColors.green700),
+              child: const Icon(
+                Icons.check,
+                size: 13,
+                color: AppColors.green700,
+              ),
             ),
             const SizedBox(width: 7),
           ],
@@ -485,12 +500,16 @@ class _GhostRow extends StatelessWidget {
                       Text(
                         'L  ${FormatUtils.weight(prevSet.leftKg!)} kg × ${prevSet.leftReps}',
                         style: const TextStyle(
-                            fontSize: 11, color: AppColors.ink300),
+                          fontSize: 11,
+                          color: AppColors.ink300,
+                        ),
                       ),
                       Text(
                         'R  ${FormatUtils.weight(prevSet.kg)} kg × ${prevSet.reps}',
                         style: const TextStyle(
-                            fontSize: 11, color: AppColors.ink300),
+                          fontSize: 11,
+                          color: AppColors.ink300,
+                        ),
                       ),
                     ],
                   )
@@ -500,7 +519,9 @@ class _GhostRow extends StatelessWidget {
                         child: Text(
                           '${FormatUtils.weight(prevSet.kg)} kg',
                           style: const TextStyle(
-                              fontSize: 11, color: AppColors.ink300),
+                            fontSize: 11,
+                            color: AppColors.ink300,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -508,7 +529,9 @@ class _GhostRow extends StatelessWidget {
                         child: Text(
                           '${prevSet.reps}',
                           style: const TextStyle(
-                              fontSize: 11, color: AppColors.ink300),
+                            fontSize: 11,
+                            color: AppColors.ink300,
+                          ),
                         ),
                       ),
                     ],
@@ -578,8 +601,7 @@ class _ActiveSetRow extends StatelessWidget {
                       currentInput: currentInput,
                       onWeightChanged: onWeightChanged,
                       onRepsChanged: onRepsChanged,
-                      onLeftWeightChanged:
-                          onLeftWeightChanged ?? (_) {},
+                      onLeftWeightChanged: onLeftWeightChanged ?? (_) {},
                       onLeftRepsChanged: onLeftRepsChanged ?? (_) {},
                     )
                   : Row(
@@ -588,7 +610,8 @@ class _ActiveSetRow extends StatelessWidget {
                           child: NumberInputWidget(
                             value: currentInput.kg,
                             onDecrement: () => onWeightChanged(
-                                (currentInput.kg - 2.5).clamp(0, 999)),
+                              (currentInput.kg - 2.5).clamp(0, 999),
+                            ),
                             onIncrement: () =>
                                 onWeightChanged(currentInput.kg + 2.5),
                             suffix: 'kg',
@@ -600,7 +623,8 @@ class _ActiveSetRow extends StatelessWidget {
                           child: NumberInputWidget(
                             value: currentInput.reps,
                             onDecrement: () => onRepsChanged(
-                                (currentInput.reps - 1).clamp(0, 999)),
+                              (currentInput.reps - 1).clamp(0, 999),
+                            ),
                             onIncrement: () =>
                                 onRepsChanged(currentInput.reps + 1),
                           ),
@@ -609,7 +633,7 @@ class _ActiveSetRow extends StatelessWidget {
                     ),
             ),
             const SizedBox(width: 8),
-            GestureDetector(
+            PressableScale(
               onTap: onFinishSet,
               child: Container(
                 width: 32,
@@ -700,8 +724,8 @@ class _SplitInputs extends StatelessWidget {
             Expanded(
               child: NumberInputWidget(
                 value: currentInput.kg,
-                onDecrement: () => onWeightChanged(
-                    (currentInput.kg - 2.5).clamp(0, 999)),
+                onDecrement: () =>
+                    onWeightChanged((currentInput.kg - 2.5).clamp(0, 999)),
                 onIncrement: () => onWeightChanged(currentInput.kg + 2.5),
                 suffix: 'kg',
                 isDouble: true,

@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../shared/widgets/glass_container.dart';
+import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../exercises/view_models/exercises_view_model.dart';
 import '../view_models/routines_view_model.dart';
@@ -17,8 +18,7 @@ class ExercisePickerScreen extends ConsumerStatefulWidget {
       _ExercisePickerScreenState();
 }
 
-class _ExercisePickerScreenState
-    extends ConsumerState<ExercisePickerScreen> {
+class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
   String _query = '';
   String _muscle = 'All';
   final _queryCtrl = TextEditingController();
@@ -50,15 +50,29 @@ class _ExercisePickerScreenState
   Widget build(BuildContext context) {
     final allExercises = ref.watch(exercisesAsyncProvider).value ?? [];
     const muscleGroups = [
-      'All', 'Chest', 'Back', 'Shoulders',
-      'Biceps', 'Triceps', 'Forearms',
-      'Core', 'Quadriceps', 'Hamstrings', 'Glutes', 'Calves', 'Other',
+      'All',
+      'Chest',
+      'Back',
+      'Shoulders',
+      'Biceps',
+      'Triceps',
+      'Forearms',
+      'Core',
+      'Quadriceps',
+      'Hamstrings',
+      'Glutes',
+      'Calves',
+      'Other',
     ];
 
     final filtered = allExercises.where((e) {
-      if (_muscle != 'All' && e.muscle != _muscle) { return false; }
+      if (_muscle != 'All' && e.muscle != _muscle) {
+        return false;
+      }
       if (_query.isNotEmpty &&
-          !e.name.toLowerCase().contains(_query.toLowerCase())) { return false; }
+          !e.name.toLowerCase().contains(_query.toLowerCase())) {
+        return false;
+      }
       return true;
     }).toList();
 
@@ -83,8 +97,11 @@ class _ExercisePickerScreenState
                   children: [
                     const Padding(
                       padding: EdgeInsets.only(left: 12),
-                      child: Icon(Icons.search,
-                          size: 16, color: AppColors.ink400),
+                      child: Icon(
+                        Icons.search,
+                        size: 16,
+                        color: AppColors.ink400,
+                      ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -94,13 +111,17 @@ class _ExercisePickerScreenState
                         decoration: const InputDecoration(
                           hintText: 'Search…',
                           hintStyle: TextStyle(
-                              fontSize: 14, color: AppColors.ink400),
+                            fontSize: 14,
+                            color: AppColors.ink400,
+                          ),
                           border: InputBorder.none,
                           isDense: true,
                           contentPadding: EdgeInsets.zero,
                         ),
                         style: const TextStyle(
-                            fontSize: 14, color: AppColors.ink900),
+                          fontSize: 14,
+                          color: AppColors.ink900,
+                        ),
                       ),
                     ),
                   ],
@@ -118,12 +139,14 @@ class _ExercisePickerScreenState
                 itemBuilder: (context, i) {
                   final m = muscleGroups[i];
                   final active = _muscle == m;
-                  return GestureDetector(
+                  return PressableScale(
                     onTap: () => setState(() => _muscle = m),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 150),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: active
                             ? AppColors.accentDeep
@@ -152,8 +175,10 @@ class _ExercisePickerScreenState
             const SizedBox(height: 12),
             Expanded(
               child: ListView.separated(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 22, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 4,
+                ),
                 itemCount: filtered.length,
                 separatorBuilder: (context, index) => const SizedBox(height: 6),
                 itemBuilder: (context, i) =>
@@ -194,13 +219,12 @@ class _ExerciseRow extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   '${exercise.muscle} · ${exercise.equipment}',
-                  style: const TextStyle(
-                      fontSize: 12, color: AppColors.ink500),
+                  style: const TextStyle(fontSize: 12, color: AppColors.ink500),
                 ),
               ],
             ),
           ),
-          GestureDetector(
+          PressableScale(
             onTap: () => onPick(exercise),
             child: Container(
               width: 32,
@@ -209,8 +233,11 @@ class _ExerciseRow extends StatelessWidget {
                 color: AppColors.accentTint,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.add,
-                  size: 16, color: AppColors.accentDeep),
+              child: const Icon(
+                Icons.add,
+                size: 16,
+                color: AppColors.accentDeep,
+              ),
             ),
           ),
         ],
@@ -220,10 +247,7 @@ class _ExerciseRow extends StatelessWidget {
 }
 
 class _ConfigSheet extends StatefulWidget {
-  const _ConfigSheet({
-    required this.exercise,
-    required this.onConfirm,
-  });
+  const _ConfigSheet({required this.exercise, required this.onConfirm});
   final Exercise exercise;
   final Future<void> Function(RoutineExercise) onConfirm;
 
@@ -246,9 +270,7 @@ class _ConfigSheetState extends State<_ConfigSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
+      margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       padding: const EdgeInsets.fromLTRB(22, 20, 22, 32),
       decoration: const BoxDecoration(
         color: AppColors.bgFrame,
@@ -287,8 +309,10 @@ class _ConfigSheetState extends State<_ConfigSheet> {
             label: 'Sets',
             child: _Stepper(
               value: _sets,
-              onDecrement: () => setState(() => _sets = (_sets - 1).clamp(1, 20)),
-              onIncrement: () => setState(() => _sets = (_sets + 1).clamp(1, 20)),
+              onDecrement: () =>
+                  setState(() => _sets = (_sets - 1).clamp(1, 20)),
+              onIncrement: () =>
+                  setState(() => _sets = (_sets + 1).clamp(1, 20)),
               display: '$_sets',
             ),
           ),
@@ -313,7 +337,9 @@ class _ConfigSheetState extends State<_ConfigSheet> {
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                 ),
               ),
             ),
@@ -323,10 +349,12 @@ class _ConfigSheetState extends State<_ConfigSheet> {
             label: 'Rest',
             child: _Stepper(
               value: _restSeconds,
-              onDecrement: () =>
-                  setState(() => _restSeconds = (_restSeconds - 15).clamp(0, 600)),
-              onIncrement: () =>
-                  setState(() => _restSeconds = (_restSeconds + 15).clamp(0, 600)),
+              onDecrement: () => setState(
+                () => _restSeconds = (_restSeconds - 15).clamp(0, 600),
+              ),
+              onIncrement: () => setState(
+                () => _restSeconds = (_restSeconds + 15).clamp(0, 600),
+              ),
               display: '${_restSeconds}s',
             ),
           ),
@@ -339,32 +367,39 @@ class _ConfigSheetState extends State<_ConfigSheet> {
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
               onPressed: _saving
                   ? null
                   : () async {
                       setState(() => _saving = true);
-                      await widget.onConfirm(RoutineExercise(
-                        exerciseId: widget.exercise.id,
-                        targetSets: _sets,
-                        targetReps: _repsCtrl.text.trim().isEmpty
-                            ? '8-12'
-                            : _repsCtrl.text.trim(),
-                        restSeconds: _restSeconds,
-                      ));
+                      await widget.onConfirm(
+                        RoutineExercise(
+                          exerciseId: widget.exercise.id,
+                          targetSets: _sets,
+                          targetReps: _repsCtrl.text.trim().isEmpty
+                              ? '8-12'
+                              : _repsCtrl.text.trim(),
+                          restSeconds: _restSeconds,
+                        ),
+                      );
                     },
               child: _saving
                   ? const SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : const Text(
                       'Add to Routine',
                       style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w600),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
             ),
           ),
@@ -387,9 +422,10 @@ class _ConfigRow extends StatelessWidget {
         Text(
           label,
           style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-              color: AppColors.ink700),
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: AppColors.ink700,
+          ),
         ),
         child,
       ],
@@ -439,7 +475,7 @@ class _StepBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
       child: Container(
         width: 36,

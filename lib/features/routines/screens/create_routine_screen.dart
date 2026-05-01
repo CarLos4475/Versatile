@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
+import '../../../core/navigation/app_page_transitions.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
+import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../view_models/routines_view_model.dart';
 import 'routine_detail_screen.dart';
@@ -52,11 +54,9 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
     );
     await ref.read(routinesProvider.notifier).addRoutine(routine);
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (_) => RoutineDetailScreen(routineId: id),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).pushReplacement(AppRoute(page: RoutineDetailScreen(routineId: id)));
   }
 
   @override
@@ -77,8 +77,10 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: GlassContainer(
                 radius: 16,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
                 child: TextField(
                   controller: _ctrl,
                   autofocus: true,
@@ -89,8 +91,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                   ),
                   decoration: const InputDecoration(
                     hintText: 'e.g. Push Day, Full Body…',
-                    hintStyle:
-                        TextStyle(fontSize: 16, color: AppColors.ink400),
+                    hintStyle: TextStyle(fontSize: 16, color: AppColors.ink400),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(vertical: 14),
                   ),
@@ -119,7 +120,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                 runSpacing: 12,
                 children: _kColors.map((c) {
                   final active = _selectedColor == c;
-                  return GestureDetector(
+                  return PressableScale(
                     onTap: () => setState(() => _selectedColor = c),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 180),
@@ -142,8 +143,11 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                             : null,
                       ),
                       child: active
-                          ? const Icon(Icons.check,
-                              color: Colors.white, size: 20)
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 20,
+                            )
                           : null,
                     ),
                   );

@@ -5,6 +5,7 @@ import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
+import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../exercises/view_models/exercises_view_model.dart';
 import '../view_models/routines_view_model.dart';
@@ -25,8 +26,10 @@ class RoutinesScreen extends ConsumerWidget {
         child: routinesAsync.when(
           loading: () => const _LoadingBody(label: 'Loading routines…'),
           error: (e, _) => Center(
-            child: Text('Error: $e',
-                style: const TextStyle(color: AppColors.ink500)),
+            child: Text(
+              'Error: $e',
+              style: const TextStyle(color: AppColors.ink500),
+            ),
           ),
           data: (routines) => SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 96),
@@ -54,12 +57,15 @@ class RoutinesScreen extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: Column(
                       children: routines
-                          .map((r) => Padding(
-                                padding:
-                                    const EdgeInsets.only(bottom: 12),
-                                child: _RoutineCard(
-                                    routine: r, exercises: exercises),
-                              ))
+                          .map(
+                            (r) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _RoutineCard(
+                                routine: r,
+                                exercises: exercises,
+                              ),
+                            ),
+                          )
                           .toList(),
                     ),
                   ),
@@ -90,8 +96,11 @@ class _EmptyRoutines extends StatelessWidget {
                 color: AppColors.accentTint,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(Icons.fitness_center,
-                  size: 34, color: AppColors.accentDeep),
+              child: const Icon(
+                Icons.fitness_center,
+                size: 34,
+                color: AppColors.accentDeep,
+              ),
             ),
             const SizedBox(height: 16),
             const Text(
@@ -105,8 +114,7 @@ class _EmptyRoutines extends StatelessWidget {
             const SizedBox(height: 6),
             const Text(
               'Tap + to create your first workout template.',
-              style:
-                  TextStyle(fontSize: 13, color: AppColors.ink400),
+              style: TextStyle(fontSize: 13, color: AppColors.ink400),
               textAlign: TextAlign.center,
             ),
           ],
@@ -136,15 +144,15 @@ class _RoutineCard extends StatelessWidget {
         .toSet()
         .toList();
 
-    return GestureDetector(
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => RoutineDetailScreen(routineId: routine.id),
-        ),
-      ),
+    return FadeSlideIn(
       child: GlassContainer(
         radius: 20,
         padding: const EdgeInsets.all(16),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => RoutineDetailScreen(routineId: routine.id),
+          ),
+        ),
         child: Column(
           children: [
             Row(
@@ -167,8 +175,11 @@ class _RoutineCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.fitness_center,
-                      color: Colors.white, size: 22),
+                  child: const Icon(
+                    Icons.fitness_center,
+                    color: Colors.white,
+                    size: 22,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -187,14 +198,18 @@ class _RoutineCard extends StatelessWidget {
                       Text(
                         '${routine.exercises.length} exercises · ~${routine.estimatedMinutes} min',
                         style: const TextStyle(
-                            fontSize: 12, color: AppColors.ink500),
+                          fontSize: 12,
+                          color: AppColors.ink500,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_right,
-                    size: 16,
-                    color: AppColors.ink900.withOpacity(0.3)),
+                Icon(
+                  Icons.chevron_right,
+                  size: 16,
+                  color: AppColors.ink900.withOpacity(0.3),
+                ),
               ],
             ),
             if (muscles.isNotEmpty) ...[
@@ -203,22 +218,26 @@ class _RoutineCard extends StatelessWidget {
                 spacing: 6,
                 runSpacing: 4,
                 children: muscles
-                    .map((m) => Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: AppColors.accentTint,
-                            borderRadius: BorderRadius.circular(8),
+                    .map(
+                      (m) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.accentTint,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          m,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.accentDeep,
+                            fontWeight: FontWeight.w500,
                           ),
-                          child: Text(
-                            m,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: AppColors.accentDeep,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ))
+                        ),
+                      ),
+                    )
                     .toList(),
               ),
             ],
@@ -244,9 +263,10 @@ class _LoadingBody extends StatelessWidget {
             strokeWidth: 2,
           ),
           const SizedBox(height: 14),
-          Text(label,
-              style: const TextStyle(
-                  fontSize: 13, color: AppColors.ink400)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 13, color: AppColors.ink400),
+          ),
         ],
       ),
     );

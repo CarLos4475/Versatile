@@ -50,8 +50,9 @@ class ExerciseWorkoutState {
       restSec: restSec,
       isExpanded: isExpanded ?? this.isExpanded,
       completedSets: completedSets ?? this.completedSets,
-      currentInput:
-          clearCurrentInput ? null : (currentInput ?? this.currentInput),
+      currentInput: clearCurrentInput
+          ? null
+          : (currentInput ?? this.currentInput),
       prevSets: prevSets,
       isUnilateral: isUnilateral,
       isSplitMode: isSplitMode ?? this.isSplitMode,
@@ -102,9 +103,9 @@ class ActiveWorkoutState {
   int get completedSets =>
       exerciseStates.fold(0, (s, e) => s + e.completedSets.length);
   double get totalVolume => exerciseStates.fold(
-        0.0,
-        (s, e) => s + e.completedSets.fold(0.0, (vs, set) => vs + set.volume),
-      );
+    0.0,
+    (s, e) => s + e.completedSets.fold(0.0, (vs, set) => vs + set.volume),
+  );
 
   Exercise? findExercise(String id) {
     try {
@@ -143,36 +144,49 @@ class _WorkoutInit {
   });
 }
 
-final workoutInitProvider =
-    FutureProvider.autoDispose.family<_WorkoutInit, String>(
-  (ref, routineId) async {
-    final routineRepo = ref.read(routineRepositoryProvider);
-    final exerciseRepo = ref.read(exerciseRepositoryProvider);
-    final sessionRepo = ref.read(sessionRepositoryProvider);
+final workoutInitProvider = FutureProvider.autoDispose
+    .family<_WorkoutInit, String>((ref, routineId) async {
+      final routineRepo = ref.read(routineRepositoryProvider);
+      final exerciseRepo = ref.read(exerciseRepositoryProvider);
+      final sessionRepo = ref.read(sessionRepositoryProvider);
 
-    final routine = await routineRepo.findById(routineId);
-    if (routine == null) throw Exception('Routine not found: $routineId');
-    final exercises = await exerciseRepo.getAll();
-    final prev = await sessionRepo.getPreviousPerformance(routineId);
+      final routine = await routineRepo.findById(routineId);
+      if (routine == null) throw Exception('Routine not found: $routineId');
+      final exercises = await exerciseRepo.getAll();
+      final prev = await sessionRepo.getPreviousPerformance(routineId);
 
-    return _WorkoutInit(
-      routine: routine,
-      exercises: exercises,
-      previousPerformance: prev,
-    );
-  },
-);
+      return _WorkoutInit(
+        routine: routine,
+        exercises: exercises,
+        previousPerformance: prev,
+      );
+    });
 
 class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
   final Ref _ref;
 
   ActiveWorkoutNotifier(String routineId, this._ref)
-      : super(_buildInitial(routineId, _ref)) {
+    : super(_buildInitial(routineId, _ref)) {
     _startSessionTimer();
   }
 
   Timer? _sessionTimer;
   Timer? _restTicker;
+
+  DateTime _workoutStartedAt = DateTime.now();
+  DateTime _startedAt = DateTime.now();
+  int _accumulatedSeconds = 0;
+  DateTime? _restEndAt;
+
+  DateTime get workoutStartedAt => _workoutStartedAt;
+
+  void restoreStartTime(DateTime originalStartedAt) {
+    _workoutStartedAt = originalStartedAt;
+    _startedAt = originalStartedAt;
+    _accumulatedSeconds = 0;
+    final elapsed = DateTime.now().difference(originalStartedAt).inSeconds;
+    state = state.copyWith(elapsedSeconds: elapsed.clamp(0, 86400));
+  }
 
   static ActiveWorkoutState _buildInitial(String routineId, Ref ref) {
     final init = ref.read(workoutInitProvider(routineId)).requireValue;
@@ -183,16 +197,16 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
       exercises: init.exercises,
       elapsedSeconds: 0,
       isRunning: true,
-      exerciseStates:
-          init.routine.exercises.asMap().entries.map((entry) {
+      exerciseStates: init.routine.exercises.asMap().entries.map((entry) {
         final i = entry.key;
         final re = entry.value;
         final prevSets = prev[re.exerciseId] ?? [];
         final firstPrev = prevSets.isNotEmpty
             ? prevSets.first
             : const WorkoutSet(kg: 0, reps: 8);
-        final isUnilateral = init.exercises
-            .any((e) => e.id == re.exerciseId && e.isUnilateral);
+        final isUnilateral = init.exercises.any(
+          (e) => e.id == re.exerciseId && e.isUnilateral,
+        );
         return ExerciseWorkoutState(
           exerciseId: re.exerciseId,
           targetSets: re.targetSets,
@@ -208,14 +222,23 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
   }
 
   void _startSessionTimer() {
+    _startedAt = DateTime.now();
     _sessionTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (state.isRunning) {
-        state = state.copyWith(elapsedSeconds: state.elapsedSeconds + 1);
+        final elapsed = _accumulatedSeconds +
+            DateTime.now().difference(_startedAt).inSeconds;
+        state = state.copyWith(elapsedSeconds: elapsed);
       }
     });
   }
 
   void togglePause() {
+    if (state.isRunning) {
+      _accumulatedSeconds +=
+          DateTime.now().difference(_startedAt).inSeconds;
+    } else {
+      _startedAt = DateTime.now();
+    }
     state = state.copyWith(isRunning: !state.isRunning);
   }
 
@@ -265,8 +288,10 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     // Mirror right to left for unilateral in symmetric mode
     var setToSave = e.currentInput!;
     if (e.isUnilateral && !e.isSplitMode) {
-      setToSave =
-          setToSave.copyWith(leftKg: setToSave.kg, leftReps: setToSave.reps);
+      setToSave = setToSave.copyWith(
+        leftKg: setToSave.kg,
+        leftReps: setToSave.reps,
+      );
     }
 
     final newCompleted = [...e.completedSets, setToSave];
@@ -276,8 +301,8 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     final nextPrev = nextIdx < prev.length
         ? prev[nextIdx]
         : prev.isNotEmpty
-            ? prev.last
-            : const WorkoutSet(kg: 0, reps: 8);
+        ? prev.last
+        : const WorkoutSet(kg: 0, reps: 8);
 
     if (isDone) {
       list[index] = e.copyWith(
@@ -291,14 +316,12 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
           kg: nextPrev.kg,
           reps: nextPrev.reps,
           leftKg: e.isSplitMode ? (nextPrev.leftKg ?? nextPrev.kg) : null,
-          leftReps:
-              e.isSplitMode ? (nextPrev.leftReps ?? nextPrev.reps) : null,
+          leftReps: e.isSplitMode ? (nextPrev.leftReps ?? nextPrev.reps) : null,
         ),
       );
     }
 
-    final exerciseName =
-        state.findExercise(e.exerciseId)?.name ?? 'Exercise';
+    final exerciseName = state.findExercise(e.exerciseId)?.name ?? 'Exercise';
 
     state = state.copyWith(
       exerciseStates: list,
@@ -313,30 +336,39 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
 
   void _startRestTimer() {
     _restTicker?.cancel();
+    final rt = state.restTimer;
+    if (rt == null) return;
+    _restEndAt = DateTime.now().add(Duration(seconds: rt.total));
     _restTicker = Timer.periodic(const Duration(seconds: 1), (_) {
-      final rt = state.restTimer;
-      if (rt == null) {
+      final endAt = _restEndAt;
+      final currentRt = state.restTimer;
+      if (endAt == null || currentRt == null) {
         _restTicker?.cancel();
         return;
       }
-      if (rt.remaining <= 0) {
+      final remaining = endAt.difference(DateTime.now()).inSeconds;
+      if (remaining <= 0) {
         state = state.copyWith(clearRestTimer: true);
+        _restEndAt = null;
         _restTicker?.cancel();
         return;
       }
-      state =
-          state.copyWith(restTimer: rt.copyWith(remaining: rt.remaining - 1));
+      state = state.copyWith(
+        restTimer: currentRt.copyWith(remaining: remaining),
+      );
     });
   }
 
   void skipRest() {
     _restTicker?.cancel();
+    _restEndAt = null;
     state = state.copyWith(clearRestTimer: true);
   }
 
   void addRestTime(int seconds) {
     final rt = state.restTimer;
     if (rt == null) return;
+    _restEndAt = (_restEndAt ?? DateTime.now()).add(Duration(seconds: seconds));
     state = state.copyWith(
       restTimer: rt.copyWith(
         remaining: rt.remaining + seconds,
@@ -357,8 +389,9 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     final list = [...state.exerciseStates];
     final e = list[index];
     if (e.currentInput == null) return;
-    list[index] =
-        e.copyWith(currentInput: e.currentInput!.copyWith(reps: reps));
+    list[index] = e.copyWith(
+      currentInput: e.currentInput!.copyWith(reps: reps),
+    );
     state = state.copyWith(exerciseStates: list);
   }
 
@@ -366,8 +399,9 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     final list = [...state.exerciseStates];
     final e = list[index];
     if (e.currentInput == null) return;
-    list[index] =
-        e.copyWith(currentInput: e.currentInput!.copyWith(leftKg: kg));
+    list[index] = e.copyWith(
+      currentInput: e.currentInput!.copyWith(leftKg: kg),
+    );
     state = state.copyWith(exerciseStates: list);
   }
 
@@ -375,8 +409,9 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     final list = [...state.exerciseStates];
     final e = list[index];
     if (e.currentInput == null) return;
-    list[index] =
-        e.copyWith(currentInput: e.currentInput!.copyWith(leftReps: reps));
+    list[index] = e.copyWith(
+      currentInput: e.currentInput!.copyWith(leftReps: reps),
+    );
     state = state.copyWith(exerciseStates: list);
   }
 
@@ -384,8 +419,9 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     _sessionTimer?.cancel();
     _restTicker?.cancel();
 
-    final exerciseStates =
-        state.exerciseStates.where((e) => e.completedSets.isNotEmpty).toList();
+    final exerciseStates = state.exerciseStates
+        .where((e) => e.completedSets.isNotEmpty)
+        .toList();
     if (exerciseStates.isEmpty) return;
 
     final sessionExercises = exerciseStates.map((e) {
@@ -397,8 +433,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
       );
     }).toList();
 
-    final totalVolume =
-        sessionExercises.fold(0.0, (s, e) => s + e.volume);
+    final totalVolume = sessionExercises.fold(0.0, (s, e) => s + e.volume);
 
     final session = Session(
       id: const Uuid().v4(),
@@ -433,5 +468,5 @@ final activeWorkoutRoutineIdProvider = StateProvider<String?>((ref) => null);
 
 final activeWorkoutProvider = StateNotifierProvider.autoDispose
     .family<ActiveWorkoutNotifier, ActiveWorkoutState, String>(
-  (ref, routineId) => ActiveWorkoutNotifier(routineId, ref),
-);
+      (ref, routineId) => ActiveWorkoutNotifier(routineId, ref),
+    );

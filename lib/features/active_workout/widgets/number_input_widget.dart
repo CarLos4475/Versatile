@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/format_utils.dart';
+import '../../../shared/widgets/motion.dart';
 
 class NumberInputWidget extends StatelessWidget {
   const NumberInputWidget({
@@ -63,7 +64,7 @@ class _Btn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
       child: Container(
         width: 22,

@@ -1,8 +1,9 @@
 import 'dart:math';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/glass_effect.dart';
 import '../../../core/utils/format_utils.dart';
+import '../../../shared/widgets/motion.dart';
 import '../view_models/active_workout_view_model.dart';
 
 class RestTimerBar extends StatelessWidget {
@@ -19,86 +20,75 @@ class RestTimerBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: 12,
-      right: 12,
-      bottom: 14,
-      child: ClipRRect(
+    return GlassEffect.wrap(
+        sigma: 10,
         borderRadius: BorderRadius.circular(22),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xEB281E16), Color(0xF51C1610)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.12),
-                width: 0.5,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
-                  blurRadius: 40,
-                  offset: const Offset(0, 16),
-                ),
-              ],
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xEB281E16), Color(0xF51C1610)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: Row(
-              children: [
-                _CircularProgress(progress: restTimer.progress),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'REST',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Color(0x99FFFFFF),
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 0.04,
-                        ),
-                      ),
-                      Text(
-                        FormatUtils.timer(restTimer.remaining),
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                          letterSpacing: -0.48,
-                          height: 1.1,
-                          fontFeatures: [FontFeature.tabularFigures()],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.12),
+              width: 0.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 40,
+                offset: const Offset(0, 16),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              _CircularProgress(progress: restTimer.progress),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _ActionBtn(
-                      label: '+15s',
-                      onTap: onAddTime,
-                      transparent: true,
+                    const Text(
+                      'REST',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Color(0x99FFFFFF),
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.04,
+                      ),
                     ),
-                    const SizedBox(width: 6),
-                    _ActionBtn(
-                      label: 'Skip',
-                      onTap: onSkip,
-                      transparent: false,
+                    Text(
+                      FormatUtils.timer(restTimer.remaining),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                        letterSpacing: -0.48,
+                        height: 1.1,
+                        fontFeatures: [FontFeature.tabularFigures()],
+                      ),
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+              Row(
+                children: [
+                  _ActionBtn(
+                    label: '+15s',
+                    onTap: onAddTime,
+                    transparent: true,
+                  ),
+                  const SizedBox(width: 6),
+                  _ActionBtn(label: 'Skip', onTap: onSkip, transparent: false),
+                ],
+              ),
+            ],
           ),
         ),
-      ),
     );
   }
 }
@@ -125,7 +115,11 @@ class _CircularProgress extends StatelessWidget {
           stroke: stroke,
         ),
         child: const Center(
-          child: Icon(Icons.timer_outlined, size: 16, color: AppColors.accentSoft),
+          child: Icon(
+            Icons.timer_outlined,
+            size: 16,
+            color: AppColors.accentSoft,
+          ),
         ),
       ),
     );
@@ -185,7 +179,7 @@ class _ActionBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
       child: Container(
         height: 34,

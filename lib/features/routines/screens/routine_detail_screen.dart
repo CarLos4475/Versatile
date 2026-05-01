@@ -5,6 +5,7 @@ import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
+import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../active_workout/screens/active_workout_screen.dart';
 import '../../exercises/view_models/exercises_view_model.dart';
@@ -36,11 +37,14 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: AppColors.bgFrame,
-        title: const Text('Delete routine?',
-            style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: AppColors.ink900)),
+        title: const Text(
+          'Delete routine?',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink900,
+          ),
+        ),
         content: const Text(
           'This will permanently remove this routine.',
           style: TextStyle(fontSize: 14, color: AppColors.ink500),
@@ -48,23 +52,26 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel',
-                style: TextStyle(color: AppColors.ink500)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppColors.ink500),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete',
-                style: TextStyle(
-                    color: AppColors.accentDeep,
-                    fontWeight: FontWeight.w600)),
+            child: const Text(
+              'Delete',
+              style: TextStyle(
+                color: AppColors.accentDeep,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
     );
     if (ok == true && mounted) {
-      await ref
-          .read(routinesProvider.notifier)
-          .deleteRoutine(widget.routineId);
+      await ref.read(routinesProvider.notifier).deleteRoutine(widget.routineId);
       if (mounted) Navigator.of(context).pop();
     }
   }
@@ -74,9 +81,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
     final exercises = [...routine.exercises];
     final moved = exercises.removeAt(oldIndex);
     exercises.insert(newIndex, moved);
-    ref
-        .read(routinesProvider.notifier)
-        .reorderExercises(routine.id, exercises);
+    ref.read(routinesProvider.notifier).reorderExercises(routine.id, exercises);
   }
 
   @override
@@ -88,8 +93,11 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
       loading: () => const Scaffold(
         backgroundColor: AppColors.bgApp,
         body: Center(
-            child: CircularProgressIndicator(
-                color: AppColors.accent, strokeWidth: 2)),
+          child: CircularProgressIndicator(
+            color: AppColors.accent,
+            strokeWidth: 2,
+          ),
+        ),
       ),
       error: (e, _) => Scaffold(
         backgroundColor: AppColors.bgApp,
@@ -101,15 +109,20 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
           return Scaffold(
             backgroundColor: AppColors.bgApp,
             body: Center(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                const Text('Routine not found',
-                    style: TextStyle(color: AppColors.ink500)),
-                const SizedBox(height: 12),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Go back'),
-                ),
-              ]),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Routine not found',
+                    style: TextStyle(color: AppColors.ink500),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Go back'),
+                  ),
+                ],
+              ),
             ),
           );
         }
@@ -126,7 +139,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (_editMode)
-              GestureDetector(
+              PressableScale(
                 onTap: _confirmDelete,
                 child: Container(
                   width: 36,
@@ -135,14 +148,19 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.accentTint,
                     borderRadius: BorderRadius.circular(12),
-                    border:
-                        Border.all(color: AppColors.glassBorder, width: 0.5),
+                    border: Border.all(
+                      color: AppColors.glassBorder,
+                      width: 0.5,
+                    ),
                   ),
-                  child: const Icon(Icons.delete_outline,
-                      size: 16, color: AppColors.accentDeep),
+                  child: const Icon(
+                    Icons.delete_outline,
+                    size: 16,
+                    color: AppColors.accentDeep,
+                  ),
                 ),
               ),
-            GestureDetector(
+            PressableScale(
               onTap: () => setState(() => _editMode = !_editMode),
               child: Container(
                 height: 36,
@@ -152,8 +170,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                       ? AppColors.accentTint
                       : const Color(0x99FFFCF7),
                   borderRadius: BorderRadius.circular(12),
-                  border:
-                      Border.all(color: AppColors.glassBorder, width: 0.5),
+                  border: Border.all(color: AppColors.glassBorder, width: 0.5),
                 ),
                 child: Center(
                   child: Text(
@@ -161,8 +178,9 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color:
-                          _editMode ? AppColors.accentDeep : AppColors.ink700,
+                      color: _editMode
+                          ? AppColors.accentDeep
+                          : AppColors.ink700,
                     ),
                   ),
                 ),
@@ -189,14 +207,16 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                           padding: const EdgeInsets.fromLTRB(22, 8, 22, 8),
                           onReorder: (old, neu) =>
                               _onReorder(routine, old, neu),
-                          children: routine.exercises.asMap().entries
-                              .map((entry) {
+                          children: routine.exercises.asMap().entries.map((
+                            entry,
+                          ) {
                             final i = entry.key;
                             final re = entry.value;
                             final ex = findEx(re.exerciseId);
                             if (ex == null) {
                               return SizedBox.shrink(
-                                  key: ValueKey(re.dbId ?? re.exerciseId));
+                                key: ValueKey(re.dbId ?? re.exerciseId),
+                              );
                             }
                             return Padding(
                               key: ValueKey(re.dbId ?? re.exerciseId),
@@ -220,8 +240,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                       height: 28,
                                       decoration: BoxDecoration(
                                         color: AppColors.accentTint,
-                                        borderRadius:
-                                            BorderRadius.circular(8),
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Center(
                                         child: Text(
@@ -258,20 +277,23 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                         ],
                                       ),
                                     ),
-                                    GestureDetector(
+                                    PressableScale(
                                       onTap: re.dbId != null
                                           ? () => ref
-                                              .read(routinesProvider.notifier)
-                                              .removeExercise(
-                                                  routine.id, re.dbId!)
+                                                .read(routinesProvider.notifier)
+                                                .removeExercise(
+                                                  routine.id,
+                                                  re.dbId!,
+                                                )
                                           : null,
                                       child: Container(
                                         width: 32,
                                         height: 32,
                                         decoration: BoxDecoration(
                                           color: AppColors.accentTint,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
                                         ),
                                         child: const Icon(
                                           Icons.delete_outline,
@@ -288,8 +310,9 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                         )
                       : ListView(
                           padding: const EdgeInsets.fromLTRB(22, 8, 22, 8),
-                          children: routine.exercises.asMap().entries
-                              .map((entry) {
+                          children: routine.exercises.asMap().entries.map((
+                            entry,
+                          ) {
                             final i = entry.key;
                             final re = entry.value;
                             final ex = findEx(re.exerciseId);
@@ -306,8 +329,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                       height: 32,
                                       decoration: BoxDecoration(
                                         color: AppColors.accentTint,
-                                        borderRadius:
-                                            BorderRadius.circular(10),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Center(
                                         child: Text(
@@ -317,7 +339,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                             fontWeight: FontWeight.w700,
                                             color: AppColors.accentDeep,
                                             fontFeatures: [
-                                              FontFeature.tabularFigures()
+                                              FontFeature.tabularFigures(),
                                             ],
                                           ),
                                         ),
@@ -350,11 +372,12 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 7, vertical: 3),
+                                        horizontal: 7,
+                                        vertical: 3,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: const Color(0x0A000000),
-                                        borderRadius:
-                                            BorderRadius.circular(6),
+                                        borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
                                         ex.muscle,
@@ -374,9 +397,8 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                 ),
                 if (_editMode)
                   Padding(
-                    padding:
-                        const EdgeInsets.fromLTRB(22, 0, 22, 22),
-                    child: GestureDetector(
+                    padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
+                    child: PressableScale(
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) =>
@@ -388,15 +410,19 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           border: Border.all(
-                              color: AppColors.accent.withOpacity(0.4)),
+                            color: AppColors.accent.withOpacity(0.4),
+                          ),
                           borderRadius: BorderRadius.circular(16),
                           color: AppColors.accentTint.withOpacity(0.5),
                         ),
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.add,
-                                size: 18, color: AppColors.accentDeep),
+                            Icon(
+                              Icons.add,
+                              size: 18,
+                              color: AppColors.accentDeep,
+                            ),
                             SizedBox(width: 8),
                             Text(
                               'Add exercise',
@@ -419,8 +445,11 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                       variant: GlassButtonVariant.primary,
                       size: GlassButtonSize.lg,
                       expand: true,
-                      leading: const Icon(Icons.play_arrow,
-                          color: Colors.white, size: 16),
+                      leading: const Icon(
+                        Icons.play_arrow,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) =>

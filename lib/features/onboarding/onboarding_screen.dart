@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/navigation/app_page_transitions.dart';
 import '../../core/providers/repository_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../app.dart';
+import '../../shared/widgets/motion.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -37,14 +39,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     await settings.setOnboarded();
     ref.invalidate(userNameProvider);
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondary) => const MainShell(),
-        transitionsBuilder: (context, anim, secondary, child) =>
-            FadeTransition(opacity: anim, child: child),
-        transitionDuration: const Duration(milliseconds: 400),
-      ),
-    );
+    Navigator.of(context).pushReplacement(AppRoute(page: const MainShell()));
   }
 
   @override
@@ -173,7 +168,7 @@ class _OnboardPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 48),
-          GestureDetector(
+          PressableScale(
             onTap: onNext,
             child: Container(
               height: 54,
@@ -303,7 +298,7 @@ class _NamePage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          GestureDetector(
+          PressableScale(
             onTap: onFinish,
             child: Container(
               height: 54,

@@ -1,8 +1,10 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/glass_effect.dart';
+import 'motion.dart';
 
 enum GlassButtonVariant { primary, glass, ghost }
+
 enum GlassButtonSize { sm, md, lg }
 
 class GlassButton extends StatelessWidget {
@@ -49,28 +51,52 @@ class GlassButton extends StatelessWidget {
     return SizedBox(
       height: h,
       width: expand ? double.infinity : null,
-      child: switch (variant) {
-        GlassButtonVariant.primary => _PrimaryButton(
-            px: px, fs: fs, gap: gap, r: r,
-            label: label, leading: effectiveLeading, onPressed: onPressed,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 180),
+        opacity: onPressed == null ? 0.58 : 1,
+        child: switch (variant) {
+          GlassButtonVariant.primary => _PrimaryButton(
+            px: px,
+            fs: fs,
+            gap: gap,
+            r: r,
+            label: label,
+            leading: effectiveLeading,
+            onPressed: onPressed,
           ),
-        GlassButtonVariant.glass => _GlassVariantButton(
-            px: px, fs: fs, gap: gap, r: r,
-            label: label, leading: effectiveLeading, onPressed: onPressed,
+          GlassButtonVariant.glass => _GlassVariantButton(
+            px: px,
+            fs: fs,
+            gap: gap,
+            r: r,
+            label: label,
+            leading: effectiveLeading,
+            onPressed: onPressed,
           ),
-        GlassButtonVariant.ghost => _GhostButton(
-            px: px, fs: fs, gap: gap, r: r,
-            label: label, leading: effectiveLeading, onPressed: onPressed,
+          GlassButtonVariant.ghost => _GhostButton(
+            px: px,
+            fs: fs,
+            gap: gap,
+            r: r,
+            label: label,
+            leading: effectiveLeading,
+            onPressed: onPressed,
           ),
-      },
+        },
+      ),
     );
   }
 }
 
 class _PrimaryButton extends StatelessWidget {
   const _PrimaryButton({
-    required this.px, required this.fs, required this.gap, required this.r,
-    required this.label, this.leading, this.onPressed,
+    required this.px,
+    required this.fs,
+    required this.gap,
+    required this.r,
+    required this.label,
+    this.leading,
+    this.onPressed,
   });
   final double px, fs, gap, r;
   final String label;
@@ -79,8 +105,9 @@ class _PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onPressed,
+      behavior: HitTestBehavior.opaque,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: px),
         decoration: BoxDecoration(
@@ -104,12 +131,15 @@ class _PrimaryButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (leading != null) ...[leading!, SizedBox(width: gap)],
-            Text(label, style: TextStyle(
-              color: Colors.white,
-              fontSize: fs,
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.01,
-            )),
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: fs,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.01,
+              ),
+            ),
           ],
         ),
       ),
@@ -119,8 +149,13 @@ class _PrimaryButton extends StatelessWidget {
 
 class _GlassVariantButton extends StatelessWidget {
   const _GlassVariantButton({
-    required this.px, required this.fs, required this.gap, required this.r,
-    required this.label, this.leading, this.onPressed,
+    required this.px,
+    required this.fs,
+    required this.gap,
+    required this.r,
+    required this.label,
+    this.leading,
+    this.onPressed,
   });
   final double px, fs, gap, r;
   final String label;
@@ -129,39 +164,41 @@ class _GlassVariantButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onPressed,
-      child: ClipRRect(
+      behavior: HitTestBehavior.opaque,
+      child: GlassEffect.wrap(
+        sigma: 8,
         borderRadius: BorderRadius.circular(r),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: px),
-            decoration: BoxDecoration(
-              color: const Color(0x8DFFFCF7),
-              borderRadius: BorderRadius.circular(r),
-              border: Border.all(color: AppColors.glassBorder, width: 0.5),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF3C2814).withOpacity(0.08),
-                  blurRadius: 14,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (leading != null) ...[leading!, SizedBox(width: gap)],
-                Text(label, style: TextStyle(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: px),
+          decoration: BoxDecoration(
+            color: const Color(0x8DFFFCF7),
+            borderRadius: BorderRadius.circular(r),
+            border: Border.all(color: AppColors.glassBorder, width: 0.5),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF3C2814).withOpacity(0.08),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (leading != null) ...[leading!, SizedBox(width: gap)],
+              Text(
+                label,
+                style: TextStyle(
                   color: AppColors.ink900,
                   fontSize: fs,
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.01,
-                )),
-              ],
-            ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -171,8 +208,13 @@ class _GlassVariantButton extends StatelessWidget {
 
 class _GhostButton extends StatelessWidget {
   const _GhostButton({
-    required this.px, required this.fs, required this.gap, required this.r,
-    required this.label, this.leading, this.onPressed,
+    required this.px,
+    required this.fs,
+    required this.gap,
+    required this.r,
+    required this.label,
+    this.leading,
+    this.onPressed,
   });
   final double px, fs, gap, r;
   final String label;
@@ -181,8 +223,9 @@ class _GhostButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onPressed,
+      behavior: HitTestBehavior.opaque,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: px),
         child: Row(
@@ -190,11 +233,14 @@ class _GhostButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (leading != null) ...[leading!, SizedBox(width: gap)],
-            Text(label, style: TextStyle(
-              color: AppColors.ink700,
-              fontSize: fs,
-              fontWeight: FontWeight.w600,
-            )),
+            Text(
+              label,
+              style: TextStyle(
+                color: AppColors.ink700,
+                fontSize: fs,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
       ),
@@ -222,8 +268,9 @@ class IconCircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onPressed,
+      behavior: HitTestBehavior.opaque,
       child: Container(
         width: size,
         height: size,
@@ -235,27 +282,32 @@ class IconCircleButton extends StatelessWidget {
                   end: Alignment.bottomCenter,
                 )
               : null,
-          color: accent ? null : subtle
+          color: accent
+              ? null
+              : subtle
               ? const Color(0x0A000000)
               : const Color(0xA6FFFCF7),
           borderRadius: BorderRadius.circular(radius),
-          border: accent || subtle ? null : Border.all(
-            color: AppColors.glassBorder,
-            width: 0.5,
-          ),
-          boxShadow: accent ? [
-            BoxShadow(
-              color: AppColors.accentDeep.withOpacity(0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ] : subtle ? null : [
-            BoxShadow(
-              color: const Color(0xFF3C2814).withOpacity(0.06),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          border: accent || subtle
+              ? null
+              : Border.all(color: AppColors.glassBorder, width: 0.5),
+          boxShadow: accent
+              ? [
+                  BoxShadow(
+                    color: AppColors.accentDeep.withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : subtle
+              ? null
+              : [
+                  BoxShadow(
+                    color: const Color(0xFF3C2814).withOpacity(0.06),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
         ),
         child: Center(
           child: IconTheme(

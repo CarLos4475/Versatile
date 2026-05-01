@@ -160,6 +160,77 @@ class SessionDetailScreen extends StatelessWidget {
                               ...ex.sets.asMap().entries.map((setEntry) {
                                 final idx = setEntry.key;
                                 final s = setEntry.value;
+
+                                Row buildSideRow(
+                                  String setLabel,
+                                  String side,
+                                  double kg,
+                                  int reps,
+                                  double vol,
+                                ) {
+                                  return Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 32,
+                                        child: Text(
+                                          setLabel,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.ink500,
+                                            fontFeatures: [FontFeature.tabularFigures()],
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              side,
+                                              style: const TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppColors.accentDeep,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              '${FormatUtils.weight(kg)} kg',
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                color: AppColors.ink900,
+                                                fontFeatures: [FontFeature.tabularFigures()],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          '$reps',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: AppColors.ink900,
+                                            fontFeatures: [FontFeature.tabularFigures()],
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 72,
+                                        child: Text(
+                                          '${vol.toStringAsFixed(0)} kg',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: AppColors.ink500,
+                                            fontFeatures: [FontFeature.tabularFigures()],
+                                          ),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }
+
                                 return Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 4, vertical: 7),
@@ -173,62 +244,82 @@ class SessionDetailScreen extends StatelessWidget {
                                           ),
                                         )
                                       : null,
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 32,
-                                        child: Text(
-                                          '${idx + 1}',
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: AppColors.ink500,
-                                            fontFeatures: [
-                                              FontFeature.tabularFigures()
-                                            ],
-                                          ),
+                                  child: s.isSplit
+                                      ? Column(
+                                          children: [
+                                            buildSideRow(
+                                              '${idx + 1}',
+                                              'R',
+                                              s.kg,
+                                              s.reps,
+                                              s.kg * s.reps,
+                                            ),
+                                            const SizedBox(height: 5),
+                                            buildSideRow(
+                                              '',
+                                              'L',
+                                              s.leftKg!,
+                                              s.leftReps!,
+                                              s.leftKg! * s.leftReps!,
+                                            ),
+                                          ],
+                                        )
+                                      : Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 32,
+                                              child: Text(
+                                                '${idx + 1}',
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: AppColors.ink500,
+                                                  fontFeatures: [
+                                                    FontFeature.tabularFigures()
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                '${FormatUtils.weight(s.kg)} kg',
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  color: AppColors.ink900,
+                                                  fontFeatures: [
+                                                    FontFeature.tabularFigures()
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                '${s.reps}',
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  color: AppColors.ink900,
+                                                  fontFeatures: [
+                                                    FontFeature.tabularFigures()
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 72,
+                                              child: Text(
+                                                '${s.volume.toStringAsFixed(0)} kg',
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: AppColors.ink500,
+                                                  fontFeatures: [
+                                                    FontFeature.tabularFigures()
+                                                  ],
+                                                ),
+                                                textAlign: TextAlign.right,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          '${FormatUtils.weight(s.kg)} kg',
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            color: AppColors.ink900,
-                                            fontFeatures: [
-                                              FontFeature.tabularFigures()
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          '${s.reps}',
-                                          style: const TextStyle(
-                                            fontSize: 13,
-                                            color: AppColors.ink900,
-                                            fontFeatures: [
-                                              FontFeature.tabularFigures()
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 72,
-                                        child: Text(
-                                          '${s.volume.toStringAsFixed(0)} kg',
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: AppColors.ink500,
-                                            fontFeatures: [
-                                              FontFeature.tabularFigures()
-                                            ],
-                                          ),
-                                          textAlign: TextAlign.right,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
                                 );
                               }),
                             ],

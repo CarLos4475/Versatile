@@ -3,13 +3,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/format_utils.dart';
 import '../../../domain/entities/session.dart';
 import '../../../shared/widgets/glass_container.dart';
+import '../../../shared/widgets/motion.dart';
 
 class SessionCard extends StatelessWidget {
-  const SessionCard({
-    super.key,
-    required this.session,
-    required this.onTap,
-  });
+  const SessionCard({super.key, required this.session, required this.onTap});
 
   final Session session;
   final VoidCallback onTap;
@@ -18,11 +15,11 @@ class SessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
+    return FadeSlideIn(
       child: GlassContainer(
         radius: 18,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        onTap: onTap,
         child: Row(
           children: [
             Container(
@@ -66,22 +63,32 @@ class SessionCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.timer_outlined,
-                          size: 13, color: AppColors.ink500),
+                      const Icon(
+                        Icons.timer_outlined,
+                        size: 13,
+                        color: AppColors.ink500,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         FormatUtils.duration(session.durationMin),
                         style: const TextStyle(
-                            fontSize: 12, color: AppColors.ink500),
+                          fontSize: 12,
+                          color: AppColors.ink500,
+                        ),
                       ),
                       const SizedBox(width: 14),
-                      const Icon(Icons.fitness_center,
-                          size: 13, color: AppColors.ink500),
+                      const Icon(
+                        Icons.fitness_center,
+                        size: 13,
+                        color: AppColors.ink500,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         FormatUtils.volume(session.volumeKg),
                         style: const TextStyle(
-                            fontSize: 12, color: AppColors.ink500),
+                          fontSize: 12,
+                          color: AppColors.ink500,
+                        ),
                       ),
                     ],
                   ),
@@ -89,8 +96,11 @@ class SessionCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Icon(Icons.chevron_right,
-                size: 16, color: AppColors.ink900.withOpacity(0.3)),
+            Icon(
+              Icons.chevron_right,
+              size: 16,
+              color: AppColors.ink900.withOpacity(0.3),
+            ),
           ],
         ),
       ),

@@ -5,17 +5,32 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
+import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../view_models/exercises_view_model.dart';
 
 const _kMuscles = [
-  'Chest', 'Back', 'Shoulders',
-  'Biceps', 'Triceps', 'Forearms',
-  'Core', 'Quadriceps', 'Hamstrings', 'Glutes', 'Calves', 'Other',
+  'Chest',
+  'Back',
+  'Shoulders',
+  'Biceps',
+  'Triceps',
+  'Forearms',
+  'Core',
+  'Quadriceps',
+  'Hamstrings',
+  'Glutes',
+  'Calves',
+  'Other',
 ];
 
 const _kEquipment = [
-  'Barbell', 'Dumbbell', 'Cable', 'Machine', 'Bodyweight', 'Other',
+  'Barbell',
+  'Dumbbell',
+  'Cable',
+  'Machine',
+  'Bodyweight',
+  'Other',
 ];
 
 class AddExerciseScreen extends ConsumerStatefulWidget {
@@ -73,8 +88,10 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: GlassContainer(
                 radius: 16,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
                 child: TextField(
                   controller: _ctrl,
                   autofocus: true,
@@ -85,8 +102,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                   ),
                   decoration: const InputDecoration(
                     hintText: 'Exercise name…',
-                    hintStyle:
-                        TextStyle(fontSize: 16, color: AppColors.ink400),
+                    hintStyle: TextStyle(fontSize: 16, color: AppColors.ink400),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(vertical: 14),
                   ),
@@ -110,7 +126,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
             const SizedBox(height: 24),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
-              child: GestureDetector(
+              child: PressableScale(
                 onTap: () => setState(() => _isUnilateral = !_isUnilateral),
                 child: Row(
                   children: [
@@ -162,7 +178,9 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                           Text(
                             'Track left and right sides separately',
                             style: TextStyle(
-                                fontSize: 12, color: AppColors.ink400),
+                              fontSize: 12,
+                              color: AppColors.ink400,
+                            ),
                           ),
                         ],
                       ),
@@ -231,16 +249,16 @@ class _Section extends StatelessWidget {
             itemBuilder: (context, i) {
               final opt = options[i];
               final active = opt == selected;
-              return GestureDetector(
+              return PressableScale(
                 onTap: () => onSelected(opt),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 160),
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 8),
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: active
-                        ? AppColors.accentDeep
-                        : AppColors.glassBg,
+                    color: active ? AppColors.accentDeep : AppColors.glassBg,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: active

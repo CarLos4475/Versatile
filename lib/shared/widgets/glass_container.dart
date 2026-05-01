@@ -1,6 +1,7 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/glass_effect.dart';
+import 'motion.dart';
 
 class GlassContainer extends StatelessWidget {
   const GlassContainer({
@@ -28,37 +29,33 @@ class GlassContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget container = ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          width: width,
-          height: height,
-          constraints: constraints,
-          padding: padding,
-          decoration: BoxDecoration(
-            color: strong ? AppColors.glassBgStrong : AppColors.glassBg,
-            borderRadius: BorderRadius.circular(radius),
-            border: Border.all(
-              color: AppColors.glassBorder,
-              width: 0.5,
+    final borderRadius = BorderRadius.circular(radius);
+    Widget container = GlassEffect.wrap(
+      sigma: strong ? 12 : 8,
+      borderRadius: borderRadius,
+      child: Container(
+        width: width,
+        height: height,
+        constraints: constraints,
+        padding: padding,
+        decoration: BoxDecoration(
+          color: strong ? AppColors.glassBgStrong : AppColors.glassBg,
+          borderRadius: borderRadius,
+          border: Border.all(color: AppColors.glassBorder, width: 0.5),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF3C2814).withOpacity(0.06),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
             ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF3C2814).withOpacity(0.06),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
-              ),
-              BoxShadow(
-                color: const Color(0xFF3C2814).withOpacity(0.04),
-                blurRadius: 2,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: child,
+            BoxShadow(
+              color: const Color(0xFF3C2814).withOpacity(0.04),
+              blurRadius: 2,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
+        child: child,
       ),
     );
 
@@ -66,7 +63,11 @@ class GlassContainer extends StatelessWidget {
       container = Container(
         margin: margin,
         child: onTap != null
-            ? GestureDetector(onTap: onTap, child: container)
+            ? PressableScale(
+                onTap: onTap,
+                behavior: HitTestBehavior.opaque,
+                child: container,
+              )
             : container,
       );
     }
