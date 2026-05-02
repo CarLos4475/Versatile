@@ -62,7 +62,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgApp,
+      backgroundColor: context.colors.bgApp,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,8 +71,9 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
               title: 'New Routine',
               subtitle: 'Name it and pick a color',
               onBack: () => Navigator.of(context).pop(),
+              accentBack: true,
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: GlassContainer(
@@ -84,14 +85,14 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                 child: TextField(
                   controller: _ctrl,
                   autofocus: true,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
-                    color: AppColors.ink900,
+                    color: context.colors.ink900,
                     fontWeight: FontWeight.w500,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'e.g. Push Day, Full Body…',
-                    hintStyle: TextStyle(fontSize: 16, color: AppColors.ink400),
+                    hintStyle: TextStyle(fontSize: 16, color: context.colors.ink400),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(vertical: 14),
                   ),
@@ -99,7 +100,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: Text(
@@ -108,11 +109,11 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.06,
-                  color: AppColors.ink400,
+                  color: context.colors.ink400,
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: Wrap(
@@ -143,7 +144,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                             : null,
                       ),
                       child: active
-                          ? const Icon(
+                          ? Icon(
                               Icons.check,
                               color: Colors.white,
                               size: 20,

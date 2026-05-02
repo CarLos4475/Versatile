@@ -98,7 +98,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.bgApp,
+      backgroundColor: context.colors.bgApp,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,6 +107,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
               title: 'Add Exercise',
               subtitle: '${allExercises.length} in library',
               onBack: () => Navigator.of(context).pop(),
+              accentBack: true,
               trailing: PressableScale(
                 onTap: () async {
                   await Navigator.of(context).push(
@@ -117,22 +118,22 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: AppColors.accentTint,
+                    color: context.colors.accentTint,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.accent.withOpacity(0.3),
+                      color: context.colors.accent.withValues(alpha: 0.3),
                       width: 0.5,
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.add,
                     size: 20,
-                    color: AppColors.accentDeep,
+                    color: context.colors.accentDeep,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: GlassContainer(
@@ -140,32 +141,32 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                 height: 44,
                 child: Row(
                   children: [
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(left: 12),
                       child: Icon(
                         Icons.search,
                         size: 16,
-                        color: AppColors.ink400,
+                        color: context.colors.ink400,
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10),
                     Expanded(
                       child: TextField(
                         controller: _queryCtrl,
                         onChanged: (v) => setState(() => _query = v),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'Search…',
                           hintStyle: TextStyle(
                             fontSize: 14,
-                            color: AppColors.ink400,
+                            color: context.colors.ink400,
                           ),
                           border: InputBorder.none,
                           isDense: true,
                           contentPadding: EdgeInsets.zero,
                         ),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.ink900,
+                          color: context.colors.ink900,
                         ),
                       ),
                     ),
@@ -173,14 +174,14 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             SizedBox(
               height: 32,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 22),
                 itemCount: _kPickerMuscleGroups.length,
-                separatorBuilder: (context, index) => const SizedBox(width: 6),
+                separatorBuilder: (context, index) => SizedBox(width: 6),
                 itemBuilder: (context, i) {
                   final m = _kPickerMuscleGroups[i];
                   final active = _muscle == m;
@@ -196,12 +197,12 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: active ? AppColors.accentDeep : AppColors.glassBg,
+                        color: active ? context.colors.accentDeep : context.colors.glassBg,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: active
                               ? Colors.transparent
-                              : AppColors.glassBorder,
+                              : context.colors.glassBorder,
                           width: 0.5,
                         ),
                       ),
@@ -210,7 +211,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: active ? Colors.white : AppColors.ink700,
+                          color: active ? Colors.white : context.colors.ink700,
                         ),
                       ),
                     ),
@@ -231,7 +232,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 22),
                           itemCount: _subMuscles.length,
-                          separatorBuilder: (_, __) => const SizedBox(width: 6),
+                          separatorBuilder: (_, __) => SizedBox(width: 6),
                           itemBuilder: (context, i) {
                             final m = _subMuscles[i];
                             final active = _subMuscle == m;
@@ -247,13 +248,13 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                                 ),
                                 decoration: BoxDecoration(
                                   color: active
-                                      ? AppColors.accent
-                                      : AppColors.glassBg,
+                                      ? context.colors.accent
+                                      : context.colors.glassBg,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
                                     color: active
                                         ? Colors.transparent
-                                        : AppColors.glassBorder,
+                                        : context.colors.glassBorder,
                                     width: 0.5,
                                   ),
                                 ),
@@ -262,7 +263,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    color: active ? Colors.white : AppColors.ink700,
+                                    color: active ? Colors.white : context.colors.ink700,
                                   ),
                                 ),
                               ),
@@ -271,9 +272,9 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                         ),
                       ),
                     )
-                  : const SizedBox.shrink(),
+                  : SizedBox.shrink(),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Expanded(
               child: ListView.separated(
                 padding: const EdgeInsets.symmetric(
@@ -281,7 +282,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                   vertical: 4,
                 ),
                 itemCount: filtered.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 6),
+                separatorBuilder: (context, index) => SizedBox(height: 6),
                 itemBuilder: (context, i) =>
                     _ExerciseRow(exercise: filtered[i], onPick: _pickExercise),
               ),
@@ -314,30 +315,30 @@ class _ExerciseRow extends StatelessWidget {
                     Flexible(
                       child: Text(
                         exercise.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.ink900,
+                          color: context.colors.ink900,
                         ),
                       ),
                     ),
                     if (exercise.isCustom) ...[
-                      const SizedBox(width: 6),
+                      SizedBox(width: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 5,
                           vertical: 1,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.accentTint,
+                          color: context.colors.accentTint,
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Text(
+                        child: Text(
                           'CUSTOM',
                           style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.accentDeep,
+                            color: context.colors.accentDeep,
                             letterSpacing: 0.05,
                           ),
                         ),
@@ -345,10 +346,10 @@ class _ExerciseRow extends StatelessWidget {
                     ],
                   ],
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   '${exercise.muscle} · ${exercise.equipment}',
-                  style: const TextStyle(fontSize: 12, color: AppColors.ink500),
+                  style: TextStyle(fontSize: 12, color: context.colors.ink500),
                 ),
               ],
             ),
@@ -359,13 +360,13 @@ class _ExerciseRow extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: AppColors.accentTint,
+                color: context.colors.accentTint,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.add,
                 size: 16,
-                color: AppColors.accentDeep,
+                color: context.colors.accentDeep,
               ),
             ),
           ),
@@ -401,8 +402,8 @@ class _ConfigSheetState extends State<_ConfigSheet> {
     return Container(
       margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       padding: const EdgeInsets.fromLTRB(22, 20, 22, 32),
-      decoration: const BoxDecoration(
-        color: AppColors.bgFrame,
+      decoration: BoxDecoration(
+        color: context.colors.bgFrame,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -414,26 +415,26 @@ class _ConfigSheetState extends State<_ConfigSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.ink300,
+                color: context.colors.ink300,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             widget.exercise.name,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               letterSpacing: -0.18,
-              color: AppColors.ink900,
+              color: context.colors.ink900,
             ),
           ),
           Text(
             '${widget.exercise.muscle} · ${widget.exercise.equipment}',
-            style: const TextStyle(fontSize: 13, color: AppColors.ink400),
+            style: TextStyle(fontSize: 13, color: context.colors.ink400),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           _ConfigRow(
             label: 'Sets',
             child: _Stepper(
@@ -445,7 +446,7 @@ class _ConfigSheetState extends State<_ConfigSheet> {
               display: '$_sets',
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           _ConfigRow(
             label: 'Reps',
             child: SizedBox(
@@ -453,10 +454,10 @@ class _ConfigSheetState extends State<_ConfigSheet> {
               child: TextField(
                 controller: _repsCtrl,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.ink900,
+                  color: context.colors.ink900,
                 ),
                 decoration: InputDecoration(
                   filled: true,
@@ -473,7 +474,7 @@ class _ConfigSheetState extends State<_ConfigSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           _ConfigRow(
             label: 'Rest',
             child: _Stepper(
@@ -487,12 +488,12 @@ class _ConfigSheetState extends State<_ConfigSheet> {
               display: '${_restSeconds}s',
             ),
           ),
-          const SizedBox(height: 28),
+          SizedBox(height: 28),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.accentDeep,
+                backgroundColor: context.colors.accentDeep,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -515,7 +516,7 @@ class _ConfigSheetState extends State<_ConfigSheet> {
                       );
                     },
               child: _saving
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 20,
                       height: 20,
                       child: CircularProgressIndicator(
@@ -523,7 +524,7 @@ class _ConfigSheetState extends State<_ConfigSheet> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text(
+                  : Text(
                       'Add to Routine',
                       style: TextStyle(
                         fontSize: 16,
@@ -550,10 +551,10 @@ class _ConfigRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w500,
-            color: AppColors.ink700,
+            color: context.colors.ink700,
           ),
         ),
         child,
@@ -584,10 +585,10 @@ class _Stepper extends StatelessWidget {
           child: Text(
             display,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: AppColors.ink900,
+              color: context.colors.ink900,
             ),
           ),
         ),
@@ -613,7 +614,7 @@ class _StepBtn extends StatelessWidget {
           color: const Color(0x0A000000),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(icon, size: 16, color: AppColors.ink700),
+        child: Icon(icon, size: 16, color: context.colors.ink700),
       ),
     );
   }

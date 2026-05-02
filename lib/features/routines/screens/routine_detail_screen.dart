@@ -36,33 +36,33 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.bgFrame,
-        title: const Text(
+        backgroundColor: context.colors.bgFrame,
+        title: Text(
           'Delete routine?',
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
-            color: AppColors.ink900,
+            color: context.colors.ink900,
           ),
         ),
-        content: const Text(
+        content: Text(
           'This will permanently remove this routine.',
-          style: TextStyle(fontSize: 14, color: AppColors.ink500),
+          style: TextStyle(fontSize: 14, color: context.colors.ink500),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text(
+            child: Text(
               'Cancel',
-              style: TextStyle(color: AppColors.ink500),
+              style: TextStyle(color: context.colors.ink500),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
+            child: Text(
               'Delete',
               style: TextStyle(
-                color: AppColors.accentDeep,
+                color: context.colors.accentDeep,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -90,36 +90,36 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
     final exercises = ref.watch(exercisesAsyncProvider).value ?? [];
 
     return routinesAsync.when(
-      loading: () => const Scaffold(
-        backgroundColor: AppColors.bgApp,
+      loading: () => Scaffold(
+        backgroundColor: context.colors.bgApp,
         body: Center(
           child: CircularProgressIndicator(
-            color: AppColors.accent,
+            color: context.colors.accent,
             strokeWidth: 2,
           ),
         ),
       ),
       error: (e, _) => Scaffold(
-        backgroundColor: AppColors.bgApp,
+        backgroundColor: context.colors.bgApp,
         body: Center(child: Text('$e')),
       ),
       data: (routines) {
         final routine = _find(routines);
         if (routine == null) {
           return Scaffold(
-            backgroundColor: AppColors.bgApp,
+            backgroundColor: context.colors.bgApp,
             body: Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     'Routine not found',
-                    style: TextStyle(color: AppColors.ink500),
+                    style: TextStyle(color: context.colors.ink500),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Go back'),
+                    child: Text('Go back'),
                   ),
                 ],
               ),
@@ -146,17 +146,17 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                   height: 36,
                   margin: const EdgeInsets.only(right: 8),
                   decoration: BoxDecoration(
-                    color: AppColors.accentTint,
+                    color: context.colors.accentTint,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.glassBorder,
+                      color: context.colors.accent.withValues(alpha: 0.4),
                       width: 0.5,
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.delete_outline,
-                    size: 16,
-                    color: AppColors.accentDeep,
+                    size: 18,
+                    color: context.colors.accentDeep,
                   ),
                 ),
               ),
@@ -166,21 +166,39 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                 height: 36,
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 decoration: BoxDecoration(
-                  color: _editMode
-                      ? AppColors.accentTint
-                      : const Color(0x99FFFCF7),
+                  gradient: _editMode
+                      ? null
+                      : const LinearGradient(
+                          colors: [Color(0xFFE08866), Color(0xFFD97757)],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
+                  color: _editMode ? context.colors.accentTint : null,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.glassBorder, width: 0.5),
+                  border: Border.all(
+                    color: _editMode
+                        ? context.colors.accent.withValues(alpha: 0.4)
+                        : context.colors.accentDeep.withValues(alpha: 0.2),
+                    width: 0.5,
+                  ),
+                  boxShadow: _editMode
+                      ? null
+                      : [
+                          BoxShadow(
+                            color: context.colors.accentDeep
+                                .withValues(alpha: 0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
                 ),
                 child: Center(
                   child: Text(
                     _editMode ? 'Done' : 'Edit',
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: _editMode
-                          ? AppColors.accentDeep
-                          : AppColors.ink700,
+                      fontWeight: FontWeight.w700,
+                      color: _editMode ? context.colors.accentDeep : Colors.white,
                     ),
                   ),
                 ),
@@ -190,7 +208,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
         );
 
         return Scaffold(
-          backgroundColor: AppColors.bgApp,
+          backgroundColor: context.colors.bgApp,
           body: SafeArea(
             child: Column(
               children: [
@@ -199,8 +217,9 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                   subtitle: '${routine.exercises.length} exercises',
                   onBack: () => Navigator.of(context).pop(),
                   trailing: trailing,
+                  accentBack: true,
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Expanded(
                   child: _editMode
                       ? ReorderableListView(
@@ -228,32 +247,32 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                   children: [
                                     ReorderableDragStartListener(
                                       index: i,
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.drag_handle,
                                         size: 18,
-                                        color: AppColors.ink300,
+                                        color: context.colors.ink300,
                                       ),
                                     ),
-                                    const SizedBox(width: 10),
+                                    SizedBox(width: 10),
                                     Container(
                                       width: 28,
                                       height: 28,
                                       decoration: BoxDecoration(
-                                        color: AppColors.accentTint,
+                                        color: context.colors.accentTint,
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Center(
                                         child: Text(
                                           '${i + 1}',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w700,
-                                            color: AppColors.accentDeep,
+                                            color: context.colors.accentDeep,
                                           ),
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 10),
+                                    SizedBox(width: 10),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
@@ -261,17 +280,17 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                         children: [
                                           Text(
                                             ex.name,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
-                                              color: AppColors.ink900,
+                                              color: context.colors.ink900,
                                             ),
                                           ),
                                           Text(
                                             '${re.targetSets} × ${re.targetReps} · ${re.restSeconds}s rest',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 12,
-                                              color: AppColors.ink500,
+                                              color: context.colors.ink500,
                                             ),
                                           ),
                                         ],
@@ -290,15 +309,15 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                         width: 32,
                                         height: 32,
                                         decoration: BoxDecoration(
-                                          color: AppColors.accentTint,
+                                          color: context.colors.accentTint,
                                           borderRadius: BorderRadius.circular(
                                             10,
                                           ),
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.delete_outline,
                                           size: 15,
-                                          color: AppColors.accentDeep,
+                                          color: context.colors.accentDeep,
                                         ),
                                       ),
                                     ),
@@ -316,7 +335,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                             final i = entry.key;
                             final re = entry.value;
                             final ex = findEx(re.exerciseId);
-                            if (ex == null) return const SizedBox.shrink();
+                            if (ex == null) return SizedBox.shrink();
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 8),
                               child: GlassContainer(
@@ -328,16 +347,16 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                       width: 32,
                                       height: 32,
                                       decoration: BoxDecoration(
-                                        color: AppColors.accentTint,
+                                        color: context.colors.accentTint,
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Center(
                                         child: Text(
                                           '${i + 1}',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w700,
-                                            color: AppColors.accentDeep,
+                                            color: context.colors.accentDeep,
                                             fontFeatures: [
                                               FontFeature.tabularFigures(),
                                             ],
@@ -345,7 +364,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
+                                    SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
@@ -353,18 +372,18 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                         children: [
                                           Text(
                                             ex.name,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w600,
-                                              color: AppColors.ink900,
+                                              color: context.colors.ink900,
                                             ),
                                           ),
-                                          const SizedBox(height: 2),
+                                          SizedBox(height: 2),
                                           Text(
                                             '${re.targetSets} × ${re.targetReps} reps · ${re.restSeconds}s rest',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 12,
-                                              color: AppColors.ink500,
+                                              color: context.colors.ink500,
                                             ),
                                           ),
                                         ],
@@ -381,9 +400,9 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                       ),
                                       child: Text(
                                         ex.muscle,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 11,
-                                          color: AppColors.ink400,
+                                          color: context.colors.ink400,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
@@ -409,27 +428,36 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          border: Border.all(
-                            color: AppColors.accent.withOpacity(0.4),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFE08866), Color(0xFFD97757)],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
                           ),
                           borderRadius: BorderRadius.circular(16),
-                          color: AppColors.accentTint.withOpacity(0.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: context.colors.accentDeep
+                                  .withValues(alpha: 0.25),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                          children: const [
                             Icon(
-                              Icons.add,
+                              Icons.add_rounded,
                               size: 18,
-                              color: AppColors.accentDeep,
+                              color: Colors.white,
                             ),
                             SizedBox(width: 8),
                             Text(
                               'Add exercise',
                               style: TextStyle(
                                 fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.accentDeep,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
                               ),
                             ),
                           ],
@@ -445,7 +473,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                       variant: GlassButtonVariant.primary,
                       size: GlassButtonSize.lg,
                       expand: true,
-                      leading: const Icon(
+                      leading: Icon(
                         Icons.play_arrow,
                         color: Colors.white,
                         size: 16,

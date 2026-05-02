@@ -22,11 +22,9 @@ class AppPageTransitionsBuilder extends PageTransitionsBuilder {
 class AppRoute<T> extends PageRouteBuilder<T> {
   AppRoute({
     required Widget page,
-    RouteSettings? settings,
-    bool fullscreenDialog = false,
+    super.settings,
+    super.fullscreenDialog,
   }) : super(
-         settings: settings,
-         fullscreenDialog: fullscreenDialog,
          pageBuilder: (context, animation, secondaryAnimation) => page,
          transitionDuration: const Duration(milliseconds: 420),
          reverseTransitionDuration: const Duration(milliseconds: 320),

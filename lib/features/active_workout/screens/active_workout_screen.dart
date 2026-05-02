@@ -27,19 +27,19 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     return initAsync.when(
       loading: () => const _LoadingScaffold(),
       error: (e, _) => Scaffold(
-        backgroundColor: AppColors.bgApp,
+        backgroundColor: context.colors.bgApp,
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'Could not load workout',
-                style: TextStyle(color: AppColors.ink500),
+                style: TextStyle(color: context.colors.ink500),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Go back'),
+                child: Text('Go back'),
               ),
             ],
           ),
@@ -59,17 +59,20 @@ class _LoadingScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: AppColors.bgApp,
+    return Scaffold(
+      backgroundColor: context.colors.bgApp,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(color: AppColors.accent, strokeWidth: 2),
+            CircularProgressIndicator(
+              color: context.colors.accent,
+              strokeWidth: 2,
+            ),
             SizedBox(height: 14),
             Text(
-              'Getting ready…',
-              style: TextStyle(fontSize: 14, color: AppColors.ink400),
+              'Preparing workout...',
+              style: TextStyle(fontSize: 14, color: context.colors.ink500),
             ),
           ],
         ),
@@ -103,8 +106,9 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(activeWorkoutRoutineIdProvider.notifier).state =
           widget.routineId;
-      final notifier =
-          ref.read(activeWorkoutProvider(widget.routineId).notifier);
+      final notifier = ref.read(
+        activeWorkoutProvider(widget.routineId).notifier,
+      );
       if (widget.restoredStartedAt != null) {
         notifier.restoreStartTime(widget.restoredStartedAt!);
       }
@@ -142,7 +146,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     final notifier = ref.read(activeWorkoutProvider(widget.routineId).notifier);
 
     return Scaffold(
-      backgroundColor: AppColors.bgApp,
+      backgroundColor: context.colors.bgApp,
       body: SafeArea(
         child: Stack(
           children: [
@@ -165,17 +169,17 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: const Color(0x0A000000),
+                              color: context.colors.press,
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.chevron_left,
                               size: 18,
-                              color: AppColors.ink700,
+                              color: context.colors.ink700,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,43 +187,44 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                               Row(
                                 children: [
                                   _PulseDot(),
-                                  const SizedBox(width: 6),
+                                  SizedBox(width: 6),
                                   Text(
-                                    'Active · ${state.routine.name}',
-                                    style: const TextStyle(
+                                    'ACTIVE · ${state.routine.name.toUpperCase()}',
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.06,
-                                      color: AppColors.accentDeep,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 0.08,
+                                      color: context.colors.accent,
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 2),
+                              SizedBox(height: 2),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.baseline,
                                 textBaseline: TextBaseline.alphabetic,
                                 children: [
                                   Text(
                                     FormatUtils.timer(state.elapsedSeconds),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 26,
-                                      fontWeight: FontWeight.w500,
+                                      fontWeight: FontWeight.w600,
                                       letterSpacing: -0.52,
-                                      color: AppColors.ink900,
+                                      color: context.colors.ink900,
                                       height: 1,
                                       fontFeatures: [
                                         FontFeature.tabularFigures(),
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
+                                  SizedBox(width: 12),
                                   Text(
                                     '${state.completedSets}/${state.totalSets} sets'
                                     ' · ${FormatUtils.volume(state.totalVolume)}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColors.ink500,
+                                      fontWeight: FontWeight.w500,
+                                      color: context.colors.ink500,
                                     ),
                                   ),
                                 ],
@@ -233,13 +238,15 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: AppColors.accentTint,
+                              color: context.colors.accentTint,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
-                              state.isRunning ? Icons.pause : Icons.play_arrow,
+                              state.isRunning
+                                  ? Icons.pause_rounded
+                                  : Icons.play_arrow_rounded,
                               size: 18,
-                              color: AppColors.accentDeep,
+                              color: context.colors.accentDeep,
                             ),
                           ),
                         ),
@@ -248,22 +255,22 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(2),
                     child: LinearProgressIndicator(
                       value: state.totalSets > 0
                           ? state.completedSets / state.totalSets
                           : 0,
-                      backgroundColor: const Color(0x0D000000),
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                        AppColors.accent,
+                      backgroundColor: context.colors.hairline,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        context.colors.accent,
                       ),
-                      minHeight: 4,
+                      minHeight: 3,
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Expanded(
                   child: ListView(
                     padding: EdgeInsets.fromLTRB(
@@ -277,7 +284,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                         final i = entry.key;
                         final e = entry.value;
                         final ex = state.findExercise(e.exerciseId);
-                        if (ex == null) return const SizedBox.shrink();
+                        if (ex == null) return SizedBox.shrink();
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
                           child: ExerciseCard(
@@ -303,7 +310,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                       }),
                       GlassButton(
                         label: _finishing ? 'Saving…' : 'Finish workout',
-                        variant: GlassButtonVariant.glass,
+                        variant: GlassButtonVariant.primary,
                         size: GlassButtonSize.md,
                         expand: true,
                         loading: _finishing,
@@ -324,20 +331,21 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                 transitionBuilder: (child, animation) => FadeTransition(
                   opacity: animation,
                   child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, 0.15),
-                      end: Offset.zero,
-                    ).animate(
-                      CurvedAnimation(
-                        parent: animation,
-                        curve: Curves.easeOutCubic,
-                      ),
-                    ),
+                    position:
+                        Tween<Offset>(
+                          begin: const Offset(0, 0.15),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeOutCubic,
+                          ),
+                        ),
                     child: child,
                   ),
                 ),
                 child: state.restTimer == null
-                    ? const SizedBox.shrink(key: ValueKey('rest-hidden'))
+                    ? SizedBox.shrink(key: ValueKey('rest-hidden'))
                     : RestTimerBar(
                         key: const ValueKey('rest-visible'),
                         restTimer: state.restTimer!,
@@ -389,8 +397,8 @@ class _PulseDotState extends State<_PulseDot>
       child: Container(
         width: 6,
         height: 6,
-        decoration: const BoxDecoration(
-          color: AppColors.accent,
+        decoration: BoxDecoration(
+          color: context.colors.accent,
           shape: BoxShape.circle,
         ),
       ),

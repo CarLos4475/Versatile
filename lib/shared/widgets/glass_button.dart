@@ -43,7 +43,7 @@ class GlassButton extends StatelessWidget {
               strokeWidth: 1.5,
               color: variant == GlassButtonVariant.primary
                   ? Colors.white
-                  : AppColors.accentDeep,
+                  : context.colors.accentDeep,
             ),
           )
         : leading;
@@ -120,7 +120,7 @@ class _PrimaryButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(r),
           boxShadow: [
             BoxShadow(
-              color: AppColors.accentDeep.withOpacity(0.35),
+              color: context.colors.accentDeep.withOpacity(0.35),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -173,16 +173,10 @@ class _GlassVariantButton extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: px),
           decoration: BoxDecoration(
-            color: const Color(0x8DFFFCF7),
+            color: context.colors.glassBg,
             borderRadius: BorderRadius.circular(r),
-            border: Border.all(color: AppColors.glassBorder, width: 0.5),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF3C2814).withOpacity(0.08),
-                blurRadius: 14,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            border: Border.all(color: context.colors.glassBorder, width: 0.5),
+            boxShadow: context.colors.glassShadow,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -192,7 +186,7 @@ class _GlassVariantButton extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  color: AppColors.ink900,
+                  color: context.colors.ink900,
                   fontSize: fs,
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.01,
@@ -236,7 +230,7 @@ class _GhostButton extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: AppColors.ink700,
+                color: context.colors.ink700,
                 fontSize: fs,
                 fontWeight: FontWeight.w600,
               ),
@@ -285,34 +279,28 @@ class IconCircleButton extends StatelessWidget {
           color: accent
               ? null
               : subtle
-              ? const Color(0x0A000000)
-              : const Color(0xA6FFFCF7),
+              ? context.colors.press
+              : context.colors.glassBg,
           borderRadius: BorderRadius.circular(radius),
           border: accent || subtle
               ? null
-              : Border.all(color: AppColors.glassBorder, width: 0.5),
+              : Border.all(color: context.colors.glassBorder, width: 0.5),
           boxShadow: accent
               ? [
                   BoxShadow(
-                    color: AppColors.accentDeep.withOpacity(0.3),
+                    color: context.colors.accentDeep.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
                 ]
               : subtle
               ? null
-              : [
-                  BoxShadow(
-                    color: const Color(0xFF3C2814).withOpacity(0.06),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+              : context.colors.glassShadow,
         ),
         child: Center(
           child: IconTheme(
             data: IconThemeData(
-              color: accent ? Colors.white : AppColors.ink700,
+              color: accent ? Colors.white : context.colors.ink700,
               size: size * 0.52,
             ),
             child: icon,

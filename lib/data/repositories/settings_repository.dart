@@ -22,4 +22,6 @@ class SettingsRepository {
   Future<void> setUserName(String name) => set('user_name', name);
   Future<bool> isOnboarded() async => (await get('onboarded')) == '1';
   Future<void> setOnboarded() => set('onboarded', '1');
+  Future<String> getThemeMode() async => (await get('theme_mode')) ?? 'system';
+  Future<void> setThemeMode(String mode) => set('theme_mode', mode);
 }

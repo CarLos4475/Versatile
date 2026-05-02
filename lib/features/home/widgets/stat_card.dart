@@ -28,14 +28,14 @@ class StatCard extends StatelessWidget {
           children: [
             Text(
               label.toUpperCase(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
-                color: AppColors.ink400,
+                color: context.colors.ink400,
                 fontWeight: FontWeight.w500,
                 letterSpacing: 0.02,
               ),
             ),
-            const SizedBox(height: 2),
+            SizedBox(height: 2),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 220),
               transitionBuilder: (child, animation) => FadeTransition(
@@ -59,15 +59,15 @@ class StatCard extends StatelessWidget {
                       fontSize: 24,
                       fontWeight: FontWeight.w500,
                       letterSpacing: -0.48,
-                      color: accent ? AppColors.accentDeep : AppColors.ink900,
+                      color: accent ? context.colors.accentDeep : context.colors.ink900,
                     ),
                   ),
-                  const SizedBox(width: 3),
+                  SizedBox(width: 3),
                   Text(
                     unit,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
-                      color: AppColors.ink400,
+                      color: context.colors.ink400,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

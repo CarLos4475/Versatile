@@ -9,12 +9,14 @@ class ScreenHeader extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.onBack,
+    this.accentBack = false,
   });
 
   final String title;
   final String? subtitle;
   final Widget? trailing;
   final VoidCallback? onBack;
+  final bool accentBack;
 
   @override
   Widget build(BuildContext context) {
@@ -37,56 +39,71 @@ class ScreenHeader extends StatelessWidget {
                           width: 38,
                           height: 38,
                           decoration: BoxDecoration(
-                            color: const Color(0xA6FFFCF7),
+                            gradient: accentBack
+                                ? const LinearGradient(
+                                    colors: [
+                                      Color(0xFFE08866),
+                                      Color(0xFFD97757),
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                  )
+                                : null,
+                            color: accentBack ? null : context.colors.glassBg,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: AppColors.glassBorder,
-                              width: 0.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(
-                                  0xFF3C2814,
-                                ).withOpacity(0.06),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
+                            border: accentBack
+                                ? null
+                                : Border.all(
+                                    color: context.colors.glassBorder,
+                                    width: 0.5,
+                                  ),
+                            boxShadow: accentBack
+                                ? [
+                                    BoxShadow(
+                                      color: context.colors.accentDeep
+                                          .withValues(alpha: 0.3),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ]
+                                : context.colors.glassShadow,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.chevron_left,
-                            color: AppColors.ink700,
+                            color: accentBack
+                                ? Colors.white
+                                : context.colors.ink700,
                             size: 20,
                           ),
                         ),
                       )
                     else
-                      const SizedBox.shrink(),
+                      SizedBox.shrink(),
                     if (trailing != null)
                       trailing!
                     else
-                      const SizedBox.shrink(),
+                      SizedBox.shrink(),
                   ],
                 ),
               ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.w500,
                 letterSpacing: -0.9,
-                color: AppColors.ink900,
+                color: context.colors.ink900,
                 height: 1.05,
               ),
             ),
             if (subtitle != null) ...[
-              const SizedBox(height: 2),
+              SizedBox(height: 2),
               Text(
                 subtitle!,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: AppColors.ink500,
+                  color: context.colors.ink500,
                   fontWeight: FontWeight.w400,
                 ),
               ),

@@ -21,14 +21,14 @@ class RoutinesScreen extends ConsumerWidget {
     final exercises = ref.watch(exercisesAsyncProvider).value ?? [];
 
     return Scaffold(
-      backgroundColor: AppColors.bgApp,
+      backgroundColor: context.colors.bgApp,
       body: SafeArea(
         child: routinesAsync.when(
           loading: () => const _LoadingBody(label: 'Loading routines…'),
           error: (e, _) => Center(
             child: Text(
               'Error: $e',
-              style: const TextStyle(color: AppColors.ink500),
+              style: TextStyle(color: context.colors.ink500),
             ),
           ),
           data: (routines) => SingleChildScrollView(
@@ -40,7 +40,7 @@ class RoutinesScreen extends ConsumerWidget {
                   title: 'Routines',
                   subtitle: '${routines.length} workout templates',
                   trailing: IconCircleButton(
-                    icon: const Icon(Icons.add),
+                    icon: Icon(Icons.add),
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => const CreateRoutineScreen(),
@@ -49,7 +49,7 @@ class RoutinesScreen extends ConsumerWidget {
                     accent: true,
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 if (routines.isEmpty)
                   const _EmptyRoutines()
                 else
@@ -93,28 +93,28 @@ class _EmptyRoutines extends StatelessWidget {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: AppColors.accentTint,
+                color: context.colors.accentTint,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.fitness_center,
                 size: 34,
-                color: AppColors.accentDeep,
+                color: context.colors.accentDeep,
               ),
             ),
-            const SizedBox(height: 16),
-            const Text(
+            SizedBox(height: 16),
+            Text(
               'No routines yet',
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
-                color: AppColors.ink900,
+                color: context.colors.ink900,
               ),
             ),
-            const SizedBox(height: 6),
-            const Text(
+            SizedBox(height: 6),
+            Text(
               'Tap + to create your first workout template.',
-              style: TextStyle(fontSize: 13, color: AppColors.ink400),
+              style: TextStyle(fontSize: 13, color: context.colors.ink400),
               textAlign: TextAlign.center,
             ),
           ],
@@ -175,31 +175,31 @@ class _RoutineCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.fitness_center,
                     color: Colors.white,
                     size: 22,
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         routine.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.17,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      SizedBox(height: 2),
                       Text(
                         '${routine.exercises.length} exercises · ~${routine.estimatedMinutes} min',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.ink500,
+                          color: context.colors.ink500,
                         ),
                       ),
                     ],
@@ -208,12 +208,12 @@ class _RoutineCard extends StatelessWidget {
                 Icon(
                   Icons.chevron_right,
                   size: 16,
-                  color: AppColors.ink900.withOpacity(0.3),
+                  color: color.withValues(alpha: 0.4),
                 ),
               ],
             ),
             if (muscles.isNotEmpty) ...[
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Wrap(
                 spacing: 6,
                 runSpacing: 4,
@@ -225,15 +225,19 @@ class _RoutineCard extends StatelessWidget {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.accentTint,
+                          color: color.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: color.withValues(alpha: 0.25),
+                            width: 0.5,
+                          ),
                         ),
                         child: Text(
                           m,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            color: AppColors.accentDeep,
-                            fontWeight: FontWeight.w500,
+                            color: color,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -258,14 +262,14 @@ class _LoadingBody extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const CircularProgressIndicator(
-            color: AppColors.accent,
+          CircularProgressIndicator(
+            color: context.colors.accent,
             strokeWidth: 2,
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           Text(
             label,
-            style: const TextStyle(fontSize: 13, color: AppColors.ink400),
+            style: TextStyle(fontSize: 13, color: context.colors.ink400),
           ),
         ],
       ),

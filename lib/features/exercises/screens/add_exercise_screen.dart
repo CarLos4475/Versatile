@@ -92,7 +92,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
-      backgroundColor: AppColors.bgApp,
+      backgroundColor: context.colors.bgApp,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Column(
@@ -102,6 +102,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
               title: 'New Exercise',
               subtitle: 'Add a custom exercise',
               onBack: () => Navigator.of(context).pop(),
+              accentBack: true,
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -111,7 +112,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 22),
                       child: GlassContainer(
@@ -123,16 +124,16 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                         child: TextField(
                           controller: _ctrl,
                           autofocus: true,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
-                            color: AppColors.ink900,
+                            color: context.colors.ink900,
                             fontWeight: FontWeight.w500,
                           ),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'Exercise name…',
                             hintStyle: TextStyle(
                               fontSize: 16,
-                              color: AppColors.ink400,
+                              color: context.colors.ink400,
                             ),
                             border: InputBorder.none,
                             contentPadding:
@@ -141,9 +142,9 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     _SectionLabel('MUSCLE GROUP'),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     SizedBox(
                       height: 36,
                       child: ListView.separated(
@@ -152,7 +153,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                             const EdgeInsets.symmetric(horizontal: 22),
                         itemCount: _kMuscleGroups.length,
                         separatorBuilder: (_, __) =>
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                         itemBuilder: (context, i) {
                           final g = _kMuscleGroups[i];
                           final active = _muscleGroup == g;
@@ -166,13 +167,13 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: active
-                                    ? AppColors.accentDeep
-                                    : AppColors.glassBg,
+                                    ? context.colors.accentDeep
+                                    : context.colors.glassBg,
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                   color: active
                                       ? Colors.transparent
-                                      : AppColors.glassBorder,
+                                      : context.colors.glassBorder,
                                   width: 0.5,
                                 ),
                               ),
@@ -183,7 +184,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                                   fontWeight: FontWeight.w600,
                                   color: active
                                       ? Colors.white
-                                      : AppColors.ink700,
+                                      : context.colors.ink700,
                                 ),
                               ),
                             ),
@@ -206,7 +207,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                                       horizontal: 22),
                                   itemCount: _subMuscles.length,
                                   separatorBuilder: (_, __) =>
-                                      const SizedBox(width: 8),
+                                      SizedBox(width: 8),
                                   itemBuilder: (context, i) {
                                     final m = _subMuscles[i];
                                     final active = _subMuscle == m;
@@ -222,14 +223,14 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: active
-                                              ? AppColors.accent
-                                              : AppColors.glassBg,
+                                              ? context.colors.accent
+                                              : context.colors.glassBg,
                                           borderRadius:
                                               BorderRadius.circular(10),
                                           border: Border.all(
                                             color: active
                                                 ? Colors.transparent
-                                                : AppColors.glassBorder,
+                                                : context.colors.glassBorder,
                                             width: 0.5,
                                           ),
                                         ),
@@ -240,7 +241,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                                             fontWeight: FontWeight.w600,
                                             color: active
                                                 ? Colors.white
-                                                : AppColors.ink700,
+                                                : context.colors.ink700,
                                           ),
                                         ),
                                       ),
@@ -249,11 +250,11 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                                 ),
                               ),
                             )
-                          : const SizedBox.shrink(),
+                          : SizedBox.shrink(),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     _SectionLabel('EQUIPMENT'),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     SizedBox(
                       height: 36,
                       child: ListView.separated(
@@ -262,7 +263,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                             const EdgeInsets.symmetric(horizontal: 22),
                         itemCount: _kEquipment.length,
                         separatorBuilder: (_, __) =>
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                         itemBuilder: (context, i) {
                           final opt = _kEquipment[i];
                           final active = opt == _equipment;
@@ -277,13 +278,13 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                               ),
                               decoration: BoxDecoration(
                                 color: active
-                                    ? AppColors.accentDeep
-                                    : AppColors.glassBg,
+                                    ? context.colors.accentDeep
+                                    : context.colors.glassBg,
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
                                   color: active
                                       ? Colors.transparent
-                                      : AppColors.glassBorder,
+                                      : context.colors.glassBorder,
                                   width: 0.5,
                                 ),
                               ),
@@ -294,7 +295,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                                   fontWeight: FontWeight.w600,
                                   color: active
                                       ? Colors.white
-                                      : AppColors.ink700,
+                                      : context.colors.ink700,
                                 ),
                               ),
                             ),
@@ -302,7 +303,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     Padding(
                       padding:
                           const EdgeInsets.symmetric(horizontal: 22),
@@ -317,13 +318,13 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                               height: 26,
                               decoration: BoxDecoration(
                                 color: _isUnilateral
-                                    ? AppColors.accentDeep
-                                    : AppColors.glassBg,
+                                    ? context.colors.accentDeep
+                                    : context.colors.glassBg,
                                 borderRadius: BorderRadius.circular(13),
                                 border: Border.all(
                                   color: _isUnilateral
                                       ? Colors.transparent
-                                      : AppColors.glassBorder,
+                                      : context.colors.glassBorder,
                                   width: 0.5,
                                 ),
                               ),
@@ -338,15 +339,15 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                                   height: 20,
                                   margin: const EdgeInsets.symmetric(
                                       horizontal: 3),
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     color: Colors.white,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            const Expanded(
+                            SizedBox(width: 12),
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment:
                                     CrossAxisAlignment.start,
@@ -356,14 +357,14 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
-                                      color: AppColors.ink900,
+                                      color: context.colors.ink900,
                                     ),
                                   ),
                                   Text(
                                     'Track left and right sides separately',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: AppColors.ink400,
+                                      color: context.colors.ink400,
                                     ),
                                   ),
                                 ],
@@ -373,7 +374,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 22),
                       child: GlassButton(
@@ -406,11 +407,11 @@ class _SectionLabel extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 22),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.06,
-          color: AppColors.ink400,
+          color: context.colors.ink400,
         ),
       ),
     );

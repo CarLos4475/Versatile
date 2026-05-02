@@ -5,6 +5,7 @@ import 'core/services/workout_notification_service.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/glass_effect.dart';
 import 'core/theme/app_theme.dart';
+import 'core/providers/theme_provider.dart';
 import 'core/utils/format_utils.dart';
 import 'features/active_workout/screens/active_workout_screen.dart';
 import 'features/active_workout/view_models/active_workout_view_model.dart';
@@ -16,14 +17,17 @@ import 'features/splash/screens/splash_screen.dart';
 import 'shared/widgets/bottom_nav_bar.dart';
 import 'shared/widgets/motion.dart';
 
-class VersatileApp extends StatelessWidget {
+class VersatileApp extends ConsumerWidget {
   const VersatileApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
     return MaterialApp(
       title: 'Versatile',
+      themeMode: themeMode,
       theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
       debugShowCheckedModeBanner: false,
       home: const SplashScreen(),
     );
@@ -105,7 +109,7 @@ class _MainShellState extends ConsumerState<MainShell> {
         _goBackTab();
       },
       child: Scaffold(
-        backgroundColor: AppColors.bgApp,
+        backgroundColor: context.colors.bgApp,
         body: Stack(
           children: [
             Positioned.fill(
@@ -196,7 +200,7 @@ class _ActiveWorkoutIsland extends ConsumerWidget {
           );
         },
         child: routineId == null
-            ? const SizedBox.shrink(key: ValueKey('no-workout'))
+            ? SizedBox.shrink(key: ValueKey('no-workout'))
             : _ActiveWorkoutIslandCard(
                 key: ValueKey(routineId),
                 routineId: routineId,
@@ -226,7 +230,7 @@ class _ActiveWorkoutIslandCard extends ConsumerWidget {
           height: 62,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: AppColors.accentDeep.withOpacity(0.92),
+            color: context.colors.accentDeep.withOpacity(0.92),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: Colors.white.withOpacity(0.18),
@@ -234,7 +238,7 @@ class _ActiveWorkoutIslandCard extends ConsumerWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.accentDeep.withOpacity(0.35),
+                color: context.colors.accentDeep.withOpacity(0.35),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -243,7 +247,7 @@ class _ActiveWorkoutIslandCard extends ConsumerWidget {
           child: Row(
             children: [
               _IslandPulseDot(),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -251,7 +255,7 @@ class _ActiveWorkoutIslandCard extends ConsumerWidget {
                   children: [
                     Text(
                       workoutState.routine.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -279,7 +283,7 @@ class _ActiveWorkoutIslandCard extends ConsumerWidget {
                 child: Text(
                   FormatUtils.timer(workoutState.elapsedSeconds),
                   key: ValueKey(workoutState.elapsedSeconds),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.2,
@@ -288,7 +292,7 @@ class _ActiveWorkoutIslandCard extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Container(
                 width: 28,
                 height: 28,
@@ -296,7 +300,7 @@ class _ActiveWorkoutIslandCard extends ConsumerWidget {
                   color: Colors.white.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.chevron_right,
                   size: 16,
                   color: Colors.white,
@@ -346,7 +350,7 @@ class _IslandPulseDotState extends State<_IslandPulseDot>
       child: Container(
         width: 7,
         height: 7,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
         ),

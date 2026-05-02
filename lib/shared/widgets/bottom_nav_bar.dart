@@ -28,16 +28,10 @@ class VersatileBottomNav extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: const Color(0x9EFFFCF7),
+          color: context.colors.glassBgStrong,
           borderRadius: BorderRadius.circular(26),
-          border: Border.all(color: const Color(0xA6FFFFFF), width: 0.5),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF3C2814).withOpacity(0.14),
-              blurRadius: 32,
-              offset: const Offset(0, 12),
-            ),
-          ],
+          border: Border.all(color: context.colors.glassBorder, width: 0.5),
+          boxShadow: context.colors.glassShadow,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -53,9 +47,7 @@ class VersatileBottomNav extends StatelessWidget {
                   curve: Curves.easeOutCubic,
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   decoration: BoxDecoration(
-                    color: isActive
-                        ? AppColors.accentDeep.withOpacity(0.72)
-                        : Colors.transparent,
+                    color: Colors.transparent,
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: Column(
@@ -64,29 +56,29 @@ class VersatileBottomNav extends StatelessWidget {
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 220),
                         curve: Curves.easeOutCubic,
-                        width: 28,
+                        width: 20,
                         height: 3,
                         decoration: BoxDecoration(
                           color: isActive
-                              ? AppColors.bone50
+                              ? context.colors.accent
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 6),
                       AnimatedScale(
-                        scale: isActive ? 1.08 : 1,
+                        scale: isActive ? 1.05 : 1.0,
                         duration: const Duration(milliseconds: 220),
                         curve: Curves.easeOutBack,
                         child: Icon(
                           item.icon,
                           size: 22,
                           color: isActive
-                              ? AppColors.bone50
-                              : AppColors.ink900.withOpacity(0.45),
+                              ? context.colors.accent
+                              : context.colors.ink400,
                         ),
                       ),
-                      const SizedBox(height: 3),
+                      SizedBox(height: 4),
                       AnimatedDefaultTextStyle(
                         duration: const Duration(milliseconds: 220),
                         curve: Curves.easeOutCubic,
@@ -96,13 +88,13 @@ class VersatileBottomNav extends StatelessWidget {
                               ? FontWeight.w600
                               : FontWeight.w500,
                           color: isActive
-                              ? AppColors.bone50
-                              : AppColors.ink900.withOpacity(0.45),
+                              ? context.colors.accent
+                              : context.colors.ink400,
                           letterSpacing: 0.01,
                         ),
                         child: Text(item.label),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 2),
                     ],
                   ),
                 ),

@@ -47,12 +47,12 @@ class RestTimerBar extends StatelessWidget {
           child: Row(
             children: [
               _CircularProgress(progress: restTimer.progress),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'REST',
                       style: TextStyle(
                         fontSize: 11,
@@ -63,7 +63,7 @@ class RestTimerBar extends StatelessWidget {
                     ),
                     Text(
                       FormatUtils.timer(restTimer.remaining),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w500,
                         color: Colors.white,
@@ -82,7 +82,7 @@ class RestTimerBar extends StatelessWidget {
                     onTap: onAddTime,
                     transparent: true,
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   _ActionBtn(label: 'Skip', onTap: onSkip, transparent: false),
                 ],
               ),
@@ -113,12 +113,13 @@ class _CircularProgress extends StatelessWidget {
           circumference: circumference,
           radius: radius,
           stroke: stroke,
+          color: context.colors.accentSoft,
         ),
-        child: const Center(
+        child: Center(
           child: Icon(
             Icons.timer_outlined,
             size: 16,
-            color: AppColors.accentSoft,
+            color: context.colors.accentSoft,
           ),
         ),
       ),
@@ -132,22 +133,24 @@ class _RingPainter extends CustomPainter {
     required this.circumference,
     required this.radius,
     required this.stroke,
+    required this.color,
   });
 
   final double progress;
   final double circumference;
   final double radius;
   final double stroke;
+  final Color color;
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final trackPaint = Paint()
-      ..color = Colors.white.withOpacity(0.12)
+      ..color = Colors.white.withValues(alpha: 0.12)
       ..style = PaintingStyle.stroke
       ..strokeWidth = stroke;
     final progressPaint = Paint()
-      ..color = AppColors.accentSoft
+      ..color = color
       ..style = PaintingStyle.stroke
       ..strokeWidth = stroke
       ..strokeCap = StrokeCap.round;
@@ -187,13 +190,13 @@ class _ActionBtn extends StatelessWidget {
         decoration: BoxDecoration(
           color: transparent
               ? Colors.white.withOpacity(0.1)
-              : AppColors.accent.withOpacity(0.85),
+              : context.colors.accent.withOpacity(0.85),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
           child: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: Colors.white,

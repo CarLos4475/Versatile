@@ -45,7 +45,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgFrame,
+      backgroundColor: context.colors.bgFrame,
       body: SafeArea(
         child: Column(
           children: [
@@ -89,7 +89,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
             _PageDots(currentPage: _currentPage, totalPages: 5),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
           ],
         ),
       ),
@@ -138,7 +138,7 @@ class _OnboardPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(22),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.accentDeep.withOpacity(0.3),
+                  color: context.colors.accentDeep.withOpacity(0.3),
                   blurRadius: 32,
                   offset: const Offset(0, 12),
                 ),
@@ -146,28 +146,28 @@ class _OnboardPage extends StatelessWidget {
             ),
             child: Icon(icon, color: Colors.white, size: 32),
           ),
-          const SizedBox(height: 36),
+          SizedBox(height: 36),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 38,
               fontWeight: FontWeight.w400,
               letterSpacing: -1.14,
-              color: AppColors.ink900,
+              color: context.colors.ink900,
               height: 1.05,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             body,
             style: TextStyle(
               fontSize: 16,
-              color: highlightBody ? AppColors.ink700 : AppColors.ink500,
+              color: highlightBody ? context.colors.ink700 : context.colors.ink500,
               height: 1.5,
               fontWeight: highlightBody ? FontWeight.w500 : FontWeight.w400,
             ),
           ),
-          const SizedBox(height: 48),
+          SizedBox(height: 48),
           PressableScale(
             onTap: onNext,
             child: Container(
@@ -181,13 +181,13 @@ class _OnboardPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.accentDeep.withOpacity(0.3),
+                    color: context.colors.accentDeep.withOpacity(0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
                 ],
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
@@ -244,60 +244,60 @@ class _NamePage extends StatelessWidget {
               borderRadius: BorderRadius.circular(22),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.accentDeep.withOpacity(0.3),
+                  color: context.colors.accentDeep.withOpacity(0.3),
                   blurRadius: 32,
                   offset: const Offset(0, 12),
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.waving_hand_outlined,
               color: Colors.white,
               size: 32,
             ),
           ),
-          const SizedBox(height: 36),
-          const Text(
+          SizedBox(height: 36),
+          Text(
             'What should\nwe call you?',
             style: TextStyle(
               fontSize: 38,
               fontWeight: FontWeight.w400,
               letterSpacing: -1.14,
-              color: AppColors.ink900,
+              color: context.colors.ink900,
               height: 1.05,
             ),
           ),
-          const SizedBox(height: 16),
-          const Text(
+          SizedBox(height: 16),
+          Text(
             'Optional — you can skip this.',
-            style: TextStyle(fontSize: 15, color: AppColors.ink400),
+            style: TextStyle(fontSize: 15, color: context.colors.ink400),
           ),
-          const SizedBox(height: 28),
+          SizedBox(height: 28),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.glassBg,
+              color: context.colors.glassBg,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.glassBorder, width: 0.5),
+              border: Border.all(color: context.colors.glassBorder, width: 0.5),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: TextField(
               controller: controller,
               autofocus: false,
               textCapitalization: TextCapitalization.words,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
-                color: AppColors.ink900,
+                color: context.colors.ink900,
                 fontWeight: FontWeight.w500,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'Your name…',
-                hintStyle: TextStyle(fontSize: 18, color: AppColors.ink300),
+                hintStyle: TextStyle(fontSize: 18, color: context.colors.ink300),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(vertical: 14),
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           PressableScale(
             onTap: onFinish,
             child: Container(
@@ -311,13 +311,13 @@ class _NamePage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.accentDeep.withOpacity(0.3),
+                    color: context.colors.accentDeep.withOpacity(0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
                 ],
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.check, size: 18, color: Colors.white),
@@ -358,7 +358,7 @@ class _PageDots extends StatelessWidget {
           width: active ? 20 : 6,
           height: 6,
           decoration: BoxDecoration(
-            color: active ? AppColors.accentDeep : AppColors.ink300,
+            color: active ? context.colors.accentDeep : context.colors.ink300,
             borderRadius: BorderRadius.circular(3),
           ),
         );

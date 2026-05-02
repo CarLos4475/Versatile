@@ -30,7 +30,7 @@ class SessionCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,53 +41,53 @@ class SessionCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           session.routineName,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.ink900,
+                            color: context.colors.ink900,
                             letterSpacing: -0.15,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Text(
                         FormatUtils.date(session.date),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.ink400,
+                          color: context.colors.ink400,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.timer_outlined,
                         size: 13,
-                        color: AppColors.ink500,
+                        color: context.colors.ink500,
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 4),
                       Text(
                         FormatUtils.duration(session.durationMin),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.ink500,
+                          color: context.colors.ink500,
                         ),
                       ),
-                      const SizedBox(width: 14),
-                      const Icon(
+                      SizedBox(width: 14),
+                      Icon(
                         Icons.fitness_center,
                         size: 13,
-                        color: AppColors.ink500,
+                        color: context.colors.ink500,
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 4),
                       Text(
                         FormatUtils.volume(session.volumeKg),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.ink500,
+                          color: context.colors.ink500,
                         ),
                       ),
                     ],
@@ -95,11 +95,11 @@ class SessionCard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Icon(
               Icons.chevron_right,
               size: 16,
-              color: AppColors.ink900.withOpacity(0.3),
+              color: context.colors.ink900.withOpacity(0.3),
             ),
           ],
         ),

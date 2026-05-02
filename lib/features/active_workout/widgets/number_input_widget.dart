@@ -29,9 +29,9 @@ class NumberInputWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 30,
+      height: 32,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.6),
+        color: context.colors.fieldBg,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -42,11 +42,11 @@ class NumberInputWidget extends StatelessWidget {
             child: Text(
               _display,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColors.ink900,
-                fontFeatures: [FontFeature.tabularFigures()],
+                fontWeight: FontWeight.w700,
+                color: context.colors.ink900,
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
           ),
@@ -67,14 +67,14 @@ class _Btn extends StatelessWidget {
     return PressableScale(
       onTap: onTap,
       child: Container(
-        width: 22,
-        height: 22,
-        margin: const EdgeInsets.all(4),
+        width: 24,
+        height: 24,
+        margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(6),
         ),
-        child: Icon(icon, size: 12, color: AppColors.ink500),
+        child: Icon(icon, size: 14, color: context.colors.ink400),
       ),
     );
   }

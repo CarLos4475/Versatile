@@ -28,7 +28,7 @@ Widget _subMuscleRow(ExercisesState state, ExercisesNotifier notifier) {
   } else if (state.selectedMuscle == 'Legs') {
     subs = kLegsSubMuscles;
   } else {
-    return const SizedBox.shrink();
+    return SizedBox.shrink();
   }
   return Padding(
     padding: const EdgeInsets.only(top: 8),
@@ -38,7 +38,7 @@ Widget _subMuscleRow(ExercisesState state, ExercisesNotifier notifier) {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 22),
         itemCount: subs.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 6),
+        separatorBuilder: (_, __) => SizedBox(width: 6),
         itemBuilder: (context, i) {
           final m = subs[i];
           return VersatileChip(
@@ -66,7 +66,7 @@ class ExercisesScreen extends ConsumerWidget {
     final myCount = allExercises.where((e) => e.isCustom).length;
 
     return Scaffold(
-      backgroundColor: AppColors.bgApp,
+      backgroundColor: context.colors.bgApp,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,14 +75,14 @@ class ExercisesScreen extends ConsumerWidget {
               title: 'Exercises',
               subtitle: '${allExercises.length} in your library',
               trailing: IconCircleButton(
-                icon: const Icon(Icons.add),
+                icon: Icon(Icons.add),
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const AddExerciseScreen()),
                 ),
                 accent: true,
               ),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: GlassContainer(
@@ -106,7 +106,7 @@ class ExercisesScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: GlassContainer(
@@ -114,31 +114,31 @@ class ExercisesScreen extends ConsumerWidget {
                 height: 44,
                 child: Row(
                   children: [
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(left: 12),
                       child: Icon(
                         Icons.search,
                         size: 16,
-                        color: AppColors.ink400,
+                        color: context.colors.ink400,
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10),
                     Expanded(
                       child: TextField(
                         onChanged: notifier.setQuery,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'Search exercises…',
                           hintStyle: TextStyle(
                             fontSize: 14,
-                            color: AppColors.ink400,
+                            color: context.colors.ink400,
                           ),
                           border: InputBorder.none,
                           isDense: true,
                           contentPadding: EdgeInsets.zero,
                         ),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.ink900,
+                          color: context.colors.ink900,
                         ),
                       ),
                     ),
@@ -156,27 +156,27 @@ class ExercisesScreen extends ConsumerWidget {
                                   color: const Color(0x14000000),
                                   borderRadius: BorderRadius.circular(11),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.close,
                                   size: 12,
-                                  color: AppColors.ink500,
+                                  color: context.colors.ink500,
                                 ),
                               ),
                             )
-                          : const SizedBox.shrink(key: ValueKey('no-query')),
+                          : SizedBox.shrink(key: ValueKey('no-query')),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             SizedBox(
               height: 32,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 22),
                 itemCount: _kMuscleGroups.length,
-                separatorBuilder: (context, index) => const SizedBox(width: 6),
+                separatorBuilder: (context, index) => SizedBox(width: 6),
                 itemBuilder: (context, i) {
                   final m = _kMuscleGroups[i];
                   return VersatileChip(
@@ -193,7 +193,7 @@ class ExercisesScreen extends ConsumerWidget {
               alignment: Alignment.topLeft,
               child: _subMuscleRow(state, notifier),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             SizedBox(
               height: 32,
               child: ListView(
@@ -205,14 +205,14 @@ class ExercisesScreen extends ConsumerWidget {
                     isActive: state.laterality == ExerciseLaterality.all,
                     onTap: () => notifier.setLaterality(ExerciseLaterality.all),
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   _LateralityChip(
                     label: 'Bilateral',
                     isActive: state.laterality == ExerciseLaterality.bilateral,
                     onTap: () =>
                         notifier.setLaterality(ExerciseLaterality.bilateral),
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   _LateralityChip(
                     label: 'Unilateral',
                     isActive: state.laterality == ExerciseLaterality.unilateral,
@@ -222,27 +222,27 @@ class ExercisesScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Expanded(
               child: allAsync.isLoading
-                  ? const Center(
+                  ? Center(
                       child: CircularProgressIndicator(
-                        color: AppColors.accent,
+                        color: context.colors.accent,
                         strokeWidth: 2,
                       ),
                     )
                   : filtered.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
                         'No exercises match',
-                        style: TextStyle(fontSize: 13, color: AppColors.ink400),
+                        style: TextStyle(fontSize: 13, color: context.colors.ink400),
                       ),
                     )
                   : ListView.separated(
                       padding: const EdgeInsets.fromLTRB(22, 0, 22, 96),
                       itemCount: filtered.length,
                       separatorBuilder: (context, index) =>
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                       itemBuilder: (context, i) =>
                           _ExerciseRow(exercise: filtered[i]),
                     ),
@@ -277,14 +277,21 @@ class _TabButton extends StatelessWidget {
           curve: Curves.easeOutCubic,
           height: 36,
           decoration: BoxDecoration(
-            color: isActive ? Colors.white : Colors.transparent,
+            gradient: isActive
+                ? const LinearGradient(
+                    colors: [Color(0xFFE08866), Color(0xFFD97757)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  )
+                : null,
+            color: isActive ? null : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
             boxShadow: isActive
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF3C2814).withOpacity(0.08),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
+                      color: context.colors.accentDeep.withValues(alpha: 0.25),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
                     ),
                   ]
                 : null,
@@ -297,15 +304,15 @@ class _TabButton extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: isActive ? AppColors.ink900 : AppColors.ink500,
+                  color: isActive ? Colors.white : context.colors.ink500,
                 ),
               ),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(
                   color: isActive
-                      ? AppColors.accentTint
+                      ? Colors.white.withValues(alpha: 0.2)
                       : const Color(0x0D000000),
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -314,7 +321,7 @@ class _TabButton extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: isActive ? AppColors.accentDeep : AppColors.ink400,
+                    color: isActive ? Colors.white : context.colors.ink400,
                   ),
                 ),
               ),
@@ -363,7 +370,7 @@ String? get _muscleAsset => switch (exercise.muscle) {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: AppColors.accentTint,
+                color: context.colors.accentTint,
                 borderRadius: BorderRadius.circular(11),
               ),
               child: asset != null
@@ -371,9 +378,9 @@ String? get _muscleAsset => switch (exercise.muscle) {
                       padding: const EdgeInsets.all(7),
                       child: Image.asset(asset, fit: BoxFit.contain),
                     )
-                  : Icon(Icons.fitness_center, size: 18, color: AppColors.accentDeep),
+                  : Icon(Icons.fitness_center, size: 18, color: context.colors.accentDeep),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -382,37 +389,37 @@ String? get _muscleAsset => switch (exercise.muscle) {
                     children: [
                       Text(
                         exercise.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.ink900,
+                          color: context.colors.ink900,
                           letterSpacing: -0.07,
                         ),
                       ),
                       if (exercise.isCustom) ...[
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 5,
                             vertical: 1,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.accentTint,
+                            color: context.colors.accentTint,
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: const Text(
+                          child: Text(
                             'CUSTOM',
                             style: TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.accentDeep,
+                              color: context.colors.accentDeep,
                               letterSpacing: 0.05,
                             ),
                           ),
                         ),
                       ],
                       if (exercise.isUnilateral) ...[
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 5,
@@ -422,12 +429,12 @@ String? get _muscleAsset => switch (exercise.muscle) {
                             color: const Color(0x14000000),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: const Text(
+                          child: Text(
                             'UNILATERAL',
                             style: TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.ink500,
+                              color: context.colors.ink500,
                               letterSpacing: 0.05,
                             ),
                           ),
@@ -435,12 +442,12 @@ String? get _muscleAsset => switch (exercise.muscle) {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 1),
+                  SizedBox(height: 1),
                   Text(
                     '${exercise.muscle} · ${exercise.equipment}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.ink500,
+                      color: context.colors.ink500,
                     ),
                   ),
                 ],
@@ -472,10 +479,10 @@ class _LateralityChip extends StatelessWidget {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isActive ? AppColors.accentDeep : AppColors.glassBg,
+          color: isActive ? context.colors.accentDeep : context.colors.glassBg,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isActive ? Colors.transparent : AppColors.glassBorder,
+            color: isActive ? Colors.transparent : context.colors.glassBorder,
             width: 0.5,
           ),
         ),
@@ -484,7 +491,7 @@ class _LateralityChip extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: isActive ? Colors.white : AppColors.ink700,
+            color: isActive ? Colors.white : context.colors.ink700,
           ),
         ),
       ),

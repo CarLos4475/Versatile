@@ -58,12 +58,12 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgFrame,
+      backgroundColor: context.colors.bgFrame,
       body: Stack(
         children: [
           Positioned.fill(
             child: DecoratedBox(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: RadialGradient(
                   center: Alignment(0, -0.3),
                   radius: 1.2,
@@ -96,7 +96,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         borderRadius: BorderRadius.circular(28),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.accentDeep.withOpacity(0.4),
+                            color: context.colors.accentDeep.withOpacity(0.4),
                             blurRadius: 48,
                             offset: const Offset(0, 24),
                           ),
@@ -107,7 +107,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                           ),
                         ],
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Icon(
                           Icons.fitness_center,
                           color: Colors.white,
@@ -117,28 +117,28 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 FadeTransition(
                   opacity: _fade,
-                  child: const Text(
+                  child: Text(
                     'Versatile',
                     style: TextStyle(
                       fontSize: 44,
                       fontWeight: FontWeight.w400,
                       letterSpacing: -1.32,
-                      color: AppColors.ink900,
+                      color: context.colors.ink900,
                       height: 1.0,
                     ),
                   ),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 FadeTransition(
                   opacity: _fade,
-                  child: const Text(
+                  child: Text(
                     'Your training, every rep.',
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.ink500,
+                      color: context.colors.ink500,
                       letterSpacing: 0.01,
                     ),
                   ),
@@ -202,8 +202,8 @@ class _PulseDotsState extends State<_PulseDots>
                 child: Container(
                   width: 6,
                   height: 6,
-                  decoration: const BoxDecoration(
-                    color: AppColors.accent,
+                  decoration: BoxDecoration(
+                    color: context.colors.accent,
                     shape: BoxShape.circle,
                   ),
                 ),

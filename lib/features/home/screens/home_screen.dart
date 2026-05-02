@@ -56,7 +56,7 @@ class HomeScreen extends ConsumerWidget {
                 : 'Last done $daysAgo days ago';
 
     return Scaffold(
-      backgroundColor: AppColors.bgApp,
+      backgroundColor: context.colors.bgApp,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.only(bottom: 96),
@@ -75,29 +75,23 @@ class HomeScreen extends ConsumerWidget {
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: const Color(0xA6FFFCF7),
+                      color: context.colors.glassBg,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: AppColors.glassBorder,
+                        color: context.colors.glassBorder,
                         width: 0.5,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF3C2814).withOpacity(0.06),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      boxShadow: context.colors.glassShadow,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.settings_outlined,
-                      color: AppColors.ink700,
+                      color: context.colors.ink700,
                       size: 20,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -123,7 +117,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -138,7 +132,7 @@ class HomeScreen extends ConsumerWidget {
                           unit: 'sessions',
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                       Expanded(
                         child: StatCard(
                           label: 'Volume',
@@ -148,7 +142,7 @@ class HomeScreen extends ConsumerWidget {
                           unit: state.weekVolume >= 1000 ? 'k kg' : 'kg',
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                       Expanded(
                         child: StatCard(
                           label: 'Avg time',
@@ -162,7 +156,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
                 child: FadeSlideIn(
@@ -175,7 +169,7 @@ class HomeScreen extends ConsumerWidget {
               ),
 
               if (state.sessions.isNotEmpty) ...[
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 22),
                   child: FadeSlideIn(
@@ -185,27 +179,27 @@ class HomeScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.baseline,
                       textBaseline: TextBaseline.alphabetic,
                       children: [
-                        const Text(
+                        Text(
                           'Recent sessions',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             letterSpacing: -0.18,
-                            color: AppColors.ink900,
+                            color: context.colors.ink900,
                           ),
                         ),
                         Text(
                           '${state.sessions.length} total',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
-                            color: AppColors.ink400,
+                            color: context.colors.ink400,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 22),
                   child: Column(
@@ -295,27 +289,27 @@ class _ActivityGrid extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'ACTIVITY',
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.06,
-              color: AppColors.ink400,
+              color: context.colors.ink400,
             ),
           ),
-          const SizedBox(height: 2),
+          SizedBox(height: 2),
           Text(
             '$sessionCount sessions in the last 30 days',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w400,
               letterSpacing: -0.4,
-              color: AppColors.ink900,
+              color: context.colors.ink900,
               height: 1.1,
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -325,7 +319,7 @@ class _ActivityGrid extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: _slot + 2), // month row + gap
+                    SizedBox(height: _slot + 2), // month row + gap
                     ..._dayLabels.map(
                       (label) => SizedBox(
                         height: _slot,
@@ -333,9 +327,9 @@ class _ActivityGrid extends StatelessWidget {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             label,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 8,
-                              color: AppColors.ink400,
+                              color: context.colors.ink400,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -345,7 +339,7 @@ class _ActivityGrid extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 2),
+              SizedBox(width: 2),
               // Fixed-width week columns
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,9 +360,9 @@ class _ActivityGrid extends StatelessWidget {
                           child: showMonth
                               ? Text(
                                   _months[monday.month - 1],
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 7,
-                                    color: AppColors.ink400,
+                                    color: context.colors.ink400,
                                     fontWeight: FontWeight.w500,
                                   ),
                                   overflow: TextOverflow.visible,
@@ -376,7 +370,7 @@ class _ActivityGrid extends StatelessWidget {
                                 )
                               : null,
                         ),
-                        const SizedBox(height: 2),
+                        SizedBox(height: 2),
                         // 7 day cells
                         ...List.generate(7, (d) {
                           final day = monday.add(Duration(days: d));
@@ -391,7 +385,7 @@ class _ActivityGrid extends StatelessWidget {
                               color: isFuture
                                   ? Colors.transparent
                                   : trained
-                                  ? AppColors.accentDeep
+                                  ? context.colors.accentDeep
                                   : const Color(0x0F000000),
                               borderRadius: BorderRadius.circular(2),
                               border: isFuture
@@ -451,7 +445,7 @@ class _HeroCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.accentDeep.withOpacity(0.35),
+            color: context.colors.accentDeep.withOpacity(0.35),
             blurRadius: 36,
             offset: const Offset(0, 18),
           ),
@@ -467,7 +461,7 @@ class _HeroCard extends StatelessWidget {
             child: Container(
               width: 280,
               height: 280,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: RadialGradient(
                   colors: [Color(0x55FFFFFF), Color(0x22FFFFFF), Color(0x00FFFFFF)],
                   stops: [0.0, 0.45, 1.0],
@@ -483,13 +477,13 @@ class _HeroCard extends StatelessWidget {
                   Container(
                     width: 6,
                     height: 6,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  const Text(
+                  SizedBox(width: 6),
+                  Text(
                     "NEXT WORKOUT",
                     style: TextStyle(
                       fontSize: 12,
@@ -500,10 +494,10 @@ class _HeroCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Text(
                 routineName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 34,
                   color: Colors.white,
                   fontWeight: FontWeight.w400,
@@ -511,16 +505,16 @@ class _HeroCard extends StatelessWidget {
                   height: 1.05,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 '$exerciseCount exercises · ~$estimatedMin min',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   color: Colors.white,
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: 2),
               Text(
                 lastDoneText,
                 style: TextStyle(
@@ -530,10 +524,10 @@ class _HeroCard extends StatelessWidget {
                 ),
               ),
               if (mainExerciseName != null) ...[
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
                 _PrChip(exerciseName: mainExerciseName!, prKg: mainPrKg),
               ],
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               PressableScale(
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -550,7 +544,7 @@ class _HeroCard extends StatelessWidget {
                       width: 0.5,
                     ),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.play_arrow, color: Colors.white, size: 16),
@@ -619,13 +613,13 @@ class _PrChip extends StatelessWidget {
           ),
           Text(
             exerciseName,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
               color: Colors.white,
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Text(
             prStr ?? 'No record yet',
             style: TextStyle(
@@ -653,11 +647,11 @@ class _EmptyHeroCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
-          color: AppColors.glassBg,
+          color: context.colors.glassBg,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppColors.glassBorder, width: 0.5),
+          border: Border.all(color: context.colors.glassBorder, width: 0.5),
         ),
-        child: const Column(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -665,14 +659,14 @@ class _EmptyHeroCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w500,
-                color: AppColors.ink900,
+                color: context.colors.ink900,
                 letterSpacing: -0.44,
               ),
             ),
             SizedBox(height: 6),
             Text(
               'Tap here to create your first workout template.',
-              style: TextStyle(fontSize: 14, color: AppColors.ink500),
+              style: TextStyle(fontSize: 14, color: context.colors.ink500),
             ),
             SizedBox(height: 18),
             Row(
@@ -680,7 +674,7 @@ class _EmptyHeroCard extends StatelessWidget {
                 Icon(
                   Icons.add_circle_outline,
                   size: 16,
-                  color: AppColors.accentDeep,
+                  color: context.colors.accentDeep,
                 ),
                 SizedBox(width: 6),
                 Text(
@@ -688,7 +682,7 @@ class _EmptyHeroCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.accentDeep,
+                    color: context.colors.accentDeep,
                   ),
                 ),
               ],

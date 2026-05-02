@@ -17,7 +17,7 @@ class HistoryScreen extends ConsumerWidget {
     final histState = historyAsync;
 
     return Scaffold(
-      backgroundColor: AppColors.bgApp,
+      backgroundColor: context.colors.bgApp,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.only(bottom: 96),
@@ -28,7 +28,7 @@ class HistoryScreen extends ConsumerWidget {
                 title: 'History',
                 subtitle: '${histState.sessions.length} sessions completed',
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -79,7 +79,7 @@ class HistoryScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -94,16 +94,16 @@ class HistoryScreen extends ConsumerWidget {
                       color: const Color(0x0A000000),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: AppColors.glassBorder,
+                        color: context.colors.glassBorder,
                         width: 0.5,
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
                         Icon(
                           Icons.info_outline,
                           size: 14,
-                          color: AppColors.ink400,
+                          color: context.colors.ink400,
                         ),
                         SizedBox(width: 8),
                         Expanded(
@@ -111,7 +111,7 @@ class HistoryScreen extends ConsumerWidget {
                             'Sessions are automatically deleted after 30 days.',
                             style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.ink400,
+                              color: context.colors.ink400,
                             ),
                           ),
                         ),
@@ -121,15 +121,15 @@ class HistoryScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               if (histState.sessions.isEmpty)
-                const Center(
+                Center(
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 40),
                     child: Text(
                       'No sessions yet.\nFinish your first workout to see history here.',
-                      style: TextStyle(fontSize: 14, color: AppColors.ink400),
+                      style: TextStyle(fontSize: 14, color: context.colors.ink400),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -147,11 +147,11 @@ class HistoryScreen extends ConsumerWidget {
                             padding: const EdgeInsets.only(left: 4, bottom: 8),
                             child: Text(
                               entry.key.toUpperCase(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 0.06,
-                                color: AppColors.ink400,
+                                color: context.colors.ink400,
                               ),
                             ),
                           ),
@@ -169,7 +169,7 @@ class HistoryScreen extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                         ],
                       );
                     }).toList(),
@@ -203,30 +203,30 @@ class _SummaryStat extends StatelessWidget {
         children: [
           Text(
             label.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.06,
-              color: AppColors.ink400,
+              color: context.colors.ink400,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
                   letterSpacing: -0.44,
                 ),
               ),
-              const SizedBox(width: 3),
+              SizedBox(width: 3),
               Text(
                 unit,
-                style: const TextStyle(fontSize: 11, color: AppColors.ink400),
+                style: TextStyle(fontSize: 11, color: context.colors.ink400),
               ),
             ],
           ),

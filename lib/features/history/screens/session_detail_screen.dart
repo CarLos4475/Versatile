@@ -18,7 +18,7 @@ class SessionDetailScreen extends StatelessWidget {
         0;
 
     return Scaffold(
-      backgroundColor: AppColors.bgApp,
+      backgroundColor: context.colors.bgApp,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.only(bottom: 32),
@@ -30,7 +30,7 @@ class SessionDetailScreen extends StatelessWidget {
                 subtitle: FormatUtils.longDate(session.date),
                 onBack: () => Navigator.of(context).pop(),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               // Stats header
               Padding(
@@ -76,7 +76,7 @@ class SessionDetailScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 18),
+              SizedBox(height: 18),
 
               // Exercises
               if (session.exercises != null)
@@ -117,11 +117,11 @@ class SessionDetailScreen extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
+                                  SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
                                       ex.name,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -129,29 +129,29 @@ class SessionDetailScreen extends StatelessWidget {
                                   ),
                                   Text(
                                     '${ex.sets.length} sets',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 11,
-                                      color: AppColors.ink400,
+                                      color: context.colors.ink400,
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: 10),
                               // Column headers
-                              const Padding(
+                              Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 4),
                                 child: Row(
                                   children: [
                                     SizedBox(
                                       width: 32,
-                                      child: Text('SET', style: _hStyle),
+                                      child: Text('SET', style: _hStyle(context)),
                                     ),
-                                    Expanded(child: Text('WEIGHT', style: _hStyle)),
-                                    Expanded(child: Text('REPS', style: _hStyle)),
+                                    Expanded(child: Text('WEIGHT', style: _hStyle(context))),
+                                    Expanded(child: Text('REPS', style: _hStyle(context))),
                                     SizedBox(
                                       width: 72,
                                       child: Text('VOLUME',
-                                          style: _hStyle,
+                                          style: _hStyle(context),
                                           textAlign: TextAlign.right),
                                     ),
                                   ],
@@ -174,10 +174,10 @@ class SessionDetailScreen extends StatelessWidget {
                                         width: 32,
                                         child: Text(
                                           setLabel,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600,
-                                            color: AppColors.ink500,
+                                            color: context.colors.ink500,
                                             fontFeatures: [FontFeature.tabularFigures()],
                                           ),
                                         ),
@@ -187,18 +187,18 @@ class SessionDetailScreen extends StatelessWidget {
                                           children: [
                                             Text(
                                               side,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.w700,
-                                                color: AppColors.accentDeep,
+                                                color: context.colors.accentDeep,
                                               ),
                                             ),
-                                            const SizedBox(width: 4),
+                                            SizedBox(width: 4),
                                             Text(
                                               '${FormatUtils.weight(kg)} kg',
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 13,
-                                                color: AppColors.ink900,
+                                                color: context.colors.ink900,
                                                 fontFeatures: [FontFeature.tabularFigures()],
                                               ),
                                             ),
@@ -208,9 +208,9 @@ class SessionDetailScreen extends StatelessWidget {
                                       Expanded(
                                         child: Text(
                                           '$reps',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 13,
-                                            color: AppColors.ink900,
+                                            color: context.colors.ink900,
                                             fontFeatures: [FontFeature.tabularFigures()],
                                           ),
                                         ),
@@ -219,9 +219,9 @@ class SessionDetailScreen extends StatelessWidget {
                                         width: 72,
                                         child: Text(
                                           '${vol.toStringAsFixed(0)} kg',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 12,
-                                            color: AppColors.ink500,
+                                            color: context.colors.ink500,
                                             fontFeatures: [FontFeature.tabularFigures()],
                                           ),
                                           textAlign: TextAlign.right,
@@ -235,7 +235,7 @@ class SessionDetailScreen extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 4, vertical: 7),
                                   decoration: idx < ex.sets.length - 1
-                                      ? const BoxDecoration(
+                                      ? BoxDecoration(
                                           border: Border(
                                             bottom: BorderSide(
                                               color: Color(0x0D000000),
@@ -254,7 +254,7 @@ class SessionDetailScreen extends StatelessWidget {
                                               s.reps,
                                               s.kg * s.reps,
                                             ),
-                                            const SizedBox(height: 5),
+                                            SizedBox(height: 5),
                                             buildSideRow(
                                               '',
                                               'L',
@@ -270,10 +270,10 @@ class SessionDetailScreen extends StatelessWidget {
                                               width: 32,
                                               child: Text(
                                                 '${idx + 1}',
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w600,
-                                                  color: AppColors.ink500,
+                                                  color: context.colors.ink500,
                                                   fontFeatures: [
                                                     FontFeature.tabularFigures()
                                                   ],
@@ -283,9 +283,9 @@ class SessionDetailScreen extends StatelessWidget {
                                             Expanded(
                                               child: Text(
                                                 '${FormatUtils.weight(s.kg)} kg',
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 13,
-                                                  color: AppColors.ink900,
+                                                  color: context.colors.ink900,
                                                   fontFeatures: [
                                                     FontFeature.tabularFigures()
                                                   ],
@@ -295,9 +295,9 @@ class SessionDetailScreen extends StatelessWidget {
                                             Expanded(
                                               child: Text(
                                                 '${s.reps}',
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 13,
-                                                  color: AppColors.ink900,
+                                                  color: context.colors.ink900,
                                                   fontFeatures: [
                                                     FontFeature.tabularFigures()
                                                   ],
@@ -308,9 +308,9 @@ class SessionDetailScreen extends StatelessWidget {
                                               width: 72,
                                               child: Text(
                                                 '${s.volume.toStringAsFixed(0)} kg',
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 12,
-                                                  color: AppColors.ink500,
+                                                  color: context.colors.ink500,
                                                   fontFeatures: [
                                                     FontFeature.tabularFigures()
                                                   ],
@@ -330,12 +330,12 @@ class SessionDetailScreen extends StatelessWidget {
                   ),
                 )
               else
-                const Center(
+                Center(
                   child: Padding(
                     padding: EdgeInsets.all(32),
                     child: Text(
                       'No detailed data for this session.',
-                      style: TextStyle(fontSize: 13, color: AppColors.ink400),
+                      style: TextStyle(fontSize: 13, color: context.colors.ink400),
                     ),
                   ),
                 ),
@@ -346,11 +346,11 @@ class SessionDetailScreen extends StatelessWidget {
     );
   }
 
-  static const _hStyle = TextStyle(
+  TextStyle _hStyle(BuildContext context) => TextStyle(
     fontSize: 10,
     fontWeight: FontWeight.w600,
     letterSpacing: 0.06,
-    color: AppColors.ink400,
+    color: context.colors.ink400,
   );
 }
 
@@ -374,23 +374,23 @@ class _DetailStat extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 14, color: AppColors.ink400),
-              const SizedBox(width: 4),
+              Icon(icon, size: 14, color: context.colors.ink400),
+              SizedBox(width: 4),
               Text(
                 label.toUpperCase(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.06,
-                  color: AppColors.ink400,
+                  color: context.colors.ink400,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w500,
               letterSpacing: -0.36,

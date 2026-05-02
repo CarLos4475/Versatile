@@ -41,16 +41,10 @@ class ExerciseCard extends StatelessWidget {
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       decoration: BoxDecoration(
-        color: AppColors.glassBg,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.glassBorder, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF3C2814).withOpacity(0.06),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        color: context.colors.bgFrame,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: context.colors.glassBorder, width: 0.5),
+        boxShadow: context.colors.glassShadow,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -104,7 +98,7 @@ class _CardHeader extends StatelessWidget {
       onTap: onToggle,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: const BoxDecoration(color: Colors.transparent),
+        decoration: BoxDecoration(color: Colors.transparent),
         child: Row(
           children: [
             _IndexBadge(
@@ -112,27 +106,27 @@ class _CardHeader extends StatelessWidget {
               isDone: data.isDone,
               hasProgress: data.completedSets.isNotEmpty,
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     exercise.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.ink900,
+                      color: context.colors.ink900,
                       letterSpacing: -0.15,
                     ),
                   ),
-                  const SizedBox(height: 1),
+                  SizedBox(height: 1),
                   Text(
                     '${data.completedSets.length}/${data.targetSets} sets · '
                     '${data.targetReps} reps · ${exercise.muscle}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.ink500,
+                      color: context.colors.ink500,
                     ),
                   ),
                 ],
@@ -149,13 +143,13 @@ class _CardHeader extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: data.isSplitMode
-                        ? AppColors.accentTint
+                        ? context.colors.accentTint
                         : const Color(0x0A000000),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: data.isSplitMode
-                          ? AppColors.accent
-                          : AppColors.glassBorder,
+                          ? context.colors.accent
+                          : context.colors.glassBorder,
                       width: 0.5,
                     ),
                   ),
@@ -165,21 +159,21 @@ class _CardHeader extends StatelessWidget {
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: data.isSplitMode
-                          ? AppColors.accentDeep
-                          : AppColors.ink400,
+                          ? context.colors.accentDeep
+                          : context.colors.ink400,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
             ],
             AnimatedRotation(
               turns: data.isExpanded ? 0.5 : 0.0,
               duration: const Duration(milliseconds: 250),
-              child: const Icon(
+              child: Icon(
                 Icons.keyboard_arrow_down,
                 size: 18,
-                color: AppColors.ink400,
+                color: context.colors.ink400,
               ),
             ),
           ],
@@ -216,8 +210,8 @@ class _IndexBadge extends StatelessWidget {
         color: isDone
             ? null
             : hasProgress
-            ? AppColors.accentTint
-            : const Color(0x0D000000),
+            ? context.colors.accent.withValues(alpha: 0.15)
+            : context.colors.fieldBg,
         borderRadius: BorderRadius.circular(10),
       ),
       child: isDone
@@ -228,7 +222,7 @@ class _IndexBadge extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: hasProgress ? AppColors.accentDeep : AppColors.ink500,
+                  color: hasProgress ? context.colors.accent : context.colors.ink500,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
@@ -262,10 +256,10 @@ class _CardBody extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
         children: [
-          const Divider(color: Color(0x0F000000), thickness: 0.5, height: 14),
+          Divider(color: context.colors.hairline, thickness: 0.5, height: 14),
 
           const _ColumnHeaders(),
-          const SizedBox(height: 2),
+          SizedBox(height: 2),
 
           // Completed sets
           ...data.completedSets.asMap().entries.map(
@@ -299,25 +293,25 @@ class _CardBody extends StatelessWidget {
           ],
 
           if (!data.isDone)
-            PressableScale(
-              onTap: onFinishSet,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10),
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: PressableScale(
+                onTap: onFinishSet,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.check_circle_outline,
-                      size: 13,
-                      color: AppColors.accentDeep,
+                    Icon(
+                      Icons.check_rounded,
+                      size: 14,
+                      color: context.colors.accent,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       'Finish set ${data.nextSetIndex + 1}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.accentDeep,
+                        fontWeight: FontWeight.w700,
+                        color: context.colors.accent,
                       ),
                     ),
                   ],
@@ -335,15 +329,15 @@ class _ColumnHeaders extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
+    return Padding(
       padding: EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         children: [
-          SizedBox(width: 32, child: Text('SET', style: _headerStyle)),
+          SizedBox(width: 32, child: Text('SET', style: _headerStyle(context))),
           SizedBox(width: 8),
-          Expanded(child: Text('WEIGHT', style: _headerStyle)),
+          Expanded(child: Text('WEIGHT', style: _headerStyle(context))),
           SizedBox(width: 8),
-          Expanded(child: Text('REPS', style: _headerStyle)),
+          Expanded(child: Text('REPS', style: _headerStyle(context))),
           SizedBox(width: 8),
           SizedBox(width: 36),
         ],
@@ -351,11 +345,11 @@ class _ColumnHeaders extends StatelessWidget {
     );
   }
 
-  static const _headerStyle = TextStyle(
+  TextStyle _headerStyle(BuildContext context) => TextStyle(
     fontSize: 10,
     fontWeight: FontWeight.w600,
     letterSpacing: 0.06,
-    color: AppColors.ink400,
+    color: context.colors.ink400,
   );
 }
 
@@ -369,16 +363,16 @@ class _CompletedSetRow extends StatelessWidget {
   final WorkoutSet set;
   final bool isSplitMode;
 
-  static const _weightStyle = TextStyle(
+  TextStyle _weightStyle(BuildContext context) => TextStyle(
     fontSize: 13,
     fontWeight: FontWeight.w500,
-    color: AppColors.ink900,
+    color: context.colors.ink900,
     fontFeatures: [FontFeature.tabularFigures()],
   );
-  static const _repsStyle = TextStyle(
+  TextStyle _repsStyle(BuildContext context) => TextStyle(
     fontSize: 13,
     fontWeight: FontWeight.w500,
-    color: AppColors.ink900,
+    color: context.colors.ink900,
     fontFeatures: [FontFeature.tabularFigures()],
   );
 
@@ -389,7 +383,7 @@ class _CompletedSetRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
         decoration: BoxDecoration(
-          color: const Color(0x0F4A8A5A),
+          color: context.colors.doneTint,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
@@ -399,15 +393,15 @@ class _CompletedSetRow extends StatelessWidget {
               width: 32,
               child: Text(
                 '${setIndex + 1}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.ink700,
+                  color: context.colors.ink700,
                   fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             if (set.isSplit) ...[
               // WEIGHT column with L / R labels
               Expanded(
@@ -418,27 +412,27 @@ class _CompletedSetRow extends StatelessWidget {
                     _SideValueRow(
                       side: 'L',
                       text: '${FormatUtils.weight(set.leftKg!)} kg',
-                      style: _weightStyle,
+                      style: _weightStyle(context),
                     ),
-                    const SizedBox(height: 3),
+                    SizedBox(height: 3),
                     _SideValueRow(
                       side: 'R',
                       text: '${FormatUtils.weight(set.kg)} kg',
-                      style: _weightStyle,
+                      style: _weightStyle(context),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               // REPS column
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('${set.leftReps}', style: _repsStyle),
-                    const SizedBox(height: 3),
-                    Text('${set.reps}', style: _repsStyle),
+                    Text('${set.leftReps}', style: _repsStyle(context)),
+                    SizedBox(height: 3),
+                    Text('${set.reps}', style: _repsStyle(context)),
                   ],
                 ),
               ),
@@ -446,29 +440,29 @@ class _CompletedSetRow extends StatelessWidget {
               Expanded(
                 child: Text(
                   '${FormatUtils.weight(set.kg)} kg',
-                  style: _weightStyle,
+                  style: _weightStyle(context),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
-                child: Text('${set.reps}', style: _repsStyle),
+                child: Text('${set.reps}', style: _repsStyle(context)),
               ),
             ],
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Container(
               width: 22,
               height: 22,
               decoration: BoxDecoration(
-                color: const Color(0x2E4A8A5A),
+                color: context.colors.doneIconBg.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.check,
                 size: 13,
-                color: AppColors.green700,
+                color: context.colors.doneStrong,
               ),
             ),
-            const SizedBox(width: 7),
+            SizedBox(width: 7),
           ],
         ),
       ),
@@ -481,9 +475,9 @@ class _GhostRow extends StatelessWidget {
   final WorkoutSet prevSet;
   final bool isSplitMode;
 
-  static const _ghostStyle = TextStyle(
+  TextStyle _ghostStyle(BuildContext context) => TextStyle(
     fontSize: 11,
-    color: AppColors.ink300,
+    color: context.colors.ink300,
     fontFeatures: [FontFeature.tabularFigures()],
   );
 
@@ -499,17 +493,17 @@ class _GhostRow extends StatelessWidget {
           SizedBox(
             width: 32,
             child: showSplit
-                ? const Column(
+                ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('↑', style: _ghostStyle),
-                      Text('Last', style: _ghostStyle),
+                      Text('↑', style: _ghostStyle(context)),
+                      Text('Last', style: _ghostStyle(context)),
                     ],
                   )
-                : const Text('↑ Last', style: _ghostStyle),
+                : Text('↑ Last', style: _ghostStyle(context)),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           if (showSplit) ...[
             Expanded(
               child: Column(
@@ -519,26 +513,26 @@ class _GhostRow extends StatelessWidget {
                   _SideValueRow(
                     side: 'L',
                     text: '${FormatUtils.weight(prevSet.leftKg!)} kg',
-                    style: _ghostStyle,
+                    style: _ghostStyle(context),
                   ),
-                  const SizedBox(height: 3),
+                  SizedBox(height: 3),
                   _SideValueRow(
                     side: 'R',
                     text: '${FormatUtils.weight(prevSet.kg)} kg',
-                    style: _ghostStyle,
+                    style: _ghostStyle(context),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('${prevSet.leftReps}', style: _ghostStyle),
-                  const SizedBox(height: 3),
-                  Text('${prevSet.reps}', style: _ghostStyle),
+                  Text('${prevSet.leftReps}', style: _ghostStyle(context)),
+                  SizedBox(height: 3),
+                  Text('${prevSet.reps}', style: _ghostStyle(context)),
                 ],
               ),
             ),
@@ -546,16 +540,16 @@ class _GhostRow extends StatelessWidget {
             Expanded(
               child: Text(
                 '${FormatUtils.weight(prevSet.kg)} kg',
-                style: _ghostStyle,
+                style: _ghostStyle(context),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Expanded(
-              child: Text('${prevSet.reps}', style: _ghostStyle),
+              child: Text('${prevSet.reps}', style: _ghostStyle(context)),
             ),
           ],
-          const SizedBox(width: 8),
-          const SizedBox(width: 36),
+          SizedBox(width: 8),
+          SizedBox(width: 36),
         ],
       ),
     );
@@ -590,10 +584,10 @@ class _ActiveSetRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0x0DD97757),
-          borderRadius: BorderRadius.circular(10),
+          color: context.colors.accent.withValues(alpha: 0.18),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: AppColors.accent.withOpacity(0.35),
+            color: context.colors.accent.withValues(alpha: 0.5),
             width: 1,
           ),
         ),
@@ -603,15 +597,15 @@ class _ActiveSetRow extends StatelessWidget {
               width: 32,
               child: Text(
                 '${setIndex + 1}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.accentDeep,
-                  fontFeatures: [FontFeature.tabularFigures()],
+                  color: context.colors.accent,
+                  fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Expanded(
               child: isSplitMode
                   ? _SplitInputs(
@@ -635,7 +629,7 @@ class _ActiveSetRow extends StatelessWidget {
                             isDouble: true,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Expanded(
                           child: NumberInputWidget(
                             value: currentInput.reps,
@@ -649,7 +643,7 @@ class _ActiveSetRow extends StatelessWidget {
                       ],
                     ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             PressableScale(
               onTap: onFinishSet,
               child: Container(
@@ -664,13 +658,13 @@ class _ActiveSetRow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.accentDeep.withOpacity(0.35),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                      color: context.colors.accentDeep.withValues(alpha: 0.25),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
-                child: const Icon(Icons.check, size: 16, color: Colors.white),
+                child: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
               ),
             ),
           ],
@@ -695,10 +689,10 @@ class _SplitInputs extends StatelessWidget {
   final ValueChanged<double> onLeftWeightChanged;
   final ValueChanged<int> onLeftRepsChanged;
 
-  static const _sideStyle = TextStyle(
+  TextStyle _sideStyle(BuildContext context) => TextStyle(
     fontSize: 10,
     fontWeight: FontWeight.w700,
-    color: AppColors.accentDeep,
+    color: context.colors.accentDeep,
   );
 
   @override
@@ -716,11 +710,11 @@ class _SplitInputs extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: 14,
-                    child: Text('L', style: _sideStyle),
+                    child: Text('L', style: _sideStyle(context)),
                   ),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4),
                   Expanded(
                     child: NumberInputWidget(
                       value: leftKg,
@@ -733,14 +727,14 @@ class _SplitInputs extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Row(
                 children: [
-                  const SizedBox(
+                  SizedBox(
                     width: 14,
-                    child: Text('R', style: _sideStyle),
+                    child: Text('R', style: _sideStyle(context)),
                   ),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4),
                   Expanded(
                     child: NumberInputWidget(
                       value: currentInput.kg,
@@ -756,7 +750,7 @@ class _SplitInputs extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         // REPS column — aligned with the REPS header
         Expanded(
           child: Column(
@@ -768,7 +762,7 @@ class _SplitInputs extends StatelessWidget {
                     onLeftRepsChanged((leftReps - 1).clamp(0, 999)),
                 onIncrement: () => onLeftRepsChanged(leftReps + 1),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               NumberInputWidget(
                 value: currentInput.reps,
                 onDecrement: () =>
@@ -794,10 +788,10 @@ class _SideValueRow extends StatelessWidget {
   final String text;
   final TextStyle style;
 
-  static const _sideStyle = TextStyle(
+  TextStyle _sideStyle(BuildContext context) => TextStyle(
     fontSize: 10,
     fontWeight: FontWeight.w700,
-    color: AppColors.accentDeep,
+    color: context.colors.accentDeep,
   );
 
   @override
@@ -805,8 +799,8 @@ class _SideValueRow extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(width: 12, child: Text(side, style: _sideStyle)),
-        const SizedBox(width: 4),
+        SizedBox(width: 12, child: Text(side, style: _sideStyle(context))),
+        SizedBox(width: 4),
         Text(text, style: style),
       ],
     );
