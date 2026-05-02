@@ -29,7 +29,7 @@ class HomeScreen extends ConsumerWidget {
     final nextRoutine = state.nextRoutine;
     final heroInfo = ref.watch(heroCardInfoProvider).value;
     final daysAgo = state.nextRoutineDaysAgo;
-    
+
     String lastDoneText;
     if (daysAgo == null) {
       lastDoneText = l10n.neverDone;
@@ -41,9 +41,9 @@ class HomeScreen extends ConsumerWidget {
       lastDoneText = l10n.lastDoneDaysAgo(daysAgo);
     }
 
-    final greeting = state.userName == 'there' || state.userName.isEmpty 
-      ? l10n.helloThere 
-      : '${l10n.hello}, ${state.userName}';
+    final greeting = state.userName == 'there' || state.userName.isEmpty
+        ? l10n.helloThere
+        : '${l10n.hello}, ${state.userName}';
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
@@ -67,9 +67,9 @@ class HomeScreen extends ConsumerWidget {
                   height: 1.05,
                 ),
                 trailing: PressableScale(
-                  onTap: () => Navigator.of(context).push(
-                    AppRoute(page: const SettingsScreen()),
-                  ),
+                  onTap: () => Navigator.of(
+                    context,
+                  ).push(AppRoute(page: const SettingsScreen())),
                   child: Container(
                     width: 38,
                     height: 38,
@@ -238,8 +238,18 @@ class _ActivityGrid extends StatelessWidget {
   final int sessionCount;
 
   static const _months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
   static const _dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   static const int _numWeeks = 26;
@@ -261,8 +271,7 @@ class _ActivityGrid extends StatelessWidget {
       builder: (context, constraints) {
         const overhead = 32.0 + 22.0 + 2.0;
         final weeksAreaWidth = constraints.maxWidth - overhead;
-        final numWeeks =
-            (weeksAreaWidth / _slot).floor().clamp(4, _numWeeks);
+        final numWeeks = (weeksAreaWidth / _slot).floor().clamp(4, _numWeeks);
 
         final gridStart = currentMonday.subtract(
           Duration(days: 7 * (numWeeks - 1)),
@@ -272,128 +281,128 @@ class _ActivityGrid extends StatelessWidget {
           (w) => gridStart.add(Duration(days: 7 * w)),
         );
 
-    return GlassContainer(
-      radius: 20,
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.activity,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.06,
-              color: context.colors.ink400,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            '$sessionCount ${l10n.sessionsLastYear}',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w400,
-              letterSpacing: -0.4,
-              color: context.colors.ink900,
-              height: 1.1,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Row(
+        return GlassContainer(
+          radius: 20,
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                width: 22,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: _slot + 2),
-                    ..._dayLabels.map(
-                      (label) => SizedBox(
-                        height: _slot,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            label,
-                            style: TextStyle(
-                              fontSize: 8,
-                              color: context.colors.ink400,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+              Text(
+                l10n.activity,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.06,
+                  color: context.colors.ink400,
                 ),
               ),
-              const SizedBox(width: 2),
+              const SizedBox(height: 2),
+              Text(
+                '$sessionCount ${l10n.sessionsLastYear}',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: -0.4,
+                  color: context.colors.ink900,
+                  height: 1.1,
+                ),
+              ),
+              const SizedBox(height: 14),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: weeks.asMap().entries.map((entry) {
-                  final w = entry.key;
-                  final monday = entry.value;
-                  final showMonth =
-                      w == 0 || monday.month != weeks[w - 1].month;
-
-                  return SizedBox(
-                    width: _slot,
+                children: [
+                  SizedBox(
+                    width: 22,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          height: _slot,
-                          child: showMonth
-                              ? Text(
-                                  _months[monday.month - 1],
-                                  style: TextStyle(
-                                    fontSize: 7,
-                                    color: context.colors.ink400,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  overflow: TextOverflow.visible,
-                                  softWrap: false,
-                                )
-                              : null,
-                        ),
-                        const SizedBox(height: 2),
-                        ...List.generate(7, (d) {
-                          final day = monday.add(Duration(days: d));
-                          final isFuture = day.isAfter(today);
-                          final trained =
-                              !isFuture && workoutDays.contains(_fmt(day));
-                          return Container(
-                            width: _cell,
-                            height: _cell,
-                            margin: const EdgeInsets.only(bottom: _gap),
-                            decoration: BoxDecoration(
-                              color: isFuture
-                                  ? Colors.transparent
-                                  : trained
-                                  ? context.colors.accentDeep
-                                  : const Color(0x0F000000),
-                              borderRadius: BorderRadius.circular(2),
-                              border: isFuture
-                                  ? null
-                                  : Border.all(
-                                      color: trained
-                                          ? Colors.transparent
-                                          : const Color(0x14000000),
-                                      width: 0.5,
-                                    ),
+                        const SizedBox(height: _slot + 2),
+                        ..._dayLabels.map(
+                          (label) => SizedBox(
+                            height: _slot,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                label,
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  color: context.colors.ink400,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ),
-                          );
-                        }),
+                          ),
+                        ),
                       ],
                     ),
-                  );
-                }).toList(),
+                  ),
+                  const SizedBox(width: 2),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: weeks.asMap().entries.map((entry) {
+                      final w = entry.key;
+                      final monday = entry.value;
+                      final showMonth =
+                          w == 0 || monday.month != weeks[w - 1].month;
+
+                      return SizedBox(
+                        width: _slot,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: _slot,
+                              child: showMonth
+                                  ? Text(
+                                      _months[monday.month - 1],
+                                      style: TextStyle(
+                                        fontSize: 7,
+                                        color: context.colors.ink400,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      overflow: TextOverflow.visible,
+                                      softWrap: false,
+                                    )
+                                  : null,
+                            ),
+                            const SizedBox(height: 2),
+                            ...List.generate(7, (d) {
+                              final day = monday.add(Duration(days: d));
+                              final isFuture = day.isAfter(today);
+                              final trained =
+                                  !isFuture && workoutDays.contains(_fmt(day));
+                              return Container(
+                                width: _cell,
+                                height: _cell,
+                                margin: const EdgeInsets.only(bottom: _gap),
+                                decoration: BoxDecoration(
+                                  color: isFuture
+                                      ? Colors.transparent
+                                      : trained
+                                      ? context.colors.accentDeep
+                                      : const Color(0x0F000000),
+                                  borderRadius: BorderRadius.circular(2),
+                                  border: isFuture
+                                      ? null
+                                      : Border.all(
+                                          color: trained
+                                              ? Colors.transparent
+                                              : const Color(0x14000000),
+                                          width: 0.5,
+                                        ),
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-    );
+        );
       },
     );
   }
@@ -425,9 +434,14 @@ class _HeroCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     String displayExName = mainExerciseName ?? '';
     if (mainExerciseId != null && !mainExerciseId!.startsWith('custom-')) {
-       // Localize builtin exercise
-       final dummy = Exercise(id: mainExerciseId!, name: mainExerciseName ?? '', muscle: '', equipment: '');
-       displayExName = dummy.getLocalizedName(context);
+      // Localize builtin exercise
+      final dummy = Exercise(
+        id: mainExerciseId!,
+        name: mainExerciseName ?? '',
+        muscle: '',
+        equipment: '',
+      );
+      displayExName = dummy.getLocalizedName(context);
     }
 
     return Container(
@@ -458,7 +472,11 @@ class _HeroCard extends StatelessWidget {
               height: 280,
               decoration: const BoxDecoration(
                 gradient: RadialGradient(
-                  colors: [Color(0x55FFFFFF), Color(0x22FFFFFF), Color(0x00FFFFFF)],
+                  colors: [
+                    Color(0x55FFFFFF),
+                    Color(0x22FFFFFF),
+                    Color(0x00FFFFFF),
+                  ],
                   stops: [0.0, 0.45, 1.0],
                 ),
               ),
@@ -542,7 +560,11 @@ class _HeroCard extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.play_arrow, color: Colors.white, size: 16),
+                      const Icon(
+                        Icons.play_arrow,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         l10n.startWorkout,
@@ -576,8 +598,8 @@ class _PrChip extends StatelessWidget {
     final prStr = prKg == null
         ? l10n.noRecordYet
         : prKg! % 1 == 0
-            ? '${prKg!.toInt()} kg'
-            : '${prKg!.toStringAsFixed(1)} kg';
+        ? '${prKg!.toInt()} kg'
+        : '${prKg!.toStringAsFixed(1)} kg';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),

@@ -101,15 +101,14 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell>
   }
 
   void _buildAnimations({required bool forward}) {
-    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _pageCtrl, curve: Curves.easeOutCubic),
-    );
+    _fadeAnim = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _pageCtrl, curve: Curves.easeOutCubic));
     _slideAnim = Tween<Offset>(
       begin: Offset(forward ? 0.04 : -0.04, 0.0),
       end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _pageCtrl, curve: Curves.easeOutCubic),
-    );
+    ).animate(CurvedAnimation(parent: _pageCtrl, curve: Curves.easeOutCubic));
   }
 
   void _onTabChanged(int i) {
@@ -166,8 +165,14 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell>
               onChanged: _onTabChanged,
               items: [
                 _NavItem(icon: Icons.home_filled, label: l10n.home),
-                _NavItem(icon: Icons.format_list_bulleted_rounded, label: l10n.routines),
-                _NavItem(icon: Icons.fitness_center_rounded, label: l10n.exercises),
+                _NavItem(
+                  icon: Icons.format_list_bulleted_rounded,
+                  label: l10n.routines,
+                ),
+                _NavItem(
+                  icon: Icons.fitness_center_rounded,
+                  label: l10n.exercises,
+                ),
                 _NavItem(icon: Icons.history_rounded, label: l10n.history),
               ],
             ),
@@ -206,7 +211,7 @@ class _LiquidNavBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.18),
+            color: Colors.black.withValues(alpha: isDark ? 0.50 : 0.18),
             blurRadius: 32,
             spreadRadius: -4,
             offset: const Offset(0, 12),
@@ -216,29 +221,28 @@ class _LiquidNavBar extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+          filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             decoration: BoxDecoration(
-              // Multi-layer glass: base tint + specular highlight
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: isDark
                     ? [
-                        Colors.white.withValues(alpha: 0.10),
-                        Colors.white.withValues(alpha: 0.05),
+                        Colors.black.withValues(alpha: 0.05),
+                        Colors.black.withValues(alpha: 0.02),
                       ]
                     : [
-                        Colors.white.withValues(alpha: 0.72),
-                        Colors.white.withValues(alpha: 0.48),
+                        Colors.white.withValues(alpha: 0.22),
+                        Colors.white.withValues(alpha: 0.12),
                       ],
               ),
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.13)
-                    : Colors.white.withValues(alpha: 0.70),
+                    ? Colors.white.withValues(alpha: 0.03)
+                    : Colors.white.withValues(alpha: 0.35),
                 width: 1,
               ),
             ),
@@ -290,7 +294,9 @@ class _NavBarButton extends StatelessWidget {
               : Colors.transparent,
           border: active
               ? Border.all(
-                  color: context.colors.accent.withValues(alpha: isDark ? 0.35 : 0.20),
+                  color: context.colors.accent.withValues(
+                    alpha: isDark ? 0.35 : 0.20,
+                  ),
                   width: 1,
                 )
               : null,
@@ -305,9 +311,7 @@ class _NavBarButton extends StatelessWidget {
               child: Icon(
                 item.icon,
                 size: 22,
-                color: active
-                    ? context.colors.accent
-                    : context.colors.ink300,
+                color: active ? context.colors.accent : context.colors.ink300,
               ),
             ),
             const SizedBox(height: 3),
@@ -317,9 +321,7 @@ class _NavBarButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                color: active
-                    ? context.colors.accent
-                    : context.colors.ink300,
+                color: active ? context.colors.accent : context.colors.ink300,
                 letterSpacing: active ? 0.0 : 0.1,
               ),
               child: Text(item.label),
@@ -396,15 +398,18 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFD97757).withValues(
-                          alpha: isDark ? 0.25 : 0.20),
+                      color: const Color(
+                        0xFFD97757,
+                      ).withValues(alpha: isDark ? 0.25 : 0.20),
                       blurRadius: 24,
                       spreadRadius: -4,
                       offset: const Offset(0, 8),
                     ),
                     // Specular top highlight
                     BoxShadow(
-                      color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.30),
+                      color: Colors.white.withValues(
+                        alpha: isDark ? 0.05 : 0.30,
+                      ),
                       blurRadius: 0,
                       spreadRadius: 0,
                       offset: const Offset(0, 1),
@@ -439,7 +444,9 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                               fontSize: 11,
                               color: isDark
                                   ? Colors.white.withValues(alpha: 0.75)
-                                  : const Color(0xFF3D1A08).withValues(alpha: 0.65),
+                                  : const Color(
+                                      0xFF3D1A08,
+                                    ).withValues(alpha: 0.65),
                             ),
                           ),
                         ],
@@ -458,7 +465,9 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                           letterSpacing: -0.3,
-                          color: isDark ? Colors.white : const Color(0xFF3D1A08),
+                          color: isDark
+                              ? Colors.white
+                              : const Color(0xFF3D1A08),
                           fontFeatures: const [FontFeature.tabularFigures()],
                         ),
                       ),
@@ -482,9 +491,7 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                       child: Icon(
                         Icons.chevron_right,
                         size: 18,
-                        color: isDark
-                            ? Colors.white
-                            : const Color(0xFF3D1A08),
+                        color: isDark ? Colors.white : const Color(0xFF3D1A08),
                       ),
                     ),
                   ],
@@ -519,9 +526,10 @@ class _IslandPulseDotState extends State<_IslandPulseDot>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     )..repeat(reverse: true);
-    _anim = Tween<double>(begin: 1.0, end: 0.30).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
-    );
+    _anim = Tween<double>(
+      begin: 1.0,
+      end: 0.30,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
   }
 
   @override
