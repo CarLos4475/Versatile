@@ -264,8 +264,8 @@ class _CardBody extends StatelessWidget {
         children: [
           const Divider(color: Color(0x0F000000), thickness: 0.5, height: 14),
 
-          if (!data.isSplitMode) const _ColumnHeaders(),
-          if (!data.isSplitMode) const SizedBox(height: 2),
+          const _ColumnHeaders(),
+          const SizedBox(height: 2),
 
           // Completed sets
           ...data.completedSets.asMap().entries.map(
@@ -369,6 +369,19 @@ class _CompletedSetRow extends StatelessWidget {
   final WorkoutSet set;
   final bool isSplitMode;
 
+  static const _weightStyle = TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    color: AppColors.ink900,
+    fontFeatures: [FontFeature.tabularFigures()],
+  );
+  static const _repsStyle = TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    color: AppColors.ink900,
+    fontFeatures: [FontFeature.tabularFigures()],
+  );
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -380,6 +393,7 @@ class _CompletedSetRow extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
               width: 32,
@@ -394,59 +408,52 @@ class _CompletedSetRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Expanded(
-              child: set.isSplit
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'L  ${FormatUtils.weight(set.leftKg!)} kg × ${set.leftReps}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.ink900,
-                            fontFeatures: [FontFeature.tabularFigures()],
-                          ),
-                        ),
-                        Text(
-                          'R  ${FormatUtils.weight(set.kg)} kg × ${set.reps}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.ink700,
-                            fontFeatures: [FontFeature.tabularFigures()],
-                          ),
-                        ),
-                      ],
-                    )
-                  : Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${FormatUtils.weight(set.kg)} kg',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.ink900,
-                              fontFeatures: [FontFeature.tabularFigures()],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            '${set.reps}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.ink900,
-                              fontFeatures: [FontFeature.tabularFigures()],
-                            ),
-                          ),
-                        ),
-                      ],
+            if (set.isSplit) ...[
+              // WEIGHT column with L / R labels
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _SideValueRow(
+                      side: 'L',
+                      text: '${FormatUtils.weight(set.leftKg!)} kg',
+                      style: _weightStyle,
                     ),
-            ),
+                    const SizedBox(height: 3),
+                    _SideValueRow(
+                      side: 'R',
+                      text: '${FormatUtils.weight(set.kg)} kg',
+                      style: _weightStyle,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              // REPS column
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('${set.leftReps}', style: _repsStyle),
+                    const SizedBox(height: 3),
+                    Text('${set.reps}', style: _repsStyle),
+                  ],
+                ),
+              ),
+            ] else ...[
+              Expanded(
+                child: Text(
+                  '${FormatUtils.weight(set.kg)} kg',
+                  style: _weightStyle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('${set.reps}', style: _repsStyle),
+              ),
+            ],
             const SizedBox(width: 8),
             Container(
               width: 22,
@@ -474,69 +481,79 @@ class _GhostRow extends StatelessWidget {
   final WorkoutSet prevSet;
   final bool isSplitMode;
 
+  static const _ghostStyle = TextStyle(
+    fontSize: 11,
+    color: AppColors.ink300,
+    fontFeatures: [FontFeature.tabularFigures()],
+  );
+
   @override
   Widget build(BuildContext context) {
+    final showSplit = isSplitMode && prevSet.isSplit;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 6, 4, 0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(
+          SizedBox(
             width: 32,
-            child: Text(
-              '↑ Last',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: AppColors.ink300,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: isSplitMode && prevSet.isSplit
-                ? Column(
+            child: showSplit
+                ? const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        'L  ${FormatUtils.weight(prevSet.leftKg!)} kg × ${prevSet.leftReps}',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.ink300,
-                        ),
-                      ),
-                      Text(
-                        'R  ${FormatUtils.weight(prevSet.kg)} kg × ${prevSet.reps}',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.ink300,
-                        ),
-                      ),
+                      Text('↑', style: _ghostStyle),
+                      Text('Last', style: _ghostStyle),
                     ],
                   )
-                : Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '${FormatUtils.weight(prevSet.kg)} kg',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.ink300,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '${prevSet.reps}',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: AppColors.ink300,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                : const Text('↑ Last', style: _ghostStyle),
           ),
+          const SizedBox(width: 8),
+          if (showSplit) ...[
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _SideValueRow(
+                    side: 'L',
+                    text: '${FormatUtils.weight(prevSet.leftKg!)} kg',
+                    style: _ghostStyle,
+                  ),
+                  const SizedBox(height: 3),
+                  _SideValueRow(
+                    side: 'R',
+                    text: '${FormatUtils.weight(prevSet.kg)} kg',
+                    style: _ghostStyle,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('${prevSet.leftReps}', style: _ghostStyle),
+                  const SizedBox(height: 3),
+                  Text('${prevSet.reps}', style: _ghostStyle),
+                ],
+              ),
+            ),
+          ] else ...[
+            Expanded(
+              child: Text(
+                '${FormatUtils.weight(prevSet.kg)} kg',
+                style: _ghostStyle,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text('${prevSet.reps}', style: _ghostStyle),
+            ),
+          ],
           const SizedBox(width: 8),
           const SizedBox(width: 36),
         ],
@@ -681,7 +698,7 @@ class _SplitInputs extends StatelessWidget {
   static const _sideStyle = TextStyle(
     fontSize: 10,
     fontWeight: FontWeight.w700,
-    color: AppColors.ink400,
+    color: AppColors.accentDeep,
   );
 
   @override
@@ -689,59 +706,108 @@ class _SplitInputs extends StatelessWidget {
     final leftKg = currentInput.leftKg ?? currentInput.kg;
     final leftReps = currentInput.leftReps ?? currentInput.reps;
 
-    return Column(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            const SizedBox(width: 14, child: Text('L', style: _sideStyle)),
-            const SizedBox(width: 4),
-            Expanded(
-              child: NumberInputWidget(
-                value: leftKg,
-                onDecrement: () =>
-                    onLeftWeightChanged((leftKg - 2.5).clamp(0, 999)),
-                onIncrement: () => onLeftWeightChanged(leftKg + 2.5),
-                suffix: 'kg',
-                isDouble: true,
+        // WEIGHT column — L/R labels live here so they align with the header
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  const SizedBox(
+                    width: 14,
+                    child: Text('L', style: _sideStyle),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: NumberInputWidget(
+                      value: leftKg,
+                      onDecrement: () =>
+                          onLeftWeightChanged((leftKg - 2.5).clamp(0, 999)),
+                      onIncrement: () => onLeftWeightChanged(leftKg + 2.5),
+                      suffix: 'kg',
+                      isDouble: true,
+                    ),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(width: 4),
-            Expanded(
-              child: NumberInputWidget(
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  const SizedBox(
+                    width: 14,
+                    child: Text('R', style: _sideStyle),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: NumberInputWidget(
+                      value: currentInput.kg,
+                      onDecrement: () =>
+                          onWeightChanged((currentInput.kg - 2.5).clamp(0, 999)),
+                      onIncrement: () => onWeightChanged(currentInput.kg + 2.5),
+                      suffix: 'kg',
+                      isDouble: true,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        // REPS column — aligned with the REPS header
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              NumberInputWidget(
                 value: leftReps,
                 onDecrement: () =>
                     onLeftRepsChanged((leftReps - 1).clamp(0, 999)),
                 onIncrement: () => onLeftRepsChanged(leftReps + 1),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            const SizedBox(width: 14, child: Text('R', style: _sideStyle)),
-            const SizedBox(width: 4),
-            Expanded(
-              child: NumberInputWidget(
-                value: currentInput.kg,
-                onDecrement: () =>
-                    onWeightChanged((currentInput.kg - 2.5).clamp(0, 999)),
-                onIncrement: () => onWeightChanged(currentInput.kg + 2.5),
-                suffix: 'kg',
-                isDouble: true,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Expanded(
-              child: NumberInputWidget(
+              const SizedBox(height: 4),
+              NumberInputWidget(
                 value: currentInput.reps,
                 onDecrement: () =>
                     onRepsChanged((currentInput.reps - 1).clamp(0, 999)),
                 onIncrement: () => onRepsChanged(currentInput.reps + 1),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ],
+    );
+  }
+}
+
+class _SideValueRow extends StatelessWidget {
+  const _SideValueRow({
+    required this.side,
+    required this.text,
+    required this.style,
+  });
+
+  final String side;
+  final String text;
+  final TextStyle style;
+
+  static const _sideStyle = TextStyle(
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    color: AppColors.accentDeep,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(width: 12, child: Text(side, style: _sideStyle)),
+        const SizedBox(width: 4),
+        Text(text, style: style),
       ],
     );
   }
