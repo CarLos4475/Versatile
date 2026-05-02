@@ -12,6 +12,9 @@ import '../../../data/database/database_helper.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
+import '../../exercises/view_models/exercises_view_model.dart';
+import '../../home/view_models/home_view_model.dart';
+import '../../routines/view_models/routines_view_model.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -111,7 +114,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       final content = await File(result.files.single.path!).readAsString();
       await DataService.importJson(content);
-      ref.invalidate(userNameProvider);
+      _invalidateAll();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Data imported successfully')),
@@ -167,7 +170,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() => _busy = true);
     try {
       await DatabaseHelper.instance.wipeUserData();
-      ref.invalidate(userNameProvider);
+      _invalidateAll();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('All data wiped')),
@@ -178,6 +181,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  void _invalidateAll() {
+    ref.invalidate(userNameProvider);
+    ref.invalidate(sessionsAsyncProvider);
+    ref.invalidate(workoutLogDaysProvider);
+    ref.invalidate(routinesProvider);
+    ref.invalidate(exercisesAsyncProvider);
   }
 
   void _showError(String msg) {
