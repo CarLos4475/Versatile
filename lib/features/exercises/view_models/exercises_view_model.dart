@@ -2,6 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../domain/entities/exercise.dart';
 
+const kArmsSubMuscles = ['Biceps', 'Triceps', 'Forearms'];
+const kLegsSubMuscles = ['Quadriceps', 'Hamstrings', 'Glutes', 'Calves'];
+
+const kArmsSet = {'Biceps', 'Triceps', 'Forearms'};
+const kLegsSet = {'Quadriceps', 'Hamstrings', 'Glutes', 'Calves'};
+
 enum ExercisesTab { all, mine }
 
 enum ExerciseLaterality { all, bilateral, unilateral }
@@ -9,12 +15,14 @@ enum ExerciseLaterality { all, bilateral, unilateral }
 class ExercisesState {
   final String query;
   final String selectedMuscle;
+  final String? selectedSubMuscle;
   final ExercisesTab tab;
   final ExerciseLaterality laterality;
 
   const ExercisesState({
     this.query = '',
     this.selectedMuscle = 'All',
+    this.selectedSubMuscle,
     this.tab = ExercisesTab.all,
     this.laterality = ExerciseLaterality.all,
   });
@@ -22,12 +30,17 @@ class ExercisesState {
   ExercisesState copyWith({
     String? query,
     String? selectedMuscle,
+    String? selectedSubMuscle,
+    bool clearSubMuscle = false,
     ExercisesTab? tab,
     ExerciseLaterality? laterality,
   }) {
     return ExercisesState(
       query: query ?? this.query,
       selectedMuscle: selectedMuscle ?? this.selectedMuscle,
+      selectedSubMuscle: clearSubMuscle
+          ? null
+          : (selectedSubMuscle ?? this.selectedSubMuscle),
       tab: tab ?? this.tab,
       laterality: laterality ?? this.laterality,
     );
@@ -38,7 +51,18 @@ class ExercisesNotifier extends StateNotifier<ExercisesState> {
   ExercisesNotifier() : super(const ExercisesState());
 
   void setQuery(String q) => state = state.copyWith(query: q);
-  void setMuscle(String m) => state = state.copyWith(selectedMuscle: m);
+
+  void setMuscle(String m) =>
+      state = state.copyWith(selectedMuscle: m, clearSubMuscle: true);
+
+  void setSubMuscle(String? m) {
+    if (state.selectedSubMuscle == m) {
+      state = state.copyWith(clearSubMuscle: true);
+    } else {
+      state = state.copyWith(selectedSubMuscle: m);
+    }
+  }
+
   void setTab(ExercisesTab t) => state = state.copyWith(tab: t);
   void setLaterality(ExerciseLaterality l) =>
       state = state.copyWith(laterality: l);
@@ -71,9 +95,25 @@ final filteredExercisesProvider = Provider<List<Exercise>>((ref) {
   final state = ref.watch(exercisesProvider);
   return allExercises.where((e) {
     if (state.tab == ExercisesTab.mine && !e.isCustom) return false;
-    if (state.selectedMuscle != 'All' && e.muscle != state.selectedMuscle) {
-      return false;
+
+    if (state.selectedMuscle != 'All') {
+      if (state.selectedMuscle == 'Arms') {
+        if (state.selectedSubMuscle != null) {
+          if (e.muscle != state.selectedSubMuscle) return false;
+        } else {
+          if (!kArmsSet.contains(e.muscle)) return false;
+        }
+      } else if (state.selectedMuscle == 'Legs') {
+        if (state.selectedSubMuscle != null) {
+          if (e.muscle != state.selectedSubMuscle) return false;
+        } else {
+          if (!kLegsSet.contains(e.muscle)) return false;
+        }
+      } else {
+        if (e.muscle != state.selectedMuscle) return false;
+      }
     }
+
     if (state.laterality == ExerciseLaterality.unilateral && !e.isUnilateral) {
       return false;
     }

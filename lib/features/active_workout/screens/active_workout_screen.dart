@@ -15,9 +15,11 @@ class ActiveWorkoutScreen extends ConsumerWidget {
     super.key,
     required this.routineId,
     this.restoredStartedAt,
+    this.restoredProgressJson,
   });
   final String routineId;
   final DateTime? restoredStartedAt;
+  final String? restoredProgressJson;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -46,6 +48,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
       data: (_) => _WorkoutBody(
         routineId: routineId,
         restoredStartedAt: restoredStartedAt,
+        restoredProgressJson: restoredProgressJson,
       ),
     );
   }
@@ -76,9 +79,14 @@ class _LoadingScaffold extends StatelessWidget {
 }
 
 class _WorkoutBody extends ConsumerStatefulWidget {
-  const _WorkoutBody({required this.routineId, this.restoredStartedAt});
+  const _WorkoutBody({
+    required this.routineId,
+    this.restoredStartedAt,
+    this.restoredProgressJson,
+  });
   final String routineId;
   final DateTime? restoredStartedAt;
+  final String? restoredProgressJson;
 
   @override
   ConsumerState<_WorkoutBody> createState() => _WorkoutBodyState();
@@ -99,6 +107,9 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
           ref.read(activeWorkoutProvider(widget.routineId).notifier);
       if (widget.restoredStartedAt != null) {
         notifier.restoreStartTime(widget.restoredStartedAt!);
+      }
+      if (widget.restoredProgressJson != null) {
+        notifier.restoreProgress(widget.restoredProgressJson!);
       }
       WorkoutNotificationService.start(
         startedAt: notifier.workoutStartedAt,

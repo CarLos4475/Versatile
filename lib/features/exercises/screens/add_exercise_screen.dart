@@ -9,18 +9,13 @@ import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../view_models/exercises_view_model.dart';
 
-const _kMuscles = [
+const _kMuscleGroups = [
   'Chest',
   'Back',
   'Shoulders',
-  'Biceps',
-  'Triceps',
-  'Forearms',
+  'Arms',
   'Core',
-  'Quadriceps',
-  'Hamstrings',
-  'Glutes',
-  'Calves',
+  'Legs',
   'Other',
 ];
 
@@ -42,10 +37,32 @@ class AddExerciseScreen extends ConsumerStatefulWidget {
 
 class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
   final _ctrl = TextEditingController();
-  String _muscle = 'Chest';
+  String _muscleGroup = 'Chest';
+  String? _subMuscle;
   String _equipment = 'Barbell';
   bool _isUnilateral = false;
   bool _saving = false;
+
+  String get _effectiveMuscle => _subMuscle ?? _muscleGroup;
+
+  List<String> get _subMuscles {
+    if (_muscleGroup == 'Arms') return kArmsSubMuscles;
+    if (_muscleGroup == 'Legs') return kLegsSubMuscles;
+    return [];
+  }
+
+  void _onGroupChanged(String group) {
+    setState(() {
+      _muscleGroup = group;
+      if (group == 'Arms') {
+        _subMuscle = kArmsSubMuscles.first;
+      } else if (group == 'Legs') {
+        _subMuscle = kLegsSubMuscles.first;
+      } else {
+        _subMuscle = null;
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -60,7 +77,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
     final exercise = Exercise(
       id: const Uuid().v4(),
       name: name,
-      muscle: _muscle,
+      muscle: _effectiveMuscle,
       equipment: _equipment,
       isCustom: true,
       isUnilateral: _isUnilateral,
@@ -72,8 +89,11 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
     return Scaffold(
       backgroundColor: AppColors.bgApp,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,122 +103,290 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
               subtitle: 'Add a custom exercise',
               onBack: () => Navigator.of(context).pop(),
             ),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              child: GlassContainer(
-                radius: 16,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 4,
-                ),
-                child: TextField(
-                  controller: _ctrl,
-                  autofocus: true,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: AppColors.ink900,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: const InputDecoration(
-                    hintText: 'Exercise name…',
-                    hintStyle: TextStyle(fontSize: 16, color: AppColors.ink400),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 14),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-            _Section(
-              label: 'MUSCLE GROUP',
-              options: _kMuscles,
-              selected: _muscle,
-              onSelected: (v) => setState(() => _muscle = v),
-            ),
-            const SizedBox(height: 20),
-            _Section(
-              label: 'EQUIPMENT',
-              options: _kEquipment,
-              selected: _equipment,
-              onSelected: (v) => setState(() => _equipment = v),
-            ),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              child: PressableScale(
-                onTap: () => setState(() => _isUnilateral = !_isUnilateral),
-                child: Row(
+            Expanded(
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: EdgeInsets.only(bottom: bottomInset + 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 160),
-                      width: 44,
-                      height: 26,
-                      decoration: BoxDecoration(
-                        color: _isUnilateral
-                            ? AppColors.accentDeep
-                            : AppColors.glassBg,
-                        borderRadius: BorderRadius.circular(13),
-                        border: Border.all(
-                          color: _isUnilateral
-                              ? Colors.transparent
-                              : AppColors.glassBorder,
-                          width: 0.5,
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: GlassContainer(
+                        radius: 16,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
                         ),
-                      ),
-                      child: AnimatedAlign(
-                        duration: const Duration(milliseconds: 160),
-                        alignment: _isUnilateral
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
+                        child: TextField(
+                          controller: _ctrl,
+                          autofocus: true,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: AppColors.ink900,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: 'Exercise name…',
+                            hintStyle: TextStyle(
+                              fontSize: 16,
+                              color: AppColors.ink400,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding:
+                                EdgeInsets.symmetric(vertical: 14),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Unilateral exercise',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.ink900,
+                    const SizedBox(height: 24),
+                    _SectionLabel('MUSCLE GROUP'),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 36,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 22),
+                        itemCount: _kMuscleGroups.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(width: 8),
+                        itemBuilder: (context, i) {
+                          final g = _kMuscleGroups[i];
+                          final active = _muscleGroup == g;
+                          return PressableScale(
+                            onTap: () => _onGroupChanged(g),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 160),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: active
+                                    ? AppColors.accentDeep
+                                    : AppColors.glassBg,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: active
+                                      ? Colors.transparent
+                                      : AppColors.glassBorder,
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Text(
+                                g,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: active
+                                      ? Colors.white
+                                      : AppColors.ink700,
+                                ),
+                              ),
                             ),
-                          ),
-                          Text(
-                            'Track left and right sides separately',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.ink400,
+                          );
+                        },
+                      ),
+                    ),
+                    AnimatedSize(
+                      duration: const Duration(milliseconds: 240),
+                      curve: Curves.easeOutCubic,
+                      alignment: Alignment.topLeft,
+                      child: _subMuscles.isNotEmpty
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: SizedBox(
+                                height: 36,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 22),
+                                  itemCount: _subMuscles.length,
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(width: 8),
+                                  itemBuilder: (context, i) {
+                                    final m = _subMuscles[i];
+                                    final active = _subMuscle == m;
+                                    return PressableScale(
+                                      onTap: () =>
+                                          setState(() => _subMuscle = m),
+                                      child: AnimatedContainer(
+                                        duration: const Duration(
+                                            milliseconds: 160),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: active
+                                              ? AppColors.accent
+                                              : AppColors.glassBg,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: active
+                                                ? Colors.transparent
+                                                : AppColors.glassBorder,
+                                            width: 0.5,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          m,
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                            color: active
+                                                ? Colors.white
+                                                : AppColors.ink700,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ),
+                    const SizedBox(height: 20),
+                    _SectionLabel('EQUIPMENT'),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 36,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 22),
+                        itemCount: _kEquipment.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(width: 8),
+                        itemBuilder: (context, i) {
+                          final opt = _kEquipment[i];
+                          final active = opt == _equipment;
+                          return PressableScale(
+                            onTap: () =>
+                                setState(() => _equipment = opt),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 160),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: active
+                                    ? AppColors.accentDeep
+                                    : AppColors.glassBg,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: active
+                                      ? Colors.transparent
+                                      : AppColors.glassBorder,
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Text(
+                                opt,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: active
+                                      ? Colors.white
+                                      : AppColors.ink700,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 22),
+                      child: PressableScale(
+                        onTap: () =>
+                            setState(() => _isUnilateral = !_isUnilateral),
+                        child: Row(
+                          children: [
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 160),
+                              width: 44,
+                              height: 26,
+                              decoration: BoxDecoration(
+                                color: _isUnilateral
+                                    ? AppColors.accentDeep
+                                    : AppColors.glassBg,
+                                borderRadius: BorderRadius.circular(13),
+                                border: Border.all(
+                                  color: _isUnilateral
+                                      ? Colors.transparent
+                                      : AppColors.glassBorder,
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: AnimatedAlign(
+                                duration:
+                                    const Duration(milliseconds: 160),
+                                alignment: _isUnilateral
+                                    ? Alignment.centerRight
+                                    : Alignment.centerLeft,
+                                child: Container(
+                                  width: 20,
+                                  height: 20,
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 3),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Unilateral exercise',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.ink900,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Track left and right sides separately',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.ink400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: GlassButton(
+                        label: 'Save Exercise',
+                        variant: GlassButtonVariant.primary,
+                        size: GlassButtonSize.lg,
+                        expand: true,
+                        loading: _saving,
+                        onPressed: _saving ? null : _save,
                       ),
                     ),
                   ],
                 ),
-              ),
-            ),
-            const Spacer(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(22, 0, 22, 24),
-              child: GlassButton(
-                label: 'Save Exercise',
-                variant: GlassButtonVariant.primary,
-                size: GlassButtonSize.lg,
-                expand: true,
-                loading: _saving,
-                onPressed: _saving ? null : _save,
               ),
             ),
           ],
@@ -208,79 +396,23 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
   }
 }
 
-class _Section extends StatelessWidget {
-  const _Section({
-    required this.label,
-    required this.options,
-    required this.selected,
-    required this.onSelected,
-  });
-
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel(this.label);
   final String label;
-  final List<String> options;
-  final String selected;
-  final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 22),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.06,
-              color: AppColors.ink400,
-            ),
-          ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 22),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.06,
+          color: AppColors.ink400,
         ),
-        const SizedBox(height: 10),
-        SizedBox(
-          height: 36,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 22),
-            itemCount: options.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 8),
-            itemBuilder: (context, i) {
-              final opt = options[i];
-              final active = opt == selected;
-              return PressableScale(
-                onTap: () => onSelected(opt),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 160),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: active ? AppColors.accentDeep : AppColors.glassBg,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: active
-                          ? Colors.transparent
-                          : AppColors.glassBorder,
-                      width: 0.5,
-                    ),
-                  ),
-                  child: Text(
-                    opt,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: active ? Colors.white : AppColors.ink700,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

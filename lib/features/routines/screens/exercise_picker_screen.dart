@@ -1,13 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/navigation/app_page_transitions.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
+import '../../exercises/screens/add_exercise_screen.dart';
 import '../../exercises/view_models/exercises_view_model.dart';
 import '../view_models/routines_view_model.dart';
+
+const _kPickerMuscleGroups = [
+  'All',
+  'Chest',
+  'Back',
+  'Shoulders',
+  'Arms',
+  'Core',
+  'Legs',
+  'Other',
+];
 
 class ExercisePickerScreen extends ConsumerStatefulWidget {
   const ExercisePickerScreen({super.key, required this.routineId});
@@ -21,6 +34,7 @@ class ExercisePickerScreen extends ConsumerStatefulWidget {
 class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
   String _query = '';
   String _muscle = 'All';
+  String? _subMuscle;
   final _queryCtrl = TextEditingController();
 
   @override
@@ -28,6 +42,14 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
     _queryCtrl.dispose();
     super.dispose();
   }
+
+  List<String> get _subMuscles {
+    if (_muscle == 'Arms') return kArmsSubMuscles;
+    if (_muscle == 'Legs') return kLegsSubMuscles;
+    return [];
+  }
+
+  bool get _hasSubRow => _muscle == 'Arms' || _muscle == 'Legs';
 
   void _pickExercise(Exercise exercise) {
     showModalBottomSheet(
@@ -49,25 +71,24 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
   @override
   Widget build(BuildContext context) {
     final allExercises = ref.watch(exercisesAsyncProvider).value ?? [];
-    const muscleGroups = [
-      'All',
-      'Chest',
-      'Back',
-      'Shoulders',
-      'Biceps',
-      'Triceps',
-      'Forearms',
-      'Core',
-      'Quadriceps',
-      'Hamstrings',
-      'Glutes',
-      'Calves',
-      'Other',
-    ];
 
     final filtered = allExercises.where((e) {
-      if (_muscle != 'All' && e.muscle != _muscle) {
-        return false;
+      if (_muscle != 'All') {
+        if (_muscle == 'Arms') {
+          if (_subMuscle != null) {
+            if (e.muscle != _subMuscle) return false;
+          } else {
+            if (!kArmsSet.contains(e.muscle)) return false;
+          }
+        } else if (_muscle == 'Legs') {
+          if (_subMuscle != null) {
+            if (e.muscle != _subMuscle) return false;
+          } else {
+            if (!kLegsSet.contains(e.muscle)) return false;
+          }
+        } else {
+          if (e.muscle != _muscle) return false;
+        }
       }
       if (_query.isNotEmpty &&
           !e.name.toLowerCase().contains(_query.toLowerCase())) {
@@ -86,6 +107,30 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
               title: 'Add Exercise',
               subtitle: '${allExercises.length} in library',
               onBack: () => Navigator.of(context).pop(),
+              trailing: PressableScale(
+                onTap: () async {
+                  await Navigator.of(context).push(
+                    AppRoute(page: const AddExerciseScreen()),
+                  );
+                },
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: AppColors.accentTint,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.accent.withOpacity(0.3),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    size: 20,
+                    color: AppColors.accentDeep,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 12),
             Padding(
@@ -134,13 +179,16 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 22),
-                itemCount: muscleGroups.length,
+                itemCount: _kPickerMuscleGroups.length,
                 separatorBuilder: (context, index) => const SizedBox(width: 6),
                 itemBuilder: (context, i) {
-                  final m = muscleGroups[i];
+                  final m = _kPickerMuscleGroups[i];
                   final active = _muscle == m;
                   return PressableScale(
-                    onTap: () => setState(() => _muscle = m),
+                    onTap: () => setState(() {
+                      _muscle = m;
+                      _subMuscle = null;
+                    }),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 150),
                       padding: const EdgeInsets.symmetric(
@@ -148,9 +196,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: active
-                            ? AppColors.accentDeep
-                            : AppColors.glassBg,
+                        color: active ? AppColors.accentDeep : AppColors.glassBg,
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: active
@@ -171,6 +217,61 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                   );
                 },
               ),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 240),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.topLeft,
+              child: _hasSubRow
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: SizedBox(
+                        height: 32,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 22),
+                          itemCount: _subMuscles.length,
+                          separatorBuilder: (_, __) => const SizedBox(width: 6),
+                          itemBuilder: (context, i) {
+                            final m = _subMuscles[i];
+                            final active = _subMuscle == m;
+                            return PressableScale(
+                              onTap: () => setState(() {
+                                _subMuscle = active ? null : m;
+                              }),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 150),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: active
+                                      ? AppColors.accent
+                                      : AppColors.glassBg,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: active
+                                        ? Colors.transparent
+                                        : AppColors.glassBorder,
+                                    width: 0.5,
+                                  ),
+                                ),
+                                child: Text(
+                                  m,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: active ? Colors.white : AppColors.ink700,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
             ),
             const SizedBox(height: 12),
             Expanded(
@@ -208,13 +309,41 @@ class _ExerciseRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  exercise.name,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.ink900,
-                  ),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        exercise.name,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.ink900,
+                        ),
+                      ),
+                    ),
+                    if (exercise.isCustom) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.accentTint,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'CUSTOM',
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.accentDeep,
+                            letterSpacing: 0.05,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 2),
                 Text(

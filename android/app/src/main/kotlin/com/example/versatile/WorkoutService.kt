@@ -123,6 +123,7 @@ class WorkoutService : Service() {
         const val PREFS_NAME = "workout_prefs"
         const val KEY_STARTED_AT = "startedAt"
         const val KEY_ROUTINE_ID = "routineId"
+        const val KEY_PROGRESS = "progress"
 
         fun clearPrefs(context: Context) {
             context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)

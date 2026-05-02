@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/providers/repository_providers.dart';
+import '../../../core/services/workout_notification_service.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../domain/entities/session.dart';
@@ -188,6 +190,106 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     state = state.copyWith(elapsedSeconds: elapsed.clamp(0, 86400));
   }
 
+  void restoreProgress(String jsonStr) {
+    try {
+      final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+      final exData = data['exercises'] as List<dynamic>;
+      if (exData.length != state.exerciseStates.length) return;
+
+      final restored = state.exerciseStates.asMap().entries.map((entry) {
+        final i = entry.key;
+        final e = entry.value;
+        final d = exData[i] as Map<String, dynamic>;
+
+        final completedSets = (d['completedSets'] as List<dynamic>).map((s) {
+          final m = s as Map<String, dynamic>;
+          return WorkoutSet(
+            kg: (m['kg'] as num).toDouble(),
+            reps: (m['reps'] as num).toInt(),
+            leftKg: m['leftKg'] != null ? (m['leftKg'] as num).toDouble() : null,
+            leftReps: m['leftReps'] != null ? (m['leftReps'] as num).toInt() : null,
+          );
+        }).toList();
+
+        final ck = d['currentKg'];
+        final cr = d['currentReps'];
+        final currentInput = (ck != null && cr != null && completedSets.length < e.targetSets)
+            ? WorkoutSet(
+                kg: (ck as num).toDouble(),
+                reps: (cr as num).toInt(),
+                leftKg: d['currentLeftKg'] != null ? (d['currentLeftKg'] as num).toDouble() : null,
+                leftReps: d['currentLeftReps'] != null ? (d['currentLeftReps'] as num).toInt() : null,
+              )
+            : e.currentInput;
+
+        return ExerciseWorkoutState(
+          exerciseId: e.exerciseId,
+          targetSets: e.targetSets,
+          targetReps: e.targetReps,
+          restSec: e.restSec,
+          isExpanded: e.isExpanded,
+          completedSets: completedSets,
+          currentInput: completedSets.length >= e.targetSets ? null : currentInput,
+          prevSets: e.prevSets,
+          isUnilateral: e.isUnilateral,
+          isSplitMode: d['isSplitMode'] as bool? ?? false,
+        );
+      }).toList();
+
+      // Restore rest timer
+      final restEndAtMs = data['restEndAtMs'];
+      final restName = data['restExerciseName'] as String?;
+      final restTotal = data['restTotal'];
+
+      RestTimerState? restTimer;
+      if (restEndAtMs != null && restName != null && restTotal != null) {
+        _restEndAt = DateTime.fromMillisecondsSinceEpoch((restEndAtMs as num).toInt());
+        final remaining = _restEndAt!.difference(DateTime.now()).inSeconds;
+        if (remaining > 0) {
+          restTimer = RestTimerState(
+            total: (restTotal as num).toInt(),
+            remaining: remaining,
+            exerciseName: restName,
+          );
+        } else {
+          _restEndAt = null;
+        }
+      }
+
+      state = state.copyWith(
+        exerciseStates: restored,
+        restTimer: restTimer,
+        clearRestTimer: restTimer == null,
+      );
+
+      if (restTimer != null) _resumeRestTimer();
+    } catch (_) {}
+  }
+
+  void _saveProgress() {
+    final exercises = state.exerciseStates.map((e) => {
+      'completedSets': e.completedSets.map((s) => {
+        'kg': s.kg,
+        'reps': s.reps,
+        'leftKg': s.leftKg,
+        'leftReps': s.leftReps,
+      }).toList(),
+      'currentKg': e.currentInput?.kg,
+      'currentReps': e.currentInput?.reps,
+      'currentLeftKg': e.currentInput?.leftKg,
+      'currentLeftReps': e.currentInput?.leftReps,
+      'isSplitMode': e.isSplitMode,
+    }).toList();
+
+    final json = jsonEncode({
+      'exercises': exercises,
+      'restEndAtMs': _restEndAt?.millisecondsSinceEpoch,
+      'restExerciseName': state.restTimer?.exerciseName,
+      'restTotal': state.restTimer?.total,
+    });
+    WorkoutNotificationService.saveProgress(json);
+  }
+
   static ActiveWorkoutState _buildInitial(String routineId, Ref ref) {
     final init = ref.read(workoutInitProvider(routineId)).requireValue;
     final prev = init.previousPerformance;
@@ -332,6 +434,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
       ),
     );
     _startRestTimer();
+    _saveProgress();
   }
 
   void _startRestTimer() {
@@ -339,6 +442,11 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     final rt = state.restTimer;
     if (rt == null) return;
     _restEndAt = DateTime.now().add(Duration(seconds: rt.total));
+    _resumeRestTimer();
+  }
+
+  void _resumeRestTimer() {
+    _restTicker?.cancel();
     _restTicker = Timer.periodic(const Duration(seconds: 1), (_) {
       final endAt = _restEndAt;
       final currentRt = state.restTimer;
@@ -363,6 +471,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     _restTicker?.cancel();
     _restEndAt = null;
     state = state.copyWith(clearRestTimer: true);
+    _saveProgress();
   }
 
   void addRestTime(int seconds) {

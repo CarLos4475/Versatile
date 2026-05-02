@@ -3,7 +3,12 @@ import 'package:flutter/services.dart';
 class ActiveWorkoutInfo {
   final String routineId;
   final DateTime startedAt;
-  const ActiveWorkoutInfo({required this.routineId, required this.startedAt});
+  final String? progressJson;
+  const ActiveWorkoutInfo({
+    required this.routineId,
+    required this.startedAt,
+    this.progressJson,
+  });
 }
 
 class WorkoutNotificationService {
@@ -27,6 +32,12 @@ class WorkoutNotificationService {
     } catch (_) {}
   }
 
+  static Future<void> saveProgress(String json) async {
+    try {
+      await _channel.invokeMethod('saveWorkoutProgress', {'json': json});
+    } catch (_) {}
+  }
+
   static Future<ActiveWorkoutInfo?> getActiveWorkout() async {
     try {
       final result = await _channel.invokeMethod<Map<dynamic, dynamic>>(
@@ -41,6 +52,7 @@ class WorkoutNotificationService {
         startedAt: DateTime.fromMillisecondsSinceEpoch(
           (startedAt as num).toInt(),
         ),
+        progressJson: result['progressJson'] as String?,
       );
     } catch (_) {
       return null;

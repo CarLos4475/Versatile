@@ -42,6 +42,12 @@ class MainActivity : FlutterActivity() {
                     stopService(Intent(this, WorkoutService::class.java))
                     result.success(null)
                 }
+                "saveWorkoutProgress" -> {
+                    val json = call.argument<String>("json") ?: ""
+                    val prefs = getSharedPreferences(WorkoutService.PREFS_NAME, Context.MODE_PRIVATE)
+                    prefs.edit().putString(WorkoutService.KEY_PROGRESS, json).apply()
+                    result.success(null)
+                }
                 "getActiveWorkout" -> {
                     if (!WorkoutService.isRunning(this)) {
                         WorkoutService.clearPrefs(this)
@@ -52,12 +58,14 @@ class MainActivity : FlutterActivity() {
                         )
                         val routineId = prefs.getString(WorkoutService.KEY_ROUTINE_ID, null)
                         val startedAt = prefs.getLong(WorkoutService.KEY_STARTED_AT, 0L)
+                        val progress = prefs.getString(WorkoutService.KEY_PROGRESS, null)
                         if (routineId == null || startedAt == 0L) {
                             result.success(null)
                         } else {
                             result.success(mapOf(
                                 "routineId" to routineId,
-                                "startedAt" to startedAt
+                                "startedAt" to startedAt,
+                                "progressJson" to progress
                             ))
                         }
                     }

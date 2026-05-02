@@ -15,16 +15,42 @@ const _kMuscleGroups = [
   'Chest',
   'Back',
   'Shoulders',
-  'Biceps',
-  'Triceps',
-  'Forearms',
+  'Arms',
   'Core',
-  'Quadriceps',
-  'Hamstrings',
-  'Glutes',
-  'Calves',
+  'Legs',
   'Other',
 ];
+
+Widget _subMuscleRow(ExercisesState state, ExercisesNotifier notifier) {
+  final List<String> subs;
+  if (state.selectedMuscle == 'Arms') {
+    subs = kArmsSubMuscles;
+  } else if (state.selectedMuscle == 'Legs') {
+    subs = kLegsSubMuscles;
+  } else {
+    return const SizedBox.shrink();
+  }
+  return Padding(
+    padding: const EdgeInsets.only(top: 8),
+    child: SizedBox(
+      height: 32,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 22),
+        itemCount: subs.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 6),
+        itemBuilder: (context, i) {
+          final m = subs[i];
+          return VersatileChip(
+            label: m,
+            isActive: state.selectedSubMuscle == m,
+            onTap: () => notifier.setSubMuscle(m),
+          );
+        },
+      ),
+    ),
+  );
+}
 
 class ExercisesScreen extends ConsumerWidget {
   const ExercisesScreen({super.key});
@@ -160,6 +186,12 @@ class ExercisesScreen extends ConsumerWidget {
                   );
                 },
               ),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 240),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.topLeft,
+              child: _subMuscleRow(state, notifier),
             ),
             const SizedBox(height: 8),
             SizedBox(

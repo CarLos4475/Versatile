@@ -57,6 +57,7 @@ class _MainShellState extends ConsumerState<MainShell> {
             page: ActiveWorkoutScreen(
               routineId: info.routineId,
               restoredStartedAt: info.startedAt,
+              restoredProgressJson: info.progressJson,
             ),
           ),
         );
