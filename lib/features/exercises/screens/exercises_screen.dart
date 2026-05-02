@@ -196,19 +196,54 @@ class ExercisesScreen extends ConsumerWidget {
                   child: GlassContainer(
                     radius: 14,
                     padding: const EdgeInsets.all(4),
-                    child: Row(
+                    child: Stack(
                       children: [
-                        _TabButton(
-                          label: 'Catalog',
-                          count: allExercises.length,
-                          isActive: state.tab == ExercisesTab.all,
-                          onTap: () => notifier.setTab(ExercisesTab.all),
+                        // Moving Indicator
+                        AnimatedAlign(
+                          duration: const Duration(milliseconds: 280),
+                          curve: Curves.easeOutCubic,
+                          alignment: state.tab == ExercisesTab.all
+                              ? Alignment.centerLeft
+                              : Alignment.centerRight,
+                          child: FractionallySizedBox(
+                            widthFactor: 0.5,
+                            child: Container(
+                              height: 36,
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFE08866), Color(0xFFD97757)],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: context.colors.accentDeep
+                                        .withValues(alpha: 0.25),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                        _TabButton(
-                          label: 'My exercises',
-                          count: myCount,
-                          isActive: state.tab == ExercisesTab.mine,
-                          onTap: () => notifier.setTab(ExercisesTab.mine),
+                        // Tab Labels
+                        Row(
+                          children: [
+                            _TabButton(
+                              label: 'Catalog',
+                              count: allExercises.length,
+                              isActive: state.tab == ExercisesTab.all,
+                              onTap: () => notifier.setTab(ExercisesTab.all),
+                            ),
+                            _TabButton(
+                              label: 'My exercises',
+                              count: myCount,
+                              isActive: state.tab == ExercisesTab.mine,
+                              onTap: () => notifier.setTab(ExercisesTab.mine),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -425,43 +460,28 @@ class _TabButton extends StatelessWidget {
     return Expanded(
       child: PressableScale(
         onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          curve: Curves.easeOutCubic,
+        child: Container(
           height: 36,
-          decoration: BoxDecoration(
-            gradient: isActive
-                ? const LinearGradient(
-                    colors: [Color(0xFFE08866), Color(0xFFD97757)],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  )
-                : null,
-            color: isActive ? null : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: isActive
-                ? [
-                    BoxShadow(
-                      color: context.colors.accentDeep.withValues(alpha: 0.25),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ]
-                : null,
+          decoration: const BoxDecoration(
+            color: Colors.transparent,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                label,
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 280),
+                curve: Curves.easeOutCubic,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: isActive ? Colors.white : context.colors.ink500,
                 ),
+                child: Text(label),
               ),
-              SizedBox(width: 6),
-              Container(
+              const SizedBox(width: 6),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 280),
+                curve: Curves.easeOutCubic,
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(
                   color: isActive
@@ -469,13 +489,15 @@ class _TabButton extends StatelessWidget {
                       : const Color(0x0D000000),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: Text(
-                  '$count',
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 280),
+                  curve: Curves.easeOutCubic,
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: isActive ? Colors.white : context.colors.ink400,
                   ),
+                  child: Text('$count'),
                 ),
               ),
             ],
