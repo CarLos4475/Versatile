@@ -417,51 +417,21 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                 if (_editMode)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
-                    child: PressableScale(
-                      onTap: () => Navigator.of(context).push(
+                    child: GlassButton(
+                      label: 'Add exercise',
+                      variant: GlassButtonVariant.primary,
+                      size: GlassButtonSize.md,
+                      expand: true,
+                      onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) =>
                               ExercisePickerScreen(routineId: routine.id),
                         ),
                       ),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFE08866), Color(0xFFD97757)],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: context.colors.accentDeep
-                                  .withValues(alpha: 0.25),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(
-                              Icons.add_rounded,
-                              size: 18,
-                              color: Colors.white,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Add exercise',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
+                      leading: const Icon(
+                        Icons.add_rounded,
+                        size: 18,
+                        color: Colors.white,
                       ),
                     ),
                   ),

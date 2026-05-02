@@ -105,24 +105,29 @@ class _PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Override radius to 16 for a more 'plain' pill/card design as requested
+    const effectiveRadius = 16.0;
+
     return PressableScale(
       onTap: onPressed,
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: px),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFE08866), Color(0xFFD97757), Color(0xFFC76346)],
-            stops: [0.0, 0.5, 1.0],
+            colors: [
+              context.colors.accentSoft,
+              context.colors.accent,
+            ],
           ),
-          borderRadius: BorderRadius.circular(r),
+          borderRadius: BorderRadius.circular(effectiveRadius),
           boxShadow: [
             BoxShadow(
-              color: context.colors.accentDeep.withOpacity(0.35),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
+              color: context.colors.accentDeep.withValues(alpha: 0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -136,7 +141,7 @@ class _PrimaryButton extends StatelessWidget {
               style: TextStyle(
                 color: Colors.white,
                 fontSize: fs,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
                 letterSpacing: -0.01,
               ),
             ),

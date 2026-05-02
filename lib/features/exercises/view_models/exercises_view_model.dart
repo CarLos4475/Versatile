@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../domain/entities/exercise.dart';
+import '../../routines/view_models/routines_view_model.dart';
 
 const kArmsSubMuscles = ['Biceps', 'Triceps', 'Forearms'];
 const kLegsSubMuscles = ['Quadriceps', 'Hamstrings', 'Glutes', 'Calves'];
@@ -18,6 +19,8 @@ class ExercisesState {
   final String? selectedSubMuscle;
   final ExercisesTab tab;
   final ExerciseLaterality laterality;
+  final bool isEditMode;
+  final Set<String> selectedIds;
 
   const ExercisesState({
     this.query = '',
@@ -25,6 +28,8 @@ class ExercisesState {
     this.selectedSubMuscle,
     this.tab = ExercisesTab.all,
     this.laterality = ExerciseLaterality.all,
+    this.isEditMode = false,
+    this.selectedIds = const {},
   });
 
   ExercisesState copyWith({
@@ -34,6 +39,8 @@ class ExercisesState {
     bool clearSubMuscle = false,
     ExercisesTab? tab,
     ExerciseLaterality? laterality,
+    bool? isEditMode,
+    Set<String>? selectedIds,
   }) {
     return ExercisesState(
       query: query ?? this.query,
@@ -43,6 +50,8 @@ class ExercisesState {
           : (selectedSubMuscle ?? this.selectedSubMuscle),
       tab: tab ?? this.tab,
       laterality: laterality ?? this.laterality,
+      isEditMode: isEditMode ?? this.isEditMode,
+      selectedIds: selectedIds ?? this.selectedIds,
     );
   }
 }
@@ -63,9 +72,35 @@ class ExercisesNotifier extends StateNotifier<ExercisesState> {
     }
   }
 
-  void setTab(ExercisesTab t) => state = state.copyWith(tab: t);
+  void setTab(ExercisesTab t) {
+    if (t != state.tab) {
+      state = state.copyWith(tab: t, isEditMode: false, selectedIds: {});
+    }
+  }
+
   void setLaterality(ExerciseLaterality l) =>
       state = state.copyWith(laterality: l);
+
+  void toggleEditMode() {
+    state = state.copyWith(
+      isEditMode: !state.isEditMode,
+      selectedIds: {},
+    );
+  }
+
+  void toggleSelection(String id) {
+    final next = Set<String>.from(state.selectedIds);
+    if (next.contains(id)) {
+      next.remove(id);
+    } else {
+      next.add(id);
+    }
+    state = state.copyWith(selectedIds: next);
+  }
+
+  void clearSelection() {
+    state = state.copyWith(selectedIds: {});
+  }
 }
 
 final exercisesProvider =
@@ -82,6 +117,22 @@ class ExercisesAsyncNotifier extends AsyncNotifier<List<Exercise>> {
   Future<void> addExercise(Exercise exercise) async {
     await ref.read(exerciseRepositoryProvider).insert(exercise);
     ref.invalidateSelf();
+  }
+
+  Future<void> deleteExercises(Set<String> ids) async {
+    final repo = ref.read(exerciseRepositoryProvider);
+    final routineRepo = ref.read(routineRepositoryProvider);
+    
+    for (final id in ids) {
+      // 1. Remove from all routines first
+      await routineRepo.deleteReferencesToExercise(id);
+      // 2. Remove the exercise definition
+      await repo.delete(id);
+    }
+    
+    // Invalidate both so routines and exercises refresh
+    ref.invalidateSelf();
+    ref.invalidate(routinesProvider);
   }
 }
 

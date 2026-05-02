@@ -584,11 +584,11 @@ class _ActiveSetRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         decoration: BoxDecoration(
-          color: context.colors.accent.withValues(alpha: 0.18),
+          color: context.colors.accent.withValues(alpha: 0.25),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: context.colors.accent.withValues(alpha: 0.5),
-            width: 1,
+            color: context.colors.accent.withValues(alpha: 0.7),
+            width: 1.2,
           ),
         ),
         child: Row(
@@ -616,33 +616,35 @@ class _ActiveSetRow extends StatelessWidget {
                       onLeftRepsChanged: onLeftRepsChanged ?? (_) {},
                     )
                   : Row(
-                      children: [
-                        Expanded(
-                          child: NumberInputWidget(
-                            value: currentInput.kg,
-                            onDecrement: () => onWeightChanged(
-                              (currentInput.kg - 2.5).clamp(0, 999),
-                            ),
-                            onIncrement: () =>
-                                onWeightChanged(currentInput.kg + 2.5),
-                            suffix: 'kg',
-                            isDouble: true,
+                    children: [
+                      Expanded(
+                        child: NumberInputWidget(
+                          value: currentInput.kg,
+                          onDecrement: () => onWeightChanged(
+                            (currentInput.kg - 2.5).clamp(0, 999),
                           ),
+                          onIncrement: () =>
+                              onWeightChanged(currentInput.kg + 2.5),
+                          onChanged: (val) =>
+                              onWeightChanged(val.toDouble()),
+                          suffix: 'kg',
+                          isDouble: true,
                         ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: NumberInputWidget(
-                            value: currentInput.reps,
-                            onDecrement: () => onRepsChanged(
-                              (currentInput.reps - 1).clamp(0, 999),
-                            ),
-                            onIncrement: () =>
-                                onRepsChanged(currentInput.reps + 1),
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: NumberInputWidget(
+                          value: currentInput.reps,
+                          onDecrement: () => onRepsChanged(
+                            (currentInput.reps - 1).clamp(0, 999),
                           ),
+                          onIncrement: () =>
+                              onRepsChanged(currentInput.reps + 1),
+                          onChanged: (val) => onRepsChanged(val.toInt()),
                         ),
-                      ],
-                    ),
-            ),
+                      ),
+                    ],
+                  ),            ),
             SizedBox(width: 8),
             PressableScale(
               onTap: onFinishSet,
@@ -721,26 +723,28 @@ class _SplitInputs extends StatelessWidget {
                       onDecrement: () =>
                           onLeftWeightChanged((leftKg - 2.5).clamp(0, 999)),
                       onIncrement: () => onLeftWeightChanged(leftKg + 2.5),
+                      onChanged: (val) => onLeftWeightChanged(val.toDouble()),
                       suffix: 'kg',
                       isDouble: true,
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Row(
                 children: [
                   SizedBox(
                     width: 14,
                     child: Text('R', style: _sideStyle(context)),
                   ),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Expanded(
                     child: NumberInputWidget(
                       value: currentInput.kg,
                       onDecrement: () =>
                           onWeightChanged((currentInput.kg - 2.5).clamp(0, 999)),
                       onIncrement: () => onWeightChanged(currentInput.kg + 2.5),
+                      onChanged: (val) => onWeightChanged(val.toDouble()),
                       suffix: 'kg',
                       isDouble: true,
                     ),
@@ -750,7 +754,7 @@ class _SplitInputs extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         // REPS column — aligned with the REPS header
         Expanded(
           child: Column(
@@ -761,13 +765,15 @@ class _SplitInputs extends StatelessWidget {
                 onDecrement: () =>
                     onLeftRepsChanged((leftReps - 1).clamp(0, 999)),
                 onIncrement: () => onLeftRepsChanged(leftReps + 1),
+                onChanged: (val) => onLeftRepsChanged(val.toInt()),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               NumberInputWidget(
                 value: currentInput.reps,
                 onDecrement: () =>
                     onRepsChanged((currentInput.reps - 1).clamp(0, 999)),
                 onIncrement: () => onRepsChanged(currentInput.reps + 1),
+                onChanged: (val) => onRepsChanged(val.toInt()),
               ),
             ],
           ),

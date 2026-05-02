@@ -81,7 +81,7 @@ class AppTheme {
     hairline: Color(0x11FFF0DC),
     press: Color(0x1AFFF0DC),
     pressStrong: Color(0x26FFF0DC),
-    fieldBg: Color(0x1AFFF0DC),
+    fieldBg: Color(0x66000000), // Darker field background
     green700: Color(0xFF9CC9A8),
     green500: Color(0xFF8CC896),
     doneTint: Color(0x1A8CC896),

@@ -87,6 +87,15 @@ class RoutineRepository {
     );
   }
 
+  Future<void> deleteReferencesToExercise(String exerciseId) async {
+    final db = await DatabaseHelper.instance.database;
+    await db.delete(
+      'routine_exercises',
+      where: 'exercise_id = ?',
+      whereArgs: [exerciseId],
+    );
+  }
+
   Future<void> reorderExercises(
       String routineId, List<RoutineExercise> exercises) async {
     final db = await DatabaseHelper.instance.database;
