@@ -38,7 +38,7 @@ Widget _subMuscleRow(ExercisesState state, ExercisesNotifier notifier) {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 22),
         itemCount: subs.length,
-        separatorBuilder: (_, __) => SizedBox(width: 6),
+        separatorBuilder: (_, _) => SizedBox(width: 6),
         itemBuilder: (context, i) {
           final m = subs[i];
           return VersatileChip(

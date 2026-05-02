@@ -17,7 +17,7 @@ class DatabaseHelper {
     final filePath = p.join(dbPath, 'versatile.db');
     return openDatabase(
       filePath,
-      version: 4,
+      version: 5,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onConfigure: (db) async => db.execute('PRAGMA foreign_keys = ON'),
@@ -53,6 +53,12 @@ class DatabaseHelper {
         'CREATE TABLE IF NOT EXISTS workout_log (date TEXT PRIMARY KEY)',
       );
     }
+    if (oldVersion < 5) {
+      try {
+        await db.execute('ALTER TABLE routines ADD COLUMN icon_code INTEGER NOT NULL DEFAULT 58713');
+        await db.execute('ALTER TABLE sessions ADD COLUMN icon_code INTEGER NOT NULL DEFAULT 58713');
+      } catch (_) {}
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -71,7 +77,8 @@ class DatabaseHelper {
       CREATE TABLE routines (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
-        color_value INTEGER NOT NULL
+        color_value INTEGER NOT NULL,
+        icon_code INTEGER NOT NULL DEFAULT 58713
       )
     ''');
 

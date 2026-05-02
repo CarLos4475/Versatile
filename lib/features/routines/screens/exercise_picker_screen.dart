@@ -232,7 +232,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 22),
                           itemCount: _subMuscles.length,
-                          separatorBuilder: (_, __) => SizedBox(width: 6),
+                          separatorBuilder: (_, _) => SizedBox(width: 6),
                           itemBuilder: (context, i) {
                             final m = _subMuscles[i];
                             final active = _subMuscle == m;

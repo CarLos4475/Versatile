@@ -18,12 +18,14 @@ class Routine {
   final String id;
   final String name;
   final int colorValue;
+  final int iconCode;
   final List<RoutineExercise> exercises;
 
   const Routine({
     required this.id,
     required this.name,
     required this.colorValue,
+    this.iconCode = 58713,
     required this.exercises,
   });
 

@@ -162,21 +162,21 @@ class _RoutineCard extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [color, color.withOpacity(0.85)],
+                      colors: [color, color.withValues(alpha: 0.85)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: color.withOpacity(0.35),
+                        color: color.withValues(alpha: 0.35),
                         blurRadius: 14,
                         offset: const Offset(0, 6),
                       ),
                     ],
                   ),
                   child: Icon(
-                    Icons.fitness_center,
+                    IconData(routine.iconCode, fontFamily: 'MaterialIcons'),
                     color: Colors.white,
                     size: 22,
                   ),

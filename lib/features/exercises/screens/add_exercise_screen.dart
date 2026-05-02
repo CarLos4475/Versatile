@@ -152,7 +152,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                         padding:
                             const EdgeInsets.symmetric(horizontal: 22),
                         itemCount: _kMuscleGroups.length,
-                        separatorBuilder: (_, __) =>
+                        separatorBuilder: (_, _) =>
                             SizedBox(width: 8),
                         itemBuilder: (context, i) {
                           final g = _kMuscleGroups[i];
@@ -206,7 +206,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 22),
                                   itemCount: _subMuscles.length,
-                                  separatorBuilder: (_, __) =>
+                                  separatorBuilder: (_, _) =>
                                       SizedBox(width: 8),
                                   itemBuilder: (context, i) {
                                     final m = _subMuscles[i];
@@ -262,7 +262,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                         padding:
                             const EdgeInsets.symmetric(horizontal: 22),
                         itemCount: _kEquipment.length,
-                        separatorBuilder: (_, __) =>
+                        separatorBuilder: (_, _) =>
                             SizedBox(width: 8),
                         itemBuilder: (context, i) {
                           final opt = _kEquipment[i];

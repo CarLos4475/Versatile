@@ -12,6 +12,7 @@ class RoutineRepository {
         id: id,
         name: r['name'] as String,
         colorValue: r['color_value'] as int,
+        iconCode: r['icon_code'] as int? ?? 58713,
         exercises: await _loadExercises(id),
       ));
     }
@@ -27,6 +28,7 @@ class RoutineRepository {
       id: id,
       name: r['name'] as String,
       colorValue: r['color_value'] as int,
+      iconCode: r['icon_code'] as int? ?? 58713,
       exercises: await _loadExercises(id),
     );
   }
@@ -37,6 +39,7 @@ class RoutineRepository {
       'id': routine.id,
       'name': routine.name,
       'color_value': routine.colorValue,
+      'icon_code': routine.iconCode,
     });
     for (var i = 0; i < routine.exercises.length; i++) {
       final re = routine.exercises[i];

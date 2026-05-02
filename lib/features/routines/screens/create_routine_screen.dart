@@ -22,6 +22,20 @@ const _kColors = [
   Color(0xFF5E7BA7),
 ];
 
+const _kIcons = [
+  Icons.fitness_center,
+  Icons.bolt,
+  Icons.timer,
+  Icons.favorite,
+  Icons.trending_up,
+  Icons.directions_run,
+  Icons.speed,
+  Icons.monitor_weight,
+  Icons.rocket_launch,
+  Icons.local_fire_department,
+  Icons.self_improvement,
+];
+
 class CreateRoutineScreen extends ConsumerStatefulWidget {
   const CreateRoutineScreen({super.key});
 
@@ -33,6 +47,7 @@ class CreateRoutineScreen extends ConsumerStatefulWidget {
 class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
   final _ctrl = TextEditingController();
   Color _selectedColor = const Color(0xFFD97757);
+  IconData _selectedIcon = Icons.fitness_center;
   bool _saving = false;
 
   @override
@@ -50,6 +65,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
       id: id,
       name: name,
       colorValue: _selectedColor.toARGB32(),
+      iconCode: _selectedIcon.codePoint,
       exercises: const [],
     );
     await ref.read(routinesProvider.notifier).addRoutine(routine);
@@ -73,89 +89,157 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
               onBack: () => Navigator.of(context).pop(),
               accentBack: true,
             ),
-            SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              child: GlassContainer(
-                radius: 16,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 4,
-                ),
-                child: TextField(
-                  controller: _ctrl,
-                  autofocus: true,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: context.colors.ink900,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'e.g. Push Day, Full Body…',
-                    hintStyle: TextStyle(fontSize: 16, color: context.colors.ink400),
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onSubmitted: (_) => _save(),
-                ),
-              ),
-            ),
-            SizedBox(height: 28),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              child: Text(
-                'COLOR',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.06,
-                  color: context.colors.ink400,
-                ),
-              ),
-            ),
-            SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22),
-              child: Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: _kColors.map((c) {
-                  final active = _selectedColor == c;
-                  return PressableScale(
-                    onTap: () => setState(() => _selectedColor = c),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: c,
-                        shape: BoxShape.circle,
-                        border: active
-                            ? Border.all(color: Colors.white, width: 3)
-                            : null,
-                        boxShadow: active
-                            ? [
-                                BoxShadow(
-                                  color: c.withOpacity(0.5),
-                                  blurRadius: 14,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ]
-                            : null,
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: GlassContainer(
+                        radius: 16,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        child: TextField(
+                          controller: _ctrl,
+                          autofocus: true,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: context.colors.ink900,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: 'e.g. Push Day, Full Body…',
+                            hintStyle: TextStyle(fontSize: 16, color: Colors.grey),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          onSubmitted: (_) => _save(),
+                        ),
                       ),
-                      child: active
-                          ? Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 20,
-                            )
-                          : null,
                     ),
-                  );
-                }).toList(),
+                    const SizedBox(height: 28),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: Text(
+                        'COLOR',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.06,
+                          color: context.colors.ink400,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: _kColors.map((c) {
+                          final active = _selectedColor == c;
+                          return PressableScale(
+                            onTap: () => setState(() => _selectedColor = c),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: c,
+                                shape: BoxShape.circle,
+                                border: active
+                                    ? Border.all(color: Colors.white, width: 3)
+                                    : null,
+                                boxShadow: active
+                                    ? [
+                                        BoxShadow(
+                                          color: c.withValues(alpha: 0.5),
+                                          blurRadius: 14,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                              child: active
+                                  ? const Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 20,
+                                    )
+                                  : null,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: Text(
+                        'ICON',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.06,
+                          color: context.colors.ink400,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: _kIcons.map((icon) {
+                          final active = _selectedIcon == icon;
+                          return PressableScale(
+                            onTap: () => setState(() => _selectedIcon = icon),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: active
+                                    ? context.colors.accent
+                                    : context.colors.glassBg,
+                                borderRadius: BorderRadius.circular(14),
+                                border: active
+                                    ? Border.all(color: Colors.white, width: 2)
+                                    : Border.all(
+                                        color: context.colors.glassBorder,
+                                        width: 0.5,
+                                      ),
+                                boxShadow: active
+                                    ? [
+                                        BoxShadow(
+                                          color: context.colors.accentDeep
+                                              .withValues(alpha: 0.3),
+                                          blurRadius: 12,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                              child: Icon(
+                                icon,
+                                color: active ? Colors.white : context.colors.ink700,
+                                size: 20,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const Spacer(),
             Padding(
               padding: const EdgeInsets.fromLTRB(22, 0, 22, 24),
               child: GlassButton(
