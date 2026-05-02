@@ -86,9 +86,12 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                     Expanded(
                       child: TextField(
                         onChanged: (v) => setState(() => _query = v),
-                        decoration: const InputDecoration(
-                          hintText: 'Search…',
-                          hintStyle: TextStyle(fontSize: 14, color: Colors.grey),
+                        decoration: InputDecoration(
+                          hintText: l10n.search,
+                          hintStyle: TextStyle(
+                            fontSize: 14,
+                            color: context.colors.ink400,
+                          ),
                           border: InputBorder.none,
                           isDense: true,
                         ),
@@ -149,13 +152,41 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  ex.getLocalizedName(context),
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: context.colors.ink900,
-                                  ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        ex.getLocalizedName(context),
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: context.colors.ink900,
+                                        ),
+                                      ),
+                                    ),
+                                    if (ex.isUnilateral) ...[
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 5,
+                                          vertical: 1,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0x1A5E7BA7),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          l10n.unilateral_label,
+                                          style: const TextStyle(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xFF5E7BA7),
+                                            letterSpacing: 0.05,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                                 Text(
                                   ex.getLocalizedMuscle(context),

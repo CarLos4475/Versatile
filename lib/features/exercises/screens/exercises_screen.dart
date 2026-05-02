@@ -9,6 +9,7 @@ import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
+import '../../active_workout/view_models/active_workout_view_model.dart';
 import '../view_models/exercises_view_model.dart';
 import 'add_exercise_screen.dart';
 
@@ -44,7 +45,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
         backgroundColor: context.colors.bgFrame,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          l10n.deleteRoutineTitle,
+          l10n.deleteExerciseTitle,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -52,7 +53,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
           ),
         ),
         content: Text(
-          'Are you sure you want to delete ${ids.length} custom exercises? This cannot be undone.',
+          l10n.deleteExerciseContent(ids.length),
           style: TextStyle(fontSize: 14, color: context.colors.ink500),
         ),
         actions: [
@@ -402,7 +403,8 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
               Positioned(
                 left: 22,
                 right: 22,
-                bottom: 94,
+                // Raise the delete button above the active workout overlay when one is present
+                bottom: ref.watch(activeWorkoutRoutineIdProvider) != null ? 166 : 94,
                 child: FadeSlideIn(
                   offset: const Offset(0, 0.1),
                   child: GlassButton(
@@ -627,6 +629,28 @@ class _ExerciseRow extends StatelessWidget {
                               fontSize: 9,
                               fontWeight: FontWeight.w700,
                               color: context.colors.accentDeep,
+                              letterSpacing: 0.05,
+                            ),
+                          ),
+                        ),
+                      ],
+                      if (exercise.isUnilateral) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 1,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0x1A5E7BA7),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            AppLocalizations.of(context)!.unilateral_label,
+                            style: const TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF5E7BA7),
                               letterSpacing: 0.05,
                             ),
                           ),

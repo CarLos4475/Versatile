@@ -41,30 +41,77 @@ class VersatileApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      builder: (context, child) {
-        return AppWrapper(child: child!);
-      },
+      builder: (context, child) => AppWrapper(child: child!),
       home: const SplashScreen(),
     );
   }
 }
 
+// ─── Main shell ────────────────────────────────────────────────────────────────
+
 class MainNavigationShell extends ConsumerStatefulWidget {
   const MainNavigationShell({super.key});
 
   @override
-  ConsumerState<MainNavigationShell> createState() => _MainNavigationShellState();
+  ConsumerState<MainNavigationShell> createState() =>
+      _MainNavigationShellState();
 }
 
-class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
+class _MainNavigationShellState extends ConsumerState<MainNavigationShell>
+    with SingleTickerProviderStateMixin {
   int _index = 0;
+  int _prevIndex = 0;
 
-  final _pages = const [
+  late final AnimationController _pageCtrl;
+  late Animation<double> _fadeAnim;
+  late Animation<Offset> _slideAnim;
+
+  static const _pages = [
     HomeScreen(),
     RoutinesScreen(),
     ExercisesScreen(),
     HistoryScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 320),
+    );
+    _buildAnimations(forward: true);
+    _pageCtrl.value = 1.0; // start fully visible
+  }
+
+  void _buildAnimations({required bool forward}) {
+    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _pageCtrl, curve: Curves.easeOutCubic),
+    );
+    _slideAnim = Tween<Offset>(
+      begin: Offset(forward ? 0.04 : -0.04, 0.0),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _pageCtrl, curve: Curves.easeOutCubic),
+    );
+  }
+
+  void _onTabChanged(int i) {
+    if (i == _index) return;
+    ref.read(exercisesProvider.notifier).setQuery('');
+    _buildAnimations(forward: i > _prevIndex);
+    _pageCtrl.forward(from: 0.0);
+    setState(() {
+      _prevIndex = _index;
+      _index = i;
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,10 +122,16 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
       extendBody: true,
       body: Stack(
         children: [
-          IndexedStack(
-            index: _index,
-            children: _pages,
+          // Animated page content
+          FadeTransition(
+            opacity: _fadeAnim,
+            child: SlideTransition(
+              position: _slideAnim,
+              child: IndexedStack(index: _index, children: _pages),
+            ),
           ),
+
+          // Active workout overlay
           if (activeRoutineId != null)
             const Positioned(
               left: 0,
@@ -86,29 +139,20 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
               bottom: 104,
               child: _ActiveWorkoutOverlay(),
             ),
+
+          // Liquid glass navbar
           Positioned(
             left: 20,
             right: 20,
             bottom: 24,
-            child: _CustomNavBar(
+            child: _LiquidNavBar(
               index: _index,
-              onChanged: (i) {
-                if (i != _index) {
-                  ref.read(exercisesProvider.notifier).setQuery('');
-                  setState(() => _index = i);
-                }
-              },
+              onChanged: _onTabChanged,
               items: [
-                _NavBarItem(icon: Icons.home_filled, label: l10n.home),
-                _NavBarItem(
-                  icon: Icons.format_list_bulleted_rounded,
-                  label: l10n.routines,
-                ),
-                _NavBarItem(
-                  icon: Icons.fitness_center_rounded,
-                  label: l10n.exercises,
-                ),
-                _NavBarItem(icon: Icons.history_rounded, label: l10n.history),
+                _NavItem(icon: Icons.home_filled, label: l10n.home),
+                _NavItem(icon: Icons.format_list_bulleted_rounded, label: l10n.routines),
+                _NavItem(icon: Icons.fitness_center_rounded, label: l10n.exercises),
+                _NavItem(icon: Icons.history_rounded, label: l10n.history),
               ],
             ),
           ),
@@ -118,8 +162,16 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
   }
 }
 
-class _CustomNavBar extends StatelessWidget {
-  const _CustomNavBar({
+// ─── Liquid glass navbar ───────────────────────────────────────────────────────
+
+class _NavItem {
+  final IconData icon;
+  final String label;
+  const _NavItem({required this.icon, required this.label});
+}
+
+class _LiquidNavBar extends StatelessWidget {
+  const _LiquidNavBar({
     required this.index,
     required this.onChanged,
     required this.items,
@@ -127,68 +179,65 @@ class _CustomNavBar extends StatelessWidget {
 
   final int index;
   final ValueChanged<int> onChanged;
-  final List<_NavBarItem> items;
+  final List<_NavItem> items;
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 24,
+            color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.18),
+            blurRadius: 32,
+            spreadRadius: -4,
             offset: const Offset(0, 12),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             decoration: BoxDecoration(
-              color: context.colors.bgApp.withValues(alpha: 0.7),
-              borderRadius: BorderRadius.circular(24),
+              // Multi-layer glass: base tint + specular highlight
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [
+                        Colors.white.withValues(alpha: 0.10),
+                        Colors.white.withValues(alpha: 0.05),
+                      ]
+                    : [
+                        Colors.white.withValues(alpha: 0.72),
+                        Colors.white.withValues(alpha: 0.48),
+                      ],
+              ),
+              borderRadius: BorderRadius.circular(28),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
-                width: 0.5,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.13)
+                    : Colors.white.withValues(alpha: 0.70),
+                width: 1,
               ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: items.asMap().entries.map((e) {
-                final i = e.key;
-                final item = e.value;
+              children: List.generate(items.length, (i) {
+                final item = items[i];
                 final active = index == i;
-
-                return PressableScale(
+                return _NavBarButton(
+                  item: item,
+                  active: active,
                   onTap: () => onChanged(i),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        item.icon,
-                        color: active
-                            ? context.colors.accent
-                            : context.colors.ink300,
-                        size: 24,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        item.label,
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                          color: active
-                              ? context.colors.accent
-                              : context.colors.ink300,
-                        ),
-                      ),
-                    ],
-                  ),
+                  isDark: isDark,
                 );
-              }).toList(),
+              }),
             ),
           ),
         ),
@@ -197,21 +246,86 @@ class _CustomNavBar extends StatelessWidget {
   }
 }
 
-class _NavBarItem {
-  final IconData icon;
-  final String label;
-  const _NavBarItem({required this.icon, required this.label});
+class _NavBarButton extends StatelessWidget {
+  const _NavBarButton({
+    required this.item,
+    required this.active,
+    required this.onTap,
+    required this.isDark,
+  });
+
+  final _NavItem item;
+  final bool active;
+  final VoidCallback onTap;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return PressableScale(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          color: active
+              ? context.colors.accent.withValues(alpha: isDark ? 0.25 : 0.12)
+              : Colors.transparent,
+          border: active
+              ? Border.all(
+                  color: context.colors.accent.withValues(alpha: isDark ? 0.35 : 0.20),
+                  width: 1,
+                )
+              : null,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedScale(
+              scale: active ? 1.12 : 1.0,
+              duration: const Duration(milliseconds: 280),
+              curve: Curves.easeOutBack,
+              child: Icon(
+                item.icon,
+                size: 22,
+                color: active
+                    ? context.colors.accent
+                    : context.colors.ink300,
+              ),
+            ),
+            const SizedBox(height: 3),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                color: active
+                    ? context.colors.accent
+                    : context.colors.ink300,
+                letterSpacing: active ? 0.0 : 0.1,
+              ),
+              child: Text(item.label),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
+
+// ─── App wrapper ───────────────────────────────────────────────────────────────
 
 class AppWrapper extends StatelessWidget {
   const AppWrapper({super.key, required this.child});
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    return child;
-  }
+  Widget build(BuildContext context) => child;
 }
+
+// ─── Active workout overlay — liquid glass ─────────────────────────────────────
 
 class _ActiveWorkoutOverlay extends ConsumerWidget {
   const _ActiveWorkoutOverlay();
@@ -223,9 +337,10 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
     if (activeRoutineId == null) return const SizedBox.shrink();
 
     final workoutState = ref.watch(activeWorkoutProvider(activeRoutineId));
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return FadeSlideIn(
-      offset: const Offset(0, 0.1),
+      offset: const Offset(0, 0.12),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: PressableScale(
@@ -235,31 +350,48 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
             ),
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(22),
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              filter: ImageFilter.blur(sigmaX: 36, sigmaY: 36),
               child: Container(
-                height: 62,
+                height: 64,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
+                  // Glass tint in accent color — translucent, shows content behind
                   gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFFE08866).withValues(alpha: 0.85),
-                      const Color(0xFFD97757).withValues(alpha: 0.85),
-                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
+                    colors: isDark
+                        ? [
+                            const Color(0xFFD97757).withValues(alpha: 0.30),
+                            const Color(0xFFB85432).withValues(alpha: 0.22),
+                          ]
+                        : [
+                            const Color(0xFFE08866).withValues(alpha: 0.55),
+                            const Color(0xFFD97757).withValues(alpha: 0.48),
+                          ],
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(22),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    width: 0.5,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.16)
+                        : Colors.white.withValues(alpha: 0.55),
+                    width: 1,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: context.colors.accentDeep.withValues(alpha: 0.3),
-                      blurRadius: 20,
+                      color: const Color(0xFFD97757).withValues(
+                          alpha: isDark ? 0.25 : 0.20),
+                      blurRadius: 24,
+                      spreadRadius: -4,
                       offset: const Offset(0, 8),
+                    ),
+                    // Specular top highlight
+                    BoxShadow(
+                      color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.30),
+                      blurRadius: 0,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 1),
                     ),
                   ],
                 ),
@@ -274,10 +406,12 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                         children: [
                           Text(
                             workoutState.routine.name,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF3D1A08),
                               letterSpacing: -0.13,
                             ),
                             maxLines: 1,
@@ -287,7 +421,9 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                             l10n.workoutInProgress,
                             style: TextStyle(
                               fontSize: 11,
-                              color: Colors.white.withValues(alpha: 0.8),
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.75)
+                                  : const Color(0xFF3D1A08).withValues(alpha: 0.65),
                             ),
                           ),
                         ],
@@ -295,19 +431,19 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                     ),
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 220),
-                      transitionBuilder: (child, animation) => FadeTransition(
-                        opacity: animation,
-                        child: ScaleTransition(scale: animation, child: child),
+                      transitionBuilder: (child, anim) => FadeTransition(
+                        opacity: anim,
+                        child: ScaleTransition(scale: anim, child: child),
                       ),
                       child: Text(
                         FormatUtils.timer(workoutState.elapsedSeconds),
                         key: ValueKey(workoutState.elapsedSeconds),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: -0.2,
-                          color: Colors.white,
-                          fontFeatures: [FontFeature.tabularFigures()],
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                          color: isDark ? Colors.white : const Color(0xFF3D1A08),
+                          fontFeatures: const [FontFeature.tabularFigures()],
                         ),
                       ),
                     ),
@@ -316,13 +452,23 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                       width: 30,
                       height: 30,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.14)
+                            : Colors.white.withValues(alpha: 0.45),
                         borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.10)
+                              : Colors.white.withValues(alpha: 0.60),
+                          width: 0.5,
+                        ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.chevron_right,
                         size: 18,
-                        color: Colors.white,
+                        color: isDark
+                            ? Colors.white
+                            : const Color(0xFF3D1A08),
                       ),
                     ),
                   ],
@@ -335,6 +481,8 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
     );
   }
 }
+
+// ─── Pulsing dot ───────────────────────────────────────────────────────────────
 
 class _IslandPulseDot extends StatefulWidget {
   const _IslandPulseDot({super.key});
@@ -355,10 +503,9 @@ class _IslandPulseDotState extends State<_IslandPulseDot>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     )..repeat(reverse: true);
-    _anim = Tween<double>(
-      begin: 1.0,
-      end: 0.35,
-    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+    _anim = Tween<double>(begin: 1.0, end: 0.30).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -369,13 +516,14 @@ class _IslandPulseDotState extends State<_IslandPulseDot>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return FadeTransition(
       opacity: _anim,
       child: Container(
         width: 7,
         height: 7,
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: isDark ? Colors.white : const Color(0xFF3D1A08),
           shape: BoxShape.circle,
         ),
       ),

@@ -68,19 +68,29 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     if (!mounted) return;
 
     if (_activeInfo != null) {
+      // First clear the stack and place the main shell as the root route.
+      // Then defer the workout screen push to the next frame so the shell
+      // has time to fully build before we push on top of it.
+      // Without the deferral, a black screen appears on first launch because
+      // the second push fires before the first route finishes rendering.
       Navigator.of(context).pushAndRemoveUntil(
         AppRoute(page: const MainNavigationShell()),
         (route) => false,
       );
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => ActiveWorkoutScreen(
-            routineId: _activeInfo!.routineId,
-            restoredStartedAt: _activeInfo!.startedAt,
-            restoredProgressJson: _activeInfo!.progressJson,
-          ),
-        ),
-      );
+      final activeInfo = _activeInfo!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ActiveWorkoutScreen(
+                routineId: activeInfo.routineId,
+                restoredStartedAt: activeInfo.startedAt,
+                restoredProgressJson: activeInfo.progressJson,
+              ),
+            ),
+          );
+        }
+      });
       return;
     }
 

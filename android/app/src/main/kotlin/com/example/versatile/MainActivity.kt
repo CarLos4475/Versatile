@@ -45,11 +45,13 @@ class MainActivity : FlutterActivity() {
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "startWorkoutService" -> {
-                    val startedAt = (call.argument<Any>("startedAt") as? Number)?.toLong() ?: 0L
-                    val routineId = call.argument<String>("routineId") ?: ""
+                    val startedAt   = (call.argument<Any>("startedAt") as? Number)?.toLong() ?: 0L
+                    val routineId   = call.argument<String>("routineId") ?: ""
+                    val routineName = call.argument<String>("routineName") ?: ""
                     val intent = Intent(this, WorkoutService::class.java).apply {
-                        putExtra(WorkoutService.KEY_STARTED_AT, startedAt)
-                        putExtra(WorkoutService.KEY_ROUTINE_ID, routineId)
+                        putExtra(WorkoutService.KEY_STARTED_AT,   startedAt)
+                        putExtra(WorkoutService.KEY_ROUTINE_ID,   routineId)
+                        putExtra(WorkoutService.KEY_ROUTINE_NAME, routineName)
                     }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         startForegroundService(intent)
@@ -77,16 +79,18 @@ class MainActivity : FlutterActivity() {
                         val prefs = getSharedPreferences(
                             WorkoutService.PREFS_NAME, Context.MODE_PRIVATE
                         )
-                        val routineId = prefs.getString(WorkoutService.KEY_ROUTINE_ID, null)
-                        val startedAt = prefs.getLong(WorkoutService.KEY_STARTED_AT, 0L)
-                        val progress = prefs.getString(WorkoutService.KEY_PROGRESS, null)
+                        val routineId   = prefs.getString(WorkoutService.KEY_ROUTINE_ID,   null)
+                        val startedAt   = prefs.getLong(WorkoutService.KEY_STARTED_AT,     0L)
+                        val progress    = prefs.getString(WorkoutService.KEY_PROGRESS,     null)
+                        val routineName = prefs.getString(WorkoutService.KEY_ROUTINE_NAME, null)
                         if (routineId == null || startedAt == 0L) {
                             result.success(null)
                         } else {
                             result.success(mapOf(
-                                "routineId" to routineId,
-                                "startedAt" to startedAt,
-                                "progressJson" to progress
+                                "routineId"   to routineId,
+                                "startedAt"   to startedAt,
+                                "progressJson" to progress,
+                                "routineName"  to routineName
                             ))
                         }
                     }

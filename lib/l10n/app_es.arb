@@ -208,5 +208,16 @@
   "equip_dumbbell": "Mancuerna",
   "equip_cable": "Polea",
   "equip_bodyweight": "Peso corporal",
-  "equip_machine": "Máquina"
+  "equip_machine": "Máquina",
+
+  "deleteExerciseTitle": "¿Eliminar ejercicio?",
+  "deleteExerciseContent": "Esto eliminará permanentemente {count} {count, plural, one{ejercicio personalizado} other{ejercicios personalizados}}. Esta acción no se puede deshacer.",
+  "@deleteExerciseContent": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unilateral_label": "UNILATERAL"
 }

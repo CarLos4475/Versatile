@@ -484,4 +484,21 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get equip_machine => 'Máquina';
+
+  @override
+  String get deleteExerciseTitle => '¿Eliminar ejercicio?';
+
+  @override
+  String deleteExerciseContent(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ejercicios personalizados',
+      one: 'ejercicio personalizado',
+    );
+    return 'Esto eliminará permanentemente $count $_temp0. Esta acción no se puede deshacer.';
+  }
+
+  @override
+  String get unilateral_label => 'UNILATERAL';
 }

@@ -1021,6 +1021,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Machine'**
   String get equip_machine;
+
+  /// No description provided for @deleteExerciseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete exercise?'**
+  String get deleteExerciseTitle;
+
+  /// No description provided for @deleteExerciseContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete {count} custom {count, plural, one{exercise} other{exercises}}. This cannot be undone.'**
+  String deleteExerciseContent(int count);
+
+  /// No description provided for @unilateral_label.
+  ///
+  /// In en, this message translates to:
+  /// **'UNILATERAL'**
+  String get unilateral_label;
 }
 
 class _AppLocalizationsDelegate

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Versatile</string>
+    <string name="notif_channel_name">Workout</string>
+    <string name="notif_channel_desc">Shows your active workout progress</string>
+    <string name="notif_title">Workout in progress</string>
+    <string name="notif_subtitle">Stay focused — tap to return</string>
+    <string name="notif_action_open">Open</string>
+</resources>

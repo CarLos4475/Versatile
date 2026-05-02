@@ -208,5 +208,16 @@
   "equip_dumbbell": "Dumbbell",
   "equip_cable": "Cable",
   "equip_bodyweight": "Bodyweight",
-  "equip_machine": "Machine"
+  "equip_machine": "Machine",
+
+  "deleteExerciseTitle": "Delete exercise?",
+  "deleteExerciseContent": "This will permanently delete {count} custom {count, plural, one{exercise} other{exercises}}. This cannot be undone.",
+  "@deleteExerciseContent": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unilateral_label": "UNILATERAL"
 }
