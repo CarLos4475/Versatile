@@ -16,7 +16,7 @@ class AppTheme {
         surface: AppColors.bgApp,
         onSurface: AppColors.ink900,
       ),
-      textTheme: GoogleFonts.interTextTheme(
+      textTheme: GoogleFonts.nunitoTextTheme(
         base.textTheme,
       ).apply(bodyColor: AppColors.ink900, displayColor: AppColors.ink900),
       appBarTheme: const AppBarTheme(

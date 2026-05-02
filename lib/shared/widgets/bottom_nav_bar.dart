@@ -54,7 +54,7 @@ class VersatileBottomNav extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   decoration: BoxDecoration(
                     color: isActive
-                        ? AppColors.accentTint.withOpacity(0.55)
+                        ? AppColors.accentDeep.withOpacity(0.72)
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(18),
                   ),
@@ -68,7 +68,7 @@ class VersatileBottomNav extends StatelessWidget {
                         height: 3,
                         decoration: BoxDecoration(
                           color: isActive
-                              ? AppColors.accent
+                              ? AppColors.bone50
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(2),
                         ),
@@ -82,7 +82,7 @@ class VersatileBottomNav extends StatelessWidget {
                           item.icon,
                           size: 22,
                           color: isActive
-                              ? AppColors.accentDeep
+                              ? AppColors.bone50
                               : AppColors.ink900.withOpacity(0.45),
                         ),
                       ),
@@ -96,7 +96,7 @@ class VersatileBottomNav extends StatelessWidget {
                               ? FontWeight.w600
                               : FontWeight.w500,
                           color: isActive
-                              ? AppColors.accentDeep
+                              ? AppColors.bone50
                               : AppColors.ink900.withOpacity(0.45),
                           letterSpacing: 0.01,
                         ),

@@ -330,24 +330,7 @@ class _ExerciseRow extends StatelessWidget {
   const _ExerciseRow({required this.exercise});
   final Exercise exercise;
 
-  Color get _muscleColor {
-    return switch (exercise.muscle) {
-      'Chest' => AppColors.accent,
-      'Back' => AppColors.accentDeep,
-      'Shoulders' => const Color(0xFFB48C64),
-      'Core' => const Color(0xFF9B7850),
-      'Biceps' => const Color(0xFFC8825A),
-      'Triceps' => const Color(0xFFB56E40),
-      'Forearms' => const Color(0xFF8A6E54),
-      'Quadriceps' => AppColors.accentSoft,
-      'Hamstrings' => const Color(0xFFCB8A6A),
-      'Glutes' => const Color(0xFFD99060),
-      'Calves' => const Color(0xFFC07A50),
-      _ => AppColors.ink400,
-    };
-  }
-
-  String? get _muscleAsset => switch (exercise.muscle) {
+String? get _muscleAsset => switch (exercise.muscle) {
     'Chest' => 'assets/assets/Torso/pecho/pecho_color_edit_24348292703575.png',
     'Back' => 'assets/assets/Torso/espalda/back_color_edit_24399873717629.png',
     'Shoulders' =>
@@ -380,7 +363,7 @@ class _ExerciseRow extends StatelessWidget {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: _muscleColor.withOpacity(0.15),
+                color: AppColors.accentTint,
                 borderRadius: BorderRadius.circular(11),
               ),
               child: asset != null
@@ -388,7 +371,7 @@ class _ExerciseRow extends StatelessWidget {
                       padding: const EdgeInsets.all(7),
                       child: Image.asset(asset, fit: BoxFit.contain),
                     )
-                  : Icon(Icons.fitness_center, size: 18, color: _muscleColor),
+                  : Icon(Icons.fitness_center, size: 18, color: AppColors.accentDeep),
             ),
             const SizedBox(width: 12),
             Expanded(

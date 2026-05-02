@@ -25,6 +25,8 @@ class HomeState {
   final int avgTimeMins;
   final String userName;
   final Set<String> workoutDays;
+  final Routine? nextRoutine;
+  final int? nextRoutineDaysAgo; // null = never done
 
   const HomeState({
     required this.sessions,
@@ -34,6 +36,8 @@ class HomeState {
     this.avgTimeMins = 0,
     this.userName = 'there',
     this.workoutDays = const {},
+    this.nextRoutine,
+    this.nextRoutineDaysAgo,
   });
 }
 
@@ -67,6 +71,33 @@ final homeProvider = Provider<HomeState>((ref) {
   final sessionDates = sessions.map((s) => s.date).toSet();
   final allWorkoutDays = {...loggedDays, ...sessionDates};
 
+  // Build last done date per routine from session history (last 30 days)
+  final lastDoneMap = <String, String>{};
+  for (final s in sessions) {
+    final existing = lastDoneMap[s.routineId];
+    if (existing == null || s.date.compareTo(existing) > 0) {
+      lastDoneMap[s.routineId] = s.date;
+    }
+  }
+
+  // Pick the routine done least recently (never-done routines rank highest)
+  Routine? nextRoutine;
+  int? nextRoutineDaysAgo;
+  if (routines.isNotEmpty) {
+    int maxScore = -1;
+    for (final routine in routines) {
+      final lastDate = lastDoneMap[routine.id];
+      final score = lastDate == null
+          ? 999999
+          : today.difference(DateTime.parse('${lastDate}T00:00:00')).inDays;
+      if (score > maxScore) {
+        maxScore = score;
+        nextRoutine = routine;
+        nextRoutineDaysAgo = lastDate == null ? null : score;
+      }
+    }
+  }
+
   return HomeState(
     sessions: sessions,
     routines: routines,
@@ -75,5 +106,39 @@ final homeProvider = Provider<HomeState>((ref) {
     avgTimeMins: avgTimeMins,
     userName: userName,
     workoutDays: allWorkoutDays,
+    nextRoutine: nextRoutine,
+    nextRoutineDaysAgo: nextRoutineDaysAgo,
   );
+});
+
+// Fetches the main exercise name and PR for the hero card's suggested routine.
+final heroCardInfoProvider =
+    FutureProvider<({String? exerciseName, double? pr})>((ref) async {
+  final state = ref.watch(homeProvider);
+  final nextRoutine = state.nextRoutine;
+  if (nextRoutine == null || nextRoutine.exercises.isEmpty) {
+    return (exerciseName: null, pr: null);
+  }
+
+  final firstExercise = nextRoutine.exercises.first;
+  final exercise = await ref
+      .read(exerciseRepositoryProvider)
+      .findById(firstExercise.exerciseId);
+
+  // Compute PR from sessions in memory (covers the last 30 days)
+  double? pr;
+  for (final session in state.sessions) {
+    for (final se in (session.exercises ?? [])) {
+      if (se.exerciseId == firstExercise.exerciseId) {
+        for (final set in se.sets) {
+          if (set.kg > (pr ?? 0)) pr = set.kg;
+          if (set.leftKg != null && set.leftKg! > (pr ?? 0)) {
+            pr = set.leftKg!;
+          }
+        }
+      }
+    }
+  }
+
+  return (exerciseName: exercise?.name, pr: pr);
 });

@@ -44,9 +44,16 @@ class HomeScreen extends ConsumerWidget {
       'December',
     ];
 
-    final firstRoutine = state.routines.isNotEmpty
-        ? state.routines.first
-        : null;
+    final nextRoutine = state.nextRoutine;
+    final heroInfo = ref.watch(heroCardInfoProvider).value;
+    final daysAgo = state.nextRoutineDaysAgo;
+    final lastDoneText = daysAgo == null
+        ? 'Never done'
+        : daysAgo == 0
+            ? 'Done today'
+            : daysAgo == 1
+                ? 'Done yesterday'
+                : 'Last done $daysAgo days ago';
 
     return Scaffold(
       backgroundColor: AppColors.bgApp,
@@ -96,12 +103,15 @@ class HomeScreen extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 22),
                 child: FadeSlideIn(
                   delay: const Duration(milliseconds: 60),
-                  child: firstRoutine != null
+                  child: nextRoutine != null
                       ? _HeroCard(
-                          routineId: firstRoutine.id,
-                          routineName: firstRoutine.name,
-                          exerciseCount: firstRoutine.exercises.length,
-                          estimatedMin: firstRoutine.estimatedMinutes,
+                          routineId: nextRoutine.id,
+                          routineName: nextRoutine.name,
+                          exerciseCount: nextRoutine.exercises.length,
+                          estimatedMin: nextRoutine.estimatedMinutes,
+                          lastDoneText: lastDoneText,
+                          mainExerciseName: heroInfo?.exerciseName,
+                          mainPrKg: heroInfo?.pr,
                         )
                       : _EmptyHeroCard(
                           onCreateRoutine: () => Navigator.of(context).push(
@@ -248,8 +258,8 @@ class _ActivityGrid extends StatelessWidget {
     'Dec',
   ];
   static const _dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  static const int _numWeeks = 29;
-  static const double _cell = 8;
+  static const int _numWeeks = 26;
+  static const double _cell = 10;
   static const double _gap = 2;
   static const double _slot = _cell + _gap;
 
@@ -261,14 +271,23 @@ class _ActivityGrid extends StatelessWidget {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final currentMonday = today.subtract(Duration(days: today.weekday - 1));
-    final gridStart = currentMonday.subtract(
-      Duration(days: 7 * (_numWeeks - 1)),
-    );
 
-    final weeks = List.generate(
-      _numWeeks,
-      (w) => gridStart.add(Duration(days: 7 * w)),
-    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // constraints.maxWidth = screen width minus the outer 22+22 padding.
+        // GlassContainer adds 16+16 inner padding; label col = 22; gap = 2.
+        const overhead = 32.0 + 22.0 + 2.0;
+        final weeksAreaWidth = constraints.maxWidth - overhead;
+        final numWeeks =
+            (weeksAreaWidth / _slot).floor().clamp(4, _numWeeks);
+
+        final gridStart = currentMonday.subtract(
+          Duration(days: 7 * (numWeeks - 1)),
+        );
+        final weeks = List.generate(
+          numWeeks,
+          (w) => gridStart.add(Duration(days: 7 * w)),
+        );
 
     return GlassContainer(
       radius: 20,
@@ -315,7 +334,7 @@ class _ActivityGrid extends StatelessWidget {
                           child: Text(
                             label,
                             style: const TextStyle(
-                              fontSize: 7,
+                              fontSize: 8,
                               color: AppColors.ink400,
                               fontWeight: FontWeight.w500,
                             ),
@@ -396,6 +415,8 @@ class _ActivityGrid extends StatelessWidget {
         ],
       ),
     );
+      },
+    );
   }
 }
 
@@ -405,12 +426,18 @@ class _HeroCard extends StatelessWidget {
     required this.routineName,
     required this.exerciseCount,
     required this.estimatedMin,
+    required this.lastDoneText,
+    this.mainExerciseName,
+    this.mainPrKg,
   });
 
   final String routineId;
   final String routineName;
   final int exerciseCount;
   final int estimatedMin;
+  final String lastDoneText;
+  final String? mainExerciseName;
+  final double? mainPrKg;
 
   @override
   Widget build(BuildContext context) {
@@ -432,17 +459,18 @@ class _HeroCard extends StatelessWidget {
       ),
       padding: const EdgeInsets.all(22),
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           Positioned(
-            right: -30,
-            top: -40,
+            right: -60,
+            top: -60,
             child: Container(
-              width: 180,
-              height: 180,
+              width: 280,
+              height: 280,
               decoration: const BoxDecoration(
-                shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [Color(0x40FFFFFF), Colors.transparent],
+                  colors: [Color(0x55FFFFFF), Color(0x22FFFFFF), Color(0x00FFFFFF)],
+                  stops: [0.0, 0.45, 1.0],
                 ),
               ),
             ),
@@ -492,7 +520,20 @@ class _HeroCard extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 2),
+              Text(
+                lastDoneText,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white.withOpacity(0.6),
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              if (mainExerciseName != null) ...[
+                const SizedBox(height: 14),
+                _PrChip(exerciseName: mainExerciseName!, prKg: mainPrKg),
+              ],
+              const SizedBox(height: 16),
               PressableScale(
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -527,6 +568,73 @@ class _HeroCard extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PrChip extends StatelessWidget {
+  const _PrChip({required this.exerciseName, this.prKg});
+
+  final String exerciseName;
+  final double? prKg;
+
+  @override
+  Widget build(BuildContext context) {
+    final prStr = prKg == null
+        ? null
+        : prKg! % 1 == 0
+            ? '${prKg!.toInt()} kg'
+            : '${prKg!.toStringAsFixed(1)} kg';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.25),
+          width: 0.5,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'PR',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: Colors.white.withOpacity(0.6),
+              letterSpacing: 0.5,
+            ),
+          ),
+          Container(
+            width: 1,
+            height: 10,
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            color: Colors.white.withOpacity(0.3),
+          ),
+          Text(
+            exerciseName,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            prStr ?? 'No record yet',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: prStr != null ? FontWeight.w700 : FontWeight.w400,
+              color: prStr != null
+                  ? Colors.white
+                  : Colors.white.withOpacity(0.6),
+            ),
           ),
         ],
       ),
