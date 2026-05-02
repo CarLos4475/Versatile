@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/navigation/app_page_transitions.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
@@ -10,6 +11,7 @@ import '../widgets/stat_card.dart';
 import '../../active_workout/screens/active_workout_screen.dart';
 import '../../history/screens/session_detail_screen.dart';
 import '../../routines/screens/create_routine_screen.dart';
+import '../../settings/screens/settings_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -58,6 +60,35 @@ class HomeScreen extends ConsumerWidget {
                 title: 'Hello, ${state.userName}',
                 subtitle:
                     '${weekdays[now.weekday - 1]}, ${months[now.month - 1]} ${now.day}',
+                trailing: PressableScale(
+                  onTap: () => Navigator.of(context).push(
+                    AppRoute(page: const SettingsScreen()),
+                  ),
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: const Color(0xA6FFFCF7),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.glassBorder,
+                        width: 0.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF3C2814).withOpacity(0.06),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.settings_outlined,
+                      color: AppColors.ink700,
+                      size: 20,
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(height: 20),
 

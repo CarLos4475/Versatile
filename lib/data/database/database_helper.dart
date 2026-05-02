@@ -212,4 +212,15 @@ class DatabaseHelper {
       }
     }
   }
+
+  Future<void> wipeUserData() async {
+    final db = await database;
+    await db.transaction((txn) async {
+      // CASCADE handles routine_exercises, session_exercises, session_sets
+      await txn.delete('routines');
+      await txn.delete('sessions');
+      await txn.delete('exercises', where: 'is_custom = ?', whereArgs: [1]);
+      await txn.delete('workout_log');
+    });
+  }
 }

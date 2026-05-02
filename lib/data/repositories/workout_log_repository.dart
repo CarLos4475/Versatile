@@ -23,4 +23,10 @@ class WorkoutLogRepository {
     );
     return rows.map((r) => r['date'] as String).toSet();
   }
+
+  Future<Set<String>> getAllDays() async {
+    final db = await DatabaseHelper.instance.database;
+    final rows = await db.query('workout_log');
+    return rows.map((r) => r['date'] as String).toSet();
+  }
 }
