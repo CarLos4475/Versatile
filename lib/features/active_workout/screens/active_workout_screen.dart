@@ -36,7 +36,7 @@ class ActiveWorkoutScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Could not load workout',
+                l10n.routineNotFound,
                 style: TextStyle(color: context.colors.ink500),
               ),
               const SizedBox(height: 12),

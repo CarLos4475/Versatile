@@ -41,10 +41,16 @@ class WorkoutService : Service() {
                 .apply()
         } else {
             // Restarted by system after being killed — restore from prefs
-            startedAtMs = prefs.getLong(KEY_STARTED_AT, System.currentTimeMillis())
+            startedAtMs = prefs.getLong(KEY_STARTED_AT, 0L)
             routineId = prefs.getString(KEY_ROUTINE_ID, null)
+            // If there's no valid session data, nothing to restore — stop ourselves
+            if (startedAtMs == 0L || routineId.isNullOrEmpty()) {
+                stopSelf()
+                return START_NOT_STICKY
+            }
         }
 
+        _isRunning = true
         val notif = buildNotification(elapsedSeconds())
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(notifId, notif, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
@@ -57,6 +63,7 @@ class WorkoutService : Service() {
     }
 
     override fun onDestroy() {
+        _isRunning = false
         handler.removeCallbacks(tick)
         super.onDestroy()
     }
@@ -125,17 +132,16 @@ class WorkoutService : Service() {
         const val KEY_ROUTINE_ID = "routineId"
         const val KEY_PROGRESS = "progress"
 
+        // Volatile flag — reliable cross-thread service state check.
+        // Replaces the deprecated ActivityManager.getRunningServices() approach.
+        @Volatile
+        private var _isRunning = false
+
+        fun isRunning(context: Context): Boolean = _isRunning
+
         fun clearPrefs(context: Context) {
             context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit().clear().apply()
-        }
-
-        @Suppress("DEPRECATION")
-        fun isRunning(context: Context): Boolean {
-            val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            return am.getRunningServices(Int.MAX_VALUE).any {
-                it.service.className == WorkoutService::class.java.name
-            }
         }
     }
 }

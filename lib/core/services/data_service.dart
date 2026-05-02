@@ -32,6 +32,7 @@ class DataService {
         'id': rId,
         'name': r['name'],
         'colorValue': r['color_value'],
+        'iconCode': r['icon_code'],
         'exercises': reRows.map((re) => {
           'exerciseId': re['exercise_id'],
           'targetSets': re['target_sets'],
@@ -63,6 +64,7 @@ class DataService {
         exercises.add({
           'exerciseId': se['exercise_id'],
           'name': se['exercise_name'],
+          'muscle': se['muscle'],
           'sets': setRows.map((ss) => {
             'kg': ss['kg'],
             'reps': ss['reps'],
@@ -76,6 +78,7 @@ class DataService {
         'routineId': s['routine_id'],
         'routineName': s['routine_name'],
         'colorValue': s['color_value'],
+        'iconCode': s['icon_code'],
         'date': s['date'],
         'durationMin': s['duration_min'],
         'volumeKg': s['volume_kg'],
@@ -103,7 +106,18 @@ class DataService {
   }
 
   static Future<void> importJson(String jsonStr) async {
-    final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+    final Map<String, dynamic> data;
+    try {
+      data = jsonDecode(jsonStr) as Map<String, dynamic>;
+    } catch (_) {
+      throw const FormatException('Invalid JSON format');
+    }
+
+    // Sanity check: make sure this looks like a Versatile backup
+    if (!data.containsKey('routines') && !data.containsKey('sessions')) {
+      throw const FormatException('File does not appear to be a Versatile backup');
+    }
+
     final db = await DatabaseHelper.instance.database;
 
     await db.transaction((txn) async {
@@ -144,6 +158,7 @@ class DataService {
             'id': r['id'],
             'name': r['name'],
             'color_value': r['colorValue'],
+            'icon_code': r['iconCode'] ?? 58713,
           },
           conflictAlgorithm: ConflictAlgorithm.ignore,
         );
@@ -172,6 +187,7 @@ class DataService {
             'routine_id': s['routineId'],
             'routine_name': s['routineName'],
             'color_value': s['colorValue'] ?? 0xFFD97757,
+            'icon_code': s['iconCode'] ?? 58713,
             'date': s['date'],
             'duration_min': s['durationMin'],
             'volume_kg': s['volumeKg'],
@@ -186,6 +202,7 @@ class DataService {
             'session_id': s['id'],
             'exercise_id': se['exerciseId'],
             'exercise_name': se['name'],
+            'muscle': se['muscle'] ?? 'Other',
             'sort_order': i,
           });
           final sets = se['sets'] as List<dynamic>? ?? [];

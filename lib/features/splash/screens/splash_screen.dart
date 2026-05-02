@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/navigation/app_page_transitions.dart';
 import '../../../core/providers/repository_providers.dart';
@@ -7,6 +9,7 @@ import '../../../app.dart';
 import '../../onboarding/onboarding_screen.dart';
 import '../../../core/services/workout_notification_service.dart';
 import '../../active_workout/screens/active_workout_screen.dart';
+import '../../home/view_models/home_view_model.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -38,17 +41,33 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
     _controller.forward();
 
-    Future.delayed(const Duration(milliseconds: 2500), _navigate);
+    // Run cleanup and navigation concurrently with a minimum splash duration
+    Future.wait([
+      _runStartupTasks(),
+      Future.delayed(const Duration(milliseconds: 2500)),
+    ]).then((_) {
+      if (mounted) _navigate();
+    });
+  }
+
+  // Holds the results of async startup work so _navigate can use them
+  bool _onboarded = false;
+  ActiveWorkoutInfo? _activeInfo;
+
+  Future<void> _runStartupTasks() async {
+    // Run cleanup silently in background — don't block navigation on it
+    unawaited(
+      ref.read(cleanupOldSessionsProvider.future).catchError((_) {}),
+    );
+    // These must complete before navigation
+    _activeInfo = await WorkoutNotificationService.getActiveWorkout();
+    _onboarded = await ref.read(settingsRepositoryProvider).isOnboarded();
   }
 
   Future<void> _navigate() async {
     if (!mounted) return;
-    
-    // Check for active workout to restore
-    final activeInfo = await WorkoutNotificationService.getActiveWorkout();
-    if (activeInfo != null && mounted) {
-      // First, set up the main shell at the bottom of the stack
-      // then push the active workout screen on top.
+
+    if (_activeInfo != null) {
       Navigator.of(context).pushAndRemoveUntil(
         AppRoute(page: const MainNavigationShell()),
         (route) => false,
@@ -56,20 +75,17 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => ActiveWorkoutScreen(
-            routineId: activeInfo.routineId,
-            restoredStartedAt: activeInfo.startedAt,
-            restoredProgressJson: activeInfo.progressJson,
+            routineId: _activeInfo!.routineId,
+            restoredStartedAt: _activeInfo!.startedAt,
+            restoredProgressJson: _activeInfo!.progressJson,
           ),
         ),
       );
       return;
     }
 
-    final settings = ref.read(settingsRepositoryProvider);
-    final onboarded = await settings.isOnboarded();
-    if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      AppRoute(page: onboarded ? const MainNavigationShell() : const OnboardingScreen()),
+      AppRoute(page: _onboarded ? const MainNavigationShell() : const OnboardingScreen()),
     );
   }
 

@@ -7,7 +7,6 @@ import '../../routines/view_models/routines_view_model.dart';
 class SessionsAsyncNotifier extends AsyncNotifier<List<Session>> {
   @override
   Future<List<Session>> build() async {
-    await ref.read(sessionRepositoryProvider).deleteOldSessions();
     return ref.read(sessionRepositoryProvider).getAll();
   }
 }
@@ -16,6 +15,12 @@ final sessionsAsyncProvider =
     AsyncNotifierProvider<SessionsAsyncNotifier, List<Session>>(
       SessionsAsyncNotifier.new,
     );
+
+/// Runs the old-session cleanup once per app launch.
+/// Called from the splash screen before navigating to MainNavigationShell.
+final cleanupOldSessionsProvider = FutureProvider<void>((ref) async {
+  await ref.read(sessionRepositoryProvider).deleteOldSessions();
+});
 
 class HomeState {
   final List<Session> sessions;

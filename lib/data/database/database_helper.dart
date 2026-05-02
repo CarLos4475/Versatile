@@ -54,15 +54,24 @@ class DatabaseHelper {
       );
     }
     if (oldVersion < 5) {
-      try {
-        await db.execute('ALTER TABLE routines ADD COLUMN icon_code INTEGER NOT NULL DEFAULT 58713');
-        await db.execute('ALTER TABLE sessions ADD COLUMN icon_code INTEGER NOT NULL DEFAULT 58713');
-      } catch (_) {}
+      // ALTER TABLE is idempotent: ignore if column already exists
+      for (final sql in [
+        'ALTER TABLE routines ADD COLUMN icon_code INTEGER NOT NULL DEFAULT 58713',
+        'ALTER TABLE sessions ADD COLUMN icon_code INTEGER NOT NULL DEFAULT 58713',
+      ]) {
+        try {
+          await db.execute(sql);
+        } on DatabaseException catch (e) {
+          if (!e.toString().contains('duplicate column')) rethrow;
+        }
+      }
     }
     if (oldVersion < 6) {
       try {
         await db.execute('ALTER TABLE session_exercises ADD COLUMN muscle TEXT NOT NULL DEFAULT "Other"');
-      } catch (_) {}
+      } on DatabaseException catch (e) {
+        if (!e.toString().contains('duplicate column')) rethrow;
+      }
     }
   }
 

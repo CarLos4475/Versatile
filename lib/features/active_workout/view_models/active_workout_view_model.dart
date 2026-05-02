@@ -263,7 +263,15 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
       );
 
       if (restTimer != null) _resumeRestTimer();
-    } catch (_) {}
+    } catch (e, st) {
+      // Progress restore failed — the workout continues from a blank state.
+      // This is intentional: corrupted progress should never block the user.
+      assert(() {
+        // ignore: avoid_print
+        print('[ActiveWorkout] restoreProgress failed: $e\n$st');
+        return true;
+      }());
+    }
   }
 
   void _saveProgress() {
@@ -550,6 +558,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
       routineId: state.routine.id,
       routineName: state.routine.name,
       colorValue: state.routine.colorValue,
+      iconCode: state.routine.iconCode,
       date: _todayString(),
       durationMin: (state.elapsedSeconds / 60).ceil(),
       volumeKg: totalVolume,
@@ -559,6 +568,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     await _ref.read(sessionRepositoryProvider).insert(session);
     await _ref.read(workoutLogRepositoryProvider).logDay(_todayString());
     _ref.invalidate(sessionsAsyncProvider);
+    _ref.invalidate(workoutLogDaysProvider);
   }
 
   String _todayString() {
