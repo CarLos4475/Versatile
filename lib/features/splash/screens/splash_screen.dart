@@ -8,7 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../app.dart';
 import '../../onboarding/onboarding_screen.dart';
 import '../../../core/services/workout_notification_service.dart';
-import '../../active_workout/screens/active_workout_screen.dart';
+import '../../active_workout/view_models/active_workout_view_model.dart';
 import '../../home/view_models/home_view_model.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -68,29 +68,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     if (!mounted) return;
 
     if (_activeInfo != null) {
-      // First clear the stack and place the main shell as the root route.
-      // Then defer the workout screen push to the next frame so the shell
-      // has time to fully build before we push on top of it.
-      // Without the deferral, a black screen appears on first launch because
-      // the second push fires before the first route finishes rendering.
-      Navigator.of(context).pushAndRemoveUntil(
+      // Store the workout info in a provider so MainNavigationShell can push
+      // the workout screen from its own stable context — avoids the black-screen
+      // bug that occurred when navigating from a SplashScreen context that was
+      // already removed from the tree before the postFrameCallback fired.
+      ref.read(pendingWorkoutRestoreProvider.notifier).state = _activeInfo;
+      Navigator.of(context).pushReplacement(
         AppRoute(page: const MainNavigationShell()),
-        (route) => false,
       );
-      final activeInfo = _activeInfo!;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => ActiveWorkoutScreen(
-                routineId: activeInfo.routineId,
-                restoredStartedAt: activeInfo.startedAt,
-                restoredProgressJson: activeInfo.progressJson,
-              ),
-            ),
-          );
-        }
-      });
       return;
     }
 

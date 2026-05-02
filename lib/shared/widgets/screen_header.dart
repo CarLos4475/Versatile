@@ -11,6 +11,7 @@ class ScreenHeader extends StatelessWidget {
     this.trailing,
     this.onBack,
     this.accentBack = false,
+    this.titleStyle,
   });
 
   final String title;
@@ -18,6 +19,7 @@ class ScreenHeader extends StatelessWidget {
   final Widget? trailing;
   final VoidCallback? onBack;
   final bool accentBack;
+  final TextStyle? titleStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +89,7 @@ class ScreenHeader extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               title,
-              style: TextStyle(
+              style: titleStyle ?? TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.w700,
                 color: context.colors.ink900,

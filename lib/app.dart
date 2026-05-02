@@ -82,6 +82,22 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell>
     );
     _buildAnimations(forward: true);
     _pageCtrl.value = 1.0; // start fully visible
+    WidgetsBinding.instance.addPostFrameCallback(_restorePendingWorkout);
+  }
+
+  void _restorePendingWorkout(_) {
+    final activeInfo = ref.read(pendingWorkoutRestoreProvider);
+    if (activeInfo == null || !mounted) return;
+    ref.read(pendingWorkoutRestoreProvider.notifier).state = null;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ActiveWorkoutScreen(
+          routineId: activeInfo.routineId,
+          restoredStartedAt: activeInfo.startedAt,
+          restoredProgressJson: activeInfo.progressJson,
+        ),
+      ),
+    );
   }
 
   void _buildAnimations({required bool forward}) {

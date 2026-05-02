@@ -59,6 +59,13 @@ class HomeScreen extends ConsumerWidget {
                   now.toIso8601String().substring(0, 10),
                   locale: Localizations.localeOf(context).languageCode,
                 ),
+                titleStyle: TextStyle(
+                  fontSize: 38,
+                  fontWeight: FontWeight.w700,
+                  color: context.colors.ink900,
+                  letterSpacing: -0.76,
+                  height: 1.05,
+                ),
                 trailing: PressableScale(
                   onTap: () => Navigator.of(context).push(
                     AppRoute(page: const SettingsScreen()),

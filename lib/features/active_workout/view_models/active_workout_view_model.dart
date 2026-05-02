@@ -590,3 +590,7 @@ final activeWorkoutProvider = StateNotifierProvider.autoDispose
     .family<ActiveWorkoutNotifier, ActiveWorkoutState, String>(
       (ref, routineId) => ActiveWorkoutNotifier(routineId, ref),
     );
+
+// Signals MainNavigationShell to push the workout screen after it builds.
+// Set by SplashScreen when it detects an active workout on launch.
+final pendingWorkoutRestoreProvider = StateProvider<ActiveWorkoutInfo?>((ref) => null);
