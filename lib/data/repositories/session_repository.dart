@@ -14,6 +14,7 @@ class SessionRepository {
         routineId: r['routine_id'] as String,
         routineName: r['routine_name'] as String,
         colorValue: r['color_value'] as int,
+        iconCode: r['icon_code'] as int? ?? 58713,
         date: r['date'] as String,
         durationMin: r['duration_min'] as int,
         volumeKg: (r['volume_kg'] as num).toDouble(),
@@ -30,6 +31,7 @@ class SessionRepository {
       'routine_id': session.routineId,
       'routine_name': session.routineName,
       'color_value': session.colorValue,
+      'icon_code': session.iconCode,
       'date': session.date,
       'duration_min': session.durationMin,
       'volume_kg': session.volumeKg,
@@ -41,6 +43,7 @@ class SessionRepository {
         'session_id': session.id,
         'exercise_id': se.exerciseId,
         'exercise_name': se.name,
+        'muscle': se.muscle,
         'sort_order': i,
       });
       for (var j = 0; j < se.sets.length; j++) {
@@ -129,6 +132,7 @@ class SessionRepository {
       result.add(SessionExercise(
         exerciseId: se['exercise_id'] as String,
         name: se['exercise_name'] as String,
+        muscle: se['muscle'] as String? ?? 'Other',
         sets: setRows
             .map((s) => WorkoutSet(
                   kg: (s['kg'] as num).toDouble(),

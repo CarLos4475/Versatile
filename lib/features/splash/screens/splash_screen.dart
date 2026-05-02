@@ -5,6 +5,8 @@ import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../app.dart';
 import '../../onboarding/onboarding_screen.dart';
+import '../../../core/services/workout_notification_service.dart';
+import '../../active_workout/screens/active_workout_screen.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -41,11 +43,33 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   Future<void> _navigate() async {
     if (!mounted) return;
+    
+    // Check for active workout to restore
+    final activeInfo = await WorkoutNotificationService.getActiveWorkout();
+    if (activeInfo != null && mounted) {
+      // First, set up the main shell at the bottom of the stack
+      // then push the active workout screen on top.
+      Navigator.of(context).pushAndRemoveUntil(
+        AppRoute(page: const MainNavigationShell()),
+        (route) => false,
+      );
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ActiveWorkoutScreen(
+            routineId: activeInfo.routineId,
+            restoredStartedAt: activeInfo.startedAt,
+            restoredProgressJson: activeInfo.progressJson,
+          ),
+        ),
+      );
+      return;
+    }
+
     final settings = ref.read(settingsRepositoryProvider);
     final onboarded = await settings.isOnboarded();
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      AppRoute(page: onboarded ? const MainShell() : const OnboardingScreen()),
+      AppRoute(page: onboarded ? const MainNavigationShell() : const OnboardingScreen()),
     );
   }
 
@@ -65,9 +89,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: RadialGradient(
-                  center: Alignment(0, -0.3),
+                  center: const Alignment(0, -0.3),
                   radius: 1.2,
-                  colors: [Color(0x80D97757), Colors.transparent],
+                  colors: [const Color(0x80D97757), Colors.transparent],
                 ),
               ),
             ),
@@ -96,18 +120,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         borderRadius: BorderRadius.circular(28),
                         boxShadow: [
                           BoxShadow(
-                            color: context.colors.accentDeep.withOpacity(0.4),
+                            color: context.colors.accentDeep.withValues(alpha: 0.4),
                             blurRadius: 48,
                             offset: const Offset(0, 24),
                           ),
                           BoxShadow(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Colors.white.withValues(alpha: 0.4),
                             blurRadius: 0,
                             spreadRadius: 12,
                           ),
                         ],
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Icon(
                           Icons.fitness_center,
                           color: Colors.white,
@@ -117,7 +141,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                   ),
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 FadeTransition(
                   opacity: _fade,
                   child: Text(
@@ -131,7 +155,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     ),
                   ),
                 ),
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 FadeTransition(
                   opacity: _fade,
                   child: Text(
@@ -159,7 +183,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 }
 
 class _PulseDots extends StatefulWidget {
-  const _PulseDots();
+  const _PulseDots({super.key});
 
   @override
   State<_PulseDots> createState() => _PulseDotsState();

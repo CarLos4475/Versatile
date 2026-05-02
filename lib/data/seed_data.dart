@@ -71,20 +71,20 @@ class SeedData {
       id: 's-7', routineId: 'r-1', routineName: 'Push Day',
       date: '2026-04-29', durationMin: 58, volumeKg: 4280,
       exercises: [
-        SessionExercise(exerciseId: 'ex-1', name: 'Bench Press', sets: [
+        SessionExercise(exerciseId: 'ex-1', name: 'Bench Press', muscle: 'Chest', sets: [
           WorkoutSet(kg: 80, reps: 8), WorkoutSet(kg: 82.5, reps: 7),
           WorkoutSet(kg: 82.5, reps: 6), WorkoutSet(kg: 80, reps: 6),
         ]),
-        SessionExercise(exerciseId: 'ex-2', name: 'Incline Dumbbell Press', sets: [
+        SessionExercise(exerciseId: 'ex-2', name: 'Incline Dumbbell Press', muscle: 'Chest', sets: [
           WorkoutSet(kg: 28, reps: 10), WorkoutSet(kg: 28, reps: 9), WorkoutSet(kg: 26, reps: 9),
         ]),
-        SessionExercise(exerciseId: 'ex-10', name: 'Overhead Press', sets: [
+        SessionExercise(exerciseId: 'ex-10', name: 'Overhead Press', muscle: 'Shoulders', sets: [
           WorkoutSet(kg: 50, reps: 8), WorkoutSet(kg: 50, reps: 7), WorkoutSet(kg: 47.5, reps: 8),
         ]),
-        SessionExercise(exerciseId: 'ex-11', name: 'Lateral Raise', sets: [
+        SessionExercise(exerciseId: 'ex-11', name: 'Lateral Raise', muscle: 'Shoulders', sets: [
           WorkoutSet(kg: 12, reps: 14), WorkoutSet(kg: 12, reps: 12), WorkoutSet(kg: 10, reps: 14),
         ]),
-        SessionExercise(exerciseId: 'ex-14', name: 'Tricep Pushdown', sets: [
+        SessionExercise(exerciseId: 'ex-14', name: 'Tricep Pushdown', muscle: 'Arms', sets: [
           WorkoutSet(kg: 30, reps: 12), WorkoutSet(kg: 32.5, reps: 10), WorkoutSet(kg: 30, reps: 10),
         ]),
       ],

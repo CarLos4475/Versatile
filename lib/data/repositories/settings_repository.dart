@@ -24,4 +24,6 @@ class SettingsRepository {
   Future<void> setOnboarded() => set('onboarded', '1');
   Future<String> getThemeMode() async => (await get('theme_mode')) ?? 'system';
   Future<void> setThemeMode(String mode) => set('theme_mode', mode);
+  Future<String> getLanguageCode() async => (await get('language_code')) ?? 'en';
+  Future<void> setLanguageCode(String code) => set('language_code', code);
 }

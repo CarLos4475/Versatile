@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:versatile/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
-import '../../../core/providers/repository_providers.dart';
-import '../../../core/providers/theme_provider.dart';
-import '../../../core/services/data_service.dart';
+import 'package:versatile/core/providers/repository_providers.dart';
+import 'package:versatile/core/providers/theme_provider.dart';
+import 'package:versatile/core/providers/locale_provider.dart';
+import 'package:versatile/core/services/data_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/database/database_helper.dart';
 import '../../../shared/widgets/glass_container.dart';
@@ -31,13 +33,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (!mounted) return;
 
     final controller = TextEditingController(text: currentName == 'there' ? '' : currentName);
-    final result = await showDialog<String>(
+    final l10n = AppLocalizations.of(context)!;
+
+    final newName = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: context.colors.glassBgStrong,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: context.colors.bgFrame,
         title: Text(
-          'Your name',
+          l10n.changeName,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -48,41 +51,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         content: TextField(
           controller: controller,
           autofocus: true,
-          textCapitalization: TextCapitalization.words,
-          style: TextStyle(color: context.colors.ink900, fontSize: 16),
+          style: TextStyle(color: context.colors.ink900),
           decoration: InputDecoration(
-            hintText: 'Enter your name',
+            hintText: l10n.userName,
             hintStyle: TextStyle(color: context.colors.ink400),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: context.colors.bone300, width: 1),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: Border.all(color: context.colors.hairline).bottom,
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: context.colors.accent, width: 1.5),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: Border.all(color: context.colors.accent).bottom,
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           ),
-          onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Cancel', style: TextStyle(color: context.colors.ink400)),
+            child: Text(l10n.cancel, style: TextStyle(color: context.colors.ink400)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
             child: Text(
-              'Save',
-              style: TextStyle(color: context.colors.accentDeep, fontWeight: FontWeight.w600),
+              l10n.done,
+              style: TextStyle(color: context.colors.accent, fontWeight: FontWeight.w600),
             ),
           ),
         ],
       ),
     );
 
-    if (result != null && result.isNotEmpty) {
-      await ref.read(settingsRepositoryProvider).setUserName(result);
+    if (newName != null && mounted) {
+      await ref.read(settingsRepositoryProvider).setUserName(newName);
       ref.invalidate(userNameProvider);
     }
   }
@@ -92,10 +90,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     try {
       final json = await DataService.exportJson();
       final dir = await getTemporaryDirectory();
-      final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-').substring(0, 19);
-      final file = File('${dir.path}/versatile_backup_$timestamp.json');
+      final file = File('${dir.path}/versatile_backup.json');
       await file.writeAsString(json);
-      await Share.shareXFiles([XFile(file.path)], text: 'Versatile backup');
+      await Share.shareXFiles([XFile(file.path)], text: 'Versatile Backup');
     } catch (e) {
       if (mounted) _showError('Export failed: $e');
     } finally {
@@ -104,22 +101,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _importData() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['json'],
-    );
-    if (result == null || result.files.single.path == null) return;
+    final result = await FilePicker.platform.pickFiles();
+    if (result == null) return;
 
     setState(() => _busy = true);
     try {
-      final content = await File(result.files.single.path!).readAsString();
-      await DataService.importJson(content);
+      final file = File(result.files.single.path!);
+      final json = await file.readAsString();
+      await DataService.importJson(json);
       _invalidateAll();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Data imported successfully')),
-        );
-      }
     } catch (e) {
       if (mounted) _showError('Import failed: $e');
     } finally {
@@ -128,78 +118,66 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _wipeData() async {
-    final confirmed = await showDialog<bool>(
+    final l10n = AppLocalizations.of(context)!;
+    final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: context.colors.glassBgStrong,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Wipe all data?',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: context.colors.ink900,
-            letterSpacing: -0.18,
-          ),
-        ),
+        backgroundColor: context.colors.bgFrame,
+        title: Text(l10n.wipeConfirmTitle, style: TextStyle(color: context.colors.ink900)),
         content: Text(
-          'This will permanently delete all your routines, sessions, and workout history. This cannot be undone.',
-          style: TextStyle(fontSize: 14, color: context.colors.ink500, height: 1.5),
+          l10n.wipeConfirmContent,
+          style: TextStyle(color: context.colors.ink500, height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text('Cancel', style: TextStyle(color: context.colors.ink400)),
+            child: Text(l10n.cancel, style: TextStyle(color: context.colors.ink400)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(
-              'Wipe',
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            child: Text(l10n.wipe, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
     );
 
-    if (confirmed != true) return;
-
-    setState(() => _busy = true);
-    try {
-      await DatabaseHelper.instance.wipeUserData();
-      _invalidateAll();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('All data wiped')),
-        );
+    if (ok == true && mounted) {
+      setState(() => _busy = true);
+      try {
+        await DatabaseHelper.instance.wipeUserData();
+        _invalidateAll();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.dataWiped)),
+          );
+        }
+      } catch (e) {
+        if (mounted) _showError(l10n.wipeFailed(e.toString()));
+      } finally {
+        if (mounted) setState(() => _busy = false);
       }
-    } catch (e) {
-      if (mounted) _showError('Wipe failed: $e');
-    } finally {
-      if (mounted) setState(() => _busy = false);
     }
   }
 
   void _invalidateAll() {
-    ref.invalidate(userNameProvider);
-    ref.invalidate(sessionsAsyncProvider);
-    ref.invalidate(workoutLogDaysProvider);
     ref.invalidate(routinesProvider);
     ref.invalidate(exercisesAsyncProvider);
+    ref.invalidate(sessionsAsyncProvider);
+    ref.invalidate(homeProvider);
   }
 
   void _showError(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: Colors.red.shade700),
+      SnackBar(content: Text(msg), backgroundColor: Colors.red.shade900),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final userName = ref.watch(userNameProvider).value ?? 'there';
+    final themeMode = ref.watch(themeModeProvider);
+    final locale = ref.watch(localeProvider);
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
@@ -212,14 +190,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ScreenHeader(
-                    title: 'Settings',
+                    title: l10n.settings,
                     onBack: () => Navigator.of(context).pop(),
                     accentBack: true,
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
                   // Profile
-                  _SectionLabel('PROFILE'),
+                  _SectionLabel(l10n.profile),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
@@ -228,18 +206,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         radius: 20,
                         child: _SettingRow(
                           icon: Icons.person_outline,
-                          title: 'Name',
-                          value: userName == 'there' ? '' : userName,
+                          title: l10n.userName,
+                          value: (userName == 'there' || userName.isEmpty) ? '' : userName,
                           onTap: _changeName,
                         ),
                       ),
                     ),
                   ),
 
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
                   // Appearance
-                  _SectionLabel('APPEARANCE'),
+                  _SectionLabel(l10n.appearance),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
@@ -248,63 +226,124 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         radius: 20,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
-                          child: Row(
+                          child: Column(
                             children: [
-                              Container(
-                                width: 34,
-                                height: 34,
-                                decoration: BoxDecoration(
-                                  color: context.colors.accentTint,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Icon(
-                                  Icons.dark_mode_outlined,
-                                  size: 18,
-                                  color: context.colors.accentDeep,
-                                ),
-                              ),
-                              SizedBox(width: 14),
-                              Expanded(
-                                child: Text(
-                                  'Theme',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: context.colors.ink900,
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 34,
+                                    height: 34,
+                                    decoration: BoxDecoration(
+                                      color: context.colors.accentTint,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(
+                                      Icons.palette_outlined,
+                                      size: 18,
+                                      color: context.colors.accentDeep,
+                                    ),
                                   ),
-                                ),
-                              ),
-                              DropdownButtonHideUnderline(
-                                child: DropdownButton<ThemeMode>(
-                                  value: ref.watch(themeModeProvider),
-                                  icon: Icon(Icons.expand_more, size: 16, color: context.colors.ink400),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: context.colors.ink700,
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Text(
+                                      l10n.theme,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: context.colors.ink900,
+                                      ),
+                                    ),
                                   ),
-                                  dropdownColor: context.colors.bgFrame,
-                                  borderRadius: BorderRadius.circular(12),
-                                  onChanged: (ThemeMode? newValue) {
-                                    if (newValue != null) {
-                                      ref.read(themeModeProvider.notifier).setThemeMode(newValue);
-                                    }
-                                  },
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: ThemeMode.light,
-                                      child: Text('Light'),
+                                  DropdownButtonHideUnderline(
+                                    child: DropdownButton<ThemeMode>(
+                                      value: themeMode,
+                                      icon: Icon(Icons.expand_more, size: 16, color: context.colors.ink400),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: context.colors.ink700,
+                                      ),
+                                      dropdownColor: context.colors.bgFrame,
+                                      borderRadius: BorderRadius.circular(12),
+                                      onChanged: (ThemeMode? newValue) {
+                                        if (newValue != null) {
+                                          ref.read(themeModeProvider.notifier).setThemeMode(newValue);
+                                        }
+                                      },
+                                      items: [
+                                        DropdownMenuItem(
+                                          value: ThemeMode.light,
+                                          child: Text(l10n.themeLight),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: ThemeMode.dark,
+                                          child: Text(l10n.themeDark),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: ThemeMode.system,
+                                          child: Text(l10n.themeSystem),
+                                        ),
+                                      ],
                                     ),
-                                    DropdownMenuItem(
-                                      value: ThemeMode.dark,
-                                      child: Text('Dark'),
+                                  ),
+                                ],
+                              ),
+                              Divider(color: context.colors.hairline, height: 1),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 34,
+                                    height: 34,
+                                    decoration: BoxDecoration(
+                                      color: context.colors.accentTint,
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
-                                    DropdownMenuItem(
-                                      value: ThemeMode.system,
-                                      child: Text('System'),
+                                    child: Icon(
+                                      Icons.language_outlined,
+                                      size: 18,
+                                      color: context.colors.accentDeep,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Text(
+                                      l10n.language,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: context.colors.ink900,
+                                      ),
+                                    ),
+                                  ),
+                                  DropdownButtonHideUnderline(
+                                    child: DropdownButton<Locale>(
+                                      value: locale,
+                                      icon: Icon(Icons.expand_more, size: 16, color: context.colors.ink400),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: context.colors.ink700,
+                                      ),
+                                      dropdownColor: context.colors.bgFrame,
+                                      borderRadius: BorderRadius.circular(12),
+                                      onChanged: (Locale? newValue) {
+                                        if (newValue != null) {
+                                          ref.read(localeProvider.notifier).setLocale(newValue);
+                                        }
+                                      },
+                                      items: [
+                                        DropdownMenuItem(
+                                          value: const Locale('en'),
+                                          child: Text(l10n.languageEn),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: const Locale('es'),
+                                          child: Text(l10n.languageEs),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -313,10 +352,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
 
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
                   // Data
-                  _SectionLabel('DATA'),
+                  _SectionLabel(l10n.data),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
@@ -327,22 +366,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           children: [
                             _SettingRow(
                               icon: Icons.upload_outlined,
-                              title: 'Export data',
-                              subtitle: 'Share a JSON backup of all your data',
+                              title: l10n.exportData,
+                              subtitle: l10n.exportSubtitle,
                               onTap: _busy ? null : _exportData,
                             ),
                             _Divider(),
                             _SettingRow(
                               icon: Icons.download_outlined,
-                              title: 'Import data',
-                              subtitle: 'Restore from a JSON backup',
+                              title: l10n.importData,
+                              subtitle: l10n.importSubtitle,
                               onTap: _busy ? null : _importData,
                             ),
                             _Divider(),
                             _SettingRow(
                               icon: Icons.delete_outline,
-                              title: 'Wipe data',
-                              subtitle: 'Delete all routines, sessions and history',
+                              title: l10n.wipeAllData,
+                              subtitle: l10n.wipeSubtitle,
                               onTap: _busy ? null : _wipeData,
                               destructive: true,
                             ),
@@ -352,10 +391,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
 
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
                   // About
-                  _SectionLabel('ABOUT'),
+                  _SectionLabel(l10n.about),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
@@ -366,13 +405,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           children: [
                             _SettingRow(
                               icon: Icons.info_outline,
-                              title: 'Version',
+                              title: l10n.version,
                               value: '1.0.0',
                             ),
                             _Divider(),
                             _SettingRow(
                               icon: Icons.code_outlined,
-                              title: 'Author',
+                              title: l10n.author,
                               value: 'CarLos',
                             ),
                           ],
@@ -386,7 +425,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             if (_busy)
               Positioned.fill(
                 child: ColoredBox(
-                  color: Color(0x33000000),
+                  color: const Color(0x33000000),
                   child: Center(
                     child: CircularProgressIndicator(color: context.colors.accent),
                   ),
@@ -452,49 +491,49 @@ class _SettingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleColor = destructive ? Colors.red.shade600 : context.colors.ink900;
-    final iconColor = destructive ? Colors.red.shade400 : context.colors.accentDeep;
-    final iconBgColor = destructive
-        ? Colors.red.withOpacity(0.08)
-        : context.colors.accentTint;
-
     Widget row = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      padding: const EdgeInsets.all(18),
       child: Row(
         children: [
           Container(
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: iconBgColor,
+              color: destructive
+                  ? Colors.red.withValues(alpha: 0.1)
+                  : context.colors.accentTint,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, size: 18, color: iconColor),
+            child: Icon(
+              icon,
+              size: 18,
+              color: destructive ? Colors.red : context.colors.accentDeep,
+            ),
           ),
-          SizedBox(width: 14),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   title,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
-                    color: titleColor,
+                    color: context.colors.ink900,
                   ),
                 ),
-                if (subtitle != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2),
-                    child: Text(
-                      subtitle!,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: context.colors.ink400,
-                      ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle!,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: context.colors.ink400,
                     ),
                   ),
+                ],
               ],
             ),
           ),
@@ -503,12 +542,13 @@ class _SettingRow extends StatelessWidget {
               value!,
               style: TextStyle(
                 fontSize: 14,
-                color: context.colors.ink400,
+                fontWeight: FontWeight.w500,
+                color: context.colors.ink700,
               ),
             ),
           if (onTap != null)
             Padding(
-              padding: EdgeInsets.only(left: 4),
+              padding: const EdgeInsets.only(left: 8),
               child: Icon(Icons.chevron_right, size: 18, color: context.colors.ink300),
             ),
         ],

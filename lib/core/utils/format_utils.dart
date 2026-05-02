@@ -1,17 +1,11 @@
+import 'package:intl/intl.dart';
+
 class FormatUtils {
   FormatUtils._();
 
-  static String date(String iso) {
+  static String date(String iso, {String? locale}) {
     final d = DateTime.parse('${iso}T00:00:00');
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final days = today.difference(d).inDays;
-    if (days == 0) return 'Today';
-    if (days == 1) return 'Yesterday';
-    if (days < 7) return '$days days ago';
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${months[d.month - 1]} ${d.day}';
+    return DateFormat.yMMMMEEEEd(locale).format(d);
   }
 
   static String duration(int minutes) {
@@ -22,7 +16,7 @@ class FormatUtils {
   }
 
   static String volume(double kg) {
-    if (kg >= 1000) return '${(kg / 1000).toStringAsFixed(1)}k kg';
+    if (kg >= 1000) return '${(kg / 1000).toStringAsFixed(1)}K kg';
     return '${kg.toStringAsFixed(0)} kg';
   }
 
@@ -37,18 +31,13 @@ class FormatUtils {
     return kg.toString();
   }
 
-  static String longDate(String iso) {
+  static String longDate(String iso, {String? locale}) {
     final d = DateTime.parse('${iso}T00:00:00');
-    const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const months = ['January', 'February', 'March', 'April', 'May', 'June',
-                    'July', 'August', 'September', 'October', 'November', 'December'];
-    return '${weekdays[d.weekday - 1]}, ${months[d.month - 1]} ${d.day}';
+    return DateFormat.yMMMMEEEEd(locale).format(d);
   }
 
-  static String monthYear(String iso) {
+  static String monthYear(String iso, {String? locale}) {
     final d = DateTime.parse('${iso}T00:00:00');
-    const months = ['January', 'February', 'March', 'April', 'May', 'June',
-                    'July', 'August', 'September', 'October', 'November', 'December'];
-    return '${months[d.month - 1]} ${d.year}';
+    return DateFormat.yMMMM(locale).format(d);
   }
 }

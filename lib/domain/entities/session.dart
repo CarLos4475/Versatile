@@ -3,11 +3,13 @@ import 'workout_set.dart';
 class SessionExercise {
   final String exerciseId;
   final String name;
+  final String muscle;
   final List<WorkoutSet> sets;
 
   const SessionExercise({
     required this.exerciseId,
     required this.name,
+    required this.muscle,
     required this.sets,
   });
 
@@ -19,6 +21,7 @@ class Session {
   final String routineId;
   final String routineName;
   final int colorValue;
+  final int iconCode;
   final String date; // 'YYYY-MM-DD'
   final int durationMin;
   final double volumeKg;
@@ -29,6 +32,7 @@ class Session {
     required this.routineId,
     required this.routineName,
     this.colorValue = 0xFFD97757,
+    this.iconCode = 58713,
     required this.date,
     required this.durationMin,
     required this.volumeKg,

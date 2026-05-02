@@ -1,8 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
+import '../../../core/utils/l10n_utils.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
@@ -32,13 +35,14 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
     }
   }
 
-  Future<void> _confirmDelete() async {
+  Future<void> _confirmDelete(Routine routine) async {
+    final l10n = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: context.colors.bgFrame,
         title: Text(
-          'Delete routine?',
+          l10n.deleteRoutineTitle,
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w600,
@@ -46,21 +50,21 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
           ),
         ),
         content: Text(
-          'This will permanently remove this routine.',
+          l10n.deleteRoutineContent(routine.name),
           style: TextStyle(fontSize: 14, color: context.colors.ink500),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
-              'Cancel',
+              l10n.cancel,
               style: TextStyle(color: context.colors.ink500),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
-              'Delete',
+              l10n.delete,
               style: TextStyle(
                 color: context.colors.accentDeep,
                 fontWeight: FontWeight.w600,
@@ -86,6 +90,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final routinesAsync = ref.watch(routinesProvider);
     final exercises = ref.watch(exercisesAsyncProvider).value ?? [];
 
@@ -116,10 +121,10 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                     'Routine not found',
                     style: TextStyle(color: context.colors.ink500),
                   ),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: Text('Go back'),
+                    child: const Text('Go back'),
                   ),
                 ],
               ),
@@ -140,7 +145,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
           children: [
             if (_editMode)
               PressableScale(
-                onTap: _confirmDelete,
+                onTap: () => _confirmDelete(routine),
                 child: Container(
                   width: 36,
                   height: 36,
@@ -194,7 +199,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    _editMode ? 'Done' : 'Edit',
+                    _editMode ? l10n.done : l10n.edit,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -214,12 +219,12 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
               children: [
                 ScreenHeader(
                   title: routine.name,
-                  subtitle: '${routine.exercises.length} exercises',
+                  subtitle: '${routine.exercises.length} ${l10n.exercisesLabel}',
                   onBack: () => Navigator.of(context).pop(),
                   trailing: trailing,
                   accentBack: true,
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Expanded(
                   child: _editMode
                       ? ReorderableListView(
@@ -253,7 +258,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                         color: context.colors.ink300,
                                       ),
                                     ),
-                                    SizedBox(width: 10),
+                                    const SizedBox(width: 10),
                                     Container(
                                       width: 28,
                                       height: 28,
@@ -272,14 +277,14 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                         ),
                                       ),
                                     ),
-                                    SizedBox(width: 10),
+                                    const SizedBox(width: 10),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            ex.name,
+                                            ex.getLocalizedName(context),
                                             style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
@@ -287,7 +292,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                             ),
                                           ),
                                           Text(
-                                            '${re.targetSets} × ${re.targetReps} · ${re.restSeconds}s rest',
+                                            '${re.targetSets} × ${re.targetReps} · ${re.restSeconds}s ${l10n.rest}',
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: context.colors.ink500,
@@ -335,7 +340,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                             final i = entry.key;
                             final re = entry.value;
                             final ex = findEx(re.exerciseId);
-                            if (ex == null) return SizedBox.shrink();
+                            if (ex == null) return const SizedBox.shrink();
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 8),
                               child: GlassContainer(
@@ -357,30 +362,30 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                             fontSize: 13,
                                             fontWeight: FontWeight.w700,
                                             color: context.colors.accentDeep,
-                                            fontFeatures: [
+                                            fontFeatures: const [
                                               FontFeature.tabularFigures(),
                                             ],
                                           ),
                                         ),
                                       ),
                                     ),
-                                    SizedBox(width: 12),
+                                    const SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            ex.name,
+                                            ex.getLocalizedName(context),
                                             style: TextStyle(
                                               fontSize: 15,
                                               fontWeight: FontWeight.w600,
                                               color: context.colors.ink900,
                                             ),
                                           ),
-                                          SizedBox(height: 2),
+                                          const SizedBox(height: 2),
                                           Text(
-                                            '${re.targetSets} × ${re.targetReps} reps · ${re.restSeconds}s rest',
+                                            '${re.targetSets} ${l10n.sets} · ${re.targetReps} reps · ${re.restSeconds}s ${l10n.rest}',
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: context.colors.ink500,
@@ -399,7 +404,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
-                                        ex.muscle,
+                                        ex.getLocalizedMuscle(context),
                                         style: TextStyle(
                                           fontSize: 11,
                                           color: context.colors.ink400,
@@ -418,7 +423,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
                     child: GlassButton(
-                      label: 'Add exercise',
+                      label: l10n.addExercise,
                       variant: GlassButtonVariant.primary,
                       size: GlassButtonSize.md,
                       expand: true,
@@ -439,11 +444,11 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
                     child: GlassButton(
-                      label: 'Start this workout',
+                      label: l10n.startThisWorkout,
                       variant: GlassButtonVariant.primary,
                       size: GlassButtonSize.lg,
                       expand: true,
-                      leading: Icon(
+                      leading: const Icon(
                         Icons.play_arrow,
                         color: Colors.white,
                         size: 16,

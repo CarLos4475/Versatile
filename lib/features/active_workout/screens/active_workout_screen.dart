@@ -1,5 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/services/workout_notification_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/format_utils.dart';
@@ -23,9 +25,10 @@ class ActiveWorkoutScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final initAsync = ref.watch(workoutInitProvider(routineId));
     return initAsync.when(
-      loading: () => const _LoadingScaffold(),
+      loading: () => _LoadingScaffold(label: l10n.preparingWorkout),
       error: (e, _) => Scaffold(
         backgroundColor: context.colors.bgApp,
         body: Center(
@@ -36,10 +39,10 @@ class ActiveWorkoutScreen extends ConsumerWidget {
                 'Could not load workout',
                 style: TextStyle(color: context.colors.ink500),
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: Text('Go back'),
+                child: Text(l10n.goBack),
               ),
             ],
           ),
@@ -55,7 +58,8 @@ class ActiveWorkoutScreen extends ConsumerWidget {
 }
 
 class _LoadingScaffold extends StatelessWidget {
-  const _LoadingScaffold();
+  const _LoadingScaffold({required this.label});
+  final String label;
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +73,9 @@ class _LoadingScaffold extends StatelessWidget {
               color: context.colors.accent,
               strokeWidth: 2,
             ),
-            SizedBox(height: 14),
+            const SizedBox(height: 14),
             Text(
-              'Preparing workout...',
+              label,
               style: TextStyle(fontSize: 14, color: context.colors.ink500),
             ),
           ],
@@ -142,6 +146,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(activeWorkoutProvider(widget.routineId));
     final notifier = ref.read(activeWorkoutProvider(widget.routineId).notifier);
 
@@ -179,7 +184,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                             ),
                           ),
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,9 +192,9 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                               Row(
                                 children: [
                                   _PulseDot(),
-                                  SizedBox(width: 6),
+                                  const SizedBox(width: 6),
                                   Text(
-                                    'ACTIVE · ${state.routine.name.toUpperCase()}',
+                                    '${l10n.active} · ${state.routine.name.toUpperCase()}',
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w700,
@@ -199,7 +204,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.baseline,
                                 textBaseline: TextBaseline.alphabetic,
@@ -212,14 +217,14 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                                       letterSpacing: -0.52,
                                       color: context.colors.ink900,
                                       height: 1,
-                                      fontFeatures: [
+                                      fontFeatures: const [
                                         FontFeature.tabularFigures(),
                                       ],
                                     ),
                                   ),
-                                  SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                                   Text(
-                                    '${state.completedSets}/${state.totalSets} sets'
+                                    '${state.completedSets}/${state.totalSets} ${l10n.sets}'
                                     ' · ${FormatUtils.volume(state.totalVolume)}',
                                     style: TextStyle(
                                       fontSize: 12,
@@ -270,7 +275,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                     ),
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Expanded(
                   child: ListView(
                     padding: EdgeInsets.fromLTRB(
@@ -284,7 +289,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                         final i = entry.key;
                         final e = entry.value;
                         final ex = state.findExercise(e.exerciseId);
-                        if (ex == null) return SizedBox.shrink();
+                        if (ex == null) return const SizedBox.shrink();
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
                           child: ExerciseCard(
@@ -309,7 +314,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                         );
                       }),
                       GlassButton(
-                        label: _finishing ? 'Saving…' : 'Finish workout',
+                        label: _finishing ? l10n.saving : l10n.finishWorkout,
                         variant: GlassButtonVariant.primary,
                         size: GlassButtonSize.md,
                         expand: true,
@@ -345,7 +350,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                   ),
                 ),
                 child: state.restTimer == null
-                    ? SizedBox.shrink(key: ValueKey('rest-hidden'))
+                    ? const SizedBox.shrink(key: ValueKey('rest-hidden'))
                     : RestTimerBar(
                         key: const ValueKey('rest-visible'),
                         restTimer: state.restTimer!,
@@ -362,6 +367,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
 }
 
 class _PulseDot extends StatefulWidget {
+  const _PulseDot({super.key});
   @override
   State<_PulseDot> createState() => _PulseDotState();
 }

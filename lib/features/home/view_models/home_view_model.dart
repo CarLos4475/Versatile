@@ -113,11 +113,11 @@ final homeProvider = Provider<HomeState>((ref) {
 
 // Fetches the main exercise name and PR for the hero card's suggested routine.
 final heroCardInfoProvider =
-    FutureProvider<({String? exerciseName, double? pr})>((ref) async {
+    FutureProvider<({String? id, String? exerciseName, double? pr})>((ref) async {
   final state = ref.watch(homeProvider);
   final nextRoutine = state.nextRoutine;
   if (nextRoutine == null || nextRoutine.exercises.isEmpty) {
-    return (exerciseName: null, pr: null);
+    return (id: null, exerciseName: null, pr: null);
   }
 
   final firstExercise = nextRoutine.exercises.first;
@@ -140,5 +140,5 @@ final heroCardInfoProvider =
     }
   }
 
-  return (exerciseName: exercise?.name, pr: pr);
+  return (id: exercise?.id, exerciseName: exercise?.name, pr: pr);
 });

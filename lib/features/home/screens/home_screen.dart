@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/navigation/app_page_transitions.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/glass_container.dart';
@@ -12,48 +13,37 @@ import '../../active_workout/screens/active_workout_screen.dart';
 import '../../history/screens/session_detail_screen.dart';
 import '../../routines/screens/create_routine_screen.dart';
 import '../../settings/screens/settings_screen.dart';
+import '../../../core/utils/format_utils.dart';
+import '../../../core/utils/l10n_utils.dart';
+import '../../../domain/entities/exercise.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(homeProvider);
     final now = DateTime.now();
-    const weekdays = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ];
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
 
     final nextRoutine = state.nextRoutine;
     final heroInfo = ref.watch(heroCardInfoProvider).value;
     final daysAgo = state.nextRoutineDaysAgo;
-    final lastDoneText = daysAgo == null
-        ? 'Never done'
-        : daysAgo == 0
-            ? 'Done today'
-            : daysAgo == 1
-                ? 'Done yesterday'
-                : 'Last done $daysAgo days ago';
+    
+    String lastDoneText;
+    if (daysAgo == null) {
+      lastDoneText = l10n.neverDone;
+    } else if (daysAgo == 0) {
+      lastDoneText = l10n.doneToday;
+    } else if (daysAgo == 1) {
+      lastDoneText = l10n.doneYesterday;
+    } else {
+      lastDoneText = l10n.lastDoneDaysAgo(daysAgo);
+    }
+
+    final greeting = state.userName == 'there' || state.userName.isEmpty 
+      ? l10n.helloThere 
+      : '${l10n.hello}, ${state.userName}';
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
@@ -64,9 +54,11 @@ class HomeScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ScreenHeader(
-                title: 'Hello, ${state.userName}',
-                subtitle:
-                    '${weekdays[now.weekday - 1]}, ${months[now.month - 1]} ${now.day}',
+                title: greeting,
+                subtitle: FormatUtils.date(
+                  now.toIso8601String().substring(0, 10),
+                  locale: Localizations.localeOf(context).languageCode,
+                ),
                 trailing: PressableScale(
                   onTap: () => Navigator.of(context).push(
                     AppRoute(page: const SettingsScreen()),
@@ -91,7 +83,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -104,6 +96,7 @@ class HomeScreen extends ConsumerWidget {
                           exerciseCount: nextRoutine.exercises.length,
                           estimatedMin: nextRoutine.estimatedMinutes,
                           lastDoneText: lastDoneText,
+                          mainExerciseId: heroInfo?.id,
                           mainExerciseName: heroInfo?.exerciseName,
                           mainPrKg: heroInfo?.pr,
                         )
@@ -117,7 +110,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -127,25 +120,25 @@ class HomeScreen extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: StatCard(
-                          label: 'This week',
+                          label: l10n.thisWeek,
                           value: state.weekSessions.toString(),
-                          unit: 'sessions',
+                          unit: l10n.sessions,
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: StatCard(
-                          label: 'Volume',
+                          label: l10n.volume,
                           value: state.weekVolume >= 1000
                               ? (state.weekVolume / 1000).toStringAsFixed(1)
                               : state.weekVolume.toStringAsFixed(0),
                           unit: state.weekVolume >= 1000 ? 'k kg' : 'kg',
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: StatCard(
-                          label: 'Avg time',
+                          label: l10n.avgTime,
                           value: '${state.avgTimeMins}',
                           unit: 'min',
                           accent: true,
@@ -156,7 +149,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
 
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
                 child: FadeSlideIn(
@@ -169,7 +162,7 @@ class HomeScreen extends ConsumerWidget {
               ),
 
               if (state.sessions.isNotEmpty) ...[
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 22),
                   child: FadeSlideIn(
@@ -180,7 +173,7 @@ class HomeScreen extends ConsumerWidget {
                       textBaseline: TextBaseline.alphabetic,
                       children: [
                         Text(
-                          'Recent sessions',
+                          l10n.recentSessions,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -189,7 +182,7 @@ class HomeScreen extends ConsumerWidget {
                           ),
                         ),
                         Text(
-                          '${state.sessions.length} total',
+                          '${state.sessions.length} ${l10n.total}',
                           style: TextStyle(
                             fontSize: 13,
                             color: context.colors.ink400,
@@ -199,7 +192,7 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 22),
                   child: Column(
@@ -238,18 +231,8 @@ class _ActivityGrid extends StatelessWidget {
   final int sessionCount;
 
   static const _months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
   ];
   static const _dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   static const int _numWeeks = 26;
@@ -265,11 +248,10 @@ class _ActivityGrid extends StatelessWidget {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final currentMonday = today.subtract(Duration(days: today.weekday - 1));
+    final l10n = AppLocalizations.of(context)!;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // constraints.maxWidth = screen width minus the outer 22+22 padding.
-        // GlassContainer adds 16+16 inner padding; label col = 22; gap = 2.
         const overhead = 32.0 + 22.0 + 2.0;
         final weeksAreaWidth = constraints.maxWidth - overhead;
         final numWeeks =
@@ -290,7 +272,7 @@ class _ActivityGrid extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'ACTIVITY',
+            l10n.activity,
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -298,9 +280,9 @@ class _ActivityGrid extends StatelessWidget {
               color: context.colors.ink400,
             ),
           ),
-          SizedBox(height: 2),
+          const SizedBox(height: 2),
           Text(
-            '$sessionCount sessions in the last 30 days',
+            '$sessionCount ${l10n.sessionsLastYear}',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w400,
@@ -309,17 +291,16 @@ class _ActivityGrid extends StatelessWidget {
               height: 1.1,
             ),
           ),
-          SizedBox(height: 14),
+          const SizedBox(height: 14),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Fixed-width weekday label column
               SizedBox(
                 width: 22,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: _slot + 2), // month row + gap
+                    const SizedBox(height: _slot + 2),
                     ..._dayLabels.map(
                       (label) => SizedBox(
                         height: _slot,
@@ -339,8 +320,7 @@ class _ActivityGrid extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 2),
-              // Fixed-width week columns
+              const SizedBox(width: 2),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: weeks.asMap().entries.map((entry) {
@@ -354,7 +334,6 @@ class _ActivityGrid extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Month label
                         SizedBox(
                           height: _slot,
                           child: showMonth
@@ -370,8 +349,7 @@ class _ActivityGrid extends StatelessWidget {
                                 )
                               : null,
                         ),
-                        SizedBox(height: 2),
-                        // 7 day cells
+                        const SizedBox(height: 2),
                         ...List.generate(7, (d) {
                           final day = monday.add(Duration(days: d));
                           final isFuture = day.isAfter(today);
@@ -421,6 +399,7 @@ class _HeroCard extends StatelessWidget {
     required this.exerciseCount,
     required this.estimatedMin,
     required this.lastDoneText,
+    this.mainExerciseId,
     this.mainExerciseName,
     this.mainPrKg,
   });
@@ -430,11 +409,20 @@ class _HeroCard extends StatelessWidget {
   final int exerciseCount;
   final int estimatedMin;
   final String lastDoneText;
+  final String? mainExerciseId;
   final String? mainExerciseName;
   final double? mainPrKg;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    String displayExName = mainExerciseName ?? '';
+    if (mainExerciseId != null && !mainExerciseId!.startsWith('custom-')) {
+       // Localize builtin exercise
+       final dummy = Exercise(id: mainExerciseId!, name: mainExerciseName ?? '', muscle: '', equipment: '');
+       displayExName = dummy.getLocalizedName(context);
+    }
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -445,7 +433,7 @@ class _HeroCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: context.colors.accentDeep.withOpacity(0.35),
+            color: context.colors.accentDeep.withValues(alpha: 0.35),
             blurRadius: 36,
             offset: const Offset(0, 18),
           ),
@@ -461,7 +449,7 @@ class _HeroCard extends StatelessWidget {
             child: Container(
               width: 280,
               height: 280,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: RadialGradient(
                   colors: [Color(0x55FFFFFF), Color(0x22FFFFFF), Color(0x00FFFFFF)],
                   stops: [0.0, 0.45, 1.0],
@@ -477,15 +465,15 @@ class _HeroCard extends StatelessWidget {
                   Container(
                     width: 6,
                     height: 6,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
                   ),
-                  SizedBox(width: 6),
+                  const SizedBox(width: 6),
                   Text(
-                    "NEXT WORKOUT",
-                    style: TextStyle(
+                    l10n.todaysSession,
+                    style: const TextStyle(
                       fontSize: 12,
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -494,10 +482,10 @@ class _HeroCard extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                 routineName,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 34,
                   color: Colors.white,
                   fontWeight: FontWeight.w400,
@@ -505,29 +493,29 @@ class _HeroCard extends StatelessWidget {
                   height: 1.05,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
-                '$exerciseCount exercises · ~$estimatedMin min',
-                style: TextStyle(
+                '$exerciseCount ${l10n.exercisesLabel} · ~$estimatedMin min',
+                style: const TextStyle(
                   fontSize: 13,
                   color: Colors.white,
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              SizedBox(height: 2),
+              const SizedBox(height: 2),
               Text(
                 lastDoneText,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.white.withOpacity(0.6),
+                  color: Colors.white.withValues(alpha: 0.6),
                   fontWeight: FontWeight.w400,
                 ),
               ),
               if (mainExerciseName != null) ...[
-                SizedBox(height: 14),
-                _PrChip(exerciseName: mainExerciseName!, prKg: mainPrKg),
+                const SizedBox(height: 14),
+                _PrChip(exerciseName: displayExName, prKg: mainPrKg),
               ],
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               PressableScale(
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
@@ -537,21 +525,21 @@ class _HeroCard extends StatelessWidget {
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.18),
+                    color: Colors.white.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       width: 0.5,
                     ),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.play_arrow, color: Colors.white, size: 16),
-                      SizedBox(width: 8),
+                      const Icon(Icons.play_arrow, color: Colors.white, size: 16),
+                      const SizedBox(width: 8),
                       Text(
-                        'Start workout',
-                        style: TextStyle(
+                        l10n.startWorkout,
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -577,8 +565,9 @@ class _PrChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final prStr = prKg == null
-        ? null
+        ? l10n.noRecordYet
         : prKg! % 1 == 0
             ? '${prKg!.toInt()} kg'
             : '${prKg!.toStringAsFixed(1)} kg';
@@ -586,10 +575,10 @@ class _PrChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: Colors.white.withOpacity(0.25),
+          color: Colors.white.withValues(alpha: 0.25),
           width: 0.5,
         ),
       ),
@@ -601,7 +590,7 @@ class _PrChip extends StatelessWidget {
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w700,
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               letterSpacing: 0.5,
             ),
           ),
@@ -609,25 +598,25 @@ class _PrChip extends StatelessWidget {
             width: 1,
             height: 10,
             margin: const EdgeInsets.symmetric(horizontal: 8),
-            color: Colors.white.withOpacity(0.3),
+            color: Colors.white.withValues(alpha: 0.3),
           ),
           Text(
             exerciseName,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
               color: Colors.white,
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Text(
-            prStr ?? 'No record yet',
+            prStr,
             style: TextStyle(
               fontSize: 13,
-              fontWeight: prStr != null ? FontWeight.w700 : FontWeight.w400,
-              color: prStr != null
+              fontWeight: prKg != null ? FontWeight.w700 : FontWeight.w400,
+              color: prKg != null
                   ? Colors.white
-                  : Colors.white.withOpacity(0.6),
+                  : Colors.white.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -642,6 +631,7 @@ class _EmptyHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PressableScale(
       onTap: onCreateRoutine,
       child: Container(
@@ -655,7 +645,7 @@ class _EmptyHeroCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'No routines yet',
+              l10n.noRoutinesYet,
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w500,
@@ -663,12 +653,12 @@ class _EmptyHeroCard extends StatelessWidget {
                 letterSpacing: -0.44,
               ),
             ),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Text(
-              'Tap here to create your first workout template.',
+              l10n.createFirstOne,
               style: TextStyle(fontSize: 14, color: context.colors.ink500),
             ),
-            SizedBox(height: 18),
+            const SizedBox(height: 18),
             Row(
               children: [
                 Icon(
@@ -676,9 +666,9 @@ class _EmptyHeroCard extends StatelessWidget {
                   size: 16,
                   color: context.colors.accentDeep,
                 ),
-                SizedBox(width: 6),
+                const SizedBox(width: 6),
                 Text(
-                  'Create routine',
+                  l10n.createRoutine,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,

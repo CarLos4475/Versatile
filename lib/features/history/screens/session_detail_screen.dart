@@ -1,400 +1,189 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/utils/format_utils.dart';
 import '../../../domain/entities/session.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/screen_header.dart';
+import '../../../core/utils/format_utils.dart';
+import '../widgets/history_exercise_detail.dart';
 
-class SessionDetailScreen extends StatelessWidget {
+class SessionDetailScreen extends ConsumerWidget {
   const SessionDetailScreen({super.key, required this.session});
   final Session session;
 
-  Color get _accent => Color(session.colorValue);
-
   @override
-  Widget build(BuildContext context) {
-    final totalSets = session.exercises
-            ?.fold(0, (s, e) => s + e.sets.length) ??
-        0;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final color = Color(session.colorValue);
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.only(bottom: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ScreenHeader(
-                title: session.routineName,
-                subtitle: FormatUtils.longDate(session.date),
-                onBack: () => Navigator.of(context).pop(),
+        child: Column(
+          children: [
+            ScreenHeader(
+              title: l10n.sessionDetail,
+              subtitle: FormatUtils.date(
+                session.date,
+                locale: Localizations.localeOf(context).languageCode,
               ),
-              SizedBox(height: 16),
-
-              // Stats header
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: GlassContainer(
-                  radius: 18,
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _DetailStat(
-                          icon: Icons.timer_outlined,
-                          label: 'Duration',
-                          value: FormatUtils.duration(session.durationMin),
-                        ),
-                      ),
-                      Container(
-                        width: 0.5,
-                        height: 40,
-                        color: const Color(0x14000000),
-                      ),
-                      Expanded(
-                        child: _DetailStat(
-                          icon: Icons.fitness_center,
-                          label: 'Volume',
-                          value: FormatUtils.volume(session.volumeKg),
-                        ),
-                      ),
-                      Container(
-                        width: 0.5,
-                        height: 40,
-                        color: const Color(0x14000000),
-                      ),
-                      Expanded(
-                        child: _DetailStat(
-                          icon: Icons.bar_chart,
-                          label: 'Sets',
-                          value: '$totalSets',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 18),
-
-              // Exercises
-              if (session.exercises != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22),
-                  child: Column(
-                    children: session.exercises!.asMap().entries.map((entry) {
-                      final i = entry.key;
-                      final ex = entry.value;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: GlassContainer(
-                          radius: 16,
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+              onBack: () => Navigator.of(context).pop(),
+              accentBack: true,
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(22, 12, 22, 40),
+                children: [
+                  GlassContainer(
+                    radius: 20,
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: color.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                IconData(session.iconCode,
+                                    fontFamily: 'MaterialIcons'),
+                                color: color,
+                                size: 22,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    width: 28,
-                                    height: 28,
-                                    decoration: BoxDecoration(
-                                      color: _accent.withOpacity(0.13),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        '${i + 1}',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                          color: _accent,
-                                          fontFeatures: const [
-                                            FontFeature.tabularFigures()
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Text(
-                                      ex.name,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                  Text(
+                                    session.routineName,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: context.colors.ink900,
+                                      letterSpacing: -0.18,
                                     ),
                                   ),
                                   Text(
-                                    '${ex.sets.length} sets',
+                                    l10n.workoutSummary,
                                     style: TextStyle(
-                                      fontSize: 11,
+                                      fontSize: 12,
                                       color: context.colors.ink400,
                                     ),
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10),
-                              // Column headers
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 4),
-                                child: Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 32,
-                                      child: Text('SET', style: _hStyle(context)),
-                                    ),
-                                    Expanded(child: Text('WEIGHT', style: _hStyle(context))),
-                                    Expanded(child: Text('REPS', style: _hStyle(context))),
-                                    SizedBox(
-                                      width: 72,
-                                      child: Text('VOLUME',
-                                          style: _hStyle(context),
-                                          textAlign: TextAlign.right),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              ...ex.sets.asMap().entries.map((setEntry) {
-                                final idx = setEntry.key;
-                                final s = setEntry.value;
-
-                                Row buildSideRow(
-                                  String setLabel,
-                                  String side,
-                                  double kg,
-                                  int reps,
-                                  double vol,
-                                ) {
-                                  return Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 32,
-                                        child: Text(
-                                          setLabel,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: context.colors.ink500,
-                                            fontFeatures: [FontFeature.tabularFigures()],
-                                          ),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              side,
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w700,
-                                                color: context.colors.accentDeep,
-                                              ),
-                                            ),
-                                            SizedBox(width: 4),
-                                            Text(
-                                              '${FormatUtils.weight(kg)} kg',
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                color: context.colors.ink900,
-                                                fontFeatures: [FontFeature.tabularFigures()],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: Text(
-                                          '$reps',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            color: context.colors.ink900,
-                                            fontFeatures: [FontFeature.tabularFigures()],
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 72,
-                                        child: Text(
-                                          '${vol.toStringAsFixed(0)} kg',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: context.colors.ink500,
-                                            fontFeatures: [FontFeature.tabularFigures()],
-                                          ),
-                                          textAlign: TextAlign.right,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }
-
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 4, vertical: 7),
-                                  decoration: idx < ex.sets.length - 1
-                                      ? BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              color: Color(0x0D000000),
-                                              width: 0.5,
-                                            ),
-                                          ),
-                                        )
-                                      : null,
-                                  child: s.isSplit
-                                      ? Column(
-                                          children: [
-                                            buildSideRow(
-                                              '${idx + 1}',
-                                              'R',
-                                              s.kg,
-                                              s.reps,
-                                              s.kg * s.reps,
-                                            ),
-                                            SizedBox(height: 5),
-                                            buildSideRow(
-                                              '',
-                                              'L',
-                                              s.leftKg!,
-                                              s.leftReps!,
-                                              s.leftKg! * s.leftReps!,
-                                            ),
-                                          ],
-                                        )
-                                      : Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 32,
-                                              child: Text(
-                                                '${idx + 1}',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: context.colors.ink500,
-                                                  fontFeatures: [
-                                                    FontFeature.tabularFigures()
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                '${FormatUtils.weight(s.kg)} kg',
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                  color: context.colors.ink900,
-                                                  fontFeatures: [
-                                                    FontFeature.tabularFigures()
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                '${s.reps}',
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                  color: context.colors.ink900,
-                                                  fontFeatures: [
-                                                    FontFeature.tabularFigures()
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 72,
-                                              child: Text(
-                                                '${s.volume.toStringAsFixed(0)} kg',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: context.colors.ink500,
-                                                  fontFeatures: [
-                                                    FontFeature.tabularFigures()
-                                                  ],
-                                                ),
-                                                textAlign: TextAlign.right,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                );
-                              }),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      );
-                    }).toList(),
-                  ),
-                )
-              else
-                Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Text(
-                      'No detailed data for this session.',
-                      style: TextStyle(fontSize: 13, color: context.colors.ink400),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: [
+                            _SummaryStat(
+                              label: l10n.duration,
+                              value: '${session.durationMin}',
+                              unit: 'min',
+                            ),
+                            _SummaryStat(
+                              label: l10n.volumeTotal,
+                              value: FormatUtils.weight(session.volumeKg),
+                              unit: 'kg',
+                            ),
+                            _SummaryStat(
+                              label: l10n.exercises,
+                              value: '${session.exercises?.length ?? 0}',
+                              unit: '',
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                ),
-            ],
-          ),
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 4, bottom: 12),
+                    child: Text(
+                      l10n.exercisesPerformed,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.05,
+                        color: context.colors.ink400,
+                      ),
+                    ),
+                  ),
+                  if (session.exercises != null)
+                    ...session.exercises!.map((e) => Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: HistoryExerciseDetail(exercise: e),
+                        )),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
-
-  TextStyle _hStyle(BuildContext context) => TextStyle(
-    fontSize: 10,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0.06,
-    color: context.colors.ink400,
-  );
 }
 
-class _DetailStat extends StatelessWidget {
-  const _DetailStat({
-    required this.icon,
+class _SummaryStat extends StatelessWidget {
+  const _SummaryStat({
     required this.label,
     required this.value,
+    required this.unit,
   });
 
-  final IconData icon;
   final String label;
   final String value;
+  final String unit;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+    return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: context.colors.ink400,
+              letterSpacing: 0.05,
+            ),
+          ),
+          const SizedBox(height: 4),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
             children: [
-              Icon(icon, size: 14, color: context.colors.ink400),
-              SizedBox(width: 4),
               Text(
-                label.toUpperCase(),
+                value,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 17,
                   fontWeight: FontWeight.w600,
-                  letterSpacing: 0.06,
-                  color: context.colors.ink400,
+                  color: context.colors.ink900,
                 ),
               ),
+              if (unit.isNotEmpty) ...[
+                const SizedBox(width: 2),
+                Text(
+                  unit,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: context.colors.ink500,
+                  ),
+                ),
+              ],
             ],
-          ),
-          SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
-              letterSpacing: -0.36,
-            ),
           ),
         ],
       ),

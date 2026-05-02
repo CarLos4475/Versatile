@@ -1,5 +1,8 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/repository_providers.dart';
+import '../../../core/providers/locale_provider.dart';
+import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../routines/view_models/routines_view_model.dart';
 
@@ -144,6 +147,8 @@ final exercisesAsyncProvider =
 final filteredExercisesProvider = Provider<List<Exercise>>((ref) {
   final allExercises = ref.watch(exercisesAsyncProvider).value ?? [];
   final state = ref.watch(exercisesProvider);
+  final locale = ref.watch(localeProvider).languageCode;
+
   return allExercises.where((e) {
     if (state.tab == ExercisesTab.mine && !e.isCustom) return false;
 
@@ -171,9 +176,9 @@ final filteredExercisesProvider = Provider<List<Exercise>>((ref) {
     if (state.laterality == ExerciseLaterality.bilateral && e.isUnilateral) {
       return false;
     }
-    if (state.query.isNotEmpty &&
-        !e.name.toLowerCase().contains(state.query.toLowerCase())) {
-      return false;
+    if (state.query.isNotEmpty) {
+      final name = e.getLocalizedNameNonContext(locale).toLowerCase();
+      if (!name.contains(state.query.toLowerCase())) return false;
     }
     return true;
   }).toList();

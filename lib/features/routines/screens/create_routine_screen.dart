@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:versatile/l10n/app_localizations.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/navigation/app_page_transitions.dart';
 import '../../../core/theme/app_colors.dart';
@@ -77,6 +78,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: context.colors.bgApp,
       body: SafeArea(
@@ -84,8 +86,8 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ScreenHeader(
-              title: 'New Routine',
-              subtitle: 'Name it and pick a color',
+              title: l10n.newRoutine,
+              subtitle: l10n.nameItAndPickColor,
               onBack: () => Navigator.of(context).pop(),
               accentBack: true,
             ),
@@ -112,11 +114,11 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                             color: context.colors.ink900,
                             fontWeight: FontWeight.w500,
                           ),
-                          decoration: const InputDecoration(
-                            hintText: 'e.g. Push Day, Full Body…',
-                            hintStyle: TextStyle(fontSize: 16, color: Colors.grey),
+                          decoration: InputDecoration(
+                            hintText: l10n.appName == 'Versatile' ? 'e.g. Push Day, Full Body…' : 'ej. Día de empuje, Cuerpo completo…',
+                            hintStyle: const TextStyle(fontSize: 16, color: Colors.grey),
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(vertical: 14),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                           onSubmitted: (_) => _save(),
                         ),
@@ -126,7 +128,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 22),
                       child: Text(
-                        'COLOR',
+                        l10n.color_label,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -181,7 +183,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 22),
                       child: Text(
-                        'ICON',
+                        l10n.icon_label,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -243,7 +245,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(22, 0, 22, 24),
               child: GlassButton(
-                label: 'Create Routine',
+                label: l10n.createRoutineBtn,
                 variant: GlassButtonVariant.primary,
                 size: GlassButtonSize.lg,
                 expand: true,

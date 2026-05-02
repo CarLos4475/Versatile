@@ -1,8 +1,14 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/utils/format_utils.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/workout_set.dart';
+import '../../../core/utils/format_utils.dart';
+import '../../../core/utils/l10n_utils.dart';
+import '../../../shared/widgets/glass_button.dart';
+import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../view_models/active_workout_view_model.dart';
 import 'number_input_widget.dart';
@@ -94,11 +100,11 @@ class _CardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PressableScale(
       onTap: onToggle,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(color: Colors.transparent),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             _IndexBadge(
@@ -106,24 +112,23 @@ class _CardHeader extends StatelessWidget {
               isDone: data.isDone,
               hasProgress: data.completedSets.isNotEmpty,
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    exercise.name,
+                    exercise.getLocalizedName(context),
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: context.colors.ink900,
-                      letterSpacing: -0.15,
+                      letterSpacing: -0.16,
                     ),
                   ),
-                  SizedBox(height: 1),
+                  const SizedBox(height: 2),
                   Text(
-                    '${data.completedSets.length}/${data.targetSets} sets · '
-                    '${data.targetReps} reps · ${exercise.muscle}',
+                    '${data.completedSets.length}/${data.targetSets} ${l10n.sets} · ${data.targetReps} reps · ${exercise.getLocalizedMuscle(context)}',
                     style: TextStyle(
                       fontSize: 12,
                       color: context.colors.ink500,
@@ -132,101 +137,41 @@ class _CardHeader extends StatelessWidget {
                 ],
               ),
             ),
-            if (data.isUnilateral && onToggleSplit != null) ...[
-              PressableScale(
-                onTap: onToggleSplit,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: data.isSplitMode
-                        ? context.colors.accentTint
-                        : const Color(0x0A000000),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
+            if (onToggleSplit != null)
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: PressableScale(
+                  onTap: onToggleSplit,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
                       color: data.isSplitMode
-                          ? context.colors.accent
-                          : context.colors.glassBorder,
-                      width: 0.5,
+                          ? context.colors.accentTint
+                          : context.colors.fieldBg,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ),
-                  child: Text(
-                    'Split',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: data.isSplitMode
-                          ? context.colors.accentDeep
-                          : context.colors.ink400,
+                    child: Text(
+                      l10n.split_label,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: data.isSplitMode
+                            ? context.colors.accentDeep
+                            : context.colors.ink400,
+                      ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(width: 8),
-            ],
-            AnimatedRotation(
-              turns: data.isExpanded ? 0.5 : 0.0,
-              duration: const Duration(milliseconds: 250),
-              child: Icon(
-                Icons.keyboard_arrow_down,
-                size: 18,
-                color: context.colors.ink400,
-              ),
+            Icon(
+              data.isExpanded ? Icons.expand_less : Icons.expand_more,
+              size: 18,
+              color: context.colors.ink300,
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _IndexBadge extends StatelessWidget {
-  const _IndexBadge({
-    required this.index,
-    required this.isDone,
-    required this.hasProgress,
-  });
-
-  final int index;
-  final bool isDone;
-  final bool hasProgress;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        gradient: isDone
-            ? const LinearGradient(
-                colors: [Color(0xFF4A8A5A), Color(0xFF3A6E48)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
-        color: isDone
-            ? null
-            : hasProgress
-            ? context.colors.accent.withValues(alpha: 0.15)
-            : context.colors.fieldBg,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: isDone
-          ? const Icon(Icons.check, size: 16, color: Colors.white)
-          : Center(
-              child: Text(
-                '${index + 1}',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: hasProgress ? context.colors.accent : context.colors.ink500,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-              ),
-            ),
     );
   }
 }
@@ -252,6 +197,7 @@ class _CardBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
@@ -259,16 +205,16 @@ class _CardBody extends StatelessWidget {
           Divider(color: context.colors.hairline, thickness: 0.5, height: 14),
 
           const _ColumnHeaders(),
-          SizedBox(height: 2),
+          const SizedBox(height: 2),
 
           // Completed sets
           ...data.completedSets.asMap().entries.map(
-            (e) => _CompletedSetRow(
-              setIndex: e.key,
-              set: e.value,
-              isSplitMode: data.isSplitMode,
-            ),
-          ),
+                (e) => _CompletedSetRow(
+                  setIndex: e.key,
+                  set: e.value,
+                  isSplitMode: data.isSplitMode,
+                ),
+              ),
 
           // Current set + ghost row
           if (!data.isDone && data.currentInput != null) ...[
@@ -307,7 +253,7 @@ class _CardBody extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Finish set ${data.nextSetIndex + 1}',
+                      l10n.finishSet(data.nextSetIndex + 1),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -329,28 +275,29 @@ class _ColumnHeaders extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final style = TextStyle(
+      fontSize: 10,
+      fontWeight: FontWeight.w700,
+      letterSpacing: 0.2,
+      color: context.colors.ink300,
+    );
+
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       child: Row(
         children: [
-          SizedBox(width: 32, child: Text('SET', style: _headerStyle(context))),
-          SizedBox(width: 8),
-          Expanded(child: Text('WEIGHT', style: _headerStyle(context))),
-          SizedBox(width: 8),
-          Expanded(child: Text('REPS', style: _headerStyle(context))),
-          SizedBox(width: 8),
-          SizedBox(width: 36),
+          SizedBox(width: 32, child: Text(l10n.set_label, style: style)),
+          const SizedBox(width: 8),
+          Expanded(child: Text(l10n.weight_label, style: style)),
+          const SizedBox(width: 8),
+          Expanded(child: Text(l10n.reps_label, style: style)),
+          const SizedBox(width: 8),
+          const SizedBox(width: 36),
         ],
       ),
     );
   }
-
-  TextStyle _headerStyle(BuildContext context) => TextStyle(
-    fontSize: 10,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0.06,
-    color: context.colors.ink400,
-  );
 }
 
 class _CompletedSetRow extends StatelessWidget {
@@ -364,17 +311,17 @@ class _CompletedSetRow extends StatelessWidget {
   final bool isSplitMode;
 
   TextStyle _weightStyle(BuildContext context) => TextStyle(
-    fontSize: 13,
-    fontWeight: FontWeight.w500,
-    color: context.colors.ink900,
-    fontFeatures: [FontFeature.tabularFigures()],
-  );
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+        color: context.colors.ink900,
+        fontFeatures: const [FontFeature.tabularFigures()],
+      );
   TextStyle _repsStyle(BuildContext context) => TextStyle(
-    fontSize: 13,
-    fontWeight: FontWeight.w500,
-    color: context.colors.ink900,
-    fontFeatures: [FontFeature.tabularFigures()],
-  );
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+        color: context.colors.ink900,
+        fontFeatures: const [FontFeature.tabularFigures()],
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -397,13 +344,12 @@ class _CompletedSetRow extends StatelessWidget {
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: context.colors.ink700,
-                  fontFeatures: [FontFeature.tabularFigures()],
+                  fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             if (set.isSplit) ...[
-              // WEIGHT column with L / R labels
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -414,7 +360,7 @@ class _CompletedSetRow extends StatelessWidget {
                       text: '${FormatUtils.weight(set.leftKg!)} kg',
                       style: _weightStyle(context),
                     ),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     _SideValueRow(
                       side: 'R',
                       text: '${FormatUtils.weight(set.kg)} kg',
@@ -423,15 +369,14 @@ class _CompletedSetRow extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: 8),
-              // REPS column
+              const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text('${set.leftReps}', style: _repsStyle(context)),
-                    SizedBox(height: 3),
+                    const SizedBox(height: 3),
                     Text('${set.reps}', style: _repsStyle(context)),
                   ],
                 ),
@@ -443,12 +388,12 @@ class _CompletedSetRow extends StatelessWidget {
                   style: _weightStyle(context),
                 ),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text('${set.reps}', style: _repsStyle(context)),
               ),
             ],
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Container(
               width: 22,
               height: 22,
@@ -462,7 +407,7 @@ class _CompletedSetRow extends StatelessWidget {
                 color: context.colors.doneStrong,
               ),
             ),
-            SizedBox(width: 7),
+            const SizedBox(width: 7),
           ],
         ),
       ),
@@ -476,13 +421,14 @@ class _GhostRow extends StatelessWidget {
   final bool isSplitMode;
 
   TextStyle _ghostStyle(BuildContext context) => TextStyle(
-    fontSize: 11,
-    color: context.colors.ink300,
-    fontFeatures: [FontFeature.tabularFigures()],
-  );
+        fontSize: 11,
+        color: context.colors.ink300,
+        fontFeatures: const [FontFeature.tabularFigures()],
+      );
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final showSplit = isSplitMode && prevSet.isSplit;
 
     return Padding(
@@ -498,12 +444,12 @@ class _GhostRow extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text('↑', style: _ghostStyle(context)),
-                      Text('Last', style: _ghostStyle(context)),
+                      Text(l10n.last_label, style: _ghostStyle(context)),
                     ],
                   )
-                : Text('↑ Last', style: _ghostStyle(context)),
+                : Text('↑ ${l10n.last_label}', style: _ghostStyle(context)),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           if (showSplit) ...[
             Expanded(
               child: Column(
@@ -515,7 +461,7 @@ class _GhostRow extends StatelessWidget {
                     text: '${FormatUtils.weight(prevSet.leftKg!)} kg',
                     style: _ghostStyle(context),
                   ),
-                  SizedBox(height: 3),
+                  const SizedBox(height: 3),
                   _SideValueRow(
                     side: 'R',
                     text: '${FormatUtils.weight(prevSet.kg)} kg',
@@ -524,14 +470,14 @@ class _GhostRow extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('${prevSet.leftReps}', style: _ghostStyle(context)),
-                  SizedBox(height: 3),
+                  const SizedBox(height: 3),
                   Text('${prevSet.reps}', style: _ghostStyle(context)),
                 ],
               ),
@@ -543,13 +489,13 @@ class _GhostRow extends StatelessWidget {
                 style: _ghostStyle(context),
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: Text('${prevSet.reps}', style: _ghostStyle(context)),
             ),
           ],
-          SizedBox(width: 8),
-          SizedBox(width: 36),
+          const SizedBox(width: 8),
+          const SizedBox(width: 36),
         ],
       ),
     );
@@ -576,6 +522,12 @@ class _ActiveSetRow extends StatelessWidget {
   final ValueChanged<int> onRepsChanged;
   final ValueChanged<double>? onLeftWeightChanged;
   final ValueChanged<int>? onLeftRepsChanged;
+
+  TextStyle _sideStyle(BuildContext context) => TextStyle(
+        fontSize: 10,
+        fontWeight: FontWeight.w700,
+        color: context.colors.accent.withValues(alpha: 0.5),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -605,7 +557,7 @@ class _ActiveSetRow extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Expanded(
               child: isSplitMode
                   ? _SplitInputs(
@@ -616,36 +568,36 @@ class _ActiveSetRow extends StatelessWidget {
                       onLeftRepsChanged: onLeftRepsChanged ?? (_) {},
                     )
                   : Row(
-                    children: [
-                      Expanded(
-                        child: NumberInputWidget(
-                          value: currentInput.kg,
-                          onDecrement: () => onWeightChanged(
-                            (currentInput.kg - 2.5).clamp(0, 999),
+                      children: [
+                        Expanded(
+                          child: NumberInputWidget(
+                            value: currentInput.kg,
+                            onDecrement: () => onWeightChanged(
+                              (currentInput.kg - 2.5).clamp(0, 999),
+                            ),
+                            onIncrement: () =>
+                                onWeightChanged(currentInput.kg + 2.5),
+                            onChanged: (val) => onWeightChanged(val.toDouble()),
+                            suffix: 'kg',
+                            isDouble: true,
                           ),
-                          onIncrement: () =>
-                              onWeightChanged(currentInput.kg + 2.5),
-                          onChanged: (val) =>
-                              onWeightChanged(val.toDouble()),
-                          suffix: 'kg',
-                          isDouble: true,
                         ),
-                      ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: NumberInputWidget(
-                          value: currentInput.reps,
-                          onDecrement: () => onRepsChanged(
-                            (currentInput.reps - 1).clamp(0, 999),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: NumberInputWidget(
+                            value: currentInput.reps,
+                            onDecrement: () => onRepsChanged(
+                              (currentInput.reps - 1).clamp(0, 999),
+                            ),
+                            onIncrement: () =>
+                                onRepsChanged(currentInput.reps + 1),
+                            onChanged: (val) => onRepsChanged(val.toInt()),
                           ),
-                          onIncrement: () =>
-                              onRepsChanged(currentInput.reps + 1),
-                          onChanged: (val) => onRepsChanged(val.toInt()),
                         ),
-                      ),
-                    ],
-                  ),            ),
-            SizedBox(width: 8),
+                      ],
+                    ),
+            ),
+            const SizedBox(width: 8),
             PressableScale(
               onTap: onFinishSet,
               child: Container(
@@ -666,7 +618,8 @@ class _ActiveSetRow extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
+                child: const Icon(Icons.check_rounded,
+                    size: 16, color: Colors.white),
               ),
             ),
           ],
@@ -692,10 +645,10 @@ class _SplitInputs extends StatelessWidget {
   final ValueChanged<int> onLeftRepsChanged;
 
   TextStyle _sideStyle(BuildContext context) => TextStyle(
-    fontSize: 10,
-    fontWeight: FontWeight.w700,
-    color: context.colors.accentDeep,
-  );
+        fontSize: 10,
+        fontWeight: FontWeight.w700,
+        color: context.colors.accent.withValues(alpha: 0.5),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -703,9 +656,8 @@ class _SplitInputs extends StatelessWidget {
     final leftReps = currentInput.leftReps ?? currentInput.reps;
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // WEIGHT column — L/R labels live here so they align with the header
+        // WEIGHT column
         Expanded(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -716,7 +668,7 @@ class _SplitInputs extends StatelessWidget {
                     width: 14,
                     child: Text('L', style: _sideStyle(context)),
                   ),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Expanded(
                     child: NumberInputWidget(
                       value: leftKg,
@@ -755,7 +707,7 @@ class _SplitInputs extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        // REPS column — aligned with the REPS header
+        // REPS column
         Expanded(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -783,22 +735,68 @@ class _SplitInputs extends StatelessWidget {
   }
 }
 
-class _SideValueRow extends StatelessWidget {
-  const _SideValueRow({
-    required this.side,
-    required this.text,
-    required this.style,
+class _IndexBadge extends StatelessWidget {
+  const _IndexBadge({
+    required this.index,
+    required this.isDone,
+    required this.hasProgress,
   });
 
+  final int index;
+  final bool isDone;
+  final bool hasProgress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        gradient: isDone
+            ? const LinearGradient(
+                colors: [Color(0xFF4A8A5A), Color(0xFF3A6E48)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : null,
+        color: isDone
+            ? null
+            : hasProgress
+                ? context.colors.accent.withValues(alpha: 0.15)
+                : context.colors.fieldBg,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: isDone
+          ? const Icon(Icons.check, size: 16, color: Colors.white)
+          : Center(
+              child: Text(
+                '${index + 1}',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: hasProgress
+                      ? context.colors.accent
+                      : context.colors.ink500,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ),
+    );
+  }
+}
+
+class _SideValueRow extends StatelessWidget {
+  const _SideValueRow(
+      {required this.side, required this.text, required this.style});
   final String side;
   final String text;
   final TextStyle style;
 
   TextStyle _sideStyle(BuildContext context) => TextStyle(
-    fontSize: 10,
-    fontWeight: FontWeight.w700,
-    color: context.colors.accentDeep,
-  );
+        fontSize: 10,
+        fontWeight: FontWeight.w700,
+        color: context.colors.ink300,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -806,7 +804,7 @@ class _SideValueRow extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(width: 12, child: Text(side, style: _sideStyle(context))),
-        SizedBox(width: 4),
+        const SizedBox(width: 4),
         Text(text, style: style),
       ],
     );

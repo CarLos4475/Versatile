@@ -17,7 +17,7 @@ class DatabaseHelper {
     final filePath = p.join(dbPath, 'versatile.db');
     return openDatabase(
       filePath,
-      version: 5,
+      version: 6,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onConfigure: (db) async => db.execute('PRAGMA foreign_keys = ON'),
@@ -57,6 +57,11 @@ class DatabaseHelper {
       try {
         await db.execute('ALTER TABLE routines ADD COLUMN icon_code INTEGER NOT NULL DEFAULT 58713');
         await db.execute('ALTER TABLE sessions ADD COLUMN icon_code INTEGER NOT NULL DEFAULT 58713');
+      } catch (_) {}
+    }
+    if (oldVersion < 6) {
+      try {
+        await db.execute('ALTER TABLE session_exercises ADD COLUMN muscle TEXT NOT NULL DEFAULT "Other"');
       } catch (_) {}
     }
   }
@@ -102,6 +107,7 @@ class DatabaseHelper {
         routine_id TEXT NOT NULL,
         routine_name TEXT NOT NULL,
         color_value INTEGER NOT NULL DEFAULT 0xFFD97757,
+        icon_code INTEGER NOT NULL DEFAULT 58713,
         date TEXT NOT NULL,
         duration_min INTEGER NOT NULL,
         volume_kg REAL NOT NULL
@@ -114,6 +120,7 @@ class DatabaseHelper {
         session_id TEXT NOT NULL,
         exercise_id TEXT NOT NULL,
         exercise_name TEXT NOT NULL,
+        muscle TEXT NOT NULL,
         sort_order INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
       )
@@ -223,7 +230,6 @@ class DatabaseHelper {
   Future<void> wipeUserData() async {
     final db = await database;
     await db.transaction((txn) async {
-      // CASCADE handles routine_exercises, session_exercises, session_sets
       await txn.delete('routines');
       await txn.delete('sessions');
       await txn.delete('exercises', where: 'is_custom = ?', whereArgs: [1]);

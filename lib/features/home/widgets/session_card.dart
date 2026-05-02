@@ -15,6 +15,7 @@ class SessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context).languageCode;
     return FadeSlideIn(
       child: GlassContainer(
         radius: 18,
@@ -30,7 +31,7 @@ class SessionCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            SizedBox(width: 14),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,9 +51,9 @@ class SessionCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
-                        FormatUtils.date(session.date),
+                        FormatUtils.date(session.date, locale: locale),
                         style: TextStyle(
                           fontSize: 12,
                           color: context.colors.ink400,
@@ -60,7 +61,7 @@ class SessionCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
                       Icon(
@@ -68,7 +69,7 @@ class SessionCard extends StatelessWidget {
                         size: 13,
                         color: context.colors.ink500,
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
                         FormatUtils.duration(session.durationMin),
                         style: TextStyle(
@@ -76,13 +77,13 @@ class SessionCard extends StatelessWidget {
                           color: context.colors.ink500,
                         ),
                       ),
-                      SizedBox(width: 14),
+                      const SizedBox(width: 14),
                       Icon(
                         Icons.fitness_center,
                         size: 13,
                         color: context.colors.ink500,
                       ),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       Text(
                         FormatUtils.volume(session.volumeKg),
                         style: TextStyle(
@@ -95,11 +96,11 @@ class SessionCard extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Icon(
               Icons.chevron_right,
               size: 16,
-              color: context.colors.ink900.withOpacity(0.3),
+              color: context.colors.ink900.withValues(alpha: 0.3),
             ),
           ],
         ),

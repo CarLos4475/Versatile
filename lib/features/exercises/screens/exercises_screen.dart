@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
+import '../../../core/utils/l10n_utils.dart';
 import '../../../shared/widgets/filter_chip_widget.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
@@ -10,63 +12,39 @@ import '../../../shared/widgets/screen_header.dart';
 import '../view_models/exercises_view_model.dart';
 import 'add_exercise_screen.dart';
 
-const _kMuscleGroups = [
-  'All',
-  'Chest',
-  'Back',
-  'Shoulders',
-  'Arms',
-  'Core',
-  'Legs',
-  'Other',
-];
-
-Widget _subMuscleRow(ExercisesState state, ExercisesNotifier notifier) {
-  final List<String> subs;
-  if (state.selectedMuscle == 'Arms') {
-    subs = kArmsSubMuscles;
-  } else if (state.selectedMuscle == 'Legs') {
-    subs = kLegsSubMuscles;
-  } else {
-    return SizedBox.shrink();
-  }
-  return Padding(
-    padding: const EdgeInsets.only(top: 8),
-    child: SizedBox(
-      height: 32,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 22),
-        itemCount: subs.length,
-        separatorBuilder: (_, _) => SizedBox(width: 6),
-        itemBuilder: (context, i) {
-          final m = subs[i];
-          return VersatileChip(
-            label: m,
-            isActive: state.selectedSubMuscle == m,
-            onTap: () => notifier.setSubMuscle(m),
-          );
-        },
-      ),
-    ),
-  );
-}
-
-class ExercisesScreen extends ConsumerWidget {
+class ExercisesScreen extends ConsumerStatefulWidget {
   const ExercisesScreen({super.key});
 
-  Future<void> _confirmDelete(
-    BuildContext context,
-    WidgetRef ref,
-    Set<String> ids,
-  ) async {
+  @override
+  ConsumerState<ExercisesScreen> createState() => _ExercisesScreenState();
+}
+
+class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
+  late TextEditingController _searchCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchCtrl = TextEditingController(
+      text: ref.read(exercisesProvider).query,
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _confirmDelete(Set<String> ids) async {
+    final l10n = AppLocalizations.of(context)!;
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: context.colors.bgFrame,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Delete exercises?',
+          l10n.deleteRoutineTitle,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -81,14 +59,14 @@ class ExercisesScreen extends ConsumerWidget {
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
             child: Text(
-              'Cancel',
+              l10n.cancel,
               style: TextStyle(color: context.colors.ink500),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
-              'Delete',
+              l10n.delete,
               style: const TextStyle(
                 color: Colors.red,
                 fontWeight: FontWeight.w600,
@@ -106,7 +84,8 @@ class ExercisesScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(exercisesProvider);
     final notifier = ref.read(exercisesProvider.notifier);
     final allAsync = ref.watch(exercisesAsyncProvider);
@@ -114,6 +93,15 @@ class ExercisesScreen extends ConsumerWidget {
 
     final allExercises = allAsync.value ?? [];
     final myCount = allExercises.where((e) => e.isCustom).length;
+
+    // Synchronize controller with state query (useful when cleared from outside)
+    if (_searchCtrl.text != state.query) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _searchCtrl.text = state.query;
+        }
+      });
+    }
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
@@ -124,8 +112,8 @@ class ExercisesScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ScreenHeader(
-                  title: 'Exercises',
-                  subtitle: '${allExercises.length} in your library',
+                  title: l10n.exercises,
+                  subtitle: l10n.inLibrary(allExercises.length),
                   trailing: state.tab == ExercisesTab.mine && myCount > 0
                       ? Row(
                           mainAxisSize: MainAxisSize.min,
@@ -190,7 +178,7 @@ class ExercisesScreen extends ConsumerWidget {
                           accent: true,
                         ),
                 ),
-                SizedBox(height: 14),
+                const SizedBox(height: 14),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 22),
                   child: GlassContainer(
@@ -198,7 +186,6 @@ class ExercisesScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(4),
                     child: Stack(
                       children: [
-                        // Moving Indicator
                         AnimatedAlign(
                           duration: const Duration(milliseconds: 280),
                           curve: Curves.easeOutCubic,
@@ -228,17 +215,16 @@ class ExercisesScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        // Tab Labels
                         Row(
                           children: [
                             _TabButton(
-                              label: 'Catalog',
+                              label: l10n.all,
                               count: allExercises.length,
                               isActive: state.tab == ExercisesTab.all,
                               onTap: () => notifier.setTab(ExercisesTab.all),
                             ),
                             _TabButton(
-                              label: 'My exercises',
+                              label: l10n.custom,
                               count: myCount,
                               isActive: state.tab == ExercisesTab.mine,
                               onTap: () => notifier.setTab(ExercisesTab.mine),
@@ -249,7 +235,7 @@ class ExercisesScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 22),
                   child: GlassContainer(
@@ -268,9 +254,10 @@ class ExercisesScreen extends ConsumerWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: TextField(
+                            controller: _searchCtrl,
                             onChanged: notifier.setQuery,
                             decoration: InputDecoration(
-                              hintText: 'Search exercises…',
+                              hintText: l10n.search,
                               hintStyle: TextStyle(
                                 fontSize: 14,
                                 color: context.colors.ink400,
@@ -312,7 +299,7 @@ class ExercisesScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 SizedBox(
                   height: 32,
                   child: ListView.separated(
@@ -323,8 +310,9 @@ class ExercisesScreen extends ConsumerWidget {
                         const SizedBox(width: 6),
                     itemBuilder: (context, i) {
                       final m = _kMuscleGroups[i];
+                      final dummy = Exercise(id: '', name: '', muscle: m, equipment: '');
                       return VersatileChip(
-                        label: m,
+                        label: dummy.getLocalizedMuscle(context),
                         isActive: state.selectedMuscle == m,
                         onTap: () => notifier.setMuscle(m),
                       );
@@ -337,7 +325,7 @@ class ExercisesScreen extends ConsumerWidget {
                   alignment: Alignment.topLeft,
                   child: _subMuscleRow(state, notifier),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 SizedBox(
                   height: 32,
                   child: ListView(
@@ -345,14 +333,14 @@ class ExercisesScreen extends ConsumerWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     children: [
                       _LateralityChip(
-                        label: 'All',
+                        label: l10n.all,
                         isActive: state.laterality == ExerciseLaterality.all,
                         onTap: () =>
                             notifier.setLaterality(ExerciseLaterality.all),
                       ),
                       const SizedBox(width: 6),
                       _LateralityChip(
-                        label: 'Bilateral',
+                        label: l10n.bilateral,
                         isActive:
                             state.laterality == ExerciseLaterality.bilateral,
                         onTap: () => notifier
@@ -360,7 +348,7 @@ class ExercisesScreen extends ConsumerWidget {
                       ),
                       const SizedBox(width: 6),
                       _LateralityChip(
-                        label: 'Unilateral',
+                        label: l10n.unilateral,
                         isActive:
                             state.laterality == ExerciseLaterality.unilateral,
                         onTap: () => notifier
@@ -369,7 +357,7 @@ class ExercisesScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Expanded(
                   child: allAsync.isLoading
                       ? Center(
@@ -381,7 +369,7 @@ class ExercisesScreen extends ConsumerWidget {
                       : filtered.isEmpty
                       ? Center(
                           child: Text(
-                            'No exercises match',
+                            l10n.noExercisesMatch,
                             style: TextStyle(
                               fontSize: 13,
                               color: context.colors.ink400,
@@ -418,15 +406,11 @@ class ExercisesScreen extends ConsumerWidget {
                 child: FadeSlideIn(
                   offset: const Offset(0, 0.1),
                   child: GlassButton(
-                    label: 'Delete Selected (${state.selectedIds.length})',
+                    label: '${l10n.delete} (${state.selectedIds.length})',
                     variant: GlassButtonVariant.primary,
                     size: GlassButtonSize.lg,
                     expand: true,
-                    onPressed: () => _confirmDelete(
-                      context,
-                      ref,
-                      state.selectedIds,
-                    ),
+                    onPressed: () => _confirmDelete(state.selectedIds),
                     leading: const Icon(
                       Icons.delete_outline,
                       color: Colors.white,
@@ -615,7 +599,7 @@ class _ExerciseRow extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          exercise.name,
+                          exercise.getLocalizedName(context),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -638,7 +622,7 @@ class _ExerciseRow extends StatelessWidget {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            'CUSTOM',
+                            AppLocalizations.of(context)!.custom,
                             style: TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w700,
@@ -648,33 +632,11 @@ class _ExerciseRow extends StatelessWidget {
                           ),
                         ),
                       ],
-                      if (exercise.isUnilateral) ...[
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 5,
-                            vertical: 1,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0x14000000),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            'UNILATERAL',
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              color: context.colors.ink500,
-                              letterSpacing: 0.05,
-                            ),
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                   const SizedBox(height: 1),
                   Text(
-                    '${exercise.muscle} · ${exercise.equipment}',
+                    '${exercise.getLocalizedMuscle(context)} · ${exercise.getLocalizedEquipment(context)}',
                     style: TextStyle(
                       fontSize: 12,
                       color: context.colors.ink500,
@@ -696,7 +658,6 @@ class _LateralityChip extends StatelessWidget {
     required this.isActive,
     required this.onTap,
   });
-
   final String label;
   final bool isActive;
   final VoidCallback onTap;
@@ -706,14 +667,13 @@ class _LateralityChip extends StatelessWidget {
     return PressableScale(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: isActive ? context.colors.accentDeep : context.colors.glassBg,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isActive ? Colors.transparent : context.colors.glassBorder,
-            width: 0.5,
           ),
         ),
         child: Text(
@@ -727,4 +687,86 @@ class _LateralityChip extends StatelessWidget {
       ),
     );
   }
+}
+
+const _kMuscleGroups = [
+  'All',
+  'Chest',
+  'Back',
+  'Legs',
+  'Shoulders',
+  'Arms',
+  'Core'
+];
+
+Widget _subMuscleRow(ExercisesState state, ExercisesNotifier notifier) {
+  final muscles = switch (state.selectedMuscle) {
+    'Arms' => kArmsSubMuscles,
+    'Legs' => kLegsSubMuscles,
+    _ => <String>[],
+  };
+
+  return AnimatedSize(
+    duration: const Duration(milliseconds: 240),
+    curve: Curves.easeOutCubic,
+    alignment: Alignment.topLeft,
+    child: muscles.isEmpty
+        ? const SizedBox(width: double.infinity, height: 0)
+        : Padding(
+            padding: const EdgeInsets.fromLTRB(22, 8, 22, 0),
+            child: SizedBox(
+              height: 32,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: muscles.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 6),
+                itemBuilder: (context, i) {
+                  final m = muscles[i];
+                  final isActive = state.selectedSubMuscle == m;
+
+                  final dummy = Exercise(
+                    id: '',
+                    name: '',
+                    muscle: m,
+                    equipment: '',
+                  );
+
+                  return PressableScale(
+                    onTap: () => notifier.setSubMuscle(m),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isActive
+                            ? context.colors.accent
+                            : context.colors.glassBg,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isActive
+                              ? Colors.transparent
+                              : context.colors.glassBorder,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          dummy.getLocalizedMuscle(context),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: isActive
+                                ? Colors.white
+                                : context.colors.ink500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+  );
 }

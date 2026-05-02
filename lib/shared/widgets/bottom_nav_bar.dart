@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/glass_effect.dart';
+import '../../l10n/app_localizations.dart';
 import 'motion.dart';
 
 class VersatileBottomNav extends StatelessWidget {
@@ -19,6 +20,17 @@ class VersatileBottomNav extends StatelessWidget {
     (icon: Icons.fitness_center, label: 'Exercises'),
     (icon: Icons.history_rounded, label: 'History'),
   ];
+
+  String _getLabel(BuildContext context, String label) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (label) {
+      case 'Home': return l10n.home;
+      case 'Routines': return l10n.routines;
+      case 'Exercises': return l10n.exercises;
+      case 'History': return l10n.history;
+      default: return label;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +104,7 @@ class VersatileBottomNav extends StatelessWidget {
                               : context.colors.ink400,
                           letterSpacing: 0.01,
                         ),
-                        child: Text(item.label),
+                        child: Text(_getLabel(context, item.label)),
                       ),
                       SizedBox(height: 2),
                     ],

@@ -538,6 +538,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
       return SessionExercise(
         exerciseId: e.exerciseId,
         name: ex?.name ?? '',
+        muscle: ex?.muscle ?? 'Other',
         sets: e.completedSets,
       );
     }).toList();

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../shared/widgets/glass_button.dart';
@@ -17,6 +19,7 @@ class RoutinesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final routinesAsync = ref.watch(routinesProvider);
     final exercises = ref.watch(exercisesAsyncProvider).value ?? [];
 
@@ -24,7 +27,7 @@ class RoutinesScreen extends ConsumerWidget {
       backgroundColor: context.colors.bgApp,
       body: SafeArea(
         child: routinesAsync.when(
-          loading: () => const _LoadingBody(label: 'Loading routines…'),
+          loading: () => _LoadingBody(label: l10n.preparingWorkout),
           error: (e, _) => Center(
             child: Text(
               'Error: $e',
@@ -37,10 +40,10 @@ class RoutinesScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ScreenHeader(
-                  title: 'Routines',
-                  subtitle: '${routines.length} workout templates',
+                  title: l10n.routines,
+                  subtitle: l10n.routinesInLibrary(routines.length),
                   trailing: IconCircleButton(
-                    icon: Icon(Icons.add),
+                    icon: const Icon(Icons.add),
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => const CreateRoutineScreen(),
@@ -49,7 +52,7 @@ class RoutinesScreen extends ConsumerWidget {
                     accent: true,
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 if (routines.isEmpty)
                   const _EmptyRoutines()
                 else
@@ -83,6 +86,7 @@ class _EmptyRoutines extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 60),
@@ -102,18 +106,18 @@ class _EmptyRoutines extends StatelessWidget {
                 color: context.colors.accentDeep,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
-              'No routines yet',
+              l10n.noRoutinesYet,
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
                 color: context.colors.ink900,
               ),
             ),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Text(
-              'Tap + to create your first workout template.',
+              l10n.createFirstOne,
               style: TextStyle(fontSize: 13, color: context.colors.ink400),
               textAlign: TextAlign.center,
             ),
@@ -131,11 +135,13 @@ class _RoutineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final color = Color(routine.colorValue);
     final muscles = routine.exercises
         .map((re) {
           try {
-            return exercises.firstWhere((ex) => ex.id == re.exerciseId).muscle;
+            final ex = exercises.firstWhere((ex) => ex.id == re.exerciseId);
+            return ex.getLocalizedMuscle(context);
           } catch (_) {
             return null;
           }
@@ -181,22 +187,22 @@ class _RoutineCard extends StatelessWidget {
                     size: 22,
                   ),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         routine.name,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.17,
                         ),
                       ),
-                      SizedBox(height: 2),
+                      const SizedBox(height: 2),
                       Text(
-                        '${routine.exercises.length} exercises · ~${routine.estimatedMinutes} min',
+                        '${routine.exercises.length} ${l10n.exercisesLabel} · ~${routine.estimatedMinutes} min',
                         style: TextStyle(
                           fontSize: 12,
                           color: context.colors.ink500,
@@ -213,7 +219,7 @@ class _RoutineCard extends StatelessWidget {
               ],
             ),
             if (muscles.isNotEmpty) ...[
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Wrap(
                 spacing: 6,
                 runSpacing: 4,
@@ -266,7 +272,7 @@ class _LoadingBody extends StatelessWidget {
             color: context.colors.accent,
             strokeWidth: 2,
           ),
-          SizedBox(height: 14),
+          const SizedBox(height: 14),
           Text(
             label,
             style: TextStyle(fontSize: 13, color: context.colors.ink400),

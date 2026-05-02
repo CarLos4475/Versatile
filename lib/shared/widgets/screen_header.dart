@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
+import '../../l10n/app_localizations.dart';
 import 'motion.dart';
 
 class ScreenHeader extends StatelessWidget {
@@ -77,28 +78,25 @@ class ScreenHeader extends StatelessWidget {
                           ),
                         ),
                       )
-                    else
-                      SizedBox.shrink(),
-                    if (trailing != null)
-                      trailing!
-                    else
-                      SizedBox.shrink(),
+                    else if (trailing != null)
+                      const Spacer(),
+                    if (trailing != null) trailing!,
                   ],
                 ),
               ),
-            SizedBox(height: 8),
+            const SizedBox(height: 16),
             Text(
               title,
               style: TextStyle(
-                fontSize: 36,
-                fontWeight: FontWeight.w500,
-                letterSpacing: -0.9,
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
                 color: context.colors.ink900,
-                height: 1.05,
+                letterSpacing: -0.56,
+                height: 1.1,
               ),
             ),
             if (subtitle != null) ...[
-              SizedBox(height: 2),
+              const SizedBox(height: 4),
               Text(
                 subtitle!,
                 style: TextStyle(

@@ -39,7 +39,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     await settings.setOnboarded();
     ref.invalidate(userNameProvider);
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(AppRoute(page: const MainShell()));
+    Navigator.of(context).pushReplacement(AppRoute(page: const MainNavigationShell()));
   }
 
   @override

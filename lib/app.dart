@@ -1,20 +1,22 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:versatile/l10n/app_localizations.dart';
 import 'core/navigation/app_page_transitions.dart';
-import 'core/services/workout_notification_service.dart';
-import 'core/theme/app_colors.dart';
-import 'core/theme/glass_effect.dart';
-import 'core/theme/app_theme.dart';
+import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/app_colors.dart';
 import 'core/utils/format_utils.dart';
-import 'features/active_workout/screens/active_workout_screen.dart';
-import 'features/active_workout/view_models/active_workout_view_model.dart';
-import 'features/exercises/screens/exercises_screen.dart';
-import 'features/history/screens/history_screen.dart';
 import 'features/home/screens/home_screen.dart';
 import 'features/routines/screens/routines_screen.dart';
+import 'features/exercises/screens/exercises_screen.dart';
+import 'features/history/screens/history_screen.dart';
+import 'features/active_workout/screens/active_workout_screen.dart';
+import 'features/active_workout/view_models/active_workout_view_model.dart';
+import 'features/exercises/view_models/exercises_view_model.dart';
 import 'features/splash/screens/splash_screen.dart';
-import 'shared/widgets/bottom_nav_bar.dart';
 import 'shared/widgets/motion.dart';
 
 class VersatileApp extends ConsumerWidget {
@@ -23,290 +25,310 @@ class VersatileApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final locale = ref.watch(localeProvider);
+
     return MaterialApp(
       title: 'Versatile',
-      themeMode: themeMode,
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      debugShowCheckedModeBanner: false,
+      themeMode: themeMode,
+      locale: locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      builder: (context, child) {
+        return AppWrapper(child: child!);
+      },
       home: const SplashScreen(),
     );
   }
 }
 
-class MainShell extends ConsumerStatefulWidget {
-  const MainShell({super.key});
+class MainNavigationShell extends ConsumerStatefulWidget {
+  const MainNavigationShell({super.key});
 
   @override
-  ConsumerState<MainShell> createState() => _MainShellState();
+  ConsumerState<MainNavigationShell> createState() => _MainNavigationShellState();
 }
 
-class _MainShellState extends ConsumerState<MainShell> {
-  int _currentIndex = 0;
-  final List<int> _tabHistory = [0];
+class _MainNavigationShellState extends ConsumerState<MainNavigationShell> {
+  int _index = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _restoreActiveWorkoutIfNeeded();
-  }
-
-  Future<void> _restoreActiveWorkoutIfNeeded() async {
-    final info = await WorkoutNotificationService.getActiveWorkout();
-    if (info == null || !mounted) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        Navigator.of(context).push(
-          AppRoute(
-            page: ActiveWorkoutScreen(
-              routineId: info.routineId,
-              restoredStartedAt: info.startedAt,
-              restoredProgressJson: info.progressJson,
-            ),
-          ),
-        );
-      }
-    });
-  }
-
-  static const _screens = [
+  final _pages = const [
     HomeScreen(),
     RoutinesScreen(),
     ExercisesScreen(),
     HistoryScreen(),
   ];
 
-  void _selectTab(int index) {
-    if (index == _currentIndex) return;
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final activeRoutineId = ref.watch(activeWorkoutRoutineIdProvider);
 
-    setState(() {
-      _currentIndex = index;
-      _tabHistory.remove(index);
-      _tabHistory.add(index);
-    });
+    return Scaffold(
+      extendBody: true,
+      body: Stack(
+        children: [
+          IndexedStack(
+            index: _index,
+            children: _pages,
+          ),
+          if (activeRoutineId != null)
+            const Positioned(
+              left: 0,
+              right: 0,
+              bottom: 104,
+              child: _ActiveWorkoutOverlay(),
+            ),
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 24,
+            child: _CustomNavBar(
+              index: _index,
+              onChanged: (i) {
+                if (i != _index) {
+                  ref.read(exercisesProvider.notifier).setQuery('');
+                  setState(() => _index = i);
+                }
+              },
+              items: [
+                _NavBarItem(icon: Icons.home_filled, label: l10n.home),
+                _NavBarItem(
+                  icon: Icons.format_list_bulleted_rounded,
+                  label: l10n.routines,
+                ),
+                _NavBarItem(
+                  icon: Icons.fitness_center_rounded,
+                  label: l10n.exercises,
+                ),
+                _NavBarItem(icon: Icons.history_rounded, label: l10n.history),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
+}
 
-  void _goBackTab() {
-    if (_tabHistory.length <= 1) return;
+class _CustomNavBar extends StatelessWidget {
+  const _CustomNavBar({
+    required this.index,
+    required this.onChanged,
+    required this.items,
+  });
 
-    setState(() {
-      _tabHistory.removeLast();
-      _currentIndex = _tabHistory.last;
-    });
-  }
+  final int index;
+  final ValueChanged<int> onChanged;
+  final List<_NavBarItem> items;
 
   @override
   Widget build(BuildContext context) {
-    final activeRoutineId = ref.watch(activeWorkoutRoutineIdProvider);
-    if (activeRoutineId != null) {
-      ref.watch(activeWorkoutProvider(activeRoutineId));
-    }
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            decoration: BoxDecoration(
+              color: context.colors.bgApp.withValues(alpha: 0.7),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+                width: 0.5,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: items.asMap().entries.map((e) {
+                final i = e.key;
+                final item = e.value;
+                final active = index == i;
 
-    return PopScope(
-      canPop: _tabHistory.length <= 1,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        _goBackTab();
-      },
-      child: Scaffold(
-        backgroundColor: context.colors.bgApp,
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: _AnimatedShellPages(
-                index: _currentIndex,
-                children: _screens,
-              ),
+                return PressableScale(
+                  onTap: () => onChanged(i),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        item.icon,
+                        color: active
+                            ? context.colors.accent
+                            : context.colors.ink300,
+                        size: 24,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        item.label,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                          color: active
+                              ? context.colors.accent
+                              : context.colors.ink300,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
-            const _ActiveWorkoutIsland(),
-            Positioned(
-              left: 12,
-              right: 12,
-              bottom: 14,
-              child: FadeSlideIn(
-                delay: const Duration(milliseconds: 160),
-                child: VersatileBottomNav(
-                  currentIndex: _currentIndex,
-                  onChanged: _selectTab,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _AnimatedShellPages extends StatelessWidget {
-  const _AnimatedShellPages({required this.index, required this.children});
+class _NavBarItem {
+  final IconData icon;
+  final String label;
+  const _NavBarItem({required this.icon, required this.label});
+}
 
-  final int index;
-  final List<Widget> children;
+class AppWrapper extends StatelessWidget {
+  const AppWrapper({super.key, required this.child});
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      key: ValueKey(index),
-      tween: Tween(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 260),
-      curve: Curves.easeOutCubic,
-      builder: (context, value, child) {
-        return Opacity(
-          opacity: value,
-          child: Transform.translate(
-            offset: Offset(18 * (1 - value), 0),
-            child: Transform.scale(
-              scale: 0.992 + (0.008 * value),
-              child: child,
+    return child;
+  }
+}
+
+class _ActiveWorkoutOverlay extends ConsumerWidget {
+  const _ActiveWorkoutOverlay();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final activeRoutineId = ref.watch(activeWorkoutRoutineIdProvider);
+    if (activeRoutineId == null) return const SizedBox.shrink();
+
+    final workoutState = ref.watch(activeWorkoutProvider(activeRoutineId));
+
+    return FadeSlideIn(
+      offset: const Offset(0, 0.1),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: PressableScale(
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ActiveWorkoutScreen(routineId: activeRoutineId),
             ),
           ),
-        );
-      },
-      child: IndexedStack(index: index, children: children),
-    );
-  }
-}
-
-class _ActiveWorkoutIsland extends ConsumerWidget {
-  const _ActiveWorkoutIsland();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final routineId = ref.watch(activeWorkoutRoutineIdProvider);
-    return Positioned(
-      left: 12,
-      right: 12,
-      bottom: 92,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 260),
-        reverseDuration: const Duration(milliseconds: 200),
-        transitionBuilder: (child, animation) {
-          return FadeTransition(
-            opacity: animation,
-            child: SlideTransition(
-              position:
-                  Tween<Offset>(
-                    begin: const Offset(0, 0.12),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(
-                      parent: animation,
-                      curve: Curves.easeOutCubic,
-                    ),
-                  ),
-              child: child,
-            ),
-          );
-        },
-        child: routineId == null
-            ? SizedBox.shrink(key: ValueKey('no-workout'))
-            : _ActiveWorkoutIslandCard(
-                key: ValueKey(routineId),
-                routineId: routineId,
-              ),
-      ),
-    );
-  }
-}
-
-class _ActiveWorkoutIslandCard extends ConsumerWidget {
-  const _ActiveWorkoutIslandCard({super.key, required this.routineId});
-
-  final String routineId;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final workoutState = ref.watch(activeWorkoutProvider(routineId));
-
-    return PressableScale(
-      onTap: () => Navigator.of(
-        context,
-      ).push(AppRoute(page: ActiveWorkoutScreen(routineId: routineId))),
-      child: GlassEffect.wrap(
-        sigma: 10,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          height: 62,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: context.colors.accentDeep.withOpacity(0.92),
+          child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.18),
-              width: 0.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: context.colors.accentDeep.withOpacity(0.35),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              _IslandPulseDot(),
-              SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      workoutState.routine.name,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        letterSpacing: -0.13,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(
+                height: 62,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFFE08866).withValues(alpha: 0.85),
+                      const Color(0xFFD97757).withValues(alpha: 0.85),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    width: 0.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: context.colors.accentDeep.withValues(alpha: 0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
                     ),
-                    Text(
-                      'Workout in progress',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.white.withOpacity(0.65),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    const _IslandPulseDot(),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            workoutState.routine.name,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              letterSpacing: -0.13,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            l10n.workoutInProgress,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.white.withValues(alpha: 0.8),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 220),
+                      transitionBuilder: (child, animation) => FadeTransition(
+                        opacity: animation,
+                        child: ScaleTransition(scale: animation, child: child),
+                      ),
+                      child: Text(
+                        FormatUtils.timer(workoutState.elapsedSeconds),
+                        key: ValueKey(workoutState.elapsedSeconds),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.2,
+                          color: Colors.white,
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.chevron_right,
+                        size: 18,
+                        color: Colors.white,
                       ),
                     ),
                   ],
                 ),
               ),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 220),
-                transitionBuilder: (child, animation) => FadeTransition(
-                  opacity: animation,
-                  child: ScaleTransition(scale: animation, child: child),
-                ),
-                child: Text(
-                  FormatUtils.timer(workoutState.elapsedSeconds),
-                  key: ValueKey(workoutState.elapsedSeconds),
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.2,
-                    color: Colors.white,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ),
-              SizedBox(width: 10),
-              Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.chevron_right,
-                  size: 16,
-                  color: Colors.white,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -315,6 +337,8 @@ class _ActiveWorkoutIslandCard extends ConsumerWidget {
 }
 
 class _IslandPulseDot extends StatefulWidget {
+  const _IslandPulseDot({super.key});
+
   @override
   State<_IslandPulseDot> createState() => _IslandPulseDotState();
 }
@@ -350,7 +374,7 @@ class _IslandPulseDotState extends State<_IslandPulseDot>
       child: Container(
         width: 7,
         height: 7,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
         ),

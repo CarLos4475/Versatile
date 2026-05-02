@@ -1,0 +1,212 @@
+{
+  "@@locale": "es",
+  "appName": "Versatile",
+  "settings": "Ajustes",
+  "appearance": "APARIENCIA",
+  "theme": "Tema",
+  "themeLight": "Claro",
+  "themeDark": "Oscuro",
+  "themeSystem": "Sistema",
+  "language": "Idioma",
+  "languageEn": "Inglés",
+  "languageEs": "Español",
+  "profile": "PERFIL",
+  "userName": "Nombre de usuario",
+  "changeName": "Cambiar nombre",
+  "data": "DATOS",
+  "exportData": "Exportar datos",
+  "importData": "Importar datos",
+  "wipeAllData": "Borrar todos los datos",
+  "wipeConfirmTitle": "¿Borrar todos los datos?",
+  "wipeConfirmContent": "Esto eliminará permanentemente todas tus rutinas, historial y ejercicios personalizados. Esto no se puede deshacer.",
+  "cancel": "Cancelar",
+  "wipe": "Borrar",
+  "dataWiped": "Todos los datos borrados",
+  "wipeFailed": "Error al borrar: {error}",
+  "@wipeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "home": "Inicio",
+  "routines": "Rutinas",
+  "exercises": "Ejercicios",
+  "history": "Historial",
+
+  "hello": "Hola",
+  "helloThere": "Hola",
+  "today": "Hoy",
+  "todaysSession": "SESIÓN DE HOY",
+  "startWorkout": "Iniciar entrenamiento",
+  "thisWeek": "ESTA SEMANA",
+  "sessions": "sesiones",
+  "volume": "VOLUMEN",
+  "avgTime": "TIEMPO PROM.",
+  "activity": "ACTIVIDAD",
+  "sessionsLastYear": "sesiones en el último año",
+  "less": "Menos",
+  "more": "Más",
+  "recentSessions": "Sesiones recientes",
+  "total": "total",
+  "noRoutinesYet": "Sin rutinas aún",
+  "createFirstOne": "Crea tu primera rutina",
+  "createRoutine": "Crear rutina",
+  "workoutInProgress": "Entrenamiento en curso",
+  "restoredProgress": "Progreso restaurado de tu entrenamiento activo.",
+
+  "routinesInLibrary": "{count} rutinas en tu biblioteca",
+  "@routinesInLibrary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exercisesLabel": "ejercicios",
+  "noRoutinesMatch": "Sin coincidencias",
+
+  "edit": "Editar",
+  "done": "Hecho",
+  "addExercise": "Añadir ejercicio",
+  "deleteRoutineTitle": "¿Borrar rutina?",
+  "deleteRoutineContent": "Esto eliminará permanentemente la rutina '{name}'.",
+  "@deleteRoutineContent": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "delete": "Borrar",
+  "startThisWorkout": "Iniciar este entrenamiento",
+  "rest": "descanso",
+
+  "active": "ACTIVO",
+  "sets": "series",
+  "finishWorkout": "Finalizar entrenamiento",
+  "saving": "Guardando…",
+  "preparingWorkout": "Preparando entrenamiento...",
+  "workoutFinished": "¡Entrenamiento finalizado!",
+  "greatJob": "¡Buen trabajo! Tu sesión ha sido guardada.",
+  "finish": "Finalizar",
+  "discardWorkoutTitle": "¿Descartar entrenamiento?",
+  "discardWorkoutContent": "Esto eliminará todo el progreso de esta sesión.",
+  "discard": "Descartar",
+  "finishSet": "Finalizar serie {number}",
+  "@finishSet": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+
+  "addExerciseTitle": "Añadir ejercicio",
+  "inLibrary": "{count} en la biblioteca",
+  "@inLibrary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "newExercise": "Nuevo ejercicio",
+  "addCustomExercise": "Añadir un ejercicio personalizado",
+  "exerciseName": "Nombre del ejercicio",
+  "egBenchPress": "ej. Press de banca",
+  "muscleGroup": "GRUPO MUSCULAR",
+  "category": "CATEGORÍA",
+  "bilateral": "Bilateral",
+  "unilateral": "Unilateral",
+  "saveExercise": "Guardar ejercicio",
+
+  "search": "Buscar…",
+  "noExercisesMatch": "Sin coincidencias",
+  "custom": "PERSONALIZADO",
+  "all": "Todo",
+
+  "noHistoryYet": "Sin historial aún",
+  "startTrainingToSee": "Entrena para ver tu progreso aquí",
+  "sessionDetail": "Detalle de Sesión",
+  "workoutSummary": "Resumen de Entrenamiento",
+  "duration": "Duración",
+  "volumeTotal": "Volumen Total",
+  "exercisesPerformed": "Ejercicios Realizados",
+
+  "neverDone": "Nunca",
+  "doneToday": "Hecho hoy",
+  "doneYesterday": "Hecho ayer",
+  "lastDoneDaysAgo": "Hace {days} días",
+  "@lastDoneDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+
+  "set_label": "SERIE",
+  "weight_label": "PESO",
+  "reps_label": "REPS",
+  "last_label": "Ant.",
+  "split_label": "Dividir",
+  "skip": "Saltar",
+  "about": "ACERCA DE",
+  "version": "Versión",
+  "author": "Autor",
+  "noRecordYet": "Sin récord aún",
+  "newRoutine": "Nueva Rutina",
+  "nameItAndPickColor": "Dale un nombre y elige un color",
+  "color_label": "COLOR",
+  "icon_label": "ICONO",
+  "createRoutineBtn": "Crear rutina",
+  "exportSubtitle": "Comparte un respaldo JSON de todos tus datos",
+  "importSubtitle": "Restaura desde un respaldo JSON",
+  "wipeSubtitle": "Elimina todas tus rutinas, sesiones e historial",
+  "routineNotFound": "Rutina no encontrada",
+  "goBack": "Volver",
+
+  "ex_bench_press": "Press de banca",
+  "ex_incline_dumbbell_press": "Press inclinado con mancuernas",
+  "ex_cable_fly": "Cruces en polea",
+  "ex_pull_up": "Dominadas",
+  "ex_barbell_row": "Remo con barra",
+  "ex_lat_pulldown": "Jalón al pecho",
+  "ex_squat": "Sentadilla",
+  "ex_romanian_deadlift": "Peso muerto rumano",
+  "ex_leg_press": "Prensa de piernas",
+  "ex_overhead_press": "Press militar",
+  "ex_lateral_raise": "Elevaciones laterales",
+  "ex_face_pull": "Face pull",
+  "ex_bicep_curl": "Curl de bíceps",
+  "ex_tricep_pushdown": "Extensión de tríceps en polea",
+  "ex_hammer_curl": "Curl martillo",
+  "ex_plank": "Plancha",
+  "ex_hanging_leg_raise": "Elevación de piernas colgado",
+  "ex_landmine_press": "Press Landmine",
+  "ex_pendlay_row": "Remo Pendlay",
+
+  "muscle_chest": "Pecho",
+  "muscle_back": "Espalda",
+  "muscle_shoulders": "Hombros",
+  "muscle_biceps": "Bíceps",
+  "muscle_triceps": "Tríceps",
+  "muscle_forearms": "Antebrazos",
+  "muscle_quadriceps": "Cuádriceps",
+  "muscle_hamstrings": "Isquiotibiales",
+  "muscle_glutes": "Glúteos",
+  "muscle_calves": "Gemelos",
+  "muscle_core": "Core",
+  "muscle_other": "Otros",
+  "muscle_arms": "Brazos",
+  "muscle_legs": "Piernas",
+
+  "equip_barbell": "Barra",
+  "equip_dumbbell": "Mancuerna",
+  "equip_cable": "Polea",
+  "equip_bodyweight": "Peso corporal",
+  "equip_machine": "Máquina"
+}

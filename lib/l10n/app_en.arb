@@ -1,0 +1,212 @@
+{
+  "@@locale": "en",
+  "appName": "Versatile",
+  "settings": "Settings",
+  "appearance": "APPEARANCE",
+  "theme": "Theme",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystem": "System",
+  "language": "Language",
+  "languageEn": "English",
+  "languageEs": "Spanish",
+  "profile": "PROFILE",
+  "userName": "User name",
+  "changeName": "Change name",
+  "data": "DATA",
+  "exportData": "Export data",
+  "importData": "Import data",
+  "wipeAllData": "Wipe all data",
+  "wipeConfirmTitle": "Wipe all data?",
+  "wipeConfirmContent": "This will permanently delete all your routines, history, and custom exercises. This cannot be undone.",
+  "cancel": "Cancel",
+  "wipe": "Wipe",
+  "dataWiped": "All data wiped",
+  "wipeFailed": "Wipe failed: {error}",
+  "@wipeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "home": "Home",
+  "routines": "Routines",
+  "exercises": "Exercises",
+  "history": "History",
+
+  "hello": "Hello",
+  "helloThere": "Hello there",
+  "today": "Today",
+  "todaysSession": "TODAY'S SESSION",
+  "startWorkout": "Start workout",
+  "thisWeek": "THIS WEEK",
+  "sessions": "sessions",
+  "volume": "VOLUME",
+  "avgTime": "AVG TIME",
+  "activity": "ACTIVITY",
+  "sessionsLastYear": "sessions in the last year",
+  "less": "Less",
+  "more": "More",
+  "recentSessions": "Recent sessions",
+  "total": "total",
+  "noRoutinesYet": "No routines yet",
+  "createFirstOne": "Create your first one",
+  "createRoutine": "Create routine",
+  "workoutInProgress": "Workout in progress",
+  "restoredProgress": "Restored progress from your active workout.",
+
+  "routinesInLibrary": "{count} routines in your library",
+  "@routinesInLibrary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exercisesLabel": "exercises",
+  "noRoutinesMatch": "No routines match",
+
+  "edit": "Edit",
+  "done": "Done",
+  "addExercise": "Add exercise",
+  "deleteRoutineTitle": "Delete routine?",
+  "deleteRoutineContent": "This will permanently delete the routine '{name}'.",
+  "@deleteRoutineContent": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "delete": "Delete",
+  "startThisWorkout": "Start this workout",
+  "rest": "rest",
+
+  "active": "ACTIVE",
+  "sets": "sets",
+  "finishWorkout": "Finish workout",
+  "saving": "Saving…",
+  "preparingWorkout": "Preparing workout...",
+  "workoutFinished": "Workout finished!",
+  "greatJob": "Great job! Your session has been saved.",
+  "finish": "Finish",
+  "discardWorkoutTitle": "Discard workout?",
+  "discardWorkoutContent": "This will delete all progress from this session.",
+  "discard": "Discard",
+  "finishSet": "Finish set {number}",
+  "@finishSet": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+
+  "addExerciseTitle": "Add Exercise",
+  "inLibrary": "{count} in library",
+  "@inLibrary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "newExercise": "New Exercise",
+  "addCustomExercise": "Add a custom exercise",
+  "exerciseName": "Exercise name",
+  "egBenchPress": "e.g. Bench Press",
+  "muscleGroup": "MUSCLE GROUP",
+  "category": "CATEGORY",
+  "bilateral": "Bilateral",
+  "unilateral": "Unilateral",
+  "saveExercise": "Save exercise",
+
+  "search": "Search…",
+  "noExercisesMatch": "No exercises match",
+  "custom": "CUSTOM",
+  "all": "All",
+
+  "noHistoryYet": "No history yet",
+  "startTrainingToSee": "Start training to see your progress here",
+  "sessionDetail": "Session Detail",
+  "workoutSummary": "Workout Summary",
+  "duration": "Duration",
+  "volumeTotal": "Total Volume",
+  "exercisesPerformed": "Exercises Performed",
+
+  "neverDone": "Never done",
+  "doneToday": "Done today",
+  "doneYesterday": "Done yesterday",
+  "lastDoneDaysAgo": "Last done {days} days ago",
+  "@lastDoneDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+
+  "set_label": "SET",
+  "weight_label": "WEIGHT",
+  "reps_label": "REPS",
+  "last_label": "Last",
+  "split_label": "Split",
+  "skip": "Skip",
+  "about": "ABOUT",
+  "version": "Version",
+  "author": "Author",
+  "noRecordYet": "No record yet",
+  "newRoutine": "New Routine",
+  "nameItAndPickColor": "Name it and pick a color",
+  "color_label": "COLOR",
+  "icon_label": "ICON",
+  "createRoutineBtn": "Create Routine",
+  "exportSubtitle": "Share a JSON backup of all your data",
+  "importSubtitle": "Restore from a JSON backup",
+  "wipeSubtitle": "Delete all routines, sessions and history",
+  "routineNotFound": "Routine not found",
+  "goBack": "Go back",
+
+  "ex_bench_press": "Bench Press",
+  "ex_incline_dumbbell_press": "Incline Dumbbell Press",
+  "ex_cable_fly": "Cable Fly",
+  "ex_pull_up": "Pull-Up",
+  "ex_barbell_row": "Barbell Row",
+  "ex_lat_pulldown": "Lat Pulldown",
+  "ex_squat": "Squat",
+  "ex_romanian_deadlift": "Romanian Deadlift",
+  "ex_leg_press": "Leg Press",
+  "ex_overhead_press": "Overhead Press",
+  "ex_lateral_raise": "Lateral Raise",
+  "ex_face_pull": "Face Pull",
+  "ex_bicep_curl": "Bicep Curl",
+  "ex_tricep_pushdown": "Tricep Pushdown",
+  "ex_hammer_curl": "Hammer Curl",
+  "ex_plank": "Plank",
+  "ex_hanging_leg_raise": "Hanging Leg Raise",
+  "ex_landmine_press": "Landmine Press",
+  "ex_pendlay_row": "Pendlay Row",
+
+  "muscle_chest": "Chest",
+  "muscle_back": "Back",
+  "muscle_shoulders": "Shoulders",
+  "muscle_biceps": "Biceps",
+  "muscle_triceps": "Triceps",
+  "muscle_forearms": "Forearms",
+  "muscle_quadriceps": "Quadriceps",
+  "muscle_hamstrings": "Hamstrings",
+  "muscle_glutes": "Glutes",
+  "muscle_calves": "Calves",
+  "muscle_core": "Core",
+  "muscle_other": "Other",
+  "muscle_arms": "Arms",
+  "muscle_legs": "Legs",
+
+  "equip_barbell": "Barbell",
+  "equip_dumbbell": "Dumbbell",
+  "equip_cable": "Cable",
+  "equip_bodyweight": "Bodyweight",
+  "equip_machine": "Machine"
+}
