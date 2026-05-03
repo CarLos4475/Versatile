@@ -12,6 +12,7 @@ import '../../../shared/widgets/screen_header.dart';
 import '../../active_workout/screens/active_workout_screen.dart';
 import '../../exercises/view_models/exercises_view_model.dart';
 import '../view_models/routines_view_model.dart';
+import '../widgets/routine_color_picker.dart';
 import 'exercise_picker_screen.dart';
 
 const _kColors = [
@@ -40,22 +41,18 @@ const _kIcons = [
 ];
 
 String? _muscleAsset(String muscle) => switch (muscle) {
-  'Chest' =>
-    'assets/assets/Torso/pecho/pecho_color_edit_24348292703575.png',
-  'Back' =>
-    'assets/assets/Torso/espalda/back_color_edit_24399873717629.png',
+  'Chest' => 'assets/assets/Torso/pecho/pecho_color_edit_24348292703575.png',
+  'Back' => 'assets/assets/Torso/espalda/back_color_edit_24399873717629.png',
   'Shoulders' =>
     'assets/assets/Torso/hombro/shoulder_color_edit_24371924634300.png',
   'Core' => 'assets/assets/Torso/core/core_color_edit_24429990449916.png',
-  'Biceps' =>
-    'assets/assets/Torso/brazos/biceps_color_edit_24552237308231.png',
+  'Biceps' => 'assets/assets/Torso/brazos/biceps_color_edit_24552237308231.png',
   'Triceps' =>
     'assets/assets/Torso/brazos/triceps_color_edit_24483943284283.png',
   'Forearms' =>
     'assets/assets/Torso/brazos/forearm_color_edit_24515208562924.png',
   'Quadriceps' => 'assets/assets/Piernas/cuadriceps_color.png',
-  'Hamstrings' =>
-    'assets/assets/Piernas/femoral_color_edit_24685232753002.png',
+  'Hamstrings' => 'assets/assets/Piernas/femoral_color_edit_24685232753002.png',
   'Glutes' => 'assets/assets/Piernas/glutes_color_edit_24667069897276.png',
   'Calves' => 'assets/assets/Piernas/calf_color_edit_24747730293097.png',
   _ => null,
@@ -289,8 +286,9 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                       ? null
                       : [
                           BoxShadow(
-                            color: context.colors.accentDeep
-                                .withValues(alpha: 0.25),
+                            color: context.colors.accentDeep.withValues(
+                              alpha: 0.25,
+                            ),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -302,7 +300,9 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: _editMode ? context.colors.accentDeep : Colors.white,
+                      color: _editMode
+                          ? context.colors.accentDeep
+                          : Colors.white,
                     ),
                   ),
                 ),
@@ -318,7 +318,8 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
               children: [
                 ScreenHeader(
                   title: routine.name,
-                  subtitle: '${routine.exercises.length} ${l10n.exercisesLabel}',
+                  subtitle:
+                      '${routine.exercises.length} ${l10n.exercisesLabel}',
                   onBack: () => Navigator.of(context).pop(),
                   trailing: trailing,
                   accentBack: true,
@@ -539,59 +540,19 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: _kColors.map((c) {
-                              final active = c.toARGB32() == currentColorValue;
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: PressableScale(
-                                  onTap: () {
-                                    setState(() => _editColorValue = c.toARGB32());
-                                    ref
-                                        .read(routinesProvider.notifier)
-                                        .updateMeta(
-                                          routine.id,
-                                          c.toARGB32(),
-                                          currentIconCode,
-                                        );
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 180),
-                                    width: 38,
-                                    height: 38,
-                                    decoration: BoxDecoration(
-                                      color: c,
-                                      shape: BoxShape.circle,
-                                      border: active
-                                          ? Border.all(
-                                              color: Colors.white,
-                                              width: 3,
-                                            )
-                                          : null,
-                                      boxShadow: active
-                                          ? [
-                                              BoxShadow(
-                                                color: c.withValues(alpha: 0.5),
-                                                blurRadius: 12,
-                                                offset: const Offset(0, 3),
-                                              ),
-                                            ]
-                                          : null,
-                                    ),
-                                    child: active
-                                        ? const Icon(
-                                            Icons.check,
-                                            color: Colors.white,
-                                            size: 18,
-                                          )
-                                        : null,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
+                        RoutineColorPicker(
+                          colors: _kColors,
+                          selectedColorValue: currentColorValue,
+                          onSelected: (color) {
+                            setState(() => _editColorValue = color.toARGB32());
+                            ref
+                                .read(routinesProvider.notifier)
+                                .updateMeta(
+                                  routine.id,
+                                  color.toARGB32(),
+                                  currentIconCode,
+                                );
+                          },
                         ),
                         const SizedBox(height: 14),
                         Text(

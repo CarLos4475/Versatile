@@ -10,6 +10,7 @@ import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../view_models/routines_view_model.dart';
+import '../widgets/routine_color_picker.dart';
 import 'routine_detail_screen.dart';
 
 const _kColors = [
@@ -115,10 +116,17 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                           decoration: InputDecoration(
-                            hintText: l10n.appName == 'Versatile' ? 'e.g. Push Day, Full Body…' : 'ej. Día de empuje, Cuerpo completo…',
-                            hintStyle: const TextStyle(fontSize: 16, color: Colors.grey),
+                            hintText: l10n.appName == 'Versatile'
+                                ? 'e.g. Push Day, Full Body…'
+                                : 'ej. Día de empuje, Cuerpo completo…',
+                            hintStyle: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey,
+                            ),
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 14,
+                            ),
                           ),
                           onSubmitted: (_) => _save(),
                         ),
@@ -140,43 +148,12 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                     const SizedBox(height: 12),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 22),
-                      child: Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: _kColors.map((c) {
-                          final active = _selectedColor == c;
-                          return PressableScale(
-                            onTap: () => setState(() => _selectedColor = c),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 180),
-                              width: 44,
-                              height: 44,
-                              decoration: BoxDecoration(
-                                color: c,
-                                shape: BoxShape.circle,
-                                border: active
-                                    ? Border.all(color: Colors.white, width: 3)
-                                    : null,
-                                boxShadow: active
-                                    ? [
-                                        BoxShadow(
-                                          color: c.withValues(alpha: 0.5),
-                                          blurRadius: 14,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ]
-                                    : null,
-                              ),
-                              child: active
-                                  ? const Icon(
-                                      Icons.check,
-                                      color: Colors.white,
-                                      size: 20,
-                                    )
-                                  : null,
-                            ),
-                          );
-                        }).toList(),
+                      child: RoutineColorPicker(
+                        colors: _kColors,
+                        selectedColorValue: _selectedColor.toARGB32(),
+                        onSelected: (color) {
+                          setState(() => _selectedColor = color);
+                        },
                       ),
                     ),
                     const SizedBox(height: 28),
@@ -230,7 +207,9 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                               ),
                               child: Icon(
                                 icon,
-                                color: active ? Colors.white : context.colors.ink700,
+                                color: active
+                                    ? Colors.white
+                                    : context.colors.ink700,
                                 size: 20,
                               ),
                             ),
