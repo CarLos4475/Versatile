@@ -74,6 +74,13 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
   bool _editMode = false;
   int? _editColorValue;
   int? _editIconCode;
+  TextEditingController? _nameCtrl;
+
+  @override
+  void dispose() {
+    _nameCtrl?.dispose();
+    super.dispose();
+  }
 
   Routine? _find(List<Routine> list) {
     try {
@@ -125,6 +132,25 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
     if (ok == true && mounted) {
       await ref.read(routinesProvider.notifier).deleteRoutine(widget.routineId);
       if (mounted) Navigator.of(context).pop();
+    }
+  }
+
+  void _toggleEdit(Routine routine) {
+    if (_editMode) {
+      final name = _nameCtrl?.text.trim() ?? '';
+      if (name.isNotEmpty && name != routine.name) {
+        ref.read(routinesProvider.notifier).updateName(routine.id, name);
+      }
+      _nameCtrl?.dispose();
+      _nameCtrl = null;
+      setState(() => _editMode = false);
+    } else {
+      setState(() {
+        _editMode = true;
+        _editColorValue = routine.colorValue;
+        _editIconCode = routine.iconCode;
+        _nameCtrl = TextEditingController(text: routine.name);
+      });
     }
   }
 
@@ -239,15 +265,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                 ),
               ),
             PressableScale(
-              onTap: () {
-                setState(() {
-                  _editMode = !_editMode;
-                  if (_editMode) {
-                    _editColorValue = routine.colorValue;
-                    _editIconCode = routine.iconCode;
-                  }
-                });
-              },
+              onTap: () => _toggleEdit(routine),
               child: Container(
                 height: 36,
                 padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -467,6 +485,50 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          l10n.name_label,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.06,
+                            color: context.colors.ink400,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        GlassContainer(
+                          radius: 14,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 4,
+                          ),
+                          child: TextField(
+                            controller: _nameCtrl,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: context.colors.ink900,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            decoration: InputDecoration(
+                              hintStyle: TextStyle(
+                                fontSize: 16,
+                                color: context.colors.ink400,
+                              ),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                              ),
+                            ),
+                            onSubmitted: (v) {
+                              final name = v.trim();
+                              if (name.isNotEmpty && name != routine.name) {
+                                ref
+                                    .read(routinesProvider.notifier)
+                                    .updateName(routine.id, name);
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 16),
                         Text(
                           l10n.color_label,
                           style: TextStyle(

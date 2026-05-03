@@ -612,7 +612,6 @@ class _PrChip extends StatelessWidget {
         ),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             'PR',
@@ -629,12 +628,16 @@ class _PrChip extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 8),
             color: Colors.white.withValues(alpha: 0.3),
           ),
-          Text(
-            exerciseName,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
+          Expanded(
+            child: Text(
+              exerciseName,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
             ),
           ),
           const SizedBox(width: 8),

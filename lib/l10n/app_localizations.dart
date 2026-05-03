@@ -746,6 +746,12 @@ abstract class AppLocalizations {
   /// **'Name it and pick a color'**
   String get nameItAndPickColor;
 
+  /// No description provided for @name_label.
+  ///
+  /// In en, this message translates to:
+  /// **'NAME'**
+  String get name_label;
+
   /// No description provided for @color_label.
   ///
   /// In en, this message translates to:

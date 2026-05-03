@@ -28,6 +28,11 @@ class RoutinesNotifier extends AsyncNotifier<List<Routine>> {
     ref.invalidateSelf();
   }
 
+  Future<void> updateName(String id, String name) async {
+    await ref.read(routineRepositoryProvider).updateName(id, name);
+    ref.invalidateSelf();
+  }
+
   Future<void> updateMeta(String id, int colorValue, int iconCode) async {
     await ref.read(routineRepositoryProvider).updateMeta(id, colorValue, iconCode);
     ref.invalidateSelf();

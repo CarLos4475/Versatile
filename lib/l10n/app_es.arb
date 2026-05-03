@@ -160,6 +160,7 @@
   "noRecordYet": "Sin récord aún",
   "newRoutine": "Nueva Rutina",
   "nameItAndPickColor": "Dale un nombre y elige un color",
+  "name_label": "NOMBRE",
   "color_label": "COLOR",
   "icon_label": "ICONO",
   "createRoutineBtn": "Crear rutina",

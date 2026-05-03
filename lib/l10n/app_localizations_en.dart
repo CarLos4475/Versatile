@@ -347,6 +347,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nameItAndPickColor => 'Name it and pick a color';
 
   @override
+  String get name_label => 'NAME';
+
+  @override
   String get color_label => 'COLOR';
 
   @override

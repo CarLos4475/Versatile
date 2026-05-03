@@ -160,6 +160,7 @@
   "noRecordYet": "No record yet",
   "newRoutine": "New Routine",
   "nameItAndPickColor": "Name it and pick a color",
+  "name_label": "NAME",
   "color_label": "COLOR",
   "icon_label": "ICON",
   "createRoutineBtn": "Create Routine",
