@@ -1,6 +1,6 @@
 name: versatile
 description: "Gym workout tracker — bone white + claude orange liquid glass UI."
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
@@ -26,11 +26,20 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  web:
+    generate: true
+  image_path: assets/icon/logo_versatile.png
 
 flutter:
   generate: true
   uses-material-design: true
   assets:
+    - assets/icon/logo_versatile.png
     - assets/assets/Piernas/
     - assets/assets/Torso/pecho/
     - assets/assets/Torso/espalda/
