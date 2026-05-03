@@ -500,4 +500,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unilateral_label => 'UNILATERAL';
+
+  @override
+  String get configureExercise => 'Configure Exercise';
+
+  @override
+  String get apply => 'Apply';
+
+  @override
+  String get setsLabel => 'Sets';
+
+  @override
+  String get repsRangeLabel => 'Reps';
+
+  @override
+  String get restSecondsLabel => 'Rest (s)';
 }

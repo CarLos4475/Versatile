@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
@@ -15,6 +14,53 @@ import '../../exercises/view_models/exercises_view_model.dart';
 import '../view_models/routines_view_model.dart';
 import 'exercise_picker_screen.dart';
 
+const _kColors = [
+  Color(0xFFD97757),
+  Color(0xFFB85432),
+  Color(0xFFE89A7E),
+  Color(0xFFB48C64),
+  Color(0xFF9B7850),
+  Color(0xFF4A7B6F),
+  Color(0xFF7B5EA7),
+  Color(0xFF5E7BA7),
+];
+
+const _kIcons = [
+  Icons.fitness_center,
+  Icons.bolt,
+  Icons.timer,
+  Icons.favorite,
+  Icons.trending_up,
+  Icons.directions_run,
+  Icons.speed,
+  Icons.monitor_weight,
+  Icons.rocket_launch,
+  Icons.local_fire_department,
+  Icons.self_improvement,
+];
+
+String? _muscleAsset(String muscle) => switch (muscle) {
+  'Chest' =>
+    'assets/assets/Torso/pecho/pecho_color_edit_24348292703575.png',
+  'Back' =>
+    'assets/assets/Torso/espalda/back_color_edit_24399873717629.png',
+  'Shoulders' =>
+    'assets/assets/Torso/hombro/shoulder_color_edit_24371924634300.png',
+  'Core' => 'assets/assets/Torso/core/core_color_edit_24429990449916.png',
+  'Biceps' =>
+    'assets/assets/Torso/brazos/biceps_color_edit_24552237308231.png',
+  'Triceps' =>
+    'assets/assets/Torso/brazos/triceps_color_edit_24483943284283.png',
+  'Forearms' =>
+    'assets/assets/Torso/brazos/forearm_color_edit_24515208562924.png',
+  'Quadriceps' => 'assets/assets/Piernas/cuadriceps_color.png',
+  'Hamstrings' =>
+    'assets/assets/Piernas/femoral_color_edit_24685232753002.png',
+  'Glutes' => 'assets/assets/Piernas/glutes_color_edit_24667069897276.png',
+  'Calves' => 'assets/assets/Piernas/calf_color_edit_24747730293097.png',
+  _ => null,
+};
+
 class RoutineDetailScreen extends ConsumerStatefulWidget {
   const RoutineDetailScreen({super.key, required this.routineId});
   final String routineId;
@@ -26,6 +72,8 @@ class RoutineDetailScreen extends ConsumerStatefulWidget {
 
 class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
   bool _editMode = false;
+  int? _editColorValue;
+  int? _editIconCode;
 
   Routine? _find(List<Routine> list) {
     try {
@@ -88,6 +136,28 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
     ref.read(routinesProvider.notifier).reorderExercises(routine.id, exercises);
   }
 
+  Widget _muscleIcon(String muscle) {
+    final asset = _muscleAsset(muscle);
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: context.colors.accentTint,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: asset != null
+          ? Padding(
+              padding: const EdgeInsets.all(7),
+              child: Image.asset(asset, fit: BoxFit.contain),
+            )
+          : Icon(
+              Icons.fitness_center,
+              size: 16,
+              color: context.colors.accentDeep,
+            ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -140,6 +210,9 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
           }
         }
 
+        final currentColorValue = _editColorValue ?? routine.colorValue;
+        final currentIconCode = _editIconCode ?? routine.iconCode;
+
         final trailing = Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -166,7 +239,15 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                 ),
               ),
             PressableScale(
-              onTap: () => setState(() => _editMode = !_editMode),
+              onTap: () {
+                setState(() {
+                  _editMode = !_editMode;
+                  if (_editMode) {
+                    _editColorValue = routine.colorValue;
+                    _editIconCode = routine.iconCode;
+                  }
+                });
+              },
               child: Container(
                 height: 36,
                 padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -234,7 +315,6 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                           children: routine.exercises.asMap().entries.map((
                             entry,
                           ) {
-                            final i = entry.key;
                             final re = entry.value;
                             final ex = findEx(re.exerciseId);
                             if (ex == null) {
@@ -251,7 +331,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                 child: Row(
                                   children: [
                                     ReorderableDragStartListener(
-                                      index: i,
+                                      index: entry.key,
                                       child: Icon(
                                         Icons.drag_handle,
                                         size: 18,
@@ -259,24 +339,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                       ),
                                     ),
                                     const SizedBox(width: 10),
-                                    Container(
-                                      width: 28,
-                                      height: 28,
-                                      decoration: BoxDecoration(
-                                        color: context.colors.accentTint,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          '${i + 1}',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                            color: context.colors.accentDeep,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    _muscleIcon(ex.muscle),
                                     const SizedBox(width: 10),
                                     Expanded(
                                       child: Column(
@@ -337,7 +400,6 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                           children: routine.exercises.asMap().entries.map((
                             entry,
                           ) {
-                            final i = entry.key;
                             final re = entry.value;
                             final ex = findEx(re.exerciseId);
                             if (ex == null) return const SizedBox.shrink();
@@ -348,27 +410,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                 padding: const EdgeInsets.all(14),
                                 child: Row(
                                   children: [
-                                    Container(
-                                      width: 32,
-                                      height: 32,
-                                      decoration: BoxDecoration(
-                                        color: context.colors.accentTint,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          '${i + 1}',
-                                          style: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w700,
-                                            color: context.colors.accentDeep,
-                                            fontFeatures: const [
-                                              FontFeature.tabularFigures(),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    _muscleIcon(ex.muscle),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
@@ -419,6 +461,153 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                           }).toList(),
                         ),
                 ),
+                if (_editMode)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(22, 8, 22, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.color_label,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.06,
+                            color: context.colors.ink400,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: _kColors.map((c) {
+                              final active = c.toARGB32() == currentColorValue;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: PressableScale(
+                                  onTap: () {
+                                    setState(() => _editColorValue = c.toARGB32());
+                                    ref
+                                        .read(routinesProvider.notifier)
+                                        .updateMeta(
+                                          routine.id,
+                                          c.toARGB32(),
+                                          currentIconCode,
+                                        );
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 180),
+                                    width: 38,
+                                    height: 38,
+                                    decoration: BoxDecoration(
+                                      color: c,
+                                      shape: BoxShape.circle,
+                                      border: active
+                                          ? Border.all(
+                                              color: Colors.white,
+                                              width: 3,
+                                            )
+                                          : null,
+                                      boxShadow: active
+                                          ? [
+                                              BoxShadow(
+                                                color: c.withValues(alpha: 0.5),
+                                                blurRadius: 12,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ]
+                                          : null,
+                                    ),
+                                    child: active
+                                        ? const Icon(
+                                            Icons.check,
+                                            color: Colors.white,
+                                            size: 18,
+                                          )
+                                        : null,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          l10n.icon_label,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.06,
+                            color: context.colors.ink400,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: _kIcons.map((icon) {
+                              final active = icon.codePoint == currentIconCode;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: PressableScale(
+                                  onTap: () {
+                                    setState(
+                                      () => _editIconCode = icon.codePoint,
+                                    );
+                                    ref
+                                        .read(routinesProvider.notifier)
+                                        .updateMeta(
+                                          routine.id,
+                                          currentColorValue,
+                                          icon.codePoint,
+                                        );
+                                  },
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 180),
+                                    width: 38,
+                                    height: 38,
+                                    decoration: BoxDecoration(
+                                      color: active
+                                          ? context.colors.accent
+                                          : context.colors.glassBg,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: active
+                                          ? Border.all(
+                                              color: Colors.white,
+                                              width: 2,
+                                            )
+                                          : Border.all(
+                                              color: context.colors.glassBorder,
+                                              width: 0.5,
+                                            ),
+                                      boxShadow: active
+                                          ? [
+                                              BoxShadow(
+                                                color: context.colors.accentDeep
+                                                    .withValues(alpha: 0.3),
+                                                blurRadius: 10,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ]
+                                          : null,
+                                    ),
+                                    child: Icon(
+                                      icon,
+                                      size: 18,
+                                      color: active
+                                          ? Colors.white
+                                          : context.colors.ink700,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                    ),
+                  ),
                 if (_editMode)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),

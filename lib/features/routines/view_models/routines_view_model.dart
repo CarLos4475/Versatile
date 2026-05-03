@@ -28,8 +28,15 @@ class RoutinesNotifier extends AsyncNotifier<List<Routine>> {
     ref.invalidateSelf();
   }
 
+  Future<void> updateMeta(String id, int colorValue, int iconCode) async {
+    await ref.read(routineRepositoryProvider).updateMeta(id, colorValue, iconCode);
+    ref.invalidateSelf();
+  }
+
   Future<void> reorderExercises(
-      String routineId, List<RoutineExercise> exercises) async {
+    String routineId,
+    List<RoutineExercise> exercises,
+  ) async {
     await ref
         .read(routineRepositoryProvider)
         .reorderExercises(routineId, exercises);
@@ -37,7 +44,6 @@ class RoutinesNotifier extends AsyncNotifier<List<Routine>> {
   }
 }
 
-final routinesProvider =
-    AsyncNotifierProvider<RoutinesNotifier, List<Routine>>(
+final routinesProvider = AsyncNotifierProvider<RoutinesNotifier, List<Routine>>(
   RoutinesNotifier.new,
 );

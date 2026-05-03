@@ -8,13 +8,15 @@ class RoutineRepository {
     final result = <Routine>[];
     for (final r in routineRows) {
       final id = r['id'] as String;
-      result.add(Routine(
-        id: id,
-        name: r['name'] as String,
-        colorValue: r['color_value'] as int,
-        iconCode: r['icon_code'] as int? ?? 58713,
-        exercises: await _loadExercises(id),
-      ));
+      result.add(
+        Routine(
+          id: id,
+          name: r['name'] as String,
+          colorValue: r['color_value'] as int,
+          iconCode: r['icon_code'] as int? ?? 58713,
+          exercises: await _loadExercises(id),
+        ),
+      );
     }
     return result;
   }
@@ -56,7 +58,22 @@ class RoutineRepository {
 
   Future<void> updateName(String id, String name) async {
     final db = await DatabaseHelper.instance.database;
-    await db.update('routines', {'name': name}, where: 'id = ?', whereArgs: [id]);
+    await db.update(
+      'routines',
+      {'name': name},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> updateMeta(String id, int colorValue, int iconCode) async {
+    final db = await DatabaseHelper.instance.database;
+    await db.update(
+      'routines',
+      {'color_value': colorValue, 'icon_code': iconCode},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future<void> delete(String id) async {
@@ -83,11 +100,7 @@ class RoutineRepository {
 
   Future<void> removeExercise(String routineId, int dbId) async {
     final db = await DatabaseHelper.instance.database;
-    await db.delete(
-      'routine_exercises',
-      where: 'id = ?',
-      whereArgs: [dbId],
-    );
+    await db.delete('routine_exercises', where: 'id = ?', whereArgs: [dbId]);
   }
 
   Future<void> deleteReferencesToExercise(String exerciseId) async {
@@ -100,7 +113,9 @@ class RoutineRepository {
   }
 
   Future<void> reorderExercises(
-      String routineId, List<RoutineExercise> exercises) async {
+    String routineId,
+    List<RoutineExercise> exercises,
+  ) async {
     final db = await DatabaseHelper.instance.database;
     await db.transaction((txn) async {
       for (var i = 0; i < exercises.length; i++) {
@@ -126,13 +141,15 @@ class RoutineRepository {
       orderBy: 'sort_order ASC',
     );
     return rows
-        .map((r) => RoutineExercise(
-              dbId: r['id'] as int,
-              exerciseId: r['exercise_id'] as String,
-              targetSets: r['target_sets'] as int,
-              targetReps: r['target_reps'] as String,
-              restSeconds: r['rest_seconds'] as int,
-            ))
+        .map(
+          (r) => RoutineExercise(
+            dbId: r['id'] as int,
+            exerciseId: r['exercise_id'] as String,
+            targetSets: r['target_sets'] as int,
+            targetReps: r['target_reps'] as String,
+            restSeconds: r['rest_seconds'] as int,
+          ),
+        )
         .toList();
   }
 }

@@ -219,5 +219,11 @@
       }
     }
   },
-  "unilateral_label": "UNILATERAL"
+  "unilateral_label": "UNILATERAL",
+
+  "configureExercise": "Configure Exercise",
+  "apply": "Apply",
+  "setsLabel": "Sets",
+  "repsRangeLabel": "Reps",
+  "restSecondsLabel": "Rest (s)"
 }

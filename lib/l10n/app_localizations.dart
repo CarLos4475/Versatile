@@ -1039,6 +1039,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'UNILATERAL'**
   String get unilateral_label;
+
+  /// No description provided for @configureExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure Exercise'**
+  String get configureExercise;
+
+  /// No description provided for @apply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get apply;
+
+  /// No description provided for @setsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sets'**
+  String get setsLabel;
+
+  /// No description provided for @repsRangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reps'**
+  String get repsRangeLabel;
+
+  /// No description provided for @restSecondsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest (s)'**
+  String get restSecondsLabel;
 }
 
 class _AppLocalizationsDelegate
