@@ -13,6 +13,266 @@ import '../../exercises/screens/add_exercise_screen.dart';
 import '../../exercises/view_models/exercises_view_model.dart';
 import '../view_models/routines_view_model.dart';
 
+String? _muscleAsset(String muscle) => switch (muscle) {
+  'Chest' =>
+    'assets/assets/Torso/pecho/pecho_color_edit_24348292703575.png',
+  'Back' =>
+    'assets/assets/Torso/espalda/back_color_edit_24399873717629.png',
+  'Shoulders' =>
+    'assets/assets/Torso/hombro/shoulder_color_edit_24371924634300.png',
+  'Core' => 'assets/assets/Torso/core/core_color_edit_24429990449916.png',
+  'Biceps' =>
+    'assets/assets/Torso/brazos/biceps_color_edit_24552237308231.png',
+  'Triceps' =>
+    'assets/assets/Torso/brazos/triceps_color_edit_24483943284283.png',
+  'Forearms' =>
+    'assets/assets/Torso/brazos/forearm_color_edit_24515208562924.png',
+  'Quadriceps' => 'assets/assets/Piernas/cuadriceps_color.png',
+  'Hamstrings' =>
+    'assets/assets/Piernas/femoral_color_edit_24685232753002.png',
+  'Glutes' => 'assets/assets/Piernas/glutes_color_edit_24667069897276.png',
+  'Calves' => 'assets/assets/Piernas/calf_color_edit_24747730293097.png',
+  _ => null,
+};
+
+// ─── Stepper / row helpers (shared by _ExerciseConfigDialog) ────────────────
+
+Widget _dialogRow(BuildContext ctx, String label, Widget child) => Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Text(
+      label,
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: ctx.colors.ink700,
+      ),
+    ),
+    child,
+  ],
+);
+
+Widget _stepBtn(BuildContext ctx, IconData icon, VoidCallback? onTap) =>
+    GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 120),
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: onTap != null ? ctx.colors.accentTint : ctx.colors.fieldBg,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          icon,
+          size: 14,
+          color: onTap != null ? ctx.colors.accentDeep : ctx.colors.ink400,
+        ),
+      ),
+    );
+
+// ─── Per-exercise configuration dialog ──────────────────────────────────────
+
+class _ExerciseConfigDialog extends StatefulWidget {
+  const _ExerciseConfigDialog({
+    required this.exerciseName,
+    required this.index,
+    required this.total,
+  });
+
+  final String exerciseName;
+  final int index;
+  final int total;
+
+  @override
+  State<_ExerciseConfigDialog> createState() => _ExerciseConfigDialogState();
+}
+
+class _ExerciseConfigDialogState extends State<_ExerciseConfigDialog> {
+  int _sets = 3;
+  int _rest = 90;
+  late final TextEditingController _repsCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _repsCtrl = TextEditingController(text: '8-12');
+  }
+
+  @override
+  void dispose() {
+    _repsCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return AlertDialog(
+      backgroundColor: context.colors.bgFrame,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.total > 1)
+            Text(
+              '${widget.index + 1} / ${widget.total}',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: context.colors.ink400,
+              ),
+            ),
+          if (widget.total > 1) const SizedBox(height: 3),
+          Text(
+            widget.exerciseName,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: context.colors.ink900,
+            ),
+          ),
+        ],
+      ),
+      contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _dialogRow(
+            context,
+            l10n.setsLabel,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _stepBtn(
+                  context,
+                  Icons.remove,
+                  _sets > 1 ? () => setState(() => _sets--) : null,
+                ),
+                SizedBox(
+                  width: 40,
+                  child: Text(
+                    '$_sets',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: context.colors.ink900,
+                    ),
+                  ),
+                ),
+                _stepBtn(
+                  context,
+                  Icons.add,
+                  _sets < 20 ? () => setState(() => _sets++) : null,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          _dialogRow(
+            context,
+            l10n.repsRangeLabel,
+            SizedBox(
+              width: 96,
+              height: 36,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: context.colors.fieldBg,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: TextField(
+                  controller: _repsCtrl,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: context.colors.ink900,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: '8-12',
+                    hintStyle: TextStyle(color: context.colors.ink400),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
+                    isDense: true,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _dialogRow(
+            context,
+            l10n.restSecondsLabel,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _stepBtn(
+                  context,
+                  Icons.remove,
+                  _rest >= 15 ? () => setState(() => _rest -= 15) : null,
+                ),
+                SizedBox(
+                  width: 40,
+                  child: Text(
+                    '$_rest',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: context.colors.ink900,
+                    ),
+                  ),
+                ),
+                _stepBtn(
+                  context,
+                  Icons.add,
+                  _rest <= 585 ? () => setState(() => _rest += 15) : null,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(null),
+          child: Text(
+            l10n.cancel,
+            style: TextStyle(color: context.colors.ink500),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            final r = _repsCtrl.text.trim();
+            Navigator.of(context).pop((
+              sets: _sets,
+              reps: r.isEmpty ? '8-12' : r,
+              rest: _rest,
+            ));
+          },
+          child: Text(
+            l10n.apply,
+            style: TextStyle(
+              color: context.colors.accentDeep,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Exercise picker ─────────────────────────────────────────────────────────
+
 class ExercisePickerScreen extends ConsumerStatefulWidget {
   const ExercisePickerScreen({super.key, required this.routineId});
   final String routineId;
@@ -26,204 +286,20 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
   String _query = '';
   final Set<String> _selectedIds = {};
 
-  Future<({int sets, String reps, int rest})?> _showConfigureDialog() async {
-    final l10n = AppLocalizations.of(context)!;
-    final repsCtrl = TextEditingController(text: '8-12');
-
-    final result = await showDialog<({int sets, String reps, int rest})>(
+  Future<({int sets, String reps, int rest})?> _showConfigureDialog({
+    required String exerciseName,
+    required int index,
+    required int total,
+  }) {
+    return showDialog<({int sets, String reps, int rest})>(
       context: context,
-      builder: (ctx) {
-        var sets = 3;
-        var rest = 90;
-        return StatefulBuilder(
-          builder: (ctx, setDialogState) => AlertDialog(
-            backgroundColor: ctx.colors.bgFrame,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: Text(
-              l10n.configureExercise,
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: ctx.colors.ink900,
-              ),
-            ),
-            contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 8),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _dialogRow(
-                  ctx,
-                  l10n.setsLabel,
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _stepBtn(
-                        ctx,
-                        Icons.remove,
-                        sets > 1 ? () => setDialogState(() => sets--) : null,
-                      ),
-                      SizedBox(
-                        width: 40,
-                        child: Text(
-                          '$sets',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: ctx.colors.ink900,
-                          ),
-                        ),
-                      ),
-                      _stepBtn(
-                        ctx,
-                        Icons.add,
-                        sets < 20 ? () => setDialogState(() => sets++) : null,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _dialogRow(
-                  ctx,
-                  l10n.repsRangeLabel,
-                  SizedBox(
-                    width: 96,
-                    height: 36,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: ctx.colors.fieldBg,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: TextField(
-                        controller: repsCtrl,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: ctx.colors.ink900,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: '8-12',
-                          hintStyle: TextStyle(color: ctx.colors.ink400),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 8,
-                          ),
-                          isDense: true,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _dialogRow(
-                  ctx,
-                  l10n.restSecondsLabel,
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _stepBtn(
-                        ctx,
-                        Icons.remove,
-                        rest >= 15
-                            ? () => setDialogState(() => rest -= 15)
-                            : null,
-                      ),
-                      SizedBox(
-                        width: 40,
-                        child: Text(
-                          '$rest',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: ctx.colors.ink900,
-                          ),
-                        ),
-                      ),
-                      _stepBtn(
-                        ctx,
-                        Icons.add,
-                        rest <= 585
-                            ? () => setDialogState(() => rest += 15)
-                            : null,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(null),
-                child: Text(
-                  l10n.cancel,
-                  style: TextStyle(color: ctx.colors.ink500),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  final r = repsCtrl.text.trim();
-                  Navigator.of(ctx).pop((
-                    sets: sets,
-                    reps: r.isEmpty ? '8-12' : r,
-                    rest: rest,
-                  ));
-                },
-                child: Text(
-                  l10n.apply,
-                  style: TextStyle(
-                    color: ctx.colors.accentDeep,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-
-    repsCtrl.dispose();
-    return result;
-  }
-
-  Widget _dialogRow(BuildContext ctx, String label, Widget child) => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text(
-        label,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: ctx.colors.ink700,
-        ),
+      builder: (_) => _ExerciseConfigDialog(
+        exerciseName: exerciseName,
+        index: index,
+        total: total,
       ),
-      child,
-    ],
-  );
-
-  Widget _stepBtn(BuildContext ctx, IconData icon, VoidCallback? onTap) =>
-      GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 120),
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: onTap != null ? ctx.colors.accentTint : ctx.colors.fieldBg,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            size: 14,
-            color: onTap != null ? ctx.colors.accentDeep : ctx.colors.ink400,
-          ),
-        ),
-      );
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -231,7 +307,10 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
     final allExercises = ref.watch(exercisesAsyncProvider).value ?? [];
     final filtered = allExercises.where((e) {
       if (_query.isEmpty) return true;
-      return e.getLocalizedName(context).toLowerCase().contains(_query.toLowerCase());
+      return e
+          .getLocalizedName(context)
+          .toLowerCase()
+          .contains(_query.toLowerCase());
     }).toList();
 
     return Scaffold(
@@ -311,6 +390,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                 itemBuilder: (context, i) {
                   final ex = filtered[i];
                   final isSelected = _selectedIds.contains(ex.id);
+                  final asset = _muscleAsset(ex.muscle);
                   return PressableScale(
                     onTap: () {
                       setState(() {
@@ -323,10 +403,11 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                     },
                     child: GlassContainer(
                       radius: 16,
-                      padding: const EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(12),
                       child: Row(
                         children: [
-                          Container(
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
                             width: 20,
                             height: 20,
                             decoration: BoxDecoration(
@@ -344,6 +425,28 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                                 ? const Icon(Icons.check,
                                     size: 14, color: Colors.white)
                                 : null,
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: context.colors.accentTint,
+                              borderRadius: BorderRadius.circular(11),
+                            ),
+                            child: asset != null
+                                ? Padding(
+                                    padding: const EdgeInsets.all(7),
+                                    child: Image.asset(
+                                      asset,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.fitness_center,
+                                    size: 18,
+                                    color: context.colors.accentDeep,
+                                  ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -406,7 +509,9 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
             Padding(
               padding: const EdgeInsets.all(22),
               child: GlassButton(
-                label: l10n.done,
+                label: _selectedIds.isEmpty
+                    ? l10n.done
+                    : '${l10n.done} (${_selectedIds.length})',
                 variant: GlassButtonVariant.primary,
                 size: GlassButtonSize.lg,
                 expand: true,
@@ -414,18 +519,48 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                     ? null
                     : () async {
                         final nav = Navigator.of(context);
-                        final params = await _showConfigureDialog();
-                        if (params == null || !mounted) return;
-                        for (final id in _selectedIds) {
+                        final exercises =
+                            ref.read(exercisesAsyncProvider).value ?? [];
+                        final ids = _selectedIds.toList();
+                        final total = ids.length;
+
+                        // Pre-capture localized names before any async gap.
+                        final entries = ids.map((id) {
+                          final ex = exercises.firstWhere(
+                            (e) => e.id == id,
+                            orElse: () => exercises.first,
+                          );
+                          return (id: id, name: ex.getLocalizedName(context));
+                        }).toList();
+
+                        // One dialog per exercise; cancelling aborts all.
+                        final configs =
+                            <({String id, int sets, String reps, int rest})>[];
+                        for (var i = 0; i < entries.length; i++) {
+                          final params = await _showConfigureDialog(
+                            exerciseName: entries[i].name,
+                            index: i,
+                            total: total,
+                          );
+                          if (params == null || !mounted) return;
+                          configs.add((
+                            id: entries[i].id,
+                            sets: params.sets,
+                            reps: params.reps,
+                            rest: params.rest,
+                          ));
+                        }
+
+                        for (final cfg in configs) {
                           await ref
                               .read(routinesProvider.notifier)
                               .addExercise(
                                 widget.routineId,
                                 RoutineExercise(
-                                  exerciseId: id,
-                                  targetSets: params.sets,
-                                  targetReps: params.reps,
-                                  restSeconds: params.rest,
+                                  exerciseId: cfg.id,
+                                  targetSets: cfg.sets,
+                                  targetReps: cfg.reps,
+                                  restSeconds: cfg.rest,
                                 ),
                               );
                         }
