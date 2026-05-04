@@ -376,8 +376,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                           fontWeight: FontWeight.w500,
                                           color: context.colors.ink900,
                                         ),
-                                      ),
-                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                ],
                                   ),
                                   const SizedBox(height: 10),
                                   Row(
@@ -412,6 +413,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                       );
                                     }).toList(),
                                   ),
+                                  const SizedBox(height: 6),
                                 ],
                               ),
                             ],

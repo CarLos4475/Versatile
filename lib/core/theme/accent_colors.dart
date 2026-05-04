@@ -31,7 +31,7 @@ class AccentColors {
     AccentOption(id: 'red', l10nKey: 'colorRed', color: Color(0xFFD95B5B)),
     AccentOption(id: 'teal', l10nKey: 'colorTeal', color: Color(0xFF0EA5A0)),
     AccentOption(id: 'pink', l10nKey: 'colorPink', color: Color(0xFFD95B9C)),
-    AccentOption(id: 'amber', l10nKey: 'colorAmber', color: Color(0xFFE6A817)),
+    AccentOption(id: 'gray', l10nKey: 'colorGray', color: Color(0xFF4A4A5A)),
   ];
 
   static AccentOption fromId(String id) {
