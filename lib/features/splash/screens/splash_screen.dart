@@ -56,9 +56,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   Future<void> _runStartupTasks() async {
     // Run cleanup silently in background — don't block navigation on it
-    unawaited(
-      ref.read(cleanupOldSessionsProvider.future).catchError((_) {}),
-    );
+    unawaited(ref.read(cleanupOldSessionsProvider.future).catchError((_) {}));
     // These must complete before navigation
     _activeInfo = await WorkoutNotificationService.getActiveWorkout();
     _onboarded = await ref.read(settingsRepositoryProvider).isOnboarded();
@@ -73,14 +71,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       // bug that occurred when navigating from a SplashScreen context that was
       // already removed from the tree before the postFrameCallback fired.
       ref.read(pendingWorkoutRestoreProvider.notifier).state = _activeInfo;
-      Navigator.of(context).pushReplacement(
-        AppRoute(page: const MainNavigationShell()),
-      );
+      Navigator.of(
+        context,
+      ).pushReplacement(AppRoute(page: const MainNavigationShell()));
       return;
     }
 
     Navigator.of(context).pushReplacement(
-      AppRoute(page: _onboarded ? const MainNavigationShell() : const OnboardingScreen()),
+      AppRoute(
+        page: _onboarded
+            ? const MainNavigationShell()
+            : const OnboardingScreen(),
+      ),
     );
   }
 
@@ -96,17 +98,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       backgroundColor: context.colors.bgFrame,
       body: Stack(
         children: [
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(0, -0.3),
-                  radius: 1.2,
-                  colors: [const Color(0x80D97757), Colors.transparent],
-                ),
-              ),
-            ),
-          ),
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -131,7 +122,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         borderRadius: BorderRadius.circular(28),
                         boxShadow: [
                           BoxShadow(
-                            color: context.colors.accentDeep.withValues(alpha: 0.4),
+                            color: context.colors.accentDeep.withValues(
+                              alpha: 0.4,
+                            ),
                             blurRadius: 48,
                             offset: const Offset(0, 24),
                           ),
