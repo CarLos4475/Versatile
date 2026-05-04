@@ -349,52 +349,69 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                 ],
                               ),
                               Divider(color: context.colors.hairline, height: 1),
-                              Row(
+                              const SizedBox(height: 6),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    width: 34,
-                                    height: 34,
-                                    decoration: BoxDecoration(
-                                      color: context.colors.accentTint,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Icon(
-                                      Icons.color_lens_outlined,
-                                      size: 18,
-                                      color: context.colors.accentDeep,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Text(
-                                      l10n.accentColor,
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        color: context.colors.ink900,
-                                      ),
-                                    ),
-                                  ),
-                                  ...AccentColors.options.map((opt) {
-                                    final selected = accent.id == opt.id;
-                                    return Padding(
-                                      padding: const EdgeInsets.only(left: 6),
-                                      child: PressableScale(
-                                        onTap: () => ref.read(accentProvider.notifier).setAccent(opt),
-                                        child: Container(
-                                          width: 26,
-                                          height: 26,
-                                          decoration: BoxDecoration(
-                                            color: opt.color,
-                                            shape: BoxShape.circle,
-                                            border: selected
-                                                ? Border.all(color: context.colors.ink300, width: 2.5)
-                                                : null,
-                                          ),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 34,
+                                        height: 34,
+                                        decoration: BoxDecoration(
+                                          color: context.colors.accentTint,
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: Icon(
+                                          Icons.color_lens_outlined,
+                                          size: 18,
+                                          color: context.colors.accentDeep,
                                         ),
                                       ),
-                                    );
-                                  }),
+                                      const SizedBox(width: 14),
+                                      Text(
+                                        l10n.accentColor,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          color: context.colors.ink900,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: AccentColors.options.map((opt) {
+                                      final selected = accent.id == opt.id;
+                                      return Padding(
+                                        padding: const EdgeInsets.only(right: 8),
+                                        child: PressableScale(
+                                          onTap: () => ref.read(accentProvider.notifier).setAccent(opt),
+                                          child: Container(
+                                            width: 30,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                              color: opt.color,
+                                              shape: BoxShape.circle,
+                                              border: selected
+                                                  ? Border.all(color: context.colors.ink300, width: 2.5)
+                                                  : null,
+                                              boxShadow: selected
+                                                  ? [
+                                                      BoxShadow(
+                                                        color: opt.color.withValues(alpha: 0.3),
+                                                        blurRadius: 8,
+                                                        offset: const Offset(0, 2),
+                                                      ),
+                                                    ]
+                                                  : null,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
                                 ],
                               ),
                             ],

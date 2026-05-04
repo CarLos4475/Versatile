@@ -16,10 +16,18 @@ class AccentColors {
   AccentColors._();
 
   static const options = [
-    AccentOption(id: 'orange', l10nKey: 'colorOrange', color: Color(0xFFD97757)),
+    AccentOption(
+      id: 'orange',
+      l10nKey: 'colorOrange',
+      color: Color(0xFFD97757),
+    ),
     AccentOption(id: 'blue', l10nKey: 'colorBlue', color: Color(0xFF4A8FCF)),
     AccentOption(id: 'green', l10nKey: 'colorGreen', color: Color(0xFF4C9B6D)),
-    AccentOption(id: 'purple', l10nKey: 'colorPurple', color: Color(0xFF8B5CF6)),
+    AccentOption(
+      id: 'purple',
+      l10nKey: 'colorPurple',
+      color: Color(0xFF8B5CF6),
+    ),
     AccentOption(id: 'red', l10nKey: 'colorRed', color: Color(0xFFD95B5B)),
     AccentOption(id: 'teal', l10nKey: 'colorTeal', color: Color(0xFF0EA5A0)),
     AccentOption(id: 'pink', l10nKey: 'colorPink', color: Color(0xFFD95B9C)),
