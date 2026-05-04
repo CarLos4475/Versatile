@@ -604,8 +604,8 @@ class _ActiveSetRow extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFE08866), Color(0xFFD97757)],
+                  gradient: LinearGradient(
+                    colors: [context.colors.accentLight, context.colors.accent],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),

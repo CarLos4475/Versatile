@@ -26,4 +26,6 @@ class SettingsRepository {
   Future<void> setThemeMode(String mode) => set('theme_mode', mode);
   Future<String> getLanguageCode() async => (await get('language_code')) ?? 'en';
   Future<void> setLanguageCode(String code) => set('language_code', code);
+  Future<String> getAccentColorId() async => (await get('accent_color')) ?? 'orange';
+  Future<void> setAccentColorId(String id) => set('accent_color', id);
 }

@@ -5,9 +5,11 @@ import 'package:versatile/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:versatile/core/providers/accent_provider.dart';
 import 'package:versatile/core/providers/repository_providers.dart';
 import 'package:versatile/core/providers/theme_provider.dart';
 import 'package:versatile/core/providers/locale_provider.dart';
+import 'package:versatile/core/theme/accent_colors.dart';
 import 'package:versatile/core/services/data_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/database/database_helper.dart';
@@ -178,6 +180,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final userName = ref.watch(userNameProvider).value ?? 'there';
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
+    final accent = ref.watch(accentProvider);
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
@@ -343,6 +346,55 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                       ],
                                     ),
                                   ),
+                                ],
+                              ),
+                              Divider(color: context.colors.hairline, height: 1),
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 34,
+                                    height: 34,
+                                    decoration: BoxDecoration(
+                                      color: context.colors.accentTint,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(
+                                      Icons.color_lens_outlined,
+                                      size: 18,
+                                      color: context.colors.accentDeep,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Text(
+                                      l10n.accentColor,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: context.colors.ink900,
+                                      ),
+                                    ),
+                                  ),
+                                  ...AccentColors.options.map((opt) {
+                                    final selected = accent.id == opt.id;
+                                    return Padding(
+                                      padding: const EdgeInsets.only(left: 6),
+                                      child: PressableScale(
+                                        onTap: () => ref.read(accentProvider.notifier).setAccent(opt),
+                                        child: Container(
+                                          width: 26,
+                                          height: 26,
+                                          decoration: BoxDecoration(
+                                            color: opt.color,
+                                            shape: BoxShape.circle,
+                                            border: selected
+                                                ? Border.all(color: context.colors.ink300, width: 2.5)
+                                                : null,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
                                 ],
                               ),
                             ],

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import 'core/navigation/app_page_transitions.dart';
+import 'core/providers/accent_provider.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/theme/app_theme.dart';
@@ -26,12 +27,13 @@ class VersatileApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
+    final accent = ref.watch(accentProvider);
 
     return MaterialApp(
       title: 'Versatile',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
+      theme: AppTheme.light(accent.color),
+      darkTheme: AppTheme.dark(accent.color),
       themeMode: themeMode,
       locale: locale,
       localizationsDelegates: const [
@@ -381,12 +383,12 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                     end: Alignment.bottomRight,
                     colors: isDark
                         ? [
-                            const Color(0xFFD97757).withValues(alpha: 0.30),
-                            const Color(0xFFB85432).withValues(alpha: 0.22),
+                            context.colors.accent.withValues(alpha: 0.30),
+                            context.colors.accentDeep.withValues(alpha: 0.22),
                           ]
                         : [
-                            const Color(0xFFE08866).withValues(alpha: 0.55),
-                            const Color(0xFFD97757).withValues(alpha: 0.48),
+                            context.colors.accentLight.withValues(alpha: 0.55),
+                            context.colors.accent.withValues(alpha: 0.48),
                           ],
                   ),
                   borderRadius: BorderRadius.circular(22),
@@ -398,9 +400,7 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(
-                        0xFFD97757,
-                      ).withValues(alpha: isDark ? 0.25 : 0.20),
+                      color: context.colors.accent.withValues(alpha: isDark ? 0.25 : 0.20),
                       blurRadius: 24,
                       spreadRadius: -4,
                       offset: const Offset(0, 8),

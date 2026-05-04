@@ -446,8 +446,8 @@ class _HeroCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFE08866), Color(0xFFD97757), Color(0xFFB85432)],
+        gradient: LinearGradient(
+          colors: [context.colors.accentLight, context.colors.accent, context.colors.accentDeep],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

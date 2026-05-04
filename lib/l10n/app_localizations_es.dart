@@ -519,4 +519,31 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get restSecondsLabel => 'Descanso (s)';
+
+  @override
+  String get accentColor => 'Color de acento';
+
+  @override
+  String get colorOrange => 'Naranja';
+
+  @override
+  String get colorBlue => 'Azul';
+
+  @override
+  String get colorGreen => 'Verde';
+
+  @override
+  String get colorPurple => 'Púrpura';
+
+  @override
+  String get colorRed => 'Rojo';
+
+  @override
+  String get colorTeal => 'Turquesa';
+
+  @override
+  String get colorPink => 'Rosa';
+
+  @override
+  String get colorAmber => 'Ámbar';
 }

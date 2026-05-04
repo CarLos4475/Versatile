@@ -226,5 +226,15 @@
   "apply": "Apply",
   "setsLabel": "Sets",
   "repsRangeLabel": "Reps",
-  "restSecondsLabel": "Rest (s)"
+  "restSecondsLabel": "Rest (s)",
+
+  "accentColor": "Accent color",
+  "colorOrange": "Orange",
+  "colorBlue": "Blue",
+  "colorGreen": "Green",
+  "colorPurple": "Purple",
+  "colorRed": "Red",
+  "colorTeal": "Teal",
+  "colorPink": "Pink",
+  "colorAmber": "Amber"
 }

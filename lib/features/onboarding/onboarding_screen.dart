@@ -126,11 +126,11 @@ class _OnboardPage extends StatelessWidget {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 colors: [
-                  Color(0xFFE08866),
-                  Color(0xFFD97757),
-                  Color(0xFFB85432),
+                  context.colors.accentLight,
+                  context.colors.accent,
+                  context.colors.accentDeep,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -173,8 +173,8 @@ class _OnboardPage extends StatelessWidget {
             child: Container(
               height: 54,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFE08866), Color(0xFFD97757)],
+                gradient: LinearGradient(
+                  colors: [context.colors.accentLight, context.colors.accent],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -232,11 +232,11 @@ class _NamePage extends StatelessWidget {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 colors: [
-                  Color(0xFFE08866),
-                  Color(0xFFD97757),
-                  Color(0xFFB85432),
+                  context.colors.accentLight,
+                  context.colors.accent,
+                  context.colors.accentDeep,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -303,8 +303,8 @@ class _NamePage extends StatelessWidget {
             child: Container(
               height: 54,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFE08866), Color(0xFFD97757)],
+                gradient: LinearGradient(
+                  colors: [context.colors.accentLight, context.colors.accent],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),

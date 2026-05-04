@@ -43,10 +43,10 @@ class ScreenHeader extends StatelessWidget {
                           height: 38,
                           decoration: BoxDecoration(
                             gradient: accentBack
-                                ? const LinearGradient(
+                                ? LinearGradient(
                                     colors: [
-                                      Color(0xFFE08866),
-                                      Color(0xFFD97757),
+                                      context.colors.accentLight,
+                                      context.colors.accent,
                                     ],
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,

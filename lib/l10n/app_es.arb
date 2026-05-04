@@ -226,5 +226,15 @@
   "apply": "Aplicar",
   "setsLabel": "Series",
   "repsRangeLabel": "Reps",
-  "restSecondsLabel": "Descanso (s)"
+  "restSecondsLabel": "Descanso (s)",
+
+  "accentColor": "Color de acento",
+  "colorOrange": "Naranja",
+  "colorBlue": "Azul",
+  "colorGreen": "Verde",
+  "colorPurple": "Púrpura",
+  "colorRed": "Rojo",
+  "colorTeal": "Turquesa",
+  "colorPink": "Rosa",
+  "colorAmber": "Ámbar"
 }

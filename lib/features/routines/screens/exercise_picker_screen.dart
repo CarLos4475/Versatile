@@ -15,23 +15,23 @@ import '../view_models/routines_view_model.dart';
 
 String? _muscleAsset(String muscle) => switch (muscle) {
   'Chest' =>
-    'assets/assets/Torso/pecho/pecho_color_edit_24348292703575.png',
+    'assets/assets/Torso/pecho/pecho_edit_24359279032740.png',
   'Back' =>
-    'assets/assets/Torso/espalda/back_color_edit_24399873717629.png',
+    'assets/assets/Torso/espalda/back_edit_24411266380648.png',
   'Shoulders' =>
-    'assets/assets/Torso/hombro/shoulder_color_edit_24371924634300.png',
-  'Core' => 'assets/assets/Torso/core/core_color_edit_24429990449916.png',
+    'assets/assets/Torso/hombro/shoulder_edit_24384715995236.png',
+  'Core' => 'assets/assets/Torso/core/Core_edit_24439960498352.png',
   'Biceps' =>
-    'assets/assets/Torso/brazos/biceps_color_edit_24552237308231.png',
+    'assets/assets/Torso/brazos/biceps_edit_24565456161875.png',
   'Triceps' =>
-    'assets/assets/Torso/brazos/triceps_color_edit_24483943284283.png',
+    'assets/assets/Torso/brazos/triceps_edit_24496361907719.png',
   'Forearms' =>
-    'assets/assets/Torso/brazos/forearm_color_edit_24515208562924.png',
-  'Quadriceps' => 'assets/assets/Piernas/cuadriceps_color.png',
+    'assets/assets/Torso/brazos/forearm_edit_24532082903547.png',
+  'Quadriceps' => 'assets/assets/Piernas/cuadriceps.png',
   'Hamstrings' =>
-    'assets/assets/Piernas/femoral_color_edit_24685232753002.png',
-  'Glutes' => 'assets/assets/Piernas/glutes_color_edit_24667069897276.png',
-  'Calves' => 'assets/assets/Piernas/calf_color_edit_24747730293097.png',
+    'assets/assets/Piernas/femoral_edit_24694965504563.png',
+  'Glutes' => 'assets/assets/Piernas/glutes_edit_24675899562379.png',
+  'Calves' => 'assets/assets/Piernas/calf_edit_24757805204033.png',
   _ => null,
 };
 

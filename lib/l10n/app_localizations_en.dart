@@ -518,4 +518,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get restSecondsLabel => 'Rest (s)';
+
+  @override
+  String get accentColor => 'Accent color';
+
+  @override
+  String get colorOrange => 'Orange';
+
+  @override
+  String get colorBlue => 'Blue';
+
+  @override
+  String get colorGreen => 'Green';
+
+  @override
+  String get colorPurple => 'Purple';
+
+  @override
+  String get colorRed => 'Red';
+
+  @override
+  String get colorTeal => 'Teal';
+
+  @override
+  String get colorPink => 'Pink';
+
+  @override
+  String get colorAmber => 'Amber';
 }

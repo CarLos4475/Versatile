@@ -275,8 +275,8 @@ class IconCircleButton extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           gradient: accent
-              ? const LinearGradient(
-                  colors: [Color(0xFFE08866), Color(0xFFD97757)],
+              ? LinearGradient(
+                  colors: [context.colors.accentLight, context.colors.accent],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 )
