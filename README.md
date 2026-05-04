@@ -1,119 +1,151 @@
-# Versatile
+# Versatile — Your training, every rep.
 
-## Badges
+**The workout tracker that works as hard as you do. No accounts. No subscriptions. Just results.**
 
-![License](https://img.shields.io/badge/license-Private-informational)
-![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter&logoColor=white)
-![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)
-![State Management](https://img.shields.io/badge/State%20Management-Riverpod-6C5CE7)
-![Database](https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white)
-![Localization](https://img.shields.io/badge/Localization-ES%20%7C%20EN-4CAF50)
-![Storage](https://img.shields.io/badge/Storage-Local%20Only-FF7043)
-![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Web%20%7C%20Desktop-111827)
-![Architecture](https://img.shields.io/badge/Architecture-Feature%20Based-8E44AD)
-![UI](https://img.shields.io/badge/UI-Liquid%20Glass-F4A261)
-![Privacy](https://img.shields.io/badge/Privacy-No%20Tracking-2E7D32)
+---
 
-Versatile es una aplicación de seguimiento de entrenamientos desarrollada con Flutter, diseñada para registrar rutinas de gimnasio de forma simple, visual y completamente local. Su enfoque combina una experiencia moderna de uso con herramientas prácticas para planificar sesiones, registrar series y repeticiones, consultar historial y dar seguimiento al progreso sin depender de cuentas, conexión a internet ni servicios de terceros.
+<div align="center">
+  <img src="assets/icon/logo_versatile.png" alt="Versatile logo" width="140" />
+</div>
 
-Pensada para usuarios que valoran tanto la organización como la privacidad, la app permite construir una biblioteca personal de ejercicios y rutinas, iniciar entrenamientos activos con cronómetro y descansos, y conservar toda la información directamente en el dispositivo.
+---
 
-## Características principales
+## Why Versatile?
 
-- Creación y gestión de rutinas personalizadas.
-- Biblioteca de ejercicios con búsqueda, filtros por grupo muscular y distinción entre ejercicios base y personalizados.
-- Registro de entrenamientos en tiempo real con series, repeticiones, peso y volumen acumulado.
-- Soporte para ejercicios bilaterales y unilaterales.
-- Historial de sesiones con detalle de rendimiento por entrenamiento.
-- Dashboard de inicio con métricas semanales, sesiones recientes y actividad acumulada.
-- Onboarding inicial para personalizar la experiencia desde el primer uso.
-- Modo claro, modo oscuro y opción de tema del sistema.
-- Soporte multilenguaje en español e inglés.
-- Exportación, importación y limpieza de datos desde la propia app.
-- Almacenamiento 100% local, sin login, sin tracking y sin sincronización externa.
+Most fitness apps want your email, your data, and your credit card before you've done a single rep. **Versatile doesn't.** It's built for people who walk into the gym, put in the work, and walk out. No distractions, no paywalls, no cloud — just you and your progress.
 
-## Enfoque del producto
+### It's fast. It's private. It's yours.
 
-Versatile busca ofrecer una experiencia de entrenamiento centrada en tres pilares:
+Every set, every rep, every PR lives on your phone. No server ever sees it. No account ever holds it hostage. You own your training data — forever, offline, free.
 
-- Simplicidad: registrar una sesión debe ser rápido y natural.
-- Control: el usuario puede crear su propia estructura de ejercicios y rutinas.
-- Privacidad: los datos permanecen en el dispositivo y el uso no depende de una cuenta.
+---
 
-## Capturas de pantalla
+## What Versatile gives you
 
-Cuando agregues las imágenes, esta sección ya queda lista para GitHub:
+- **Build your library** — 19 built-in exercises to get you started, plus unlimited custom exercises. Name them, tag them by muscle group, and choose barbell, dumbbell, cable, bodyweight, or machine.
+- **Design your routines** — Create push days, pull days, leg days, or whatever split you follow. Pick a color, an icon, add exercises, set target sets and reps, and you're ready to go.
+- **Track every rep live** — Start a workout and log weight and reps set by set. The timer runs so you can focus on lifting. Progress bar fills up. Volume accumulates in real time.
+- **Unilateral support** — Training one arm or leg at a time? Flip the split toggle and log left and right separately. Precision matters.
+- **Rest timer** — After each set, a timer kicks in. Add 15 seconds or skip to the next exercise. Never lose track of rest periods again.
+- **Watch your progress** — A 26-week activity heatmap shows your consistency. Weekly stats tell you volume, sessions, and average time. Every session is saved with full detail.
+- **Dark and light themes** — Bone white by day, dark warm tones by night. The liquid glass UI looks premium on any screen.
+- **English & Spanish** — Full localization in both languages. Switch anytime.
+- **Backup and restore** — Export your entire training history as JSON, or import a backup. Your data moves with you, not through a server.
+- **100% offline, 100% private** — No login. No internet required. No analytics. No tracking. Your gym log stays between you and your phone.
 
-```md
-## Capturas de pantalla
+---
 
-| Inicio | Rutinas | Entrenamiento activo |
-|--------|---------|----------------------|
+## The experience
+
+| Screen | What you do |
+|---|---|
+| **Home** | See your next suggested routine, weekly stats, activity heatmap, and recent sessions at a glance |
+| **Routines** | Create, edit, and organize your training splits with rich visual cards |
+| **Exercises** | Browse, search, filter by muscle group, laterality, and custom vs. built-in |
+| **Active Workout** | Log every set with weight and reps. Pause/resume the session timer. Rest timer between sets. |
+| **History** | Browse past sessions with full breakdown of every exercise and every set |
+| **Settings** | Set your name, switch theme and language, export/import/wipe data |
+
+---
+
+## Screenshots
+
+*Add your screenshots here:*
+
+```
+| Home | Routines | Active Workout |
+|------|----------|----------------|
 | ![Home](./docs/screenshots/home.png) | ![Routines](./docs/screenshots/routines.png) | ![Workout](./docs/screenshots/active-workout.png) |
 
-| Ejercicios | Historial | Ajustes |
-|------------|-----------|---------|
+| Exercises | History | Settings |
+|-----------|---------|----------|
 | ![Exercises](./docs/screenshots/exercises.png) | ![History](./docs/screenshots/history.png) | ![Settings](./docs/screenshots/settings.png) |
 ```
 
-## Stack técnico
+---
 
-- Flutter
-- Dart
-- Riverpod para gestión de estado
-- SQLite (`sqflite`) para persistencia local
-- Internacionalización con `flutter_localizations` e `intl`
-- `share_plus` y `file_picker` para exportación e importación de respaldos
+## Privacy by design
 
-## Arquitectura general
+Versatile collects **nothing**. It sends **nothing**. There is no server, no analytics SDK, no ad network, and no third-party service reading your workouts. The app works fully offline. Your data is stored in a local SQLite database on your device, and you can export or wipe it anytime from Settings.
 
-El proyecto está organizado alrededor de una estructura clara por capas:
+*This is a workout tracker, not a data harvester.*
 
-- `lib/features`: pantallas y lógica orientada a cada módulo funcional.
-- `lib/domain`: entidades principales de negocio.
-- `lib/data`: repositorios, base de datos y datos iniciales.
-- `lib/core`: servicios, navegación, tema, utilidades y providers compartidos.
-- `lib/shared`: widgets reutilizables de interfaz.
+---
 
-## Módulos funcionales
+## Tech stack
 
-### Inicio
-Pantalla principal con saludo personalizado, próxima rutina sugerida, métricas semanales, volumen acumulado, tiempo promedio de entrenamiento y sesiones recientes.
+| Layer | Technology |
+|---|---|
+| Framework | Flutter |
+| Language | Dart |
+| State management | Riverpod |
+| Database | SQLite (sqflite) |
+| Localization | flutter_localizations + intl (EN / ES) |
+| Backup | share_plus + file_picker |
+| Design | Custom liquid glass component library, Material 3 |
 
-### Rutinas
-Permite crear, consultar y organizar rutinas de entrenamiento con estimación de duración, cantidad de ejercicios y grupos musculares involucrados.
+---
 
-### Ejercicios
-Incluye catálogo de ejercicios, búsqueda, filtros por músculo, ejercicios personalizados y soporte para clasificar movimientos unilaterales y bilaterales.
+## Download
 
-### Entrenamiento activo
-Ofrece seguimiento en tiempo real de una rutina en curso con cronómetro, progreso por series, volumen total y temporizador de descanso.
+Coming soon to the Google Play Store.
 
-### Historial
-Muestra las sesiones realizadas y su detalle para revisar el progreso acumulado a lo largo del tiempo.
+---
 
-### Ajustes
-Permite cambiar nombre de usuario, idioma, tema visual y gestionar respaldos locales mediante importación y exportación de datos.
+## License
 
-## Privacidad
+Private. This repository is not open for redistribution.
 
-Uno de los puntos más fuertes de Versatile es su enfoque local-first:
+---
 
-- No requiere crear cuenta.
-- No depende de servidores externos.
-- No incorpora analítica ni tracking.
-- Los datos del usuario permanecen en el dispositivo.
+---
 
-## Instalación
+# Versatile — Tu entrenamiento, cada repetición.
 
-Versatile está planteada para distribuirse mediante releases del repositorio. La idea es que cualquier usuario pueda descargar la versión publicada, instalar el APK y comenzar a usar la aplicación sin configuraciones adicionales ni pasos técnicos.
+**El tracker de gimnasio que entrena tan duro como tú. Sin cuentas. Sin suscripciones. Solo resultados.**
 
-Cuando la primera release esté disponible, esta sección puede incluir:
+## ¿Por qué Versatile?
 
-- Enlace directo al APK oficial.
-- Instrucciones breves de instalación en Android.
-- Notas de versión con mejoras y cambios importantes.
+La mayoría de las apps fitness te piden tu email, tus datos y tu tarjeta antes de que hayas hecho una sola serie. **Versatile no.** Está hecha para gente que entra al gimnasio, hace el trabajo y se va. Sin distracciones, sin muros de pago, sin nube — solo tú y tu progreso.
 
-## Estado del proyecto
+### Es rápido. Es privado. Es tuyo.
 
-Versatile se encuentra planteado como una base sólida para una app de seguimiento fitness moderna, privada y extensible. El repositorio ya incluye soporte multiplataforma con Flutter y una estructura preparada para seguir evolucionando tanto a nivel visual como funcional.
+Cada serie, cada repetición, cada PR se queda en tu teléfono. Ningún servidor lo ve. Ninguna cuenta lo retiene. Eres dueño de tus datos de entrenamiento — para siempre, sin conexión, sin costo.
+
+## Lo que Versatile te da
+
+- **Construye tu biblioteca** — 19 ejercicios incluidos para empezar, más ejercicios personalizados ilimitados. Nómbralos, clasifícalos por grupo muscular y elige entre barra, mancuerna, cable, peso corporal o máquina.
+- **Diseña tus rutinas** — Crea días de empuje, jalón, pierna o la división que sigas. Elige un color, un ícono, añade ejercicios, define series y repeticiones objetivo, y listo.
+- **Registra cada repetición en vivo** — Inicia un entrenamiento y registra peso y repeticiones serie por serie. El cronómetro corre para que te concentres en levantar. La barra de progreso se llena. El volumen se acumula en tiempo real.
+- **Soporte unilateral** — ¿Entrenando un brazo o pierna a la vez? Activa el modo dividido y registra izquierda y derecha por separado. La precisión importa.
+- **Temporizador de descanso** — Después de cada serie, se activa un temporizador. Añade 15 segundos o salta al siguiente ejercicio. Nunca más pierdas la noción del descanso.
+- **Observa tu progreso** — Un mapa de actividad de 26 semanas muestra tu consistencia. Las estadísticas semanales te dicen volumen, sesiones y tiempo promedio. Cada sesión se guarda con detalle completo.
+- **Tema claro y oscuro** — Blanco hueso de día, tonos cálidos oscuros de noche. La interfaz liquid glass se ve premium en cualquier pantalla.
+- **Inglés y español** — Localización completa en ambos idiomas. Cambia cuando quieras.
+- **Respaldo y restauración** — Exporta todo tu historial de entrenamiento como JSON o importa un respaldo. Tus datos se mueven contigo, no a través de un servidor.
+- **100% offline, 100% privado** — Sin inicio de sesión. Sin internet necesario. Sin analíticas. Sin rastreo. Tu registro de gimnasio se queda entre tú y tu teléfono.
+
+## La experiencia
+
+| Pantalla | Qué haces |
+|---|---|
+| **Inicio** | Ve tu próxima rutina sugerida, estadísticas semanales, mapa de actividad y sesiones recientes de un vistazo |
+| **Rutinas** | Crea, edita y organiza tus divisiones de entrenamiento con tarjetas visuales |
+| **Ejercicios** | Explora, busca, filtra por grupo muscular, lateralidad y ejercicios base vs. personalizados |
+| **Entrenamiento activo** | Registra cada serie con peso y repeticiones. Pausa/reanuda el cronómetro. Temporizador de descanso entre series. |
+| **Historial** | Revisa sesiones pasadas con desglose completo de cada ejercicio y cada serie |
+| **Ajustes** | Configura tu nombre, cambia tema e idioma, exporta/importa/borra datos |
+
+## Privacidad por diseño
+
+Versatile no recopila **nada**. No envía **nada**. No hay servidor, no hay SDK de analíticas, no hay red publicitaria y no hay servicios de terceros leyendo tus entrenamientos. La app funciona completamente offline. Tus datos se almacenan en una base de datos SQLite local en tu dispositivo, y puedes exportarlos o eliminarlos en cualquier momento desde Ajustes.
+
+*Esto es un tracker de entrenamiento, no un recolector de datos.*
+
+## Descarga
+
+Próximamente en Google Play Store.
+
+---
+
+Hecho con Flutter, Dart y mucho amor por el entrenamiento. Por CarLos.
