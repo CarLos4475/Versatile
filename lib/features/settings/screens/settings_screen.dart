@@ -196,12 +196,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _pickSoundFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.audio,
+      withData: true,
     );
     if (result == null || result.files.isEmpty) return;
-    final path = result.files.single.path;
-    if (path == null) return;
-    setState(() => _customPath = path);
-    await _soundService.setCustomPath(path);
+
+    final picked = result.files.single;
+    final dir = await getApplicationDocumentsDirectory();
+    final soundsDir = Directory('${dir.path}/sounds');
+    if (!await soundsDir.exists()) {
+      await soundsDir.create(recursive: true);
+    }
+
+    final ext = picked.extension ?? 'mp3';
+    final destPath = '${soundsDir.path}/custom_alert.$ext';
+    final destFile = File(destPath);
+
+    if (picked.bytes != null) {
+      await destFile.writeAsBytes(picked.bytes!);
+    } else if (picked.path != null) {
+      final sourceFile = File(picked.path!);
+      await sourceFile.copy(destPath);
+    } else {
+      return;
+    }
+
+    setState(() => _customPath = destPath);
+    await _soundService.setCustomPath(destPath);
   }
 
   @override

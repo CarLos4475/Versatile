@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
@@ -497,6 +498,8 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
 
   static const _channel = MethodChannel('com.example.versatile/workout');
 
+  AudioPlayer? _alertPlayer;
+
   Future<void> _onRestFinished(String exerciseName) async {
     try {
       final settings = _ref.read(settingsRepositoryProvider);
@@ -510,6 +513,16 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
           'exerciseName': exerciseName,
         });
       } catch (_) {}
+
+      final soundType = await settings.get('rest_alert_sound_type') ?? 'default';
+      if (soundType == 'custom') {
+        final path = await settings.get('rest_alert_custom_path');
+        if (path != null && path.isNotEmpty) {
+          _alertPlayer ??= AudioPlayer();
+          await _alertPlayer!.setVolume(1.0);
+          await _alertPlayer!.play(DeviceFileSource(path));
+        }
+      }
     } catch (_) {}
   }
 
