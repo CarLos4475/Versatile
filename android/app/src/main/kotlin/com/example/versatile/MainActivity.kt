@@ -1,9 +1,14 @@
 package com.example.versatile
 
 import android.Manifest
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
@@ -95,9 +100,75 @@ class MainActivity : FlutterActivity() {
                         }
                     }
                 }
+                "showRestAlert" -> {
+                    val exerciseName = call.argument<String>("exerciseName") ?: ""
+                    showRestAlertNotification(exerciseName)
+                    result.success(null)
+                }
                 else -> result.notImplemented()
             }
         }
+    }
+
+    private val restAlertChannelId = "rest_alert_channel"
+    private var restAlertNotifId = 2001
+
+    private fun showRestAlertNotification(exerciseName: String) {
+        val nm = getSystemService(NotificationManager::class.java)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                restAlertChannelId,
+                getString(R.string.rest_alert_channel_name),
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = getString(R.string.rest_alert_channel_desc)
+                enableVibration(true)
+                setSound(
+                    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
+                    Notification.AUDIO_ATTRIBUTES_DEFAULT
+                )
+            }
+            nm.createNotificationChannel(channel)
+        }
+
+        val openIntent = PendingIntent.getActivity(
+            this, 0,
+            Intent(this, MainActivity::class.java).apply {
+                action = WorkoutService.ACTION_OPEN
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            },
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        val title = getString(R.string.rest_complete)
+        val content = if (exerciseName.isNotBlank())
+            getString(R.string.next_exercise, exerciseName)
+        else
+            getString(R.string.rest_complete)
+
+        val notif = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Notification.Builder(this, restAlertChannelId)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(R.drawable.ic_notif_dumbbell)
+                .setContentIntent(openIntent)
+                .setAutoCancel(true)
+                .setTimeoutAfter(5000)
+                .build()
+        } else {
+            @Suppress("DEPRECATION")
+            Notification.Builder(this)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(R.drawable.ic_notif_dumbbell)
+                .setContentIntent(openIntent)
+                .setAutoCancel(true)
+                .build()
+        }
+
+        nm.notify(restAlertNotifId, notif)
+        restAlertNotifId++
     }
 
     private fun requestHighestRefreshRate() {

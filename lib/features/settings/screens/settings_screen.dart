@@ -11,6 +11,7 @@ import 'package:versatile/core/providers/theme_provider.dart';
 import 'package:versatile/core/providers/locale_provider.dart';
 import 'package:versatile/core/theme/accent_colors.dart';
 import 'package:versatile/core/services/data_service.dart';
+import 'package:versatile/core/services/sound_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/database/database_helper.dart';
 import '../../../shared/widgets/glass_container.dart';
@@ -29,6 +30,24 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _busy = false;
+  bool _restAlertEnabled = true;
+  String _soundType = 'default';
+  String? _customPath;
+  late final SoundService _soundService;
+
+  @override
+  void initState() {
+    super.initState();
+    _soundService = SoundService(ref.read(settingsRepositoryProvider));
+    _loadSoundSettings();
+  }
+
+  Future<void> _loadSoundSettings() async {
+    _restAlertEnabled = await _soundService.isAlertEnabled;
+    _soundType = await _soundService.soundType;
+    _customPath = await _soundService.customPath;
+    if (mounted) setState(() {});
+  }
 
   Future<void> _changeName() async {
     final currentName = await ref.read(settingsRepositoryProvider).getUserName();
@@ -172,6 +191,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(msg), backgroundColor: Colors.red.shade900),
     );
+  }
+
+  Future<void> _pickSoundFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.audio,
+    );
+    if (result == null || result.files.isEmpty) return;
+    final path = result.files.single.path;
+    if (path == null) return;
+    setState(() => _customPath = path);
+    await _soundService.setCustomPath(path);
   }
 
   @override
@@ -416,6 +446,193 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   const SizedBox(height: 6),
                                 ],
                               ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Sound
+                  _SectionLabel(l10n.sound),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
+                    child: FadeSlideIn(
+                      delay: const Duration(milliseconds: 130),
+                      child: GlassContainer(
+                        radius: 20,
+                        child: Padding(
+                          padding: const EdgeInsets.all(18),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 34,
+                                    height: 34,
+                                    decoration: BoxDecoration(
+                                      color: context.colors.accentTint,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(
+                                      Icons.notifications_active_outlined,
+                                      size: 18,
+                                      color: context.colors.accentDeep,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Text(
+                                      l10n.restTimerAlert,
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: context.colors.ink900,
+                                      ),
+                                    ),
+                                  ),
+                                  Switch(
+                                    value: _restAlertEnabled,
+                                    onChanged: (v) {
+                                      setState(() => _restAlertEnabled = v);
+                                      _soundService.setAlertEnabled(v);
+                                    },
+                                    activeColor: context.colors.accent,
+                                  ),
+                                ],
+                              ),
+                              Divider(color: context.colors.hairline, height: 1),
+                              const SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  const SizedBox(width: 48),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() => _soundType = 'default');
+                                        _soundService.setSoundType('default');
+                                      },
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 6),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              _soundType == 'default'
+                                                  ? Icons.radio_button_checked
+                                                  : Icons.radio_button_off,
+                                              size: 20,
+                                              color: _soundType == 'default'
+                                                  ? context.colors.accent
+                                                  : context.colors.ink300,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              l10n.defaultSound,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: context.colors.ink700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const SizedBox(width: 48),
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () {
+                                        setState(() => _soundType = 'custom');
+                                        _soundService.setSoundType('custom');
+                                      },
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 6),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              _soundType == 'custom'
+                                                  ? Icons.radio_button_checked
+                                                  : Icons.radio_button_off,
+                                              size: 20,
+                                              color: _soundType == 'custom'
+                                                  ? context.colors.accent
+                                                  : context.colors.ink300,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              l10n.customSound,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: context.colors.ink700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (_soundType == 'custom') ...[
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    const SizedBox(width: 48),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: _pickSoundFile,
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: context.colors.press,
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.audio_file_outlined,
+                                                size: 16,
+                                                color: context.colors.ink500,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Text(
+                                                  _customPath != null
+                                                      ? _customPath!.split('/').last
+                                                      : l10n.pickSoundFile,
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: _customPath != null
+                                                        ? context.colors.ink700
+                                                        : context.colors.ink400,
+                                                  ),
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ],
                           ),
                         ),

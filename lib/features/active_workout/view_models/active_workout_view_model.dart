@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/providers/repository_providers.dart';
@@ -91,6 +92,7 @@ class ActiveWorkoutState {
   final bool isRunning;
   final List<ExerciseWorkoutState> exerciseStates;
   final RestTimerState? restTimer;
+  final bool autoFinish;
 
   const ActiveWorkoutState({
     required this.routine,
@@ -99,6 +101,7 @@ class ActiveWorkoutState {
     required this.isRunning,
     required this.exerciseStates,
     this.restTimer,
+    this.autoFinish = false,
   });
 
   int get totalSets => exerciseStates.fold(0, (s, e) => s + e.targetSets);
@@ -123,6 +126,7 @@ class ActiveWorkoutState {
     List<ExerciseWorkoutState>? exerciseStates,
     RestTimerState? restTimer,
     bool clearRestTimer = false,
+    bool? autoFinish,
   }) {
     return ActiveWorkoutState(
       routine: routine,
@@ -131,6 +135,7 @@ class ActiveWorkoutState {
       isRunning: isRunning ?? this.isRunning,
       exerciseStates: exerciseStates ?? this.exerciseStates,
       restTimer: clearRestTimer ? null : (restTimer ?? this.restTimer),
+      autoFinish: autoFinish ?? this.autoFinish,
     );
   }
 }
@@ -433,6 +438,20 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
 
     final exerciseName = state.findExercise(e.exerciseId)?.name ?? 'Exercise';
 
+    final allDone = list.every((es) => es.isDone);
+
+    if (allDone) {
+      state = state.copyWith(
+        exerciseStates: list,
+        clearRestTimer: true,
+        autoFinish: true,
+      );
+      _restTicker?.cancel();
+      _restEndAt = null;
+      _saveProgress();
+      return;
+    }
+
     state = state.copyWith(
       exerciseStates: list,
       restTimer: RestTimerState(
@@ -467,12 +486,31 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
         state = state.copyWith(clearRestTimer: true);
         _restEndAt = null;
         _restTicker?.cancel();
+        _onRestFinished(currentRt.exerciseName);
         return;
       }
       state = state.copyWith(
         restTimer: currentRt.copyWith(remaining: remaining),
       );
     });
+  }
+
+  static const _channel = MethodChannel('com.example.versatile/workout');
+
+  Future<void> _onRestFinished(String exerciseName) async {
+    try {
+      final settings = _ref.read(settingsRepositoryProvider);
+      final enabled = (await settings.get('rest_alert_enabled')) != 'false';
+      if (!enabled) return;
+
+      HapticFeedback.heavyImpact();
+
+      try {
+        await _channel.invokeMethod('showRestAlert', {
+          'exerciseName': exerciseName,
+        });
+      } catch (_) {}
+    } catch (_) {}
   }
 
   void skipRest() {
@@ -532,14 +570,14 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     state = state.copyWith(exerciseStates: list);
   }
 
-  Future<void> finishWorkout() async {
+  Future<Session?> finishWorkout() async {
     _sessionTimer?.cancel();
     _restTicker?.cancel();
 
     final exerciseStates = state.exerciseStates
         .where((e) => e.completedSets.isNotEmpty)
         .toList();
-    if (exerciseStates.isEmpty) return;
+    if (exerciseStates.isEmpty) return null;
 
     final sessionExercises = exerciseStates.map((e) {
       final ex = state.findExercise(e.exerciseId);
@@ -569,6 +607,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     await _ref.read(workoutLogRepositoryProvider).logDay(_todayString());
     _ref.invalidate(sessionsAsyncProvider);
     _ref.invalidate(workoutLogDaysProvider);
+    return session;
   }
 
   String _todayString() {

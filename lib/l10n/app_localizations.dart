@@ -1076,6 +1076,60 @@ abstract class AppLocalizations {
   /// **'Rest (s)'**
   String get restSecondsLabel;
 
+  /// No description provided for @sound.
+  ///
+  /// In en, this message translates to:
+  /// **'SOUND'**
+  String get sound;
+
+  /// No description provided for @restTimerAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest timer alert'**
+  String get restTimerAlert;
+
+  /// No description provided for @defaultSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get defaultSound;
+
+  /// No description provided for @customSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get customSound;
+
+  /// No description provided for @pickSoundFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick sound file'**
+  String get pickSoundFile;
+
+  /// No description provided for @noSoundSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'No sound selected'**
+  String get noSoundSelected;
+
+  /// No description provided for @sessionComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Session complete!'**
+  String get sessionComplete;
+
+  /// No description provided for @congratulations.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations!'**
+  String get congratulations;
+
+  /// No description provided for @backToHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to home'**
+  String get backToHome;
+
   /// No description provided for @accentColor.
   ///
   /// In en, this message translates to:

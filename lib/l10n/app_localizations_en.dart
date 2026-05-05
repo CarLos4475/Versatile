@@ -520,6 +520,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restSecondsLabel => 'Rest (s)';
 
   @override
+  String get sound => 'SOUND';
+
+  @override
+  String get restTimerAlert => 'Rest timer alert';
+
+  @override
+  String get defaultSound => 'Default';
+
+  @override
+  String get customSound => 'Custom';
+
+  @override
+  String get pickSoundFile => 'Pick sound file';
+
+  @override
+  String get noSoundSelected => 'No sound selected';
+
+  @override
+  String get sessionComplete => 'Session complete!';
+
+  @override
+  String get congratulations => 'Congratulations!';
+
+  @override
+  String get backToHome => 'Back to home';
+
+  @override
   String get accentColor => 'Accent color';
 
   @override

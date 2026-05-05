@@ -6,4 +6,8 @@
     <string name="notif_title">Entrenamiento en curso</string>
     <string name="notif_subtitle">Mantén el ritmo — toca para volver</string>
     <string name="notif_action_open">Abrir</string>
+    <string name="rest_alert_channel_name">Temporizador de descanso</string>
+    <string name="rest_alert_channel_desc">Alertas del temporizador de descanso</string>
+    <string name="rest_complete">¡Descanso completo!</string>
+    <string name="next_exercise">Siguiente: %1$s</string>
 </resources>

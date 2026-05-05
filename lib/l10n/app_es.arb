@@ -228,6 +228,16 @@
   "repsRangeLabel": "Reps",
   "restSecondsLabel": "Descanso (s)",
 
+  "sound": "SONIDO",
+  "restTimerAlert": "Alerta de descanso",
+  "defaultSound": "Por defecto",
+  "customSound": "Personalizado",
+  "pickSoundFile": "Elegir archivo",
+  "noSoundSelected": "Sin sonido seleccionado",
+  "sessionComplete": "¡Sesión completa!",
+  "congratulations": "¡Felicidades!",
+  "backToHome": "Volver al inicio",
+
   "accentColor": "Color de acento",
   "colorOrange": "Naranja",
   "colorBlue": "Azul",

@@ -11,6 +11,7 @@ import '../../../shared/widgets/motion.dart';
 import '../view_models/active_workout_view_model.dart';
 import '../widgets/exercise_card.dart';
 import '../widgets/rest_timer_bar.dart';
+import 'workout_complete_screen.dart';
 
 class ActiveWorkoutScreen extends ConsumerWidget {
   const ActiveWorkoutScreen({
@@ -102,6 +103,7 @@ class _WorkoutBody extends ConsumerStatefulWidget {
 class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     with WidgetsBindingObserver {
   bool _finishing = false;
+  bool _autoFinishTriggered = false;
 
   @override
   void initState() {
@@ -142,9 +144,16 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     setState(() => _finishing = true);
     await WorkoutNotificationService.stop();
     final notifier = ref.read(activeWorkoutProvider(widget.routineId).notifier);
-    await notifier.finishWorkout();
-    if (mounted) {
-      ref.read(activeWorkoutRoutineIdProvider.notifier).state = null;
+    final session = await notifier.finishWorkout();
+    if (!mounted) return;
+    ref.read(activeWorkoutRoutineIdProvider.notifier).state = null;
+    if (session != null) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => WorkoutCompleteScreen(session: session),
+        ),
+      );
+    } else {
       Navigator.of(context).pop();
     }
   }
@@ -154,6 +163,17 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(activeWorkoutProvider(widget.routineId));
     final notifier = ref.read(activeWorkoutProvider(widget.routineId).notifier);
+
+    if (state.autoFinish && !_autoFinishTriggered && !_finishing) {
+      _autoFinishTriggered = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (mounted && !_finishing) {
+            _finish();
+          }
+        });
+      });
+    }
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,

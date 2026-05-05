@@ -228,6 +228,16 @@
   "repsRangeLabel": "Reps",
   "restSecondsLabel": "Rest (s)",
 
+  "sound": "SOUND",
+  "restTimerAlert": "Rest timer alert",
+  "defaultSound": "Default",
+  "customSound": "Custom",
+  "pickSoundFile": "Pick sound file",
+  "noSoundSelected": "No sound selected",
+  "sessionComplete": "Session complete!",
+  "congratulations": "Congratulations!",
+  "backToHome": "Back to home",
+
   "accentColor": "Accent color",
   "colorOrange": "Orange",
   "colorBlue": "Blue",

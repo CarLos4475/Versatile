@@ -521,6 +521,33 @@ class AppLocalizationsEs extends AppLocalizations {
   String get restSecondsLabel => 'Descanso (s)';
 
   @override
+  String get sound => 'SONIDO';
+
+  @override
+  String get restTimerAlert => 'Alerta de descanso';
+
+  @override
+  String get defaultSound => 'Por defecto';
+
+  @override
+  String get customSound => 'Personalizado';
+
+  @override
+  String get pickSoundFile => 'Elegir archivo';
+
+  @override
+  String get noSoundSelected => 'Sin sonido seleccionado';
+
+  @override
+  String get sessionComplete => '¡Sesión completa!';
+
+  @override
+  String get congratulations => '¡Felicidades!';
+
+  @override
+  String get backToHome => 'Volver al inicio';
+
+  @override
   String get accentColor => 'Color de acento';
 
   @override
