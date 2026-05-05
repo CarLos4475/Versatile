@@ -15,6 +15,7 @@ class WorkoutService : Service() {
     private var startedAtMs = 0L
     private var routineId: String? = null
     private var routineName: String? = null
+    private var subtitle: String? = null
     private val channelId = "workout_channel"
     private val notifId = 1001
 
@@ -24,6 +25,7 @@ class WorkoutService : Service() {
         const val KEY_STARTED_AT    = "startedAt"
         const val KEY_ROUTINE_ID    = "routineId"
         const val KEY_ROUTINE_NAME  = "routineName"
+        const val KEY_SUBTITLE      = "subtitle"
         const val KEY_PROGRESS      = "progress"
         const val ACTION_OPEN       = "com.example.versatile.ACTION_OPEN_WORKOUT"
 
@@ -62,17 +64,20 @@ class WorkoutService : Service() {
             startedAtMs  = if (ts > 0L) ts else System.currentTimeMillis()
             routineId    = intent.getStringExtra(KEY_ROUTINE_ID)
             routineName  = intent.getStringExtra(KEY_ROUTINE_NAME)
+            subtitle     = intent.getStringExtra(KEY_SUBTITLE)
 
             prefs.edit()
                 .putLong(KEY_STARTED_AT, startedAtMs)
                 .putString(KEY_ROUTINE_ID, routineId)
                 .putString(KEY_ROUTINE_NAME, routineName)
+                .putString(KEY_SUBTITLE, subtitle)
                 .apply()
         } else {
             // Restarted by system — restore from prefs
             startedAtMs = prefs.getLong(KEY_STARTED_AT, 0L)
             routineId   = prefs.getString(KEY_ROUTINE_ID, null)
             routineName = prefs.getString(KEY_ROUTINE_NAME, null)
+            subtitle    = prefs.getString(KEY_SUBTITLE, null)
 
             if (startedAtMs == 0L || routineId.isNullOrEmpty()) {
                 stopSelf()
@@ -163,9 +168,10 @@ class WorkoutService : Service() {
             ?: getString(R.string.notif_title)
 
         // Content: elapsed time  ·  motivational subtitle
-        val timer    = formatTimer(elapsed)
-        val subtitle = getString(R.string.notif_subtitle)
-        val content  = "$timer  ·  $subtitle"
+        val timer        = formatTimer(elapsed)
+        val sub          = subtitle?.takeIf { it.isNotBlank() }
+            ?: getString(R.string.notif_subtitle)
+        val content  = "$timer  ·  $sub"
 
         val actionLabel = getString(R.string.notif_action_open)
 

@@ -1130,6 +1130,12 @@ abstract class AppLocalizations {
   /// **'Back to home'**
   String get backToHome;
 
+  /// No description provided for @notificationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay focused — tap to return'**
+  String get notificationSubtitle;
+
   /// No description provided for @accentColor.
   ///
   /// In en, this message translates to:

@@ -547,6 +547,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backToHome => 'Back to home';
 
   @override
+  String get notificationSubtitle => 'Stay focused — tap to return';
+
+  @override
   String get accentColor => 'Accent color';
 
   @override

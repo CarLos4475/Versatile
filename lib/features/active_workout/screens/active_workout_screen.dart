@@ -124,11 +124,11 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
       WorkoutNotificationService.start(
         startedAt: notifier.workoutStartedAt,
         routineId: widget.routineId,
-        // Pass the routine name so the native notification shows it as title
         routineName: ref
             .read(activeWorkoutProvider(widget.routineId))
             .routine
             .name,
+        subtitle: AppLocalizations.of(context)!.notificationSubtitle,
       );
     });
   }

@@ -237,6 +237,7 @@
   "sessionComplete": "Session complete!",
   "congratulations": "Congratulations!",
   "backToHome": "Back to home",
+  "notificationSubtitle": "Stay focused — tap to return",
 
   "accentColor": "Accent color",
   "colorOrange": "Orange",

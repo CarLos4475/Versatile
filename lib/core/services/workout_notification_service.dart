@@ -19,16 +19,19 @@ class WorkoutNotificationService {
 
   /// Starts the foreground workout service.
   /// [routineName] is shown in the notification title.
+  /// [subtitle] is the localized motivational text.
   static Future<void> start({
     required DateTime startedAt,
     required String routineId,
     String? routineName,
+    String? subtitle,
   }) async {
     try {
       await _channel.invokeMethod('startWorkoutService', {
         'startedAt': startedAt.millisecondsSinceEpoch,
         'routineId': routineId,
         'routineName': routineName ?? '',
+        'subtitle': subtitle ?? '',
       });
     } catch (_) {}
   }

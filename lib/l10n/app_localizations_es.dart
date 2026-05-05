@@ -548,6 +548,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get backToHome => 'Volver al inicio';
 
   @override
+  String get notificationSubtitle => 'Mantén el ritmo — toca para volver';
+
+  @override
   String get accentColor => 'Color de acento';
 
   @override

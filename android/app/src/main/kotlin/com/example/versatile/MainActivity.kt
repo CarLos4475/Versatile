@@ -53,10 +53,12 @@ class MainActivity : FlutterActivity() {
                     val startedAt   = (call.argument<Any>("startedAt") as? Number)?.toLong() ?: 0L
                     val routineId   = call.argument<String>("routineId") ?: ""
                     val routineName = call.argument<String>("routineName") ?: ""
+                    val subtitle    = call.argument<String>("subtitle") ?: ""
                     val intent = Intent(this, WorkoutService::class.java).apply {
                         putExtra(WorkoutService.KEY_STARTED_AT,   startedAt)
                         putExtra(WorkoutService.KEY_ROUTINE_ID,   routineId)
                         putExtra(WorkoutService.KEY_ROUTINE_NAME, routineName)
+                        putExtra(WorkoutService.KEY_SUBTITLE,     subtitle)
                     }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         startForegroundService(intent)
