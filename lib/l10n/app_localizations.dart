@@ -710,7 +710,7 @@ abstract class AppLocalizations {
   /// **'Skip'**
   String get skip;
 
-  /// No description provided for @skipped.
+  /// Label shown on an exercise card that was skipped during a workout
   ///
   /// In en, this message translates to:
   /// **'Skipped'**
@@ -722,10 +722,10 @@ abstract class AppLocalizations {
   /// **'Skip exercise'**
   String get skipExercise;
 
-  /// No description provided for @skipExerciseContent.
+  /// Confirmation message when skipping an exercise
   ///
   /// In en, this message translates to:
-  /// **'Skip this exercise? Progress will not be recorded.'**
+  /// **'Skip this exercise? Its sets will be filled from your last session.'**
   String get skipExerciseContent;
 
   /// No description provided for @about.

@@ -154,6 +154,15 @@
   "last_label": "Ant.",
   "split_label": "Dividir",
   "skip": "Saltar",
+  "skipped": "Saltado",
+  "@skipped": {
+    "description": "Label shown on an exercise card that was skipped during a workout"
+  },
+  "skipExercise": "Saltar ejercicio",
+  "skipExerciseContent": "¿Saltar este ejercicio? Sus series se rellenarán con los datos de tu última sesión.",
+  "@skipExerciseContent": {
+    "description": "Confirmation message when skipping an exercise"
+  },
   "about": "ACERCA DE",
   "version": "Versión",
   "author": "Autor",

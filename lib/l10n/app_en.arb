@@ -154,6 +154,15 @@
   "last_label": "Last",
   "split_label": "Split",
   "skip": "Skip",
+  "skipped": "Skipped",
+  "@skipped": {
+    "description": "Label shown on an exercise card that was skipped during a workout"
+  },
+  "skipExercise": "Skip exercise",
+  "skipExerciseContent": "Skip this exercise? Its sets will be filled from your last session.",
+  "@skipExerciseContent": {
+    "description": "Confirmation message when skipping an exercise"
+  },
   "about": "ABOUT",
   "version": "Version",
   "author": "Author",
