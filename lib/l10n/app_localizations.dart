@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -710,6 +710,24 @@ abstract class AppLocalizations {
   /// **'Skip'**
   String get skip;
 
+  /// No description provided for @skipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Skipped'**
+  String get skipped;
+
+  /// No description provided for @skipExercise.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip exercise'**
+  String get skipExercise;
+
+  /// No description provided for @skipExerciseContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip this exercise? Progress will not be recorded.'**
+  String get skipExerciseContent;
+
   /// No description provided for @about.
   ///
   /// In en, this message translates to:
@@ -1189,12 +1207,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Amber'**
   String get colorAmber;
-
-  String get skipExercise;
-
-  String get skipExerciseContent;
-
-  String get skipped;
 }
 
 class _AppLocalizationsDelegate

@@ -1,4 +1,4 @@
-﻿// ignore: unused_import
+// ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
@@ -330,6 +330,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get skip => 'Saltar';
 
   @override
+  String get skipped => 'Saltado';
+
+  @override
+  String get skipExercise => 'Saltar ejercicio';
+
+  @override
+  String get skipExerciseContent =>
+      '¿Saltar este ejercicio? Sus series se rellenarán con los datos de tu última sesión.';
+
+  @override
   String get about => 'ACERCA DE';
 
   @override
@@ -576,12 +586,4 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get colorAmber => 'Ámbar';
-  @override
-  String get skipExercise => 'Saltar ejercicio?';
-
-  @override
-  String get skipExerciseContent => 'Este ejercicio se marcara como saltado.';
-
-  @override
-  String get skipped => 'Saltado';
 }
