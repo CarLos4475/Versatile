@@ -23,6 +23,7 @@ class ExerciseWorkoutState {
   final List<WorkoutSet> prevSets;
   final bool isUnilateral;
   final bool isSplitMode;
+  final bool skipped;
 
   const ExerciseWorkoutState({
     required this.exerciseId,
@@ -35,6 +36,7 @@ class ExerciseWorkoutState {
     this.prevSets = const [],
     this.isUnilateral = false,
     this.isSplitMode = false,
+    this.skipped = false,
   });
 
   bool get isDone => completedSets.length >= targetSets;
@@ -46,6 +48,7 @@ class ExerciseWorkoutState {
     WorkoutSet? currentInput,
     bool clearCurrentInput = false,
     bool? isSplitMode,
+    bool? skipped,
   }) {
     return ExerciseWorkoutState(
       exerciseId: exerciseId,
@@ -60,6 +63,7 @@ class ExerciseWorkoutState {
       prevSets: prevSets,
       isUnilateral: isUnilateral,
       isSplitMode: isSplitMode ?? this.isSplitMode,
+      skipped: skipped ?? this.skipped,
     );
   }
 }
@@ -239,6 +243,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
           prevSets: e.prevSets,
           isUnilateral: e.isUnilateral,
           isSplitMode: d['isSplitMode'] as bool? ?? false,
+          skipped: d['skipped'] as bool? ?? false,
         );
       }).toList();
 
@@ -293,6 +298,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
       'currentLeftKg': e.currentInput?.leftKg,
       'currentLeftReps': e.currentInput?.leftReps,
       'isSplitMode': e.isSplitMode,
+      'skipped': e.skipped,
     }).toList();
 
     final json = jsonEncode({
@@ -392,6 +398,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
       prevSets: e.prevSets,
       isUnilateral: e.isUnilateral,
       isSplitMode: newSplit,
+      skipped: e.skipped,
     );
     state = state.copyWith(exerciseStates: list);
   }
@@ -545,6 +552,58 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     );
   }
 
+  void skipExercise(int index) {
+    final list = [...state.exerciseStates];
+    final e = list[index];
+    if (e.isDone || e.skipped) return;
+
+    final prev = e.prevSets;
+    final filled = <WorkoutSet>[];
+    for (var i = 0; i < e.targetSets; i++) {
+      if (i < prev.length) {
+        filled.add(prev[i]);
+      } else if (prev.isNotEmpty) {
+        filled.add(prev.last);
+      } else {
+        filled.add(const WorkoutSet(kg: 0, reps: 0));
+      }
+    }
+
+    list[index] = ExerciseWorkoutState(
+      exerciseId: e.exerciseId,
+      targetSets: e.targetSets,
+      targetReps: e.targetReps,
+      restSec: e.restSec,
+      isExpanded: e.isExpanded,
+      completedSets: filled,
+      currentInput: null,
+      prevSets: e.prevSets,
+      isUnilateral: e.isUnilateral,
+      isSplitMode: e.isSplitMode,
+      skipped: true,
+    );
+
+    final allDone = list.every((es) => es.isDone || es.skipped);
+
+    if (allDone) {
+      state = state.copyWith(
+        exerciseStates: list,
+        clearRestTimer: true,
+        autoFinish: true,
+      );
+      _restTicker?.cancel();
+      _restEndAt = null;
+      _saveProgress();
+      return;
+    }
+
+    state = state.copyWith(
+      exerciseStates: list,
+      clearRestTimer: true,
+    );
+    _saveProgress();
+  }
+
   void updateWeight(int index, double kg) {
     final list = [...state.exerciseStates];
     final e = list[index];
@@ -626,6 +685,12 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
   String _todayString() {
     final now = DateTime.now();
     return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+  }
+
+  void cancelWorkout() {
+    _sessionTimer?.cancel();
+    _restTicker?.cancel();
+    _restEndAt = null;
   }
 
   @override

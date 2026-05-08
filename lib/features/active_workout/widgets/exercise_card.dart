@@ -1,14 +1,10 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/workout_set.dart';
 import '../../../core/utils/format_utils.dart';
 import '../../../core/utils/l10n_utils.dart';
-import '../../../shared/widgets/glass_button.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../view_models/active_workout_view_model.dart';
 import 'number_input_widget.dart';
@@ -27,6 +23,7 @@ class ExerciseCard extends StatelessWidget {
     this.onToggleSplit,
     this.onLeftWeightChanged,
     this.onLeftRepsChanged,
+    this.onSkip,
   });
 
   final int index;
@@ -40,45 +37,78 @@ class ExerciseCard extends StatelessWidget {
   final VoidCallback? onToggleSplit;
   final ValueChanged<double>? onLeftWeightChanged;
   final ValueChanged<int>? onLeftRepsChanged;
+  final VoidCallback? onSkip;
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      decoration: BoxDecoration(
-        color: context.colors.bgFrame,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: context.colors.glassBorder, width: 0.5),
-        boxShadow: context.colors.glassShadow,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _CardHeader(
-            index: index,
-            data: data,
-            exercise: exercise,
-            onToggle: onToggle,
-            onToggleSplit: onToggleSplit,
+    return Stack(
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          decoration: BoxDecoration(
+            color: context.colors.bgFrame,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: context.colors.glassBorder, width: 0.5),
+            boxShadow: context.colors.glassShadow,
           ),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 280),
-            curve: Curves.easeOutCubic,
-            child: data.isExpanded
-                ? _CardBody(
-                    data: data,
-                    prevSets: prevSets,
-                    onFinishSet: onFinishSet,
-                    onWeightChanged: onWeightChanged,
-                    onRepsChanged: onRepsChanged,
-                    onLeftWeightChanged: onLeftWeightChanged,
-                    onLeftRepsChanged: onLeftRepsChanged,
-                  )
-                : const SizedBox.shrink(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _CardHeader(
+                index: index,
+                data: data,
+                exercise: exercise,
+                onToggle: onToggle,
+                onToggleSplit: onToggleSplit,
+                onSkip: onSkip,
+              ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 280),
+                curve: Curves.easeOutCubic,
+                child: data.isExpanded && !data.skipped
+                    ? _CardBody(
+                        data: data,
+                        prevSets: prevSets,
+                        onFinishSet: onFinishSet,
+                        onWeightChanged: onWeightChanged,
+                        onRepsChanged: onRepsChanged,
+                        onLeftWeightChanged: onLeftWeightChanged,
+                        onLeftRepsChanged: onLeftRepsChanged,
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        if (data.skipped)
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: context.colors.accent.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: context.colors.accent.withValues(alpha: 0.55),
+                    width: 1.5,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.skipped.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.08,
+                      color: context.colors.accentDeep,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -90,6 +120,7 @@ class _CardHeader extends StatelessWidget {
     required this.exercise,
     required this.onToggle,
     this.onToggleSplit,
+    this.onSkip,
   });
 
   final int index;
@@ -97,6 +128,7 @@ class _CardHeader extends StatelessWidget {
   final Exercise exercise;
   final VoidCallback onToggle;
   final VoidCallback? onToggleSplit;
+  final VoidCallback? onSkip;
 
   @override
   Widget build(BuildContext context) {
@@ -137,14 +169,36 @@ class _CardHeader extends StatelessWidget {
                 ],
               ),
             ),
+            if (onSkip != null && !data.isDone && !data.skipped)
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: PressableScale(
+                  onTap: onSkip,
+                  child: Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: context.colors.hairline.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.skip_next_rounded,
+                      size: 16,
+                      color: context.colors.ink300,
+                    ),
+                  ),
+                ),
+              ),
             if (onToggleSplit != null)
               Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: PressableScale(
                   onTap: onToggleSplit,
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: data.isSplitMode
                           ? context.colors.accentTint
@@ -209,12 +263,12 @@ class _CardBody extends StatelessWidget {
 
           // Completed sets
           ...data.completedSets.asMap().entries.map(
-                (e) => _CompletedSetRow(
-                  setIndex: e.key,
-                  set: e.value,
-                  isSplitMode: data.isSplitMode,
-                ),
-              ),
+            (e) => _CompletedSetRow(
+              setIndex: e.key,
+              set: e.value,
+              isSplitMode: data.isSplitMode,
+            ),
+          ),
 
           // Current set + ghost row
           if (!data.isDone && data.currentInput != null) ...[
@@ -311,17 +365,17 @@ class _CompletedSetRow extends StatelessWidget {
   final bool isSplitMode;
 
   TextStyle _weightStyle(BuildContext context) => TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w500,
-        color: context.colors.ink900,
-        fontFeatures: const [FontFeature.tabularFigures()],
-      );
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    color: context.colors.ink900,
+    fontFeatures: const [FontFeature.tabularFigures()],
+  );
   TextStyle _repsStyle(BuildContext context) => TextStyle(
-        fontSize: 13,
-        fontWeight: FontWeight.w500,
-        color: context.colors.ink900,
-        fontFeatures: const [FontFeature.tabularFigures()],
-      );
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    color: context.colors.ink900,
+    fontFeatures: const [FontFeature.tabularFigures()],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -389,9 +443,7 @@ class _CompletedSetRow extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Expanded(
-                child: Text('${set.reps}', style: _repsStyle(context)),
-              ),
+              Expanded(child: Text('${set.reps}', style: _repsStyle(context))),
             ],
             const SizedBox(width: 8),
             Container(
@@ -421,10 +473,10 @@ class _GhostRow extends StatelessWidget {
   final bool isSplitMode;
 
   TextStyle _ghostStyle(BuildContext context) => TextStyle(
-        fontSize: 11,
-        color: context.colors.ink300,
-        fontFeatures: const [FontFeature.tabularFigures()],
-      );
+    fontSize: 11,
+    color: context.colors.ink300,
+    fontFeatures: const [FontFeature.tabularFigures()],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -524,10 +576,10 @@ class _ActiveSetRow extends StatelessWidget {
   final ValueChanged<int>? onLeftRepsChanged;
 
   TextStyle _sideStyle(BuildContext context) => TextStyle(
-        fontSize: 10,
-        fontWeight: FontWeight.w700,
-        color: context.colors.accent.withValues(alpha: 0.5),
-      );
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    color: context.colors.accent.withValues(alpha: 0.5),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -618,8 +670,11 @@ class _ActiveSetRow extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.check_rounded,
-                    size: 16, color: Colors.white),
+                child: const Icon(
+                  Icons.check_rounded,
+                  size: 16,
+                  color: Colors.white,
+                ),
               ),
             ),
           ],
@@ -645,10 +700,10 @@ class _SplitInputs extends StatelessWidget {
   final ValueChanged<int> onLeftRepsChanged;
 
   TextStyle _sideStyle(BuildContext context) => TextStyle(
-        fontSize: 10,
-        fontWeight: FontWeight.w700,
-        color: context.colors.accent.withValues(alpha: 0.5),
-      );
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    color: context.colors.accent.withValues(alpha: 0.5),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -693,8 +748,9 @@ class _SplitInputs extends StatelessWidget {
                   Expanded(
                     child: NumberInputWidget(
                       value: currentInput.kg,
-                      onDecrement: () =>
-                          onWeightChanged((currentInput.kg - 2.5).clamp(0, 999)),
+                      onDecrement: () => onWeightChanged(
+                        (currentInput.kg - 2.5).clamp(0, 999),
+                      ),
                       onIncrement: () => onWeightChanged(currentInput.kg + 2.5),
                       onChanged: (val) => onWeightChanged(val.toDouble()),
                       suffix: 'kg',
@@ -762,8 +818,8 @@ class _IndexBadge extends StatelessWidget {
         color: isDone
             ? null
             : hasProgress
-                ? context.colors.accent.withValues(alpha: 0.15)
-                : context.colors.fieldBg,
+            ? context.colors.accent.withValues(alpha: 0.15)
+            : context.colors.fieldBg,
         borderRadius: BorderRadius.circular(10),
       ),
       child: isDone
@@ -786,17 +842,20 @@ class _IndexBadge extends StatelessWidget {
 }
 
 class _SideValueRow extends StatelessWidget {
-  const _SideValueRow(
-      {required this.side, required this.text, required this.style});
+  const _SideValueRow({
+    required this.side,
+    required this.text,
+    required this.style,
+  });
   final String side;
   final String text;
   final TextStyle style;
 
   TextStyle _sideStyle(BuildContext context) => TextStyle(
-        fontSize: 10,
-        fontWeight: FontWeight.w700,
-        color: context.colors.ink300,
-      );
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    color: context.colors.ink300,
+  );
 
   @override
   Widget build(BuildContext context) {

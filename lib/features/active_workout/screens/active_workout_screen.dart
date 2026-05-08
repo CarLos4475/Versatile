@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
@@ -136,6 +135,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    WorkoutNotificationService.stop();
     super.dispose();
   }
 
@@ -156,6 +156,56 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     } else {
       Navigator.of(context).pop();
     }
+  }
+
+  void _confirmDiscard(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
+    showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.discardWorkoutTitle),
+        content: Text(l10n.discardWorkoutContent),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.discard, style: const TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    ).then((confirmed) async {
+      if (confirmed != true || !mounted) return;
+      ref.read(activeWorkoutProvider(widget.routineId).notifier).cancelWorkout();
+      await WorkoutNotificationService.stop();
+      if (!mounted) return;
+      ref.read(activeWorkoutRoutineIdProvider.notifier).state = null;
+      if (mounted) Navigator.of(context).pop();
+    });
+  }
+
+  void _confirmSkip(BuildContext context, int index, AppLocalizations l10n) {
+    showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.skipExercise),
+        content: Text(l10n.skipExerciseContent),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.skip),
+          ),
+        ],
+      ),
+    ).then((confirmed) {
+      if (confirmed != true || !mounted) return;
+      ref.read(activeWorkoutProvider(widget.routineId).notifier).skipExercise(index);
+    });
   }
 
   @override
@@ -206,6 +256,23 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                               Icons.chevron_left,
                               size: 18,
                               color: context.colors.ink700,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        PressableScale(
+                          onTap: () => _confirmDiscard(context, ref, l10n),
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: context.colors.press,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              Icons.close_rounded,
+                              size: 18,
+                              color: context.colors.ink500,
                             ),
                           ),
                         ),
@@ -317,7 +384,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                         if (ex == null) return const SizedBox.shrink();
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
-                          child: ExerciseCard(
+                           child: ExerciseCard(
                             index: i,
                             data: e,
                             exercise: ex,
@@ -335,6 +402,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                                 notifier.updateLeftWeight(i, kg),
                             onLeftRepsChanged: (reps) =>
                                 notifier.updateLeftReps(i, reps),
+                            onSkip: () => _confirmSkip(context, i, l10n),
                           ),
                         );
                       }),
@@ -392,7 +460,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
 }
 
 class _PulseDot extends StatefulWidget {
-  const _PulseDot({super.key});
+  const _PulseDot();
   @override
   State<_PulseDot> createState() => _PulseDotState();
 }

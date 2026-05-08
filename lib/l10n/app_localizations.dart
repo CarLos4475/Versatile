@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -1189,6 +1189,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Amber'**
   String get colorAmber;
+
+  String get skipExercise;
+
+  String get skipExerciseContent;
+
+  String get skipped;
 }
 
 class _AppLocalizationsDelegate

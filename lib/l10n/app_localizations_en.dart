@@ -1,4 +1,4 @@
-// ignore: unused_import
+﻿// ignore: unused_import
 import 'package:intl/intl.dart' as intl;
 import 'app_localizations.dart';
 
@@ -575,4 +575,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get colorAmber => 'Amber';
+
+  @override
+  String get skipExercise => 'Skip exercise?';
+
+  @override
+  String get skipExerciseContent => 'This exercise will be marked as skipped.';
+
+  @override
+  String get skipped => 'Skipped';
 }
