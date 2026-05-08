@@ -41,6 +41,75 @@ class ExerciseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (data.skipped) {
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        decoration: BoxDecoration(
+          color: context.colors.bgFrame,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: context.colors.glassBorder, width: 0.5),
+          boxShadow: context.colors.glassShadow,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  exercise.getLocalizedName(context),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: context.colors.ink400,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 28),
+                  decoration: BoxDecoration(
+                    color: context.colors.accent.withValues(alpha: 0.15),
+                    border: Border(
+                      top: BorderSide(
+                        color: context.colors.accent.withValues(alpha: 0.55),
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      l10n.skipped.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.08,
+                        color: context.colors.accentDeep,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Stack(
       children: [
         AnimatedContainer(
@@ -81,33 +150,6 @@ class ExerciseCard extends StatelessWidget {
             ],
           ),
         ),
-        if (data.skipped)
-          Positioned.fill(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: context.colors.accent.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: context.colors.accent.withValues(alpha: 0.55),
-                    width: 1.5,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    AppLocalizations.of(context)!.skipped.toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.08,
-                      color: context.colors.accentDeep,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
       ],
     );
   }
@@ -175,16 +217,16 @@ class _CardHeader extends StatelessWidget {
                 child: PressableScale(
                   onTap: onSkip,
                   child: Container(
-                    width: 28,
-                    height: 28,
+                    width: 36,
+                    height: 36,
                     decoration: BoxDecoration(
-                      color: context.colors.hairline.withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(8),
+                      color: context.colors.accentTint,
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       Icons.skip_next_rounded,
-                      size: 16,
-                      color: context.colors.ink300,
+                      size: 18,
+                      color: context.colors.accentDeep,
                     ),
                   ),
                 ),

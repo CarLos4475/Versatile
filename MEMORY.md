@@ -8,7 +8,7 @@ A workout-tracking Flutter app. Users create routines with exercises, start work
 
 - **Flutter** (Dart) with `flutter_riverpod` for state management
 - **SQLite** via `sqflite` — single `DatabaseHelper` singleton (`lib/data/database/database_helper.dart`)
-- **Localization**: gen-l10n with `AppLocalizations` (EN + ES)
+ - **Localization**: gen-l10n via `l10n.yaml`. **Source files are the `.arb` files** (`app_en.arb`, `app_es.arb`). The `.dart` files (`app_localizations.dart`, `_en.dart`, `_es.dart`) are auto-regenerated on build. NEVER edit the `.dart` l10n files directly — always add strings to the `.arb` files first, then run `flutter gen-l10n`.
 - **Android**: `WorkoutService.kt` (foreground service), MethodChannel for rest alerts
 - **Audio**: `audioplayers` for rest timer alert sounds
 
@@ -90,4 +90,22 @@ lib/
 - `SessionExercise`: exerciseId, name, muscle, sets (List<WorkoutSet>), computed volume
 - `WorkoutSet`: kg, reps, leftKg?, leftReps?, computed volume, computed isSplit
 - `Routine`: id, name, colorValue, iconCode, exercises (List<RoutineExercise>), lastDoneDaysAgo
-- `Exercise`: id, name, muscle, equipment, isCustom, isUnilateral, getLocalizedName/muscle (l10n-aware)
+ - `Exercise`: id, name, muscle, equipment, isCustom, isUnilateral, getLocalizedName/muscle (l10n-aware)
+
+## Active Workout Features
+
+### Cancel Workout
+- Cancel button (X icon in header, next to back arrow) shows `AlertDialog` using `discardWorkoutTitle`/`discardWorkoutContent` l10n strings
+- On confirm: calls `cancelWorkout()` on notifier (stops all timers), stops `WorkoutNotificationService`, clears `activeWorkoutRoutineIdProvider`, pops back
+- `dispose()` also stops the notification service as a safety net
+
+### Skip Exercise
+- Skip button in `_CardHeader` (styled like the pause button: `accentTint` bg, `accentDeep` icon, 36x36, border-radius 12), visible when `!isDone && !skipped`
+- Tapping shows a confirmation dialog (`skipExercise`/`skipExerciseContent` l10n)
+- On confirm: `skipExercise()` fills `completedSets` with `prevSets` data copied from last session (repeating last prevSet to meet `targetSets`), marks `skipped = true` on the exercise state
+- Skipped card shows only: exercise name (tiny, 11px, top-left) + accent overlay with "SKIPPED" centered — no other UI leaks through
+- Skipped exercises save the filled sets into the session history (no empty gaps)
+
+## L10n ARB File Trap
+
+The `.dart` l10n files are auto-generated on build from the `.arb` files. Adding getters directly to the `.dart` files WILL be reverted on the next build. Always edit `app_en.arb` and `app_es.arb` first, then run `flutter gen-l10n` or let the build regenerate.
