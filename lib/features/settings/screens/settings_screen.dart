@@ -14,6 +14,7 @@ import 'package:versatile/core/services/data_service.dart';
 import 'package:versatile/core/services/sound_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/database/database_helper.dart';
+import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
@@ -34,12 +35,90 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _soundType = 'default';
   String? _customPath;
   late final SoundService _soundService;
+  final _colorSectionKey = GlobalKey();
+  final _soundSectionKey = GlobalKey();
+  final _dataSectionKey = GlobalKey();
+  bool _coachmarkChecked = false;
 
   @override
   void initState() {
     super.initState();
     _soundService = SoundService(ref.read(settingsRepositoryProvider));
     _loadSoundSettings();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkCoachmark());
+  }
+
+  Future<void> _checkCoachmark() async {
+    if (!mounted || _coachmarkChecked) return;
+    _coachmarkChecked = true;
+    final service = ref.read(coachmarkServiceProvider);
+    final shouldColors = await service.shouldShow('settings_colors');
+    if (shouldColors && mounted) {
+      final l10n = AppLocalizations.of(context)!;
+      CoachmarkOverlay.show(
+        context: context,
+        targetKey: _colorSectionKey,
+        title: l10n.coachmarkSettingsColorsTitle,
+        body: l10n.coachmarkSettingsColorsBody,
+        gotItLabel: l10n.coachmarkGotIt,
+        skipLabel: l10n.coachmarkSkipAll,
+        onDone: () async {
+          await service.markSeen('settings_colors');
+          if (mounted) _checkSoundCoachmark();
+        },
+        onSkipAll: () async {
+          await service.markSeen('settings_colors');
+          await service.markSeen('settings_sound');
+          await service.markSeen('settings_data');
+        },
+      );
+      return;
+    }
+    _checkSoundCoachmark();
+  }
+
+  Future<void> _checkSoundCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('settings_sound');
+    if (should && mounted) {
+      final l10n = AppLocalizations.of(context)!;
+      CoachmarkOverlay.show(
+        context: context,
+        targetKey: _soundSectionKey,
+        title: l10n.coachmarkSettingsSoundTitle,
+        body: l10n.coachmarkSettingsSoundBody,
+        gotItLabel: l10n.coachmarkGotIt,
+        skipLabel: l10n.coachmarkSkipAll,
+        onDone: () async {
+          await service.markSeen('settings_sound');
+          if (mounted) _checkDataCoachmark();
+        },
+        onSkipAll: () async {
+          await service.markSeen('settings_sound');
+          await service.markSeen('settings_data');
+        },
+      );
+      return;
+    }
+    _checkDataCoachmark();
+  }
+
+  Future<void> _checkDataCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('settings_data');
+    if (!should || !mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: _dataSectionKey,
+      title: l10n.coachmarkSettingsDataTitle,
+      body: l10n.coachmarkSettingsDataBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('settings_data'),
+    );
   }
 
   Future<void> _loadSoundSettings() async {
@@ -275,7 +354,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
                       delay: const Duration(milliseconds: 100),
-                      child: GlassContainer(
+                      child: KeyedSubtree(
+                        key: _colorSectionKey,
+                        child: GlassContainer(
                         radius: 20,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
@@ -470,6 +551,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           ),
                         ),
                       ),
+                      ),
                     ),
                   ),
 
@@ -481,7 +563,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
                       delay: const Duration(milliseconds: 130),
-                      child: GlassContainer(
+                      child: KeyedSubtree(
+                        key: _soundSectionKey,
+                        child: GlassContainer(
                         radius: 20,
                         child: Padding(
                           padding: const EdgeInsets.all(18),
@@ -656,6 +740,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             ],
                           ),
                         ),
+                        ),
                       ),
                     ),
                   ),
@@ -668,7 +753,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
                       delay: const Duration(milliseconds: 140),
-                      child: GlassContainer(
+                      child: KeyedSubtree(
+                        key: _dataSectionKey,
+                        child: GlassContainer(
                         radius: 20,
                         child: Column(
                           children: [
@@ -694,6 +781,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               destructive: true,
                             ),
                           ],
+                        ),
                         ),
                       ),
                     ),

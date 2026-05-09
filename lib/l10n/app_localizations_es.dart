@@ -637,4 +637,60 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get coachmarkSkipAll => 'Omitir';
+
+  @override
+  String get coachmarkTabRoutinesTitle => 'Crea rutinas';
+
+  @override
+  String get coachmarkTabRoutinesBody =>
+      'Toca aquí para crear y gestionar tus rutinas de entrenamiento.';
+
+  @override
+  String get coachmarkTabExercisesTitle => 'Tus ejercicios';
+
+  @override
+  String get coachmarkTabExercisesBody =>
+      'Explora la biblioteca de ejercicios y toca cualquiera para ver tu progreso.';
+
+  @override
+  String get coachmarkTabHistoryTitle => 'Historial y gráficas';
+
+  @override
+  String get coachmarkTabHistoryBody =>
+      'Aquí están tus sesiones pasadas y las gráficas de progreso de cada ejercicio. Toca para explorar.';
+
+  @override
+  String get coachmarkRoutineEditTitle => 'Edita tu rutina';
+
+  @override
+  String get coachmarkRoutineEditBody =>
+      'Toca Editar para reordenar ejercicios, ajustar series y descanso, o renombrar esta rutina.';
+
+  @override
+  String get coachmarkExerciseAddTitle => 'Añade ejercicios propios';
+
+  @override
+  String get coachmarkExerciseAddBody =>
+      'Toca + para crear tus propios ejercicios con nombre, grupo muscular y tipo de equipo.';
+
+  @override
+  String get coachmarkSettingsColorsTitle => 'Personalízalo a tu gusto';
+
+  @override
+  String get coachmarkSettingsColorsBody =>
+      'Elige un color de acento y cambia entre temas claro y oscuro para personalizar la app.';
+
+  @override
+  String get coachmarkSettingsSoundTitle => 'Sonido del temporizador';
+
+  @override
+  String get coachmarkSettingsSoundBody =>
+      'Activa una alerta cuando termine tu descanso. Usa el tono predeterminado o elige tu propio audio.';
+
+  @override
+  String get coachmarkSettingsDataTitle => 'Respalda tus datos';
+
+  @override
+  String get coachmarkSettingsDataBody =>
+      'Exporta tus rutinas e historial como JSON para hacer un respaldo o transferirlos a otro dispositivo.';
 }

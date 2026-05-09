@@ -6,7 +6,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
-import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
@@ -25,23 +24,13 @@ class RoutinesScreen extends ConsumerStatefulWidget {
 
 class _RoutinesScreenState extends ConsumerState<RoutinesScreen> {
   final _addBtnKey = GlobalKey();
-  bool _coachmarkScheduled = false;
 
-  Future<void> _checkCoachmark() async {
-    if (!mounted) return;
-    final service = ref.read(coachmarkServiceProvider);
-    final should = await service.shouldShow('routines');
-    if (!should || !mounted) return;
-    final l10n = AppLocalizations.of(context)!;
-    CoachmarkOverlay.show(
-      context: context,
-      targetKey: _addBtnKey,
-      title: l10n.coachmarkRoutinesTitle,
-      body: l10n.coachmarkRoutinesBody,
-      gotItLabel: l10n.coachmarkGotIt,
-      skipLabel: l10n.coachmarkSkipAll,
-      onDone: () => service.markSeen('routines'),
-    );
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(routinesAddKeyProvider.notifier).state = _addBtnKey;
+    });
   }
 
   @override
@@ -50,66 +39,64 @@ class _RoutinesScreenState extends ConsumerState<RoutinesScreen> {
     final routinesAsync = ref.watch(routinesProvider);
     final exercises = ref.watch(exercisesAsyncProvider).value ?? [];
 
-    if (routinesAsync.hasValue && !_coachmarkScheduled) {
-      _coachmarkScheduled = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) => _checkCoachmark());
-    }
-
     return Scaffold(
       backgroundColor: context.colors.bgApp,
       body: SafeArea(
-        child: routinesAsync.when(
-          loading: () => _LoadingBody(label: l10n.preparingWorkout),
-          error: (e, _) => Center(
-            child: Text(
-              'Error: $e',
-              style: TextStyle(color: context.colors.ink500),
-            ),
-          ),
-          data: (routines) => SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 96),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ScreenHeader(
-                  title: l10n.routines,
-                  subtitle: l10n.routinesInLibrary(routines.length),
-                  trailing: KeyedSubtree(
-                    key: _addBtnKey,
-                    child: IconCircleButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const CreateRoutineScreen(),
-                        ),
-                      ),
-                      accent: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ScreenHeader(
+              title: l10n.routines,
+              subtitle: routinesAsync.maybeWhen(
+                data: (r) => l10n.routinesInLibrary(r.length),
+                orElse: () => '',
+              ),
+              trailing: KeyedSubtree(
+                key: _addBtnKey,
+                child: IconCircleButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const CreateRoutineScreen(),
                     ),
+                  ),
+                  accent: true,
+                ),
+              ),
+            ),
+            Expanded(
+              child: routinesAsync.when(
+                loading: () => _LoadingBody(label: l10n.preparingWorkout),
+                error: (e, _) => Center(
+                  child: Text(
+                    'Error: $e',
+                    style: TextStyle(color: context.colors.ink500),
                   ),
                 ),
-                const SizedBox(height: 16),
-                if (routines.isEmpty)
-                  const _EmptyRoutines()
-                else
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 22),
-                    child: Column(
-                      children: routines
-                          .map(
-                            (r) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: _RoutineCard(
-                                routine: r,
-                                exercises: exercises,
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ),
-              ],
+                data: (routines) => routines.isEmpty
+                    ? const _EmptyRoutines()
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.only(bottom: 96),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(22, 16, 22, 0),
+                          child: Column(
+                            children: routines
+                                .map(
+                                  (r) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 12),
+                                    child: _RoutineCard(
+                                      routine: r,
+                                      exercises: exercises,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                      ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

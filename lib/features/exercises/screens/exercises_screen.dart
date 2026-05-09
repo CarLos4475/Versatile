@@ -5,7 +5,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../core/providers/repository_providers.dart';
-import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../shared/widgets/filter_chip_widget.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
@@ -26,6 +25,7 @@ class ExercisesScreen extends ConsumerStatefulWidget {
 class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
   late TextEditingController _searchCtrl;
   final _searchBarKey = GlobalKey();
+  final _addBtnKey = GlobalKey();
 
   @override
   void initState() {
@@ -33,24 +33,12 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
     _searchCtrl = TextEditingController(
       text: ref.read(exercisesProvider).query,
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkCoachmark());
-  }
-
-  Future<void> _checkCoachmark() async {
-    if (!mounted) return;
-    final service = ref.read(coachmarkServiceProvider);
-    final should = await service.shouldShow('exercises');
-    if (!should || !mounted) return;
-    final l10n = AppLocalizations.of(context)!;
-    CoachmarkOverlay.show(
-      context: context,
-      targetKey: _searchBarKey,
-      title: l10n.coachmarkExercisesTitle,
-      body: l10n.coachmarkExercisesBody,
-      gotItLabel: l10n.coachmarkGotIt,
-      skipLabel: l10n.coachmarkSkipAll,
-      onDone: () => service.markSeen('exercises'),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(exercisesSearchKeyProvider.notifier).state = _searchBarKey;
+        ref.read(exercisesAddKeyProvider.notifier).state = _addBtnKey;
+      }
+    });
   }
 
   @override
@@ -180,25 +168,31 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            IconCircleButton(
-                              icon: const Icon(Icons.add),
-                              onPressed: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => const AddExerciseScreen(),
+                            KeyedSubtree(
+                              key: _addBtnKey,
+                              child: IconCircleButton(
+                                icon: const Icon(Icons.add),
+                                onPressed: () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const AddExerciseScreen(),
+                                  ),
                                 ),
+                                accent: true,
                               ),
-                              accent: true,
                             ),
                           ],
                         )
-                      : IconCircleButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const AddExerciseScreen(),
+                      : KeyedSubtree(
+                          key: _addBtnKey,
+                          child: IconCircleButton(
+                            icon: const Icon(Icons.add),
+                            onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const AddExerciseScreen(),
+                              ),
                             ),
+                            accent: true,
                           ),
-                          accent: true,
                         ),
                 ),
                 const SizedBox(height: 14),

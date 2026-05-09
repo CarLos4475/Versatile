@@ -273,5 +273,22 @@
   "coachmarkExercisesTitle": "Sigue tu progreso",
   "coachmarkExercisesBody": "Toca cualquier ejercicio para ver tu gráfica de progreso y récords personales.",
   "coachmarkGotIt": "Entendido",
-  "coachmarkSkipAll": "Omitir"
+  "coachmarkSkipAll": "Omitir",
+
+  "coachmarkTabRoutinesTitle": "Crea rutinas",
+  "coachmarkTabRoutinesBody": "Toca aquí para crear y gestionar tus rutinas de entrenamiento.",
+  "coachmarkTabExercisesTitle": "Tus ejercicios",
+  "coachmarkTabExercisesBody": "Explora la biblioteca de ejercicios y toca cualquiera para ver tu progreso.",
+  "coachmarkTabHistoryTitle": "Historial y gráficas",
+  "coachmarkTabHistoryBody": "Aquí están tus sesiones pasadas y las gráficas de progreso de cada ejercicio. Toca para explorar.",
+  "coachmarkRoutineEditTitle": "Edita tu rutina",
+  "coachmarkRoutineEditBody": "Toca Editar para reordenar ejercicios, ajustar series y descanso, o renombrar esta rutina.",
+  "coachmarkExerciseAddTitle": "Añade ejercicios propios",
+  "coachmarkExerciseAddBody": "Toca + para crear tus propios ejercicios con nombre, grupo muscular y tipo de equipo.",
+  "coachmarkSettingsColorsTitle": "Personalízalo a tu gusto",
+  "coachmarkSettingsColorsBody": "Elige un color de acento y cambia entre temas claro y oscuro para personalizar la app.",
+  "coachmarkSettingsSoundTitle": "Sonido del temporizador",
+  "coachmarkSettingsSoundBody": "Activa una alerta cuando termine tu descanso. Usa el tono predeterminado o elige tu propio audio.",
+  "coachmarkSettingsDataTitle": "Respalda tus datos",
+  "coachmarkSettingsDataBody": "Exporta tus rutinas e historial como JSON para hacer un respaldo o transferirlos a otro dispositivo."
 }

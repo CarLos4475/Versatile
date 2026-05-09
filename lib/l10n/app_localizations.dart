@@ -1297,6 +1297,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip all'**
   String get coachmarkSkipAll;
+
+  /// No description provided for @coachmarkTabRoutinesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create routines'**
+  String get coachmarkTabRoutinesTitle;
+
+  /// No description provided for @coachmarkTabRoutinesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap here to build and manage your workout routines.'**
+  String get coachmarkTabRoutinesBody;
+
+  /// No description provided for @coachmarkTabExercisesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your exercises'**
+  String get coachmarkTabExercisesTitle;
+
+  /// No description provided for @coachmarkTabExercisesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse the exercise library and tap any exercise to track your progress.'**
+  String get coachmarkTabExercisesBody;
+
+  /// No description provided for @coachmarkTabHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'History & progress'**
+  String get coachmarkTabHistoryTitle;
+
+  /// No description provided for @coachmarkTabHistoryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your past sessions and progress graphs for every exercise live here. Tap to explore.'**
+  String get coachmarkTabHistoryBody;
+
+  /// No description provided for @coachmarkRoutineEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit your routine'**
+  String get coachmarkRoutineEditTitle;
+
+  /// No description provided for @coachmarkRoutineEditBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap Edit to reorder exercises, adjust sets and rest time, or rename this routine.'**
+  String get coachmarkRoutineEditBody;
+
+  /// No description provided for @coachmarkExerciseAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add custom exercises'**
+  String get coachmarkExerciseAddTitle;
+
+  /// No description provided for @coachmarkExerciseAddBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to create your own exercises with a name, muscle group, and equipment type.'**
+  String get coachmarkExerciseAddBody;
+
+  /// No description provided for @coachmarkSettingsColorsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it yours'**
+  String get coachmarkSettingsColorsTitle;
+
+  /// No description provided for @coachmarkSettingsColorsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an accent color and switch between light and dark themes to personalize the app.'**
+  String get coachmarkSettingsColorsBody;
+
+  /// No description provided for @coachmarkSettingsSoundTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest timer sound'**
+  String get coachmarkSettingsSoundTitle;
+
+  /// No description provided for @coachmarkSettingsSoundBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable an alert when your rest period ends. Use the default tone or pick a custom audio file.'**
+  String get coachmarkSettingsSoundBody;
+
+  /// No description provided for @coachmarkSettingsDataTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up your data'**
+  String get coachmarkSettingsDataTitle;
+
+  /// No description provided for @coachmarkSettingsDataBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Export your routines and history as a JSON file to keep a backup or move to another device.'**
+  String get coachmarkSettingsDataBody;
 }
 
 class _AppLocalizationsDelegate

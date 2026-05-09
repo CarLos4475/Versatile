@@ -29,6 +29,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _heroCardKey = GlobalKey();
   bool _coachmarkChecked = false;
+  bool _pendingHistoryCoachmark = false;
 
   @override
   void initState() {
@@ -42,17 +43,85 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (!mounted || _coachmarkChecked) return;
     _coachmarkChecked = true;
     final service = ref.read(coachmarkServiceProvider);
-    final should = await service.shouldShow('home');
+    final shouldShowHome = await service.shouldShow('home');
+    if (!mounted) return;
+    if (shouldShowHome) {
+      final l10n = AppLocalizations.of(context)!;
+      CoachmarkOverlay.show(
+        context: context,
+        targetKey: _heroCardKey,
+        title: l10n.coachmarkHomeTitle,
+        body: l10n.coachmarkHomeBody,
+        gotItLabel: l10n.coachmarkGotIt,
+        skipLabel: l10n.coachmarkSkipAll,
+        onDone: () {
+          service.markSeen('home');
+          _checkRoutinesTabCoachmark();
+        },
+      );
+    } else {
+      _checkRoutinesTabCoachmark();
+    }
+  }
+
+  Future<void> _checkRoutinesTabCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('tab_routines');
     if (!should || !mounted) return;
+    final routinesKey = ref.read(routinesNavKeyProvider);
+    if (routinesKey == null) return;
     final l10n = AppLocalizations.of(context)!;
     CoachmarkOverlay.show(
       context: context,
-      targetKey: _heroCardKey,
-      title: l10n.coachmarkHomeTitle,
-      body: l10n.coachmarkHomeBody,
+      targetKey: routinesKey,
+      title: l10n.coachmarkTabRoutinesTitle,
+      body: l10n.coachmarkTabRoutinesBody,
       gotItLabel: l10n.coachmarkGotIt,
       skipLabel: l10n.coachmarkSkipAll,
-      onDone: () => service.markSeen('home'),
+      onDone: () {
+        service.markSeen('tab_routines');
+        _checkExercisesTabCoachmark();
+      },
+    );
+  }
+
+  Future<void> _checkExercisesTabCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('tab_exercises');
+    if (!should || !mounted) return;
+    final exercisesKey = ref.read(exercisesNavKeyProvider);
+    if (exercisesKey == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: exercisesKey,
+      title: l10n.coachmarkTabExercisesTitle,
+      body: l10n.coachmarkTabExercisesBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('tab_exercises'),
+    );
+  }
+
+  Future<void> _checkTabHistoryCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('tab_history');
+    if (!should || !mounted) return;
+    if (ref.read(homeProvider).sessions.isEmpty) return;
+    final historyKey = ref.read(historyNavKeyProvider);
+    if (historyKey == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: historyKey,
+      title: l10n.coachmarkTabHistoryTitle,
+      body: l10n.coachmarkTabHistoryBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('tab_history'),
     );
   }
 
@@ -60,6 +129,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(homeProvider);
+
+    // Subscribe to route changes so we rebuild when the home screen becomes
+    // current again (e.g. after popping back from the workout completion screen).
+    final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
+
+    ref.listen<int>(
+      homeProvider.select((s) => s.sessions.length),
+      (previous, current) {
+        if ((previous ?? 0) == 0 && current > 0) {
+          _pendingHistoryCoachmark = true;
+        }
+      },
+    );
+
+    // Show the history coachmark only once we're back on the home screen.
+    if (_pendingHistoryCoachmark && isCurrentRoute) {
+      _pendingHistoryCoachmark = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkTabHistoryCoachmark();
+      });
+    }
+
     final now = DateTime.now();
 
     final nextRoutine = state.nextRoutine;

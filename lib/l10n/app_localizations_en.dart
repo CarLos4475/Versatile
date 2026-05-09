@@ -635,4 +635,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get coachmarkSkipAll => 'Skip all';
+
+  @override
+  String get coachmarkTabRoutinesTitle => 'Create routines';
+
+  @override
+  String get coachmarkTabRoutinesBody =>
+      'Tap here to build and manage your workout routines.';
+
+  @override
+  String get coachmarkTabExercisesTitle => 'Your exercises';
+
+  @override
+  String get coachmarkTabExercisesBody =>
+      'Browse the exercise library and tap any exercise to track your progress.';
+
+  @override
+  String get coachmarkTabHistoryTitle => 'History & progress';
+
+  @override
+  String get coachmarkTabHistoryBody =>
+      'Your past sessions and progress graphs for every exercise live here. Tap to explore.';
+
+  @override
+  String get coachmarkRoutineEditTitle => 'Edit your routine';
+
+  @override
+  String get coachmarkRoutineEditBody =>
+      'Tap Edit to reorder exercises, adjust sets and rest time, or rename this routine.';
+
+  @override
+  String get coachmarkExerciseAddTitle => 'Add custom exercises';
+
+  @override
+  String get coachmarkExerciseAddBody =>
+      'Tap + to create your own exercises with a name, muscle group, and equipment type.';
+
+  @override
+  String get coachmarkSettingsColorsTitle => 'Make it yours';
+
+  @override
+  String get coachmarkSettingsColorsBody =>
+      'Choose an accent color and switch between light and dark themes to personalize the app.';
+
+  @override
+  String get coachmarkSettingsSoundTitle => 'Rest timer sound';
+
+  @override
+  String get coachmarkSettingsSoundBody =>
+      'Enable an alert when your rest period ends. Use the default tone or pick a custom audio file.';
+
+  @override
+  String get coachmarkSettingsDataTitle => 'Back up your data';
+
+  @override
+  String get coachmarkSettingsDataBody =>
+      'Export your routines and history as a JSON file to keep a backup or move to another device.';
 }

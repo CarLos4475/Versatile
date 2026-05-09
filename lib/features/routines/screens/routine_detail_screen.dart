@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
+import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
+import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
@@ -72,6 +74,25 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
   int? _editColorValue;
   int? _editIconCode;
   TextEditingController? _nameCtrl;
+  final _editBtnKey = GlobalKey();
+  bool _coachmarkScheduled = false;
+
+  Future<void> _checkCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('routine_edit');
+    if (!should || !mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: _editBtnKey,
+      title: l10n.coachmarkRoutineEditTitle,
+      body: l10n.coachmarkRoutineEditBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('routine_edit'),
+    );
+  }
 
   @override
   void dispose() {
@@ -261,6 +282,11 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
           }
         }
 
+        if (!_coachmarkScheduled) {
+          _coachmarkScheduled = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) => _checkCoachmark());
+        }
+
         final currentColorValue = _editColorValue ?? routine.colorValue;
         final currentIconCode = _editIconCode ?? routine.iconCode;
 
@@ -289,7 +315,9 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                   ),
                 ),
               ),
-            PressableScale(
+            KeyedSubtree(
+              key: _editBtnKey,
+              child: PressableScale(
               onTap: () => _toggleEdit(routine),
               child: Container(
                 height: 36,
@@ -335,6 +363,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                   ),
                 ),
               ),
+            ),
             ),
           ],
         );

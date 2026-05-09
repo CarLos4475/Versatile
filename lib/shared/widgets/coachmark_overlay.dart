@@ -30,6 +30,7 @@ class CoachmarkOverlay extends StatefulWidget {
     required String gotItLabel,
     required String skipLabel,
     required VoidCallback onDone,
+    VoidCallback? onSkipAll,
   }) {
     final renderBox =
         targetKey.currentContext?.findRenderObject() as RenderBox?;
@@ -51,7 +52,7 @@ class CoachmarkOverlay extends StatefulWidget {
         },
         onSkip: () {
           entry.remove();
-          onDone();
+          (onSkipAll ?? onDone)();
         },
       ),
     );

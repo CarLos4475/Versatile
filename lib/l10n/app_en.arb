@@ -273,5 +273,22 @@
   "coachmarkExercisesTitle": "Track your progress",
   "coachmarkExercisesBody": "Tap any exercise to view your progress chart and personal records.",
   "coachmarkGotIt": "Got it",
-  "coachmarkSkipAll": "Skip all"
+  "coachmarkSkipAll": "Skip all",
+
+  "coachmarkTabRoutinesTitle": "Create routines",
+  "coachmarkTabRoutinesBody": "Tap here to build and manage your workout routines.",
+  "coachmarkTabExercisesTitle": "Your exercises",
+  "coachmarkTabExercisesBody": "Browse the exercise library and tap any exercise to track your progress.",
+  "coachmarkTabHistoryTitle": "History & progress",
+  "coachmarkTabHistoryBody": "Your past sessions and progress graphs for every exercise live here. Tap to explore.",
+  "coachmarkRoutineEditTitle": "Edit your routine",
+  "coachmarkRoutineEditBody": "Tap Edit to reorder exercises, adjust sets and rest time, or rename this routine.",
+  "coachmarkExerciseAddTitle": "Add custom exercises",
+  "coachmarkExerciseAddBody": "Tap + to create your own exercises with a name, muscle group, and equipment type.",
+  "coachmarkSettingsColorsTitle": "Make it yours",
+  "coachmarkSettingsColorsBody": "Choose an accent color and switch between light and dark themes to personalize the app.",
+  "coachmarkSettingsSoundTitle": "Rest timer sound",
+  "coachmarkSettingsSoundBody": "Enable an alert when your rest period ends. Use the default tone or pick a custom audio file.",
+  "coachmarkSettingsDataTitle": "Back up your data",
+  "coachmarkSettingsDataBody": "Export your routines and history as a JSON file to keep a backup or move to another device."
 }

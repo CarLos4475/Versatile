@@ -3,7 +3,8 @@
     "allow": [
       "Bash(Get-ChildItem -Recurse \"C:\\\\Users\\\\PC\\\\Documents\\\\PROYECTOS\\\\androidStudio\\\\versatile\\\\assets\")",
       "Bash(Select-Object FullName)",
-      "Bash(Get-ChildItem *)"
+      "Bash(Get-ChildItem *)",
+      "Bash(flutter analyze *)"
     ]
   }
 }

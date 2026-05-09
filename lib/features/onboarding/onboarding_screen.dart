@@ -57,6 +57,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
     return Scaffold(
       backgroundColor: context.colors.bgApp,
       body: Stack(
@@ -128,11 +129,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ],
                   ),
                 ),
-                _PageDots(
+                if (!keyboardVisible) _PageDots(
                   currentPage: _currentPage,
                   totalPages: _totalPages,
                 ),
-                const SizedBox(height: 32),
+                if (!keyboardVisible) const SizedBox(height: 32),
               ],
             ),
           ),
@@ -494,11 +495,7 @@ class _NamePageState extends State<_NamePage>
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
-        left: 32,
-        right: 32,
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/exercise_repository.dart';
 import '../../data/repositories/routine_repository.dart';
@@ -40,3 +41,10 @@ final exerciseProgressProvider = FutureProvider.autoDispose
 final coachmarkServiceProvider = Provider<CoachmarkService>(
   (ref) => CoachmarkService(ref.read(settingsRepositoryProvider)),
 );
+
+final historyNavKeyProvider = StateProvider<GlobalKey?>((ref) => null);
+final routinesNavKeyProvider = StateProvider<GlobalKey?>((ref) => null);
+final routinesAddKeyProvider = StateProvider<GlobalKey?>((ref) => null);
+final exercisesNavKeyProvider = StateProvider<GlobalKey?>((ref) => null);
+final exercisesSearchKeyProvider = StateProvider<GlobalKey?>((ref) => null);
+final exercisesAddKeyProvider = StateProvider<GlobalKey?>((ref) => null);

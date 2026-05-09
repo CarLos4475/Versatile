@@ -18,7 +18,9 @@ import 'features/active_workout/screens/active_workout_screen.dart';
 import 'features/active_workout/view_models/active_workout_view_model.dart';
 import 'features/exercises/view_models/exercises_view_model.dart';
 import 'features/splash/screens/splash_screen.dart';
+import 'shared/widgets/coachmark_overlay.dart';
 import 'shared/widgets/motion.dart';
+import 'core/providers/repository_providers.dart';
 
 class VersatileApp extends ConsumerWidget {
   const VersatileApp({super.key});
@@ -63,6 +65,9 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell>
     with SingleTickerProviderStateMixin {
   int _index = 0;
   int _prevIndex = 0;
+  final _historyTabKey = GlobalKey();
+  final _routinesTabKey = GlobalKey();
+  final _exercisesTabKey = GlobalKey();
 
   late final AnimationController _pageCtrl;
   late Animation<double> _fadeAnim;
@@ -85,6 +90,13 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell>
     _buildAnimations(forward: true);
     _pageCtrl.value = 1.0; // start fully visible
     WidgetsBinding.instance.addPostFrameCallback(_restorePendingWorkout);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(historyNavKeyProvider.notifier).state = _historyTabKey;
+        ref.read(routinesNavKeyProvider.notifier).state = _routinesTabKey;
+        ref.read(exercisesNavKeyProvider.notifier).state = _exercisesTabKey;
+      }
+    });
   }
 
   void _restorePendingWorkout(_) {
@@ -117,11 +129,88 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell>
     if (i == _index) return;
     ref.read(exercisesProvider.notifier).setQuery('');
     _buildAnimations(forward: i > _prevIndex);
-    _pageCtrl.forward(from: 0.0);
+    final animFuture = _pageCtrl.forward(from: 0.0);
     setState(() {
       _prevIndex = _index;
       _index = i;
     });
+    if (i == 1) {
+      // Wait for the slide animation to finish before computing the add-button
+      // position, otherwise localToGlobal includes the in-progress transform.
+      animFuture.whenCompleteOrCancel(() {
+        if (mounted) _triggerRoutinesCoachmark();
+      });
+    } else if (i == 2) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _triggerExercisesCoachmark());
+    }
+  }
+
+  Future<void> _triggerExercisesCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final shouldSearch = await service.shouldShow('exercises');
+    if (!mounted) return;
+    if (shouldSearch) {
+      final searchKey = ref.read(exercisesSearchKeyProvider);
+      if (searchKey == null) return;
+      final l10n = AppLocalizations.of(context)!;
+      CoachmarkOverlay.show(
+        context: context,
+        targetKey: searchKey,
+        title: l10n.coachmarkExercisesTitle,
+        body: l10n.coachmarkExercisesBody,
+        gotItLabel: l10n.coachmarkGotIt,
+        skipLabel: l10n.coachmarkSkipAll,
+        onDone: () async {
+          await service.markSeen('exercises');
+          if (mounted) _triggerExercisesAddCoachmark();
+        },
+        onSkipAll: () async {
+          await service.markSeen('exercises');
+          await service.markSeen('exercise_add');
+        },
+      );
+      return;
+    }
+    _triggerExercisesAddCoachmark();
+  }
+
+  Future<void> _triggerExercisesAddCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('exercise_add');
+    if (!should || !mounted) return;
+    final addKey = ref.read(exercisesAddKeyProvider);
+    if (addKey == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: addKey,
+      title: l10n.coachmarkExerciseAddTitle,
+      body: l10n.coachmarkExerciseAddBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('exercise_add'),
+    );
+  }
+
+  Future<void> _triggerRoutinesCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('routines');
+    if (!should || !mounted) return;
+    final addKey = ref.read(routinesAddKeyProvider);
+    if (addKey == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: addKey,
+      title: l10n.coachmarkRoutinesTitle,
+      body: l10n.coachmarkRoutinesBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('routines'),
+    );
   }
 
   @override
@@ -165,6 +254,9 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell>
             child: _LiquidNavBar(
               index: _index,
               onChanged: _onTabChanged,
+              routinesKey: _routinesTabKey,
+              exercisesKey: _exercisesTabKey,
+              historyKey: _historyTabKey,
               items: [
                 _NavItem(icon: Icons.home_filled, label: l10n.home),
                 _NavItem(
@@ -198,11 +290,17 @@ class _LiquidNavBar extends StatelessWidget {
     required this.index,
     required this.onChanged,
     required this.items,
+    this.routinesKey,
+    this.exercisesKey,
+    this.historyKey,
   });
 
   final int index;
   final ValueChanged<int> onChanged;
   final List<_NavItem> items;
+  final GlobalKey? routinesKey;
+  final GlobalKey? exercisesKey;
+  final GlobalKey? historyKey;
 
   @override
   Widget build(BuildContext context) {
@@ -253,12 +351,20 @@ class _LiquidNavBar extends StatelessWidget {
               children: List.generate(items.length, (i) {
                 final item = items[i];
                 final active = index == i;
-                return _NavBarButton(
+                Widget btn = _NavBarButton(
                   item: item,
                   active: active,
                   onTap: () => onChanged(i),
                   isDark: isDark,
                 );
+                if (i == 1 && routinesKey != null) {
+                  btn = KeyedSubtree(key: routinesKey!, child: btn);
+                } else if (i == 2 && exercisesKey != null) {
+                  btn = KeyedSubtree(key: exercisesKey!, child: btn);
+                } else if (i == 3 && historyKey != null) {
+                  btn = KeyedSubtree(key: historyKey!, child: btn);
+                }
+                return btn;
               }),
             ),
           ),
