@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
+import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
+import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
@@ -14,14 +16,44 @@ import '../view_models/routines_view_model.dart';
 import 'create_routine_screen.dart';
 import 'routine_detail_screen.dart';
 
-class RoutinesScreen extends ConsumerWidget {
+class RoutinesScreen extends ConsumerStatefulWidget {
   const RoutinesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RoutinesScreen> createState() => _RoutinesScreenState();
+}
+
+class _RoutinesScreenState extends ConsumerState<RoutinesScreen> {
+  final _addBtnKey = GlobalKey();
+  bool _coachmarkScheduled = false;
+
+  Future<void> _checkCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('routines');
+    if (!should || !mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: _addBtnKey,
+      title: l10n.coachmarkRoutinesTitle,
+      body: l10n.coachmarkRoutinesBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('routines'),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final routinesAsync = ref.watch(routinesProvider);
     final exercises = ref.watch(exercisesAsyncProvider).value ?? [];
+
+    if (routinesAsync.hasValue && !_coachmarkScheduled) {
+      _coachmarkScheduled = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _checkCoachmark());
+    }
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
@@ -42,14 +74,17 @@ class RoutinesScreen extends ConsumerWidget {
                 ScreenHeader(
                   title: l10n.routines,
                   subtitle: l10n.routinesInLibrary(routines.length),
-                  trailing: IconCircleButton(
-                    icon: const Icon(Icons.add),
-                    onPressed: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const CreateRoutineScreen(),
+                  trailing: KeyedSubtree(
+                    key: _addBtnKey,
+                    child: IconCircleButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const CreateRoutineScreen(),
+                        ),
                       ),
+                      accent: true,
                     ),
-                    accent: true,
                   ),
                 ),
                 const SizedBox(height: 16),

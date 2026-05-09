@@ -4,6 +4,8 @@ import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../core/utils/l10n_utils.dart';
+import '../../../core/providers/repository_providers.dart';
+import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../shared/widgets/filter_chip_widget.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
@@ -23,12 +25,31 @@ class ExercisesScreen extends ConsumerStatefulWidget {
 
 class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
   late TextEditingController _searchCtrl;
+  final _searchBarKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     _searchCtrl = TextEditingController(
       text: ref.read(exercisesProvider).query,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkCoachmark());
+  }
+
+  Future<void> _checkCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('exercises');
+    if (!should || !mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: _searchBarKey,
+      title: l10n.coachmarkExercisesTitle,
+      body: l10n.coachmarkExercisesBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('exercises'),
     );
   }
 
@@ -241,6 +262,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 22),
                   child: GlassContainer(
+                    key: _searchBarKey,
                     radius: 14,
                     height: 44,
                     child: Row(

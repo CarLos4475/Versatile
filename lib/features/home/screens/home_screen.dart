@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/navigation/app_page_transitions.dart';
+import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
@@ -17,11 +19,45 @@ import '../../../core/utils/format_utils.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/exercise.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final _heroCardKey = GlobalKey();
+  bool _coachmarkChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkCoachmark();
+    });
+  }
+
+  Future<void> _checkCoachmark() async {
+    if (!mounted || _coachmarkChecked) return;
+    _coachmarkChecked = true;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('home');
+    if (!should || !mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: _heroCardKey,
+      title: l10n.coachmarkHomeTitle,
+      body: l10n.coachmarkHomeBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('home'),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(homeProvider);
     final now = DateTime.now();
@@ -96,24 +132,27 @@ class HomeScreen extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 22),
                 child: FadeSlideIn(
                   delay: const Duration(milliseconds: 60),
-                  child: nextRoutine != null
-                      ? _HeroCard(
-                          routineId: nextRoutine.id,
-                          routineName: nextRoutine.name,
-                          exerciseCount: nextRoutine.exercises.length,
-                          estimatedMin: nextRoutine.estimatedMinutes,
-                          lastDoneText: lastDoneText,
-                          mainExerciseId: heroInfo?.id,
-                          mainExerciseName: heroInfo?.exerciseName,
-                          mainPrKg: heroInfo?.pr,
-                        )
-                      : _EmptyHeroCard(
-                          onCreateRoutine: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => const CreateRoutineScreen(),
+                  child: KeyedSubtree(
+                    key: _heroCardKey,
+                    child: nextRoutine != null
+                        ? _HeroCard(
+                            routineId: nextRoutine.id,
+                            routineName: nextRoutine.name,
+                            exerciseCount: nextRoutine.exercises.length,
+                            estimatedMin: nextRoutine.estimatedMinutes,
+                            lastDoneText: lastDoneText,
+                            mainExerciseId: heroInfo?.id,
+                            mainExerciseName: heroInfo?.exerciseName,
+                            mainPrKg: heroInfo?.pr,
+                          )
+                        : _EmptyHeroCard(
+                            onCreateRoutine: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const CreateRoutineScreen(),
+                              ),
                             ),
                           ),
-                        ),
+                  ),
                 ),
               ),
 
@@ -434,7 +473,6 @@ class _HeroCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     String displayExName = mainExerciseName ?? '';
     if (mainExerciseId != null && !mainExerciseId!.startsWith('custom-')) {
-      // Localize builtin exercise
       final dummy = Exercise(
         id: mainExerciseId!,
         name: mainExerciseName ?? '',

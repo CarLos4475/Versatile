@@ -1249,6 +1249,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Total kg × reps across all sets per session'**
   String get volumeDescription;
+
+  /// No description provided for @coachmarkHomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your next workout'**
+  String get coachmarkHomeTitle;
+
+  /// No description provided for @coachmarkHomeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This card suggests the routine you should train today. Tap Start to begin.'**
+  String get coachmarkHomeBody;
+
+  /// No description provided for @coachmarkRoutinesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your routines'**
+  String get coachmarkRoutinesTitle;
+
+  /// No description provided for @coachmarkRoutinesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap + to build a custom workout with your exercises, sets, and rest times.'**
+  String get coachmarkRoutinesBody;
+
+  /// No description provided for @coachmarkExercisesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your progress'**
+  String get coachmarkExercisesTitle;
+
+  /// No description provided for @coachmarkExercisesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap any exercise to view your progress chart and personal records.'**
+  String get coachmarkExercisesBody;
+
+  /// No description provided for @coachmarkGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get coachmarkGotIt;
+
+  /// No description provided for @coachmarkSkipAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip all'**
+  String get coachmarkSkipAll;
 }
 
 class _AppLocalizationsDelegate

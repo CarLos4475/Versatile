@@ -264,5 +264,14 @@
   "seeProgress": "See progress",
   "best_label": "BEST",
   "oneRmDescription": "Best estimated max single-rep weight per session",
-  "volumeDescription": "Total kg × reps across all sets per session"
+  "volumeDescription": "Total kg × reps across all sets per session",
+
+  "coachmarkHomeTitle": "Your next workout",
+  "coachmarkHomeBody": "This card suggests the routine you should train today. Tap Start to begin.",
+  "coachmarkRoutinesTitle": "Create your routines",
+  "coachmarkRoutinesBody": "Tap + to build a custom workout with your exercises, sets, and rest times.",
+  "coachmarkExercisesTitle": "Track your progress",
+  "coachmarkExercisesBody": "Tap any exercise to view your progress chart and personal records.",
+  "coachmarkGotIt": "Got it",
+  "coachmarkSkipAll": "Skip all"
 }

@@ -608,4 +608,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get volumeDescription => 'Total kg × reps across all sets per session';
+
+  @override
+  String get coachmarkHomeTitle => 'Your next workout';
+
+  @override
+  String get coachmarkHomeBody =>
+      'This card suggests the routine you should train today. Tap Start to begin.';
+
+  @override
+  String get coachmarkRoutinesTitle => 'Create your routines';
+
+  @override
+  String get coachmarkRoutinesBody =>
+      'Tap + to build a custom workout with your exercises, sets, and rest times.';
+
+  @override
+  String get coachmarkExercisesTitle => 'Track your progress';
+
+  @override
+  String get coachmarkExercisesBody =>
+      'Tap any exercise to view your progress chart and personal records.';
+
+  @override
+  String get coachmarkGotIt => 'Got it';
+
+  @override
+  String get coachmarkSkipAll => 'Skip all';
 }

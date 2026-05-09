@@ -610,4 +610,31 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get volumeDescription =>
       'Total de kg × repeticiones en todas las series por sesión';
+
+  @override
+  String get coachmarkHomeTitle => 'Tu próximo entrenamiento';
+
+  @override
+  String get coachmarkHomeBody =>
+      'Esta tarjeta sugiere la rutina que deberías entrenar hoy. Toca Iniciar para comenzar.';
+
+  @override
+  String get coachmarkRoutinesTitle => 'Crea tus rutinas';
+
+  @override
+  String get coachmarkRoutinesBody =>
+      'Toca + para crear un entrenamiento con tus ejercicios, series y tiempos de descanso.';
+
+  @override
+  String get coachmarkExercisesTitle => 'Sigue tu progreso';
+
+  @override
+  String get coachmarkExercisesBody =>
+      'Toca cualquier ejercicio para ver tu gráfica de progreso y récords personales.';
+
+  @override
+  String get coachmarkGotIt => 'Entendido';
+
+  @override
+  String get coachmarkSkipAll => 'Omitir';
 }

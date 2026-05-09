@@ -5,6 +5,7 @@ import '../../data/repositories/session_repository.dart';
 import '../../data/repositories/settings_repository.dart';
 import '../../data/repositories/workout_log_repository.dart';
 import '../../domain/entities/exercise_progress.dart';
+import '../services/coachmark_service.dart';
 
 final exerciseRepositoryProvider = Provider<ExerciseRepository>(
   (_) => ExerciseRepository(),
@@ -35,3 +36,7 @@ final exerciseProgressProvider = FutureProvider.autoDispose
       (ref, exerciseId) =>
           ref.read(sessionRepositoryProvider).getExerciseProgress(exerciseId),
     );
+
+final coachmarkServiceProvider = Provider<CoachmarkService>(
+  (ref) => CoachmarkService(ref.read(settingsRepositoryProvider)),
+);
