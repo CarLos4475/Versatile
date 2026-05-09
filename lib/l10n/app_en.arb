@@ -256,5 +256,13 @@
   "colorRed": "Red",
   "colorTeal": "Teal",
   "colorPink": "Pink",
-  "colorAmber": "Amber"
+  "colorAmber": "Amber",
+
+  "progressTitle": "Progress",
+  "estimatedOneRm": "Est. 1RM",
+  "noProgressYet": "No data yet. Complete a workout with this exercise to track your progress.",
+  "seeProgress": "See progress",
+  "best_label": "BEST",
+  "oneRmDescription": "Best estimated max single-rep weight per session",
+  "volumeDescription": "Total kg × reps across all sets per session"
 }

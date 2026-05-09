@@ -55,9 +55,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   ActiveWorkoutInfo? _activeInfo;
 
   Future<void> _runStartupTasks() async {
-    // Run cleanup silently in background — don't block navigation on it
-    unawaited(ref.read(cleanupOldSessionsProvider.future).catchError((_) {}));
-    // These must complete before navigation
     _activeInfo = await WorkoutNotificationService.getActiveWorkout();
     _onboarded = await ref.read(settingsRepositoryProvider).isOnboarded();
   }

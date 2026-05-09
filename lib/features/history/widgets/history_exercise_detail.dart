@@ -3,10 +3,12 @@ import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/format_utils.dart';
 import '../../../shared/widgets/glass_container.dart';
+import '../../../shared/widgets/motion.dart';
 import '../../../domain/entities/session.dart';
 import '../../../domain/entities/workout_set.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/exercise.dart';
+import '../../exercises/screens/exercise_progress_screen.dart';
 
 String? _muscleAsset(String muscle) => switch (muscle) {
   'Chest' =>
@@ -98,19 +100,46 @@ class HistoryExerciseDetail extends StatelessWidget {
                   ],
                 ),
               ),
+              PressableScale(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ExerciseProgressScreen(
+                      exerciseId: exercise.exerciseId,
+                      exerciseName: exercise.name,
+                      muscle: exercise.muscle,
+                    ),
+                  ),
+                ),
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: context.colors.accentTint,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.show_chart_rounded,
+                    size: 16,
+                    color: context.colors.accentDeep,
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
           Divider(color: context.colors.hairline, thickness: 0.5, height: 1),
           const SizedBox(height: 8),
           _ColumnHeaders(l10n: l10n),
-          const SizedBox(height: 4),
-          ...sets.asMap().entries.map(
-            (entry) => Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: _SetRow(setIndex: entry.key, set: entry.value),
-            ),
-          ),
+          ...List.generate(sets.length, (i) => Column(
+            children: [
+              Divider(
+                color: context.colors.accent.withValues(alpha: 0.25),
+                thickness: 0.5,
+                height: 10,
+              ),
+              _SetRow(setIndex: i, set: sets[i]),
+            ],
+          )),
         ],
       ),
     );
@@ -164,10 +193,6 @@ class _SetRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final decoration = BoxDecoration(
-      color: context.colors.doneTint,
-      borderRadius: BorderRadius.circular(10),
-    );
     final indexStyle = TextStyle(
       fontSize: 13,
       fontWeight: FontWeight.w600,
@@ -176,9 +201,8 @@ class _SetRow extends StatelessWidget {
     );
 
     if (set.isSplit) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        decoration: decoration,
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         child: Column(
           children: [
             Row(
@@ -238,9 +262,8 @@ class _SetRow extends StatelessWidget {
       );
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-      decoration: decoration,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       child: Row(
         children: [
           SizedBox(

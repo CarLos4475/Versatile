@@ -585,4 +585,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get colorAmber => 'Amber';
+
+  @override
+  String get progressTitle => 'Progress';
+
+  @override
+  String get estimatedOneRm => 'Est. 1RM';
+
+  @override
+  String get noProgressYet =>
+      'No data yet. Complete a workout with this exercise to track your progress.';
+
+  @override
+  String get seeProgress => 'See progress';
+
+  @override
+  String get best_label => 'BEST';
+
+  @override
+  String get oneRmDescription =>
+      'Best estimated max single-rep weight per session';
+
+  @override
+  String get volumeDescription => 'Total kg × reps across all sets per session';
 }

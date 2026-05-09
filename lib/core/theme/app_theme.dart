@@ -12,7 +12,7 @@ class AppTheme {
     final accentSoft = AccentColors.soften(accent);
     final accentDeep = AccentColors.deepen(accent);
     final accentLight = AccentColors.lighten(accent);
-    final accentTint = accent.withValues(alpha: isLight ? 0.12 : 0.15);
+    final accentTint = accent.withValues(alpha: isLight ? 0.20 : 0.15);
 
     if (isLight) {
       return AppColors(

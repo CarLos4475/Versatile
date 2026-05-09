@@ -1207,6 +1207,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Amber'**
   String get colorAmber;
+
+  /// No description provided for @progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get progressTitle;
+
+  /// No description provided for @estimatedOneRm.
+  ///
+  /// In en, this message translates to:
+  /// **'Est. 1RM'**
+  String get estimatedOneRm;
+
+  /// No description provided for @noProgressYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No data yet. Complete a workout with this exercise to track your progress.'**
+  String get noProgressYet;
+
+  /// No description provided for @seeProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'See progress'**
+  String get seeProgress;
+
+  /// No description provided for @best_label.
+  ///
+  /// In en, this message translates to:
+  /// **'BEST'**
+  String get best_label;
+
+  /// No description provided for @oneRmDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Best estimated max single-rep weight per session'**
+  String get oneRmDescription;
+
+  /// No description provided for @volumeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Total kg × reps across all sets per session'**
+  String get volumeDescription;
 }
 
 class _AppLocalizationsDelegate

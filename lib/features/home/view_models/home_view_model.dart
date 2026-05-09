@@ -16,12 +16,6 @@ final sessionsAsyncProvider =
       SessionsAsyncNotifier.new,
     );
 
-/// Runs the old-session cleanup once per app launch.
-/// Called from the splash screen before navigating to MainNavigationShell.
-final cleanupOldSessionsProvider = FutureProvider<void>((ref) async {
-  await ref.read(sessionRepositoryProvider).deleteOldSessions();
-});
-
 class HomeState {
   final List<Session> sessions;
   final List<Routine> routines;

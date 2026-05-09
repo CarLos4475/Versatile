@@ -586,4 +586,28 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get colorAmber => 'Ámbar';
+
+  @override
+  String get progressTitle => 'Progreso';
+
+  @override
+  String get estimatedOneRm => '1RM Est.';
+
+  @override
+  String get noProgressYet =>
+      'Sin datos aún. Completa un entrenamiento con este ejercicio para ver tu progreso.';
+
+  @override
+  String get seeProgress => 'Ver progreso';
+
+  @override
+  String get best_label => 'MEJOR';
+
+  @override
+  String get oneRmDescription =>
+      'Mejor estimación de peso máximo para 1 repetición por sesión';
+
+  @override
+  String get volumeDescription =>
+      'Total de kg × repeticiones en todas las series por sesión';
 }

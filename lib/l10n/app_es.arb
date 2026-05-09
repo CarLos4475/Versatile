@@ -256,5 +256,13 @@
   "colorRed": "Rojo",
   "colorTeal": "Turquesa",
   "colorPink": "Rosa",
-  "colorAmber": "Ámbar"
+  "colorAmber": "Ámbar",
+
+  "progressTitle": "Progreso",
+  "estimatedOneRm": "1RM Est.",
+  "noProgressYet": "Sin datos aún. Completa un entrenamiento con este ejercicio para ver tu progreso.",
+  "seeProgress": "Ver progreso",
+  "best_label": "MEJOR",
+  "oneRmDescription": "Mejor estimación de peso máximo para 1 repetición por sesión",
+  "volumeDescription": "Total de kg × repeticiones en todas las series por sesión"
 }

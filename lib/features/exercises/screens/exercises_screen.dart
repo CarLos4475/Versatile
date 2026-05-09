@@ -12,6 +12,7 @@ import '../../../shared/widgets/screen_header.dart';
 import '../../active_workout/view_models/active_workout_view_model.dart';
 import '../view_models/exercises_view_model.dart';
 import 'add_exercise_screen.dart';
+import 'exercise_progress_screen.dart';
 
 class ExercisesScreen extends ConsumerStatefulWidget {
   const ExercisesScreen({super.key});
@@ -535,7 +536,17 @@ class _ExerciseRow extends StatelessWidget {
       child: GlassContainer(
         radius: 14,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        onTap: isEditMode ? onSelect : null,
+        onTap: isEditMode
+            ? onSelect
+            : () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ExerciseProgressScreen(
+                      exerciseId: exercise.id,
+                      exerciseName: exercise.name,
+                      muscle: exercise.muscle,
+                    ),
+                  ),
+                ),
         child: Row(
           children: [
             AnimatedSwitcher(

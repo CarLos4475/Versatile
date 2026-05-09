@@ -1,11 +1,12 @@
 import '../../data/database/database_helper.dart';
+import '../../domain/entities/exercise_progress.dart';
 import '../../domain/entities/session.dart';
 import '../../domain/entities/workout_set.dart';
 
 class SessionRepository {
   Future<List<Session>> getAll() async {
     final db = await DatabaseHelper.instance.database;
-    final rows = await db.query('sessions', orderBy: 'date DESC');
+    final rows = await db.query('sessions', orderBy: 'date DESC, rowid DESC');
     final result = <Session>[];
     for (final r in rows) {
       final sessionId = r['id'] as String;
@@ -60,14 +61,6 @@ class SessionRepository {
     }
   }
 
-  Future<void> deleteOldSessions() async {
-    final db = await DatabaseHelper.instance.database;
-    final cutoff = DateTime.now().subtract(const Duration(days: 30));
-    final cutoffStr =
-        '${cutoff.year}-${cutoff.month.toString().padLeft(2, '0')}-${cutoff.day.toString().padLeft(2, '0')}';
-    await db.delete('sessions', where: 'date < ?', whereArgs: [cutoffStr]);
-  }
-
   Future<Map<String, List<WorkoutSet>>> getPreviousPerformance(
       String routineId) async {
     final db = await DatabaseHelper.instance.database;
@@ -108,6 +101,58 @@ class SessionRepository {
                 leftReps: s['left_reps'] as int?,
               ))
           .toList();
+    }
+    return result;
+  }
+
+  Future<List<ExerciseProgressPoint>> getExerciseProgress(
+    String exerciseId,
+  ) async {
+    final db = await DatabaseHelper.instance.database;
+    final rows = await db.rawQuery('''
+      SELECT se.id AS se_id, s.date
+      FROM session_exercises se
+      JOIN sessions s ON s.id = se.session_id
+      WHERE se.exercise_id = ?
+      ORDER BY s.date ASC
+    ''', [exerciseId]);
+
+    final result = <ExerciseProgressPoint>[];
+    for (final row in rows) {
+      final seId = row['se_id'] as int;
+      final date = row['date'] as String;
+      final setRows = await db.query(
+        'session_sets',
+        where: 'session_exercise_id = ?',
+        whereArgs: [seId],
+      );
+      if (setRows.isEmpty) continue;
+
+      double bestOneRm = 0;
+      double totalVolume = 0;
+      for (final s in setRows) {
+        final kg = (s['kg'] as num).toDouble();
+        final reps = s['reps'] as int;
+        final leftKg =
+            s['left_kg'] != null ? (s['left_kg'] as num).toDouble() : null;
+        final leftReps = s['left_reps'] as int?;
+
+        final orm = kg * (1 + reps / 30);
+        if (orm > bestOneRm) bestOneRm = orm;
+        totalVolume += kg * reps;
+
+        if (leftKg != null && leftReps != null) {
+          final leftOrm = leftKg * (1 + leftReps / 30);
+          if (leftOrm > bestOneRm) bestOneRm = leftOrm;
+          totalVolume += leftKg * leftReps;
+        }
+      }
+
+      result.add(ExerciseProgressPoint(
+        date: date,
+        estimatedOneRm: bestOneRm,
+        volume: totalVolume,
+      ));
     }
     return result;
   }
