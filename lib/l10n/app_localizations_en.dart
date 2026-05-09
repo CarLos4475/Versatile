@@ -691,4 +691,53 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get coachmarkSettingsDataBody =>
       'Export your routines and history as a JSON file to keep a backup or move to another device.';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get onboardingContinue => 'Continue';
+
+  @override
+  String get onboardingWhatsYourName => 'What\'s your name?';
+
+  @override
+  String get onboardingPage1Title => 'Built for\nevery rep.';
+
+  @override
+  String get onboardingPage1Body =>
+      'A gym tracker that\'s fast, private, and built for you — no logins, no cloud, just your lifts.';
+
+  @override
+  String get onboardingPage2Title => 'Log weights.\nBreak records.';
+
+  @override
+  String get onboardingPage2Body =>
+      'Record every set, rep, and weight. Watch your estimated 1-rep max climb over time.';
+
+  @override
+  String get onboardingPage3Title => 'Routines\nyour way.';
+
+  @override
+  String get onboardingPage3Body =>
+      'Build custom workouts with exactly the exercises you need. Reorder them, adjust sets, and keep evolving.';
+
+  @override
+  String get onboardingPage4Title => 'Your data,\nyour device.';
+
+  @override
+  String get onboardingPage4Body =>
+      'No internet. No account. No subscription. Everything stays on your phone — always.';
+
+  @override
+  String get onboardingNameTitle => 'What should\nwe call you?';
+
+  @override
+  String get onboardingNameSubtitle => 'Optional — you can always skip this.';
+
+  @override
+  String get onboardingNameHint => 'Your name…';
+
+  @override
+  String get onboardingLetsGo => 'Let\'s go';
 }

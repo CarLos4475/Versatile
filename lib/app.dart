@@ -141,7 +141,9 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell>
         if (mounted) _triggerRoutinesCoachmark();
       });
     } else if (i == 2) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _triggerExercisesCoachmark());
+      animFuture.whenCompleteOrCancel(() {
+        if (mounted) _triggerExercisesCoachmark();
+      });
     }
   }
 

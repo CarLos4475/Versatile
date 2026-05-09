@@ -290,5 +290,21 @@
   "coachmarkSettingsSoundTitle": "Rest timer sound",
   "coachmarkSettingsSoundBody": "Enable an alert when your rest period ends. Use the default tone or pick a custom audio file.",
   "coachmarkSettingsDataTitle": "Back up your data",
-  "coachmarkSettingsDataBody": "Export your routines and history as a JSON file to keep a backup or move to another device."
+  "coachmarkSettingsDataBody": "Export your routines and history as a JSON file to keep a backup or move to another device.",
+
+  "onboardingSkip": "Skip",
+  "onboardingContinue": "Continue",
+  "onboardingWhatsYourName": "What's your name?",
+  "onboardingPage1Title": "Built for\nevery rep.",
+  "onboardingPage1Body": "A gym tracker that's fast, private, and built for you — no logins, no cloud, just your lifts.",
+  "onboardingPage2Title": "Log weights.\nBreak records.",
+  "onboardingPage2Body": "Record every set, rep, and weight. Watch your estimated 1-rep max climb over time.",
+  "onboardingPage3Title": "Routines\nyour way.",
+  "onboardingPage3Body": "Build custom workouts with exactly the exercises you need. Reorder them, adjust sets, and keep evolving.",
+  "onboardingPage4Title": "Your data,\nyour device.",
+  "onboardingPage4Body": "No internet. No account. No subscription. Everything stays on your phone — always.",
+  "onboardingNameTitle": "What should\nwe call you?",
+  "onboardingNameSubtitle": "Optional — you can always skip this.",
+  "onboardingNameHint": "Your name…",
+  "onboardingLetsGo": "Let's go"
 }

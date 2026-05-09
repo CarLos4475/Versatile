@@ -693,4 +693,53 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get coachmarkSettingsDataBody =>
       'Exporta tus rutinas e historial como JSON para hacer un respaldo o transferirlos a otro dispositivo.';
+
+  @override
+  String get onboardingSkip => 'Omitir';
+
+  @override
+  String get onboardingContinue => 'Continuar';
+
+  @override
+  String get onboardingWhatsYourName => '¿Cómo te llamas?';
+
+  @override
+  String get onboardingPage1Title => 'Creado para\ncada rep.';
+
+  @override
+  String get onboardingPage1Body =>
+      'Un registro de gym rápido, privado y hecho para ti — sin cuentas, sin nube, solo tus pesas.';
+
+  @override
+  String get onboardingPage2Title => 'Registra pesos.\nRompe récords.';
+
+  @override
+  String get onboardingPage2Body =>
+      'Anota cada serie, repetición y peso. Observa cómo tu 1RM estimado sube con el tiempo.';
+
+  @override
+  String get onboardingPage3Title => 'Rutinas a\ntu manera.';
+
+  @override
+  String get onboardingPage3Body =>
+      'Crea entrenamientos con los ejercicios que necesitas. Reordénalos, ajusta las series y sigue evolucionando.';
+
+  @override
+  String get onboardingPage4Title => 'Tus datos,\ntu dispositivo.';
+
+  @override
+  String get onboardingPage4Body =>
+      'Sin internet. Sin cuenta. Sin suscripción. Todo se queda en tu teléfono — siempre.';
+
+  @override
+  String get onboardingNameTitle => '¿Cómo\nte llamamos?';
+
+  @override
+  String get onboardingNameSubtitle => 'Opcional — siempre puedes omitirlo.';
+
+  @override
+  String get onboardingNameHint => 'Tu nombre…';
+
+  @override
+  String get onboardingLetsGo => '¡Vamos!';
 }

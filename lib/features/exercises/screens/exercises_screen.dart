@@ -24,7 +24,7 @@ class ExercisesScreen extends ConsumerStatefulWidget {
 
 class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
   late TextEditingController _searchCtrl;
-  final _searchBarKey = GlobalKey();
+  final _firstExerciseKey = GlobalKey();
   final _addBtnKey = GlobalKey();
 
   @override
@@ -35,7 +35,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        ref.read(exercisesSearchKeyProvider.notifier).state = _searchBarKey;
+        ref.read(exercisesSearchKeyProvider.notifier).state = _firstExerciseKey;
         ref.read(exercisesAddKeyProvider.notifier).state = _addBtnKey;
       }
     });
@@ -256,7 +256,6 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 22),
                   child: GlassContainer(
-                    key: _searchBarKey,
                     radius: 14,
                     height: 44,
                     child: Row(
@@ -410,6 +409,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                               onSelect: () => notifier.toggleSelection(
                                 exercise.id,
                               ),
+                              containerKey: i == 0 ? _firstExerciseKey : null,
                             );
                           },
                         ),
@@ -517,11 +517,13 @@ class _ExerciseRow extends StatelessWidget {
     this.isEditMode = false,
     this.isSelected = false,
     this.onSelect,
+    this.containerKey,
   });
   final Exercise exercise;
   final bool isEditMode;
   final bool isSelected;
   final VoidCallback? onSelect;
+  final GlobalKey? containerKey;
 
   String? get _muscleAsset => switch (exercise.muscle) {
         'Chest' =>
@@ -550,6 +552,7 @@ class _ExerciseRow extends StatelessWidget {
     final asset = _muscleAsset;
     return FadeSlideIn(
       child: GlassContainer(
+        key: containerKey,
         radius: 14,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         onTap: isEditMode

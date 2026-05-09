@@ -290,5 +290,21 @@
   "coachmarkSettingsSoundTitle": "Sonido del temporizador",
   "coachmarkSettingsSoundBody": "Activa una alerta cuando termine tu descanso. Usa el tono predeterminado o elige tu propio audio.",
   "coachmarkSettingsDataTitle": "Respalda tus datos",
-  "coachmarkSettingsDataBody": "Exporta tus rutinas e historial como JSON para hacer un respaldo o transferirlos a otro dispositivo."
+  "coachmarkSettingsDataBody": "Exporta tus rutinas e historial como JSON para hacer un respaldo o transferirlos a otro dispositivo.",
+
+  "onboardingSkip": "Omitir",
+  "onboardingContinue": "Continuar",
+  "onboardingWhatsYourName": "¿Cómo te llamas?",
+  "onboardingPage1Title": "Creado para\ncada rep.",
+  "onboardingPage1Body": "Un registro de gym rápido, privado y hecho para ti — sin cuentas, sin nube, solo tus pesas.",
+  "onboardingPage2Title": "Registra pesos.\nRompe récords.",
+  "onboardingPage2Body": "Anota cada serie, repetición y peso. Observa cómo tu 1RM estimado sube con el tiempo.",
+  "onboardingPage3Title": "Rutinas a\ntu manera.",
+  "onboardingPage3Body": "Crea entrenamientos con los ejercicios que necesitas. Reordénalos, ajusta las series y sigue evolucionando.",
+  "onboardingPage4Title": "Tus datos,\ntu dispositivo.",
+  "onboardingPage4Body": "Sin internet. Sin cuenta. Sin suscripción. Todo se queda en tu teléfono — siempre.",
+  "onboardingNameTitle": "¿Cómo\nte llamamos?",
+  "onboardingNameSubtitle": "Opcional — siempre puedes omitirlo.",
+  "onboardingNameHint": "Tu nombre…",
+  "onboardingLetsGo": "¡Vamos!"
 }

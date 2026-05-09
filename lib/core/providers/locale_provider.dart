@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/settings_repository.dart';
@@ -16,8 +17,15 @@ class LocaleNotifier extends StateNotifier<Locale> {
   }
 
   Future<void> _loadLocale() async {
-    final code = await _repo.getLanguageCode();
-    state = Locale(code);
+    final saved = await _repo.get('language_code');
+    if (saved != null) {
+      state = Locale(saved);
+    } else {
+      final deviceCode = PlatformDispatcher.instance.locale.languageCode;
+      final resolved = deviceCode == 'es' ? 'es' : 'en';
+      state = Locale(resolved);
+      await _repo.setLanguageCode(resolved);
+    }
   }
 
   Future<void> setLocale(Locale locale) async {

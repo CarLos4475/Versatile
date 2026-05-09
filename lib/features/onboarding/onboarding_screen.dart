@@ -4,6 +4,7 @@ import '../../core/navigation/app_page_transitions.dart';
 import '../../core/providers/repository_providers.dart';
 import '../../core/theme/app_colors.dart';
 import '../../app.dart';
+import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/motion.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -57,6 +58,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final keyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
     return Scaffold(
       backgroundColor: context.colors.bgApp,
@@ -79,7 +81,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         child: Padding(
                           padding: const EdgeInsets.only(right: 24),
                           child: Text(
-                            'Skip',
+                            l10n.onboardingSkip,
                             style: TextStyle(
                               fontSize: 15,
                               color: context.colors.ink400,
@@ -98,30 +100,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     children: [
                       _AnimatedOnboardPage(
                         icon: Icons.fitness_center_rounded,
-                        title: 'Built for\nevery rep.',
-                        body:
-                            'A gym tracker that\'s fast, private, and built for you — no logins, no cloud, just your lifts.',
+                        title: l10n.onboardingPage1Title,
+                        body: l10n.onboardingPage1Body,
                         onNext: _next,
                       ),
                       _AnimatedOnboardPage(
                         icon: Icons.trending_up_rounded,
-                        title: 'Log weights.\nBreak records.',
-                        body:
-                            'Record every set, rep, and weight. Watch your estimated 1-rep max climb over time.',
+                        title: l10n.onboardingPage2Title,
+                        body: l10n.onboardingPage2Body,
                         onNext: _next,
                       ),
                       _AnimatedOnboardPage(
                         icon: Icons.event_note_rounded,
-                        title: 'Routines\nyour way.',
-                        body:
-                            'Build custom workouts with exactly the exercises you need. Reorder them, adjust sets, and keep evolving.',
+                        title: l10n.onboardingPage3Title,
+                        body: l10n.onboardingPage3Body,
                         onNext: _next,
                       ),
                       _AnimatedOnboardPage(
                         icon: Icons.shield_outlined,
-                        title: 'Your data,\nyour device.',
-                        body:
-                            'No internet. No account. No subscription. Everything stays on your phone — always.',
+                        title: l10n.onboardingPage4Title,
+                        body: l10n.onboardingPage4Body,
                         onNext: _next,
                         isLast: true,
                       ),
@@ -330,7 +328,9 @@ class _AnimatedOnboardPageState extends State<_AnimatedOnboardPage>
             child: SlideTransition(
               position: _btnSlide,
               child: _ContinueButton(
-                label: widget.isLast ? "What's your name?" : 'Continue',
+                label: widget.isLast
+                    ? AppLocalizations.of(context)!.onboardingWhatsYourName
+                    : AppLocalizations.of(context)!.onboardingContinue,
                 icon: widget.isLast
                     ? Icons.person_outline
                     : Icons.arrow_forward,
@@ -516,7 +516,7 @@ class _NamePageState extends State<_NamePage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'What should\nwe call you?',
+                    AppLocalizations.of(context)!.onboardingNameTitle,
                     style: TextStyle(
                       fontSize: 42,
                       fontWeight: FontWeight.w700,
@@ -527,7 +527,7 @@ class _NamePageState extends State<_NamePage>
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Optional — you can always skip this.',
+                    AppLocalizations.of(context)!.onboardingNameSubtitle,
                     style: TextStyle(
                       fontSize: 15,
                       color: context.colors.ink400,
@@ -556,7 +556,7 @@ class _NamePageState extends State<_NamePage>
                         fontWeight: FontWeight.w500,
                       ),
                       decoration: InputDecoration(
-                        hintText: 'Your name…',
+                        hintText: AppLocalizations.of(context)!.onboardingNameHint,
                         hintStyle: TextStyle(
                           fontSize: 18,
                           color: context.colors.ink300,
@@ -569,7 +569,7 @@ class _NamePageState extends State<_NamePage>
                   ),
                   const SizedBox(height: 24),
                   _ContinueButton(
-                    label: "Let's go",
+                    label: AppLocalizations.of(context)!.onboardingLetsGo,
                     icon: Icons.check,
                     onTap: widget.onFinish,
                   ),
