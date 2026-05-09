@@ -28,6 +28,19 @@ class RoutinesNotifier extends AsyncNotifier<List<Routine>> {
     ref.invalidateSelf();
   }
 
+  Future<void> updateExercise(
+    String routineId,
+    int dbId,
+    int sets,
+    String reps,
+    int rest,
+  ) async {
+    await ref
+        .read(routineRepositoryProvider)
+        .updateExercise(dbId, sets, reps, rest);
+    ref.invalidateSelf();
+  }
+
   Future<void> updateName(String id, String name) async {
     await ref.read(routineRepositoryProvider).updateName(id, name);
     ref.invalidateSelf();

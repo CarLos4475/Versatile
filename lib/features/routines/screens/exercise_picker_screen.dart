@@ -73,30 +73,39 @@ Widget _stepBtn(BuildContext ctx, IconData icon, VoidCallback? onTap) =>
 
 // ─── Per-exercise configuration dialog ──────────────────────────────────────
 
-class _ExerciseConfigDialog extends StatefulWidget {
-  const _ExerciseConfigDialog({
+class ExerciseConfigDialog extends StatefulWidget {
+  const ExerciseConfigDialog({
+    super.key,
     required this.exerciseName,
     required this.index,
     required this.total,
+    this.initialSets = 3,
+    this.initialReps = '8-12',
+    this.initialRest = 90,
   });
 
   final String exerciseName;
   final int index;
   final int total;
+  final int initialSets;
+  final String initialReps;
+  final int initialRest;
 
   @override
-  State<_ExerciseConfigDialog> createState() => _ExerciseConfigDialogState();
+  State<ExerciseConfigDialog> createState() => _ExerciseConfigDialogState();
 }
 
-class _ExerciseConfigDialogState extends State<_ExerciseConfigDialog> {
-  int _sets = 3;
-  int _rest = 90;
+class _ExerciseConfigDialogState extends State<ExerciseConfigDialog> {
+  late int _sets;
+  late int _rest;
   late final TextEditingController _repsCtrl;
 
   @override
   void initState() {
     super.initState();
-    _repsCtrl = TextEditingController(text: '8-12');
+    _sets = widget.initialSets;
+    _rest = widget.initialRest;
+    _repsCtrl = TextEditingController(text: widget.initialReps);
   }
 
   @override
@@ -293,7 +302,7 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
   }) {
     return showDialog<({int sets, String reps, int rest})>(
       context: context,
-      builder: (_) => _ExerciseConfigDialog(
+      builder: (_) => ExerciseConfigDialog(
         exerciseName: exerciseName,
         index: index,
         total: total,

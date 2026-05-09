@@ -151,6 +151,34 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
     }
   }
 
+  Future<void> _showEditDialog(
+    BuildContext context,
+    String routineId,
+    RoutineExercise re,
+    String exerciseName,
+  ) async {
+    if (re.dbId == null) return;
+    final result = await showDialog<({int sets, String reps, int rest})>(
+      context: context,
+      builder: (_) => ExerciseConfigDialog(
+        exerciseName: exerciseName,
+        index: 0,
+        total: 1,
+        initialSets: re.targetSets,
+        initialReps: re.targetReps,
+        initialRest: re.restSeconds,
+      ),
+    );
+    if (result == null || !mounted) return;
+    await ref.read(routinesProvider.notifier).updateExercise(
+      routineId,
+      re.dbId!,
+      result.sets,
+      result.reps,
+      result.rest,
+    );
+  }
+
   void _onReorder(Routine routine, int oldIndex, int newIndex) {
     if (newIndex > oldIndex) newIndex--;
     final exercises = [...routine.exercises];
@@ -381,6 +409,30 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                                             ),
                                           ),
                                         ],
+                                      ),
+                                    ),
+                                    PressableScale(
+                                      onTap: re.dbId != null
+                                          ? () => _showEditDialog(
+                                                context,
+                                                routine.id,
+                                                re,
+                                                ex.getLocalizedName(context),
+                                              )
+                                          : null,
+                                      child: Container(
+                                        width: 32,
+                                        height: 32,
+                                        margin: const EdgeInsets.only(right: 6),
+                                        decoration: BoxDecoration(
+                                          color: context.colors.accentTint,
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: Icon(
+                                          Icons.edit_outlined,
+                                          size: 15,
+                                          color: context.colors.accentDeep,
+                                        ),
                                       ),
                                     ),
                                     PressableScale(

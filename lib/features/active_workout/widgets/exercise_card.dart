@@ -43,57 +43,36 @@ class ExerciseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    if (data.skipped) {
-      return AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        decoration: BoxDecoration(
-          color: context.colors.bgFrame,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: context.colors.glassBorder, width: 0.5),
-          boxShadow: context.colors.glassShadow,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  exercise.getLocalizedName(context),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: context.colors.ink400,
-                  ),
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) =>
+          FadeTransition(opacity: animation, child: child),
+      child: data.skipped
+          ? AnimatedContainer(
+              key: const ValueKey(true),
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              decoration: BoxDecoration(
+                color: context.colors.accent.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: context.colors.accent.withValues(alpha: 0.55),
+                  width: 1.5,
                 ),
+                boxShadow: context.colors.glassShadow,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 28),
-                  decoration: BoxDecoration(
-                    color: context.colors.accent.withValues(alpha: 0.15),
-                    border: Border(
-                      top: BorderSide(
-                        color: context.colors.accent.withValues(alpha: 0.55),
-                        width: 1.5,
-                      ),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      l10n.skipped.toUpperCase(),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      exercise.getLocalizedName(context),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -101,56 +80,68 @@ class ExerciseCard extends StatelessWidget {
                         color: context.colors.accentDeep,
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    Center(
+                      child: Text(
+                        l10n.skipped.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.08,
+                          color: context.colors.accentDeep,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return Stack(
-      children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          decoration: BoxDecoration(
-            color: context.colors.bgFrame,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: context.colors.glassBorder, width: 0.5),
-            boxShadow: context.colors.glassShadow,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _CardHeader(
-                index: index,
-                data: data,
-                exercise: exercise,
-                onToggle: onToggle,
-                onToggleSplit: onToggleSplit,
-                onSkip: onSkip,
-              ),
-              AnimatedSize(
-                duration: const Duration(milliseconds: 280),
-                curve: Curves.easeOutCubic,
-                child: data.isExpanded && !data.skipped
-                    ? _CardBody(
+            )
+          : Stack(
+              key: const ValueKey(false),
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  decoration: BoxDecoration(
+                    color: context.colors.bgFrame,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: context.colors.glassBorder,
+                      width: 0.5,
+                    ),
+                    boxShadow: context.colors.glassShadow,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _CardHeader(
+                        index: index,
                         data: data,
-                        prevSets: prevSets,
-                        onFinishSet: onFinishSet,
-                        onWeightChanged: onWeightChanged,
-                        onRepsChanged: onRepsChanged,
-                        onLeftWeightChanged: onLeftWeightChanged,
-                        onLeftRepsChanged: onLeftRepsChanged,
-                      )
-                    : const SizedBox.shrink(),
-              ),
-            ],
-          ),
-        ),
-      ],
+                        exercise: exercise,
+                        onToggle: onToggle,
+                        onToggleSplit: onToggleSplit,
+                        onSkip: onSkip,
+                      ),
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 280),
+                        curve: Curves.easeOutCubic,
+                        child: data.isExpanded && !data.skipped
+                            ? _CardBody(
+                                data: data,
+                                prevSets: prevSets,
+                                onFinishSet: onFinishSet,
+                                onWeightChanged: onWeightChanged,
+                                onRepsChanged: onRepsChanged,
+                                onLeftWeightChanged: onLeftWeightChanged,
+                                onLeftRepsChanged: onLeftRepsChanged,
+                              )
+                            : const SizedBox.shrink(),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
     );
   }
 }
