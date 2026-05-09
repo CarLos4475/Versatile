@@ -306,5 +306,15 @@
   "onboardingNameTitle": "What should\nwe call you?",
   "onboardingNameSubtitle": "Optional — you can always skip this.",
   "onboardingNameHint": "Your name…",
-  "onboardingLetsGo": "Let's go"
+  "onboardingLetsGo": "Let's go",
+
+  "coachmarkHistoryFirstCardTitle": "Tap to see the details",
+  "coachmarkHistoryFirstCardBody": "Here you'll find every set and rep you logged. Your training history is always one tap away.",
+  "coachmarkSessionChartTitle": "Track your progress",
+  "coachmarkSessionChartBody": "Tap this button to see a chart of your estimated 1RM and total volume over time for this exercise.",
+
+  "coachmarkRestTimerTitle": "Rest timer",
+  "coachmarkRestTimerBody": "This counts down your rest between sets. Tap +15s to extend, or Skip to move on early.",
+  "coachmarkProgressToggleTitle": "Switch metrics",
+  "coachmarkProgressToggleBody": "Toggle between estimated 1RM and total volume to track your progress from two different angles."
 }

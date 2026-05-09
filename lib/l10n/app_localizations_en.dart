@@ -740,4 +740,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingLetsGo => 'Let\'s go';
+
+  @override
+  String get coachmarkHistoryFirstCardTitle => 'Tap to see the details';
+
+  @override
+  String get coachmarkHistoryFirstCardBody =>
+      'Here you\'ll find every set and rep you logged. Your training history is always one tap away.';
+
+  @override
+  String get coachmarkSessionChartTitle => 'Track your progress';
+
+  @override
+  String get coachmarkSessionChartBody =>
+      'Tap this button to see a chart of your estimated 1RM and total volume over time for this exercise.';
+
+  @override
+  String get coachmarkRestTimerTitle => 'Rest timer';
+
+  @override
+  String get coachmarkRestTimerBody =>
+      'This counts down your rest between sets. Tap +15s to extend, or Skip to move on early.';
+
+  @override
+  String get coachmarkProgressToggleTitle => 'Switch metrics';
+
+  @override
+  String get coachmarkProgressToggleBody =>
+      'Toggle between estimated 1RM and total volume to track your progress from two different angles.';
 }

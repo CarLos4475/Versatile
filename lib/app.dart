@@ -144,6 +144,10 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell>
       animFuture.whenCompleteOrCancel(() {
         if (mounted) _triggerExercisesCoachmark();
       });
+    } else if (i == 3) {
+      animFuture.whenCompleteOrCancel(() {
+        if (mounted) _triggerHistoryCoachmark();
+      });
     }
   }
 
@@ -212,6 +216,27 @@ class _MainNavigationShellState extends ConsumerState<MainNavigationShell>
       gotItLabel: l10n.coachmarkGotIt,
       skipLabel: l10n.coachmarkSkipAll,
       onDone: () => service.markSeen('routines'),
+    );
+  }
+
+  Future<void> _triggerHistoryCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('history_first_card');
+    if (!should || !mounted) return;
+    final cardKey = ref.read(historyFirstCardKeyProvider);
+    if (cardKey == null) return;
+    if (cardKey.currentContext?.findRenderObject() == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: cardKey,
+      title: l10n.coachmarkHistoryFirstCardTitle,
+      body: l10n.coachmarkHistoryFirstCardBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('history_first_card'),
+      onSkipAll: () => service.markSeen('history_first_card'),
     );
   }
 

@@ -7,8 +7,9 @@ import '../../../core/utils/format_utils.dart';
 import '../screens/session_detail_screen.dart';
 
 class HistorySessionCard extends StatelessWidget {
-  const HistorySessionCard({super.key, required this.session});
+  const HistorySessionCard({super.key, required this.session, this.containerKey});
   final Session session;
+  final GlobalKey? containerKey;
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +18,7 @@ class HistorySessionCard extends StatelessWidget {
     final locale = Localizations.localeOf(context).languageCode;
 
     return GlassContainer(
+      key: containerKey,
       radius: 18,
       padding: const EdgeInsets.all(16),
       onTap: () {

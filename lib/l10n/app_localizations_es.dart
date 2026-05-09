@@ -742,4 +742,32 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingLetsGo => '¡Vamos!';
+
+  @override
+  String get coachmarkHistoryFirstCardTitle => 'Toca para ver los detalles';
+
+  @override
+  String get coachmarkHistoryFirstCardBody =>
+      'Aquí encontrarás cada serie y repetición que registraste. Tu historial siempre a un toque.';
+
+  @override
+  String get coachmarkSessionChartTitle => 'Sigue tu progreso';
+
+  @override
+  String get coachmarkSessionChartBody =>
+      'Toca este botón para ver una gráfica de tu 1RM estimado y volumen total a lo largo del tiempo.';
+
+  @override
+  String get coachmarkRestTimerTitle => 'Temporizador de descanso';
+
+  @override
+  String get coachmarkRestTimerBody =>
+      'Cuenta regresiva entre series. Toca +15s para agregar tiempo o Saltar para continuar antes.';
+
+  @override
+  String get coachmarkProgressToggleTitle => 'Cambia la métrica';
+
+  @override
+  String get coachmarkProgressToggleBody =>
+      'Alterna entre 1RM estimado y volumen total para ver tu progreso desde dos ángulos distintos.';
 }

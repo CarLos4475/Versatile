@@ -1,21 +1,60 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
+import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/session.dart';
+import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../../core/utils/format_utils.dart';
 import '../widgets/history_exercise_detail.dart';
 
-class SessionDetailScreen extends ConsumerWidget {
+class SessionDetailScreen extends ConsumerStatefulWidget {
   const SessionDetailScreen({super.key, required this.session});
   final Session session;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SessionDetailScreen> createState() =>
+      _SessionDetailScreenState();
+}
+
+class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
+  final _chartBtnKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkChartCoachmark());
+  }
+
+  Future<void> _checkChartCoachmark() async {
+    if (!mounted) return;
+    final exercises = widget.session.exercises;
+    if (exercises == null || exercises.isEmpty) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('session_chart');
+    if (!should || !mounted) return;
+    if (_chartBtnKey.currentContext?.findRenderObject() == null) return;
     final l10n = AppLocalizations.of(context)!;
-    final color = Color(session.colorValue);
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: _chartBtnKey,
+      title: l10n.coachmarkSessionChartTitle,
+      body: l10n.coachmarkSessionChartBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('session_chart'),
+      onSkipAll: () => service.markSeen('session_chart'),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final color = Color(widget.session.colorValue);
+
+    final session = widget.session;
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
@@ -120,9 +159,12 @@ class SessionDetailScreen extends ConsumerWidget {
                     ),
                   ),
                   if (session.exercises != null)
-                    ...session.exercises!.map((e) => Padding(
+                    ...List.generate(session.exercises!.length, (i) => Padding(
                           padding: const EdgeInsets.only(bottom: 12),
-                          child: HistoryExerciseDetail(exercise: e),
+                          child: HistoryExerciseDetail(
+                            exercise: session.exercises![i],
+                            chartBtnKey: i == 0 ? _chartBtnKey : null,
+                          ),
                         )),
                 ],
               ),

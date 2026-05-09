@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/exercise_progress.dart';
@@ -60,6 +61,27 @@ class ExerciseProgressScreen extends ConsumerStatefulWidget {
 class _ExerciseProgressScreenState
     extends ConsumerState<ExerciseProgressScreen> {
   _Metric _metric = _Metric.oneRm;
+  final _metricToggleKey = GlobalKey();
+  bool _coachmarkShown = false;
+
+  Future<void> _triggerMetricToggleCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('progress_toggle');
+    if (!should || !mounted) return;
+    if (_metricToggleKey.currentContext?.findRenderObject() == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: _metricToggleKey,
+      title: l10n.coachmarkProgressToggleTitle,
+      body: l10n.coachmarkProgressToggleBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('progress_toggle'),
+      onSkipAll: () => service.markSeen('progress_toggle'),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +95,20 @@ class _ExerciseProgressScreenState
       equipment: '',
     );
     final asset = _muscleAsset(widget.muscle);
+
+    ref.listen(exerciseProgressProvider(widget.exerciseId), (prev, next) {
+      next.whenData((points) {
+        if (!_coachmarkShown && points.isNotEmpty) {
+          _coachmarkShown = true;
+          // Wait for the MaterialPageRoute slide-in transition (~300 ms) to
+          // finish before computing localToGlobal, otherwise the in-progress
+          // SlideTransition offset shifts the spotlight out of position.
+          Future.delayed(const Duration(milliseconds: 400), () {
+            if (mounted) _triggerMetricToggleCoachmark();
+          });
+        }
+      });
+    });
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
@@ -119,6 +155,7 @@ class _ExerciseProgressScreenState
                       _HeaderCard(asset: asset, dummy: dummy),
                       const SizedBox(height: 16),
                       _MetricToggle(
+                        key: _metricToggleKey,
                         metric: _metric,
                         onChanged: (m) => setState(() => _metric = m),
                         l10n: l10n,
@@ -246,6 +283,7 @@ class _HeaderCard extends StatelessWidget {
 
 class _MetricToggle extends StatelessWidget {
   const _MetricToggle({
+    super.key,
     required this.metric,
     required this.onChanged,
     required this.l10n,

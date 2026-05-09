@@ -1483,6 +1483,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Let\'s go'**
   String get onboardingLetsGo;
+
+  /// No description provided for @coachmarkHistoryFirstCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to see the details'**
+  String get coachmarkHistoryFirstCardTitle;
+
+  /// No description provided for @coachmarkHistoryFirstCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Here you\'ll find every set and rep you logged. Your training history is always one tap away.'**
+  String get coachmarkHistoryFirstCardBody;
+
+  /// No description provided for @coachmarkSessionChartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your progress'**
+  String get coachmarkSessionChartTitle;
+
+  /// No description provided for @coachmarkSessionChartBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap this button to see a chart of your estimated 1RM and total volume over time for this exercise.'**
+  String get coachmarkSessionChartBody;
+
+  /// No description provided for @coachmarkRestTimerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest timer'**
+  String get coachmarkRestTimerTitle;
+
+  /// No description provided for @coachmarkRestTimerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This counts down your rest between sets. Tap +15s to extend, or Skip to move on early.'**
+  String get coachmarkRestTimerBody;
+
+  /// No description provided for @coachmarkProgressToggleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch metrics'**
+  String get coachmarkProgressToggleTitle;
+
+  /// No description provided for @coachmarkProgressToggleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle between estimated 1RM and total volume to track your progress from two different angles.'**
+  String get coachmarkProgressToggleBody;
 }
 
 class _AppLocalizationsDelegate

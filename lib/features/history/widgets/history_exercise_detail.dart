@@ -33,8 +33,9 @@ String? _muscleAsset(String muscle) => switch (muscle) {
 };
 
 class HistoryExerciseDetail extends StatelessWidget {
-  const HistoryExerciseDetail({super.key, required this.exercise});
+  const HistoryExerciseDetail({super.key, required this.exercise, this.chartBtnKey});
   final SessionExercise exercise;
+  final GlobalKey? chartBtnKey;
 
   @override
   Widget build(BuildContext context) {
@@ -100,30 +101,35 @@ class HistoryExerciseDetail extends StatelessWidget {
                   ],
                 ),
               ),
-              PressableScale(
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ExerciseProgressScreen(
-                      exerciseId: exercise.exerciseId,
-                      exerciseName: exercise.name,
-                      muscle: exercise.muscle,
+              Builder(builder: (context) {
+                final btn = PressableScale(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ExerciseProgressScreen(
+                        exerciseId: exercise.exerciseId,
+                        exerciseName: exercise.name,
+                        muscle: exercise.muscle,
+                      ),
                     ),
                   ),
-                ),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: context.colors.accentTint,
-                    borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: context.colors.accentTint,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.show_chart_rounded,
+                      size: 16,
+                      color: context.colors.accentDeep,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.show_chart_rounded,
-                    size: 16,
-                    color: context.colors.accentDeep,
-                  ),
-                ),
-              ),
+                );
+                return chartBtnKey != null
+                    ? KeyedSubtree(key: chartBtnKey!, child: btn)
+                    : btn;
+              }),
             ],
           ),
           const SizedBox(height: 12),

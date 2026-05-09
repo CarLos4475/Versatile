@@ -306,5 +306,15 @@
   "onboardingNameTitle": "¿Cómo\nte llamamos?",
   "onboardingNameSubtitle": "Opcional — siempre puedes omitirlo.",
   "onboardingNameHint": "Tu nombre…",
-  "onboardingLetsGo": "¡Vamos!"
+  "onboardingLetsGo": "¡Vamos!",
+
+  "coachmarkHistoryFirstCardTitle": "Toca para ver los detalles",
+  "coachmarkHistoryFirstCardBody": "Aquí encontrarás cada serie y repetición que registraste. Tu historial siempre a un toque.",
+  "coachmarkSessionChartTitle": "Sigue tu progreso",
+  "coachmarkSessionChartBody": "Toca este botón para ver una gráfica de tu 1RM estimado y volumen total a lo largo del tiempo.",
+
+  "coachmarkRestTimerTitle": "Temporizador de descanso",
+  "coachmarkRestTimerBody": "Cuenta regresiva entre series. Toca +15s para agregar tiempo o Saltar para continuar antes.",
+  "coachmarkProgressToggleTitle": "Cambia la métrica",
+  "coachmarkProgressToggleBody": "Alterna entre 1RM estimado y volumen total para ver tu progreso desde dos ángulos distintos."
 }

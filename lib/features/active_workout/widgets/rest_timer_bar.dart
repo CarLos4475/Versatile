@@ -12,11 +12,13 @@ class RestTimerBar extends StatelessWidget {
     required this.restTimer,
     required this.onSkip,
     required this.onAddTime,
+    this.barKey,
   });
 
   final RestTimerState restTimer;
   final VoidCallback onSkip;
   final VoidCallback onAddTime;
+  final GlobalKey? barKey;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,7 @@ class RestTimerBar extends StatelessWidget {
     return FadeSlideIn(
       offset: const Offset(0, 0.1),
       child: GlassContainer(
+        key: barKey,
         radius: 24,
         strong: true,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

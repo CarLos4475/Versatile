@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
+import '../../../core/providers/repository_providers.dart';
 import '../../../core/services/workout_notification_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../core/utils/format_utils.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
@@ -103,6 +105,8 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     with WidgetsBindingObserver {
   bool _finishing = false;
   bool _autoFinishTriggered = false;
+  bool _restCoachmarkShown = false;
+  final _restTimerKey = GlobalKey();
 
   @override
   void initState() {
@@ -208,11 +212,41 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     });
   }
 
+  Future<void> _triggerRestTimerCoachmark() async {
+    if (!mounted) return;
+    final service = ref.read(coachmarkServiceProvider);
+    final should = await service.shouldShow('rest_timer');
+    if (!should || !mounted) return;
+    if (_restTimerKey.currentContext?.findRenderObject() == null) return;
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: _restTimerKey,
+      title: l10n.coachmarkRestTimerTitle,
+      body: l10n.coachmarkRestTimerBody,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: () => service.markSeen('rest_timer'),
+      onSkipAll: () => service.markSeen('rest_timer'),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(activeWorkoutProvider(widget.routineId));
     final notifier = ref.read(activeWorkoutProvider(widget.routineId).notifier);
+
+    ref.listen(activeWorkoutProvider(widget.routineId), (prev, next) {
+      if (!_restCoachmarkShown &&
+          prev?.restTimer == null &&
+          next.restTimer != null) {
+        _restCoachmarkShown = true;
+        Future.delayed(const Duration(milliseconds: 450), () {
+          if (mounted) _triggerRestTimerCoachmark();
+        });
+      }
+    });
 
     if (state.autoFinish && !_autoFinishTriggered && !_finishing) {
       _autoFinishTriggered = true;
@@ -446,6 +480,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                     ? const SizedBox.shrink(key: ValueKey('rest-hidden'))
                     : RestTimerBar(
                         key: const ValueKey('rest-visible'),
+                        barKey: _restTimerKey,
                         restTimer: state.restTimer!,
                         onSkip: notifier.skipRest,
                         onAddTime: () => notifier.addRestTime(15),

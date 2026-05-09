@@ -48,3 +48,4 @@ final routinesAddKeyProvider = StateProvider<GlobalKey?>((ref) => null);
 final exercisesNavKeyProvider = StateProvider<GlobalKey?>((ref) => null);
 final exercisesSearchKeyProvider = StateProvider<GlobalKey?>((ref) => null);
 final exercisesAddKeyProvider = StateProvider<GlobalKey?>((ref) => null);
+final historyFirstCardKeyProvider = StateProvider<GlobalKey?>((ref) => null);
