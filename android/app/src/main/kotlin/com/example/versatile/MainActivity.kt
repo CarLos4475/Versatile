@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
+import android.media.MediaPlayer
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.os.Build
@@ -123,6 +124,7 @@ class MainActivity : FlutterActivity() {
     private val restAlertChannelId = "rest_alert_v2"
     private var restAlertNotifId = 2001
     private var activeRingtone: Ringtone? = null
+    private var activePlayer: MediaPlayer? = null
     private var activeFocusRequest: AudioFocusRequest? = null
 
     private fun showRestAlertNotification(exerciseName: String) {
@@ -185,9 +187,45 @@ class MainActivity : FlutterActivity() {
 
     private fun playRestAlertSound() {
         val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val ringtone = RingtoneManager.getRingtone(this, uri) ?: return
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // API 28+: use MediaPlayer for onCompletionListener callback
+            val am = getSystemService(AudioManager::class.java)
+            val audioAttrs = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+
+            activeFocusRequest?.let { am.abandonAudioFocusRequest(it) }
+
+            val focusRequest = AudioFocusRequest
+                .Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+                .setAudioAttributes(audioAttrs)
+                .setAcceptsDelayedFocusGain(false)
+                .setOnAudioFocusChangeListener { }
+                .build()
+
+            activeFocusRequest = focusRequest
+            am.requestAudioFocus(focusRequest)
+
+            activePlayer?.release()
+            val player = MediaPlayer().apply {
+                setDataSource(this@MainActivity, uri)
+                setAudioAttributes(audioAttrs)
+                setOnCompletionListener {
+                    am.abandonAudioFocusRequest(focusRequest)
+                    activeFocusRequest = null
+                    activePlayer = null
+                    release()
+                }
+                prepare()
+                start()
+            }
+            activePlayer = player
+
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // API 26-27: Ringtone has no completion callback; timed fallback
+            val ringtone = RingtoneManager.getRingtone(this, uri) ?: return
             val am = getSystemService(AudioManager::class.java)
             val audioAttrs = AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION)
@@ -195,7 +233,6 @@ class MainActivity : FlutterActivity() {
                 .build()
             ringtone.audioAttributes = audioAttrs
 
-            // Abandon any in-flight focus before requesting a new one
             activeFocusRequest?.let { am.abandonAudioFocusRequest(it) }
 
             val focusRequest = AudioFocusRequest
@@ -212,24 +249,14 @@ class MainActivity : FlutterActivity() {
             activeRingtone = ringtone
             ringtone.play()
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                // API 28+: clean release as soon as the tone finishes
-                ringtone.setOnCompletionListener {
-                    am.abandonAudioFocusRequest(focusRequest)
-                    activeFocusRequest = null
-                    activeRingtone = null
-                }
-            } else {
-                // API 26-27: release after a fixed window (notification tones
-                // are typically < 2 s; 3 s gives comfortable margin)
-                Handler(Looper.getMainLooper()).postDelayed({
-                    am.abandonAudioFocusRequest(focusRequest)
-                    activeFocusRequest = null
-                    activeRingtone = null
-                }, 3000L)
-            }
+            Handler(Looper.getMainLooper()).postDelayed({
+                am.abandonAudioFocusRequest(focusRequest)
+                activeFocusRequest = null
+                activeRingtone = null
+            }, 3000L)
         } else {
             // Pre-O: play without focus management (legacy path)
+            val ringtone = RingtoneManager.getRingtone(this, uri) ?: return
             ringtone.play()
         }
     }

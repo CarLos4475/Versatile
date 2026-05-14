@@ -68,7 +68,7 @@ class SessionRepository {
       'sessions',
       where: 'routine_id = ?',
       whereArgs: [routineId],
-      orderBy: 'rowid DESC',
+      orderBy: 'date DESC, rowid DESC',
       limit: 1,
     );
     if (lastRows.isEmpty) return {};
