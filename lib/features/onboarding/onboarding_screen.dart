@@ -127,10 +127,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ],
                   ),
                 ),
-                if (!keyboardVisible) _PageDots(
-                  currentPage: _currentPage,
-                  totalPages: _totalPages,
-                ),
+                if (!keyboardVisible)
+                  _PageDots(currentPage: _currentPage, totalPages: _totalPages),
                 if (!keyboardVisible) const SizedBox(height: 32),
               ],
             ),
@@ -241,13 +239,13 @@ class _AnimatedOnboardPageState extends State<_AnimatedOnboardPage>
         curve: const Interval(0.22, 0.55, curve: Curves.easeOut),
       ),
     );
-    _titleSlide =
-        Tween<Offset>(begin: const Offset(0, 0.22), end: Offset.zero).animate(
-      CurvedAnimation(
-        parent: _ctrl,
-        curve: const Interval(0.22, 0.58, curve: Curves.easeOutCubic),
-      ),
-    );
+    _titleSlide = Tween<Offset>(begin: const Offset(0, 0.22), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _ctrl,
+            curve: const Interval(0.22, 0.58, curve: Curves.easeOutCubic),
+          ),
+        );
     _bodyOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _ctrl,
@@ -260,13 +258,13 @@ class _AnimatedOnboardPageState extends State<_AnimatedOnboardPage>
         curve: const Interval(0.58, 0.88, curve: Curves.easeOut),
       ),
     );
-    _btnSlide =
-        Tween<Offset>(begin: const Offset(0, 0.28), end: Offset.zero).animate(
-      CurvedAnimation(
-        parent: _ctrl,
-        curve: const Interval(0.58, 0.88, curve: Curves.easeOutCubic),
-      ),
-    );
+    _btnSlide = Tween<Offset>(begin: const Offset(0, 0.28), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _ctrl,
+            curve: const Interval(0.58, 0.88, curve: Curves.easeOutCubic),
+          ),
+        );
 
     _ctrl.forward();
   }
@@ -478,11 +476,11 @@ class _NamePageState extends State<_NamePage>
     );
     _contentSlide =
         Tween<Offset>(begin: const Offset(0, 0.18), end: Offset.zero).animate(
-      CurvedAnimation(
-        parent: _ctrl,
-        curve: const Interval(0.3, 0.75, curve: Curves.easeOutCubic),
-      ),
-    );
+          CurvedAnimation(
+            parent: _ctrl,
+            curve: const Interval(0.3, 0.75, curve: Curves.easeOutCubic),
+          ),
+        );
     _ctrl.forward();
   }
 
@@ -545,7 +543,9 @@ class _NamePageState extends State<_NamePage>
                       ),
                     ),
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 4),
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
                     child: TextField(
                       controller: widget.controller,
                       autofocus: false,
@@ -556,14 +556,17 @@ class _NamePageState extends State<_NamePage>
                         fontWeight: FontWeight.w500,
                       ),
                       decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!.onboardingNameHint,
+                        hintText: AppLocalizations.of(
+                          context,
+                        )!.onboardingNameHint,
                         hintStyle: TextStyle(
                           fontSize: 18,
                           color: context.colors.ink300,
                         ),
                         border: InputBorder.none,
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 14),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                        ),
                       ),
                     ),
                   ),
@@ -602,9 +605,7 @@ class _PageDots extends StatelessWidget {
           width: active ? 22 : 6,
           height: 6,
           decoration: BoxDecoration(
-            color: active
-                ? context.colors.accentDeep
-                : context.colors.ink300,
+            color: active ? context.colors.accentDeep : context.colors.ink300,
             borderRadius: BorderRadius.circular(3),
           ),
         );

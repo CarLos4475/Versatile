@@ -526,6 +526,14 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
         final path = await settings.get('rest_alert_custom_path');
         if (path != null && path.isNotEmpty) {
           _alertPlayer ??= AudioPlayer();
+          await _alertPlayer!.setAudioContext(AudioContext(
+            android: AudioContextAndroid(
+              stayAwake: false,
+              contentType: AndroidContentType.sonification,
+              usageType: AndroidUsageType.notification,
+              audioFocus: AndroidAudioFocus.gainTransientMayDuck,
+            ),
+          ));
           await _alertPlayer!.setVolume(1.0);
           await _alertPlayer!.play(DeviceFileSource(path));
         }
