@@ -50,6 +50,14 @@ class SoundService {
       final path = await customPath;
       if (path != null && path.isNotEmpty) {
         _player ??= AudioPlayer();
+        await _player!.setAudioContext(AudioContext(
+          android: AudioContextAndroid(
+            stayAwake: false,
+            contentType: AndroidContentType.sonification,
+            usageType: AndroidUsageType.notification,
+            audioFocus: AndroidAudioFocus.gainTransientMayDuck,
+          ),
+        ));
         await _player!.setVolume(1.0);
         await _player!.play(DeviceFileSource(path));
       }
