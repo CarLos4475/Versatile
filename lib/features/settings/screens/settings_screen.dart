@@ -139,6 +139,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: context.colors.bgFrame,
+        scrollable: true,
         title: Text(
           l10n.changeName,
           style: TextStyle(
@@ -223,6 +224,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: context.colors.bgFrame,
+        scrollable: true,
         title: Text(l10n.wipeConfirmTitle, style: TextStyle(color: context.colors.ink900)),
         content: Text(
           l10n.wipeConfirmContent,

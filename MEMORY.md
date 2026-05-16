@@ -9,8 +9,8 @@ A workout-tracking Flutter app. Users create routines with exercises, start work
 - **Flutter** (Dart) with `flutter_riverpod` for state management
 - **SQLite** via `sqflite` — single `DatabaseHelper` singleton (`lib/data/database/database_helper.dart`)
  - **Localization**: gen-l10n via `l10n.yaml`. **Source files are the `.arb` files** (`app_en.arb`, `app_es.arb`). The `.dart` files (`app_localizations.dart`, `_en.dart`, `_es.dart`) are auto-regenerated on build. NEVER edit the `.dart` l10n files directly — always add strings to the `.arb` files first, then run `flutter gen-l10n`.
-- **Android**: `WorkoutService.kt` (foreground service), MethodChannel for rest alerts
-- **Audio**: `audioplayers` for rest timer alert sounds
+- **Android**: `WorkoutService.kt` (foreground service), MethodChannel for rest alerts (vibration-only notification; sound is played from Dart)
+- **Audio**: `audioplayers` (`^6.6.0`) for rest timer alert sounds. Custom sounds set `AudioContext` with `gainTransientMayDuck` to avoid pausing background music. Native (MainActivity.kt) does NOT play audio — it only shows the notification + vibration.
 
 ## Directory Structure
 
@@ -92,7 +92,10 @@ lib/
 - `Routine`: id, name, colorValue, iconCode, exercises (List<RoutineExercise>), lastDoneDaysAgo
  - `Exercise`: id, name, muscle, equipment, isCustom, isUnilateral, getLocalizedName/muscle (l10n-aware)
 
-## Active Workout Features
+## Session Repository Queries
+
+- Always order session queries by `date DESC, rowid DESC` — never rely on `rowid` alone. SQLite can reuse rowid values after deletions, so `rowid DESC` may return stale rows. The `date` column is the chronologically correct sort key.
+- `getPreviousPerformance()` is used by the active workout screen to show "↑ Last" ghost rows per exercise. It fetches sets from the most recent session for the given routine.
 
 ### Cancel Workout
 - Cancel button (X icon in header, next to back arrow) shows `AlertDialog` using `discardWorkoutTitle`/`discardWorkoutContent` l10n strings

@@ -114,6 +114,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: context.colors.bgFrame,
+        scrollable: true,
         title: Text(
           l10n.deleteRoutineTitle,
           style: TextStyle(

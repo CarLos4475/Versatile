@@ -4,7 +4,10 @@
       "Bash(Get-ChildItem -Recurse \"C:\\\\Users\\\\PC\\\\Documents\\\\PROYECTOS\\\\androidStudio\\\\versatile\\\\assets\")",
       "Bash(Select-Object FullName)",
       "Bash(Get-ChildItem *)",
-      "Bash(flutter analyze *)"
+      "Bash(flutter analyze *)",
+      "Bash(git *)",
+      "Bash(Get-Content pubspec.yaml)",
+      "Bash(Select-Object -First 30)"
     ]
   }
 }

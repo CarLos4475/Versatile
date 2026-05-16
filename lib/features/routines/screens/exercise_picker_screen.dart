@@ -119,6 +119,7 @@ class _ExerciseConfigDialogState extends State<ExerciseConfigDialog> {
     final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
       backgroundColor: context.colors.bgFrame,
+      scrollable: true,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       title: Column(

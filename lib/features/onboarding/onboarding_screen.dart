@@ -277,67 +277,76 @@ class _AnimatedOnboardPageState extends State<_AnimatedOnboardPage>
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          FadeTransition(
-            opacity: _iconOpacity,
-            child: ScaleTransition(
-              scale: _iconScale,
-              child: _IconBadge(icon: widget.icon),
-            ),
-          ),
-          const SizedBox(height: 40),
-          FadeTransition(
-            opacity: _titleOpacity,
-            child: SlideTransition(
-              position: _titleSlide,
-              child: Text(
-                widget.title,
-                style: TextStyle(
-                  fontSize: 42,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -1.26,
-                  color: context.colors.ink900,
-                  height: 1.04,
-                ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  FadeTransition(
+                    opacity: _iconOpacity,
+                    child: ScaleTransition(
+                      scale: _iconScale,
+                      child: _IconBadge(icon: widget.icon),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  FadeTransition(
+                    opacity: _titleOpacity,
+                    child: SlideTransition(
+                      position: _titleSlide,
+                      child: Text(
+                        widget.title,
+                        style: TextStyle(
+                          fontSize: 42,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -1.26,
+                          color: context.colors.ink900,
+                          height: 1.04,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  FadeTransition(
+                    opacity: _bodyOpacity,
+                    child: Text(
+                      widget.body,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: context.colors.ink500,
+                        height: 1.55,
+                        letterSpacing: -0.1,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 52),
+                  FadeTransition(
+                    opacity: _btnOpacity,
+                    child: SlideTransition(
+                      position: _btnSlide,
+                      child: _ContinueButton(
+                        label: widget.isLast
+                            ? AppLocalizations.of(context)!.onboardingWhatsYourName
+                            : AppLocalizations.of(context)!.onboardingContinue,
+                        icon: widget.isLast
+                            ? Icons.person_outline
+                            : Icons.arrow_forward,
+                        onTap: widget.onNext,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          FadeTransition(
-            opacity: _bodyOpacity,
-            child: Text(
-              widget.body,
-              style: TextStyle(
-                fontSize: 16,
-                color: context.colors.ink500,
-                height: 1.55,
-                letterSpacing: -0.1,
-              ),
-            ),
-          ),
-          const SizedBox(height: 52),
-          FadeTransition(
-            opacity: _btnOpacity,
-            child: SlideTransition(
-              position: _btnSlide,
-              child: _ContinueButton(
-                label: widget.isLast
-                    ? AppLocalizations.of(context)!.onboardingWhatsYourName
-                    : AppLocalizations.of(context)!.onboardingContinue,
-                icon: widget.isLast
-                    ? Icons.person_outline
-                    : Icons.arrow_forward,
-                onTap: widget.onNext,
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -492,96 +501,105 @@ class _NamePageState extends State<_NamePage>
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          FadeTransition(
-            opacity: _iconOpacity,
-            child: ScaleTransition(
-              scale: _iconScale,
-              child: const _IconBadge(icon: Icons.waving_hand_outlined),
-            ),
-          ),
-          const SizedBox(height: 40),
-          FadeTransition(
-            opacity: _contentOpacity,
-            child: SlideTransition(
-              position: _contentSlide,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    AppLocalizations.of(context)!.onboardingNameTitle,
-                    style: TextStyle(
-                      fontSize: 42,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -1.26,
-                      color: context.colors.ink900,
-                      height: 1.04,
+                  FadeTransition(
+                    opacity: _iconOpacity,
+                    child: ScaleTransition(
+                      scale: _iconScale,
+                      child: const _IconBadge(icon: Icons.waving_hand_outlined),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    AppLocalizations.of(context)!.onboardingNameSubtitle,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: context.colors.ink400,
-                      height: 1.4,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: context.colors.glassBg,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: context.colors.glassBorder,
-                        width: 0.5,
+                  const SizedBox(height: 40),
+                  FadeTransition(
+                    opacity: _contentOpacity,
+                    child: SlideTransition(
+                      position: _contentSlide,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            AppLocalizations.of(context)!.onboardingNameTitle,
+                            style: TextStyle(
+                              fontSize: 42,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -1.26,
+                              color: context.colors.ink900,
+                              height: 1.04,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            AppLocalizations.of(context)!.onboardingNameSubtitle,
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: context.colors.ink400,
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: 28),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: context.colors.glassBg,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: context.colors.glassBorder,
+                                width: 0.5,
+                              ),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            child: TextField(
+                              controller: widget.controller,
+                              autofocus: false,
+                              textCapitalization: TextCapitalization.words,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: context.colors.ink900,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              decoration: InputDecoration(
+                                hintText: AppLocalizations.of(
+                                  context,
+                                )!.onboardingNameHint,
+                                hintStyle: TextStyle(
+                                  fontSize: 18,
+                                  color: context.colors.ink300,
+                                ),
+                                border: InputBorder.none,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _ContinueButton(
+                            label: AppLocalizations.of(context)!.onboardingLetsGo,
+                            icon: Icons.check,
+                            onTap: widget.onFinish,
+                          ),
+                        ],
                       ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 4,
-                    ),
-                    child: TextField(
-                      controller: widget.controller,
-                      autofocus: false,
-                      textCapitalization: TextCapitalization.words,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: context.colors.ink900,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(
-                          context,
-                        )!.onboardingNameHint,
-                        hintStyle: TextStyle(
-                          fontSize: 18,
-                          color: context.colors.ink300,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  _ContinueButton(
-                    label: AppLocalizations.of(context)!.onboardingLetsGo,
-                    icon: Icons.check,
-                    onTap: widget.onFinish,
                   ),
                 ],
               ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

@@ -53,6 +53,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: context.colors.bgFrame,
+        scrollable: true,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           l10n.deleteExerciseTitle,

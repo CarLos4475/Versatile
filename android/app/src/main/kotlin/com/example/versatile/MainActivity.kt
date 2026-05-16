@@ -78,27 +78,36 @@ class MainActivity : FlutterActivity() {
                     result.success(null)
                 }
                 "getActiveWorkout" -> {
-                    if (!WorkoutService.isRunning(this)) {
-                        WorkoutService.clearPrefs(this)
+                    val prefs = getSharedPreferences(
+                        WorkoutService.PREFS_NAME, Context.MODE_PRIVATE
+                    )
+                    val routineId   = prefs.getString(WorkoutService.KEY_ROUTINE_ID,   null)
+                    val startedAt   = prefs.getLong(WorkoutService.KEY_STARTED_AT,     0L)
+                    val progress    = prefs.getString(WorkoutService.KEY_PROGRESS,     null)
+                    val routineName = prefs.getString(WorkoutService.KEY_ROUTINE_NAME, null)
+                    if (routineId.isNullOrEmpty() || startedAt == 0L) {
                         result.success(null)
                     } else {
-                        val prefs = getSharedPreferences(
-                            WorkoutService.PREFS_NAME, Context.MODE_PRIVATE
-                        )
-                        val routineId   = prefs.getString(WorkoutService.KEY_ROUTINE_ID,   null)
-                        val startedAt   = prefs.getLong(WorkoutService.KEY_STARTED_AT,     0L)
-                        val progress    = prefs.getString(WorkoutService.KEY_PROGRESS,     null)
-                        val routineName = prefs.getString(WorkoutService.KEY_ROUTINE_NAME, null)
-                        if (routineId == null || startedAt == 0L) {
-                            result.success(null)
-                        } else {
-                            result.success(mapOf(
-                                "routineId"   to routineId,
-                                "startedAt"   to startedAt,
-                                "progressJson" to progress,
-                                "routineName"  to routineName
-                            ))
+                        if (!WorkoutService.isRunning(this)) {
+                            val subtitle = prefs.getString(WorkoutService.KEY_SUBTITLE, "")
+                            val intent = Intent(this, WorkoutService::class.java).apply {
+                                putExtra(WorkoutService.KEY_STARTED_AT,   startedAt)
+                                putExtra(WorkoutService.KEY_ROUTINE_ID,   routineId)
+                                putExtra(WorkoutService.KEY_ROUTINE_NAME, routineName ?: "")
+                                putExtra(WorkoutService.KEY_SUBTITLE,     subtitle ?: "")
+                            }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                startForegroundService(intent)
+                            } else {
+                                startService(intent)
+                            }
                         }
+                        result.success(mapOf(
+                            "routineId"   to routineId,
+                            "startedAt"   to startedAt,
+                            "progressJson" to progress,
+                            "routineName"  to routineName
+                        ))
                     }
                 }
                 "showRestAlert" -> {

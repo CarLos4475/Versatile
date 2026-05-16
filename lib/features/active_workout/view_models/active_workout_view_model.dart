@@ -285,6 +285,8 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     }
   }
 
+  void persistProgress() => _saveProgress();
+
   void _saveProgress() {
     final exercises = state.exerciseStates.map((e) => {
       'completedSets': e.completedSets.map((s) => {

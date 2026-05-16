@@ -139,8 +139,20 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    WorkoutNotificationService.stop();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      if (mounted) {
+        ref
+            .read(activeWorkoutProvider(widget.routineId).notifier)
+            .persistProgress();
+      }
+    }
   }
 
   Future<void> _finish() async {
@@ -166,6 +178,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true,
         title: Text(l10n.discardWorkoutTitle),
         content: Text(l10n.discardWorkoutContent),
         actions: [
@@ -193,6 +206,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true,
         title: Text(l10n.skipExercise),
         content: Text(l10n.skipExerciseContent),
         actions: [

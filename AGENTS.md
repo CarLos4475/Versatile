@@ -5,6 +5,10 @@
 1. **Read MEMORY.md first** — always read `MEMORY.md` at the start of every session to understand the project without re-scanning the codebase.
 2. **Activate relevant skills** — load skills that match the current task (flutter-*, ios-*, etc.) using the Skill tool. Scan the prompt for technology keywords and activate matching skills before writing code.
 
+## Pending tasks lifecycle
+
+The memory file `project_pending_tasks.md` (indexed in `MEMORY.md`) tracks postponed work. When the user confirms that a pending task is done ("ya quedó listo", "ya está", etc.), **delete that entry from `project_pending_tasks.md`** immediately. If the file ends up empty, remove the file itself and its line from `MEMORY.md`. Do not leave stale pendings — they must reflect only work that is still outstanding.
+
 ## Architecture
 
 - **State management**: Riverpod (`flutter_riverpod`). Providers in `core/providers/`, view models per feature in `features/*/view_models/`.
