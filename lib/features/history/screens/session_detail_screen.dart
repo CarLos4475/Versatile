@@ -6,8 +6,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/session.dart';
 import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../shared/widgets/glass_container.dart';
+import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../../core/utils/format_utils.dart';
+import '../../share/screens/share_session_screen.dart';
 import '../widgets/history_exercise_detail.dart';
 
 class SessionDetailScreen extends ConsumerStatefulWidget {
@@ -69,6 +71,31 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
               ),
               onBack: () => Navigator.of(context).pop(),
               accentBack: true,
+              trailing: PressableScale(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ShareSessionScreen(session: session),
+                  ),
+                ),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: context.colors.glassBg,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: context.colors.glassBorder,
+                      width: 0.5,
+                    ),
+                    boxShadow: context.colors.glassShadow,
+                  ),
+                  child: Icon(
+                    Icons.ios_share_rounded,
+                    color: context.colors.ink700,
+                    size: 18,
+                  ),
+                ),
+              ),
             ),
             Expanded(
               child: ListView(

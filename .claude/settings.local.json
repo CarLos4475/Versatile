@@ -7,7 +7,9 @@
       "Bash(flutter analyze *)",
       "Bash(git *)",
       "Bash(Get-Content pubspec.yaml)",
-      "Bash(Select-Object -First 30)"
+      "Bash(Select-Object -First 30)",
+      "Bash(Get-Content android/app/build.gradle.kts)",
+      "Bash(Select-String -Pattern \"minSdk|targetSdk|compileSdk\")"
     ]
   }
 }

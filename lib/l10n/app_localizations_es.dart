@@ -1001,4 +1001,116 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get close => 'Cerrar';
+
+  @override
+  String get recapTitle => 'Tu mes entrenando';
+
+  @override
+  String get recapIntroSubtitle => 'Un vistazo a lo que entrenaste.';
+
+  @override
+  String get recapSessionsTitle => 'Apareciste';
+
+  @override
+  String recapSessionsBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# entrenamientos',
+      one: '# entrenamiento',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recapVolumeTitle => 'Levantaste';
+
+  @override
+  String recapVolumeDeltaUp(int pct, String month) {
+    return '$pct% más que en $month';
+  }
+
+  @override
+  String recapVolumeDeltaDown(int pct, String month) {
+    return '$pct% menos que en $month';
+  }
+
+  @override
+  String recapVolumeDeltaSame(String month) {
+    return 'Más o menos igual que en $month';
+  }
+
+  @override
+  String get recapTopRoutineTitle => 'Tu favorita';
+
+  @override
+  String recapTopRoutineBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# sesiones',
+      one: '# sesión',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recapTopExerciseTitle => 'La estrella del mes';
+
+  @override
+  String recapTopExerciseBody(int sets, String volume) {
+    String _temp0 = intl.Intl.pluralLogic(
+      sets,
+      locale: localeName,
+      other: '# sets',
+      one: '# set',
+    );
+    return '$_temp0 · $volume';
+  }
+
+  @override
+  String get recapPRTitle => '¡Nuevo récord!';
+
+  @override
+  String recapPRBody(String exercise) {
+    return 'en $exercise';
+  }
+
+  @override
+  String get recapOutroTitle => 'Nos vemos el próximo mes';
+
+  @override
+  String get recapOutroBody => 'Sigue apareciendo.';
+
+  @override
+  String recapEntryCardTitle(String month) {
+    return 'Resumen de $month';
+  }
+
+  @override
+  String recapEntryCardSubtitle(int count, String volume) {
+    return '$count sesiones · $volume';
+  }
+
+  @override
+  String get recapPastRecaps => 'Resúmenes anteriores';
+
+  @override
+  String get recapPastRecapsEmpty => 'Aún no hay resúmenes pasados';
+
+  @override
+  String get recapPastRecapsSubtitle => 'Revisa cualquier mes cerrado';
+
+  @override
+  String get recapBannerCta => 'Ver';
+
+  @override
+  String get share => 'Compartir';
+
+  @override
+  String get shareWorkout => 'Compartir entrenamiento';
+
+  @override
+  String get sharePreviewSubtitle =>
+      'Una tarjeta cuadrada para publicar donde quieras';
 }

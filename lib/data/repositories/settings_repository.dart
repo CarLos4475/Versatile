@@ -48,4 +48,9 @@ class SettingsRepository {
 
   Future<void> setActiveProgramStartDate(DateTime date) =>
       set('active_program_start_date', date.toIso8601String().substring(0, 10));
+
+  Future<bool> isRecapSeen(String monthKey) async =>
+      (await get('recap_seen_$monthKey')) == '1';
+  Future<void> setRecapSeen(String monthKey) =>
+      set('recap_seen_$monthKey', '1');
 }

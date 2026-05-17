@@ -414,5 +414,71 @@
   "programsHelpBadgesBody": "Cuando el día de hoy tiene una rutina planeada, la tarjeta de inicio muestra el badge PLANEADO. Las semanas de descarga muestran DESCARGA. La tarjeta sigue funcionando igual — toca Start para comenzar.",
   "programsHelpOptionalTitle": "100% opcional",
   "programsHelpOptionalBody": "Si ignoras los planes, la app funciona exactamente igual que antes. Los planes son un extra que puedes activar o desactivar en cualquier momento sin perder rutinas ni historial.",
-  "close": "Cerrar"
+  "close": "Cerrar",
+
+  "recapTitle": "Tu mes entrenando",
+  "recapIntroSubtitle": "Un vistazo a lo que entrenaste.",
+  "recapSessionsTitle": "Apareciste",
+  "recapSessionsBody": "{count, plural, one{# entrenamiento} other{# entrenamientos}}",
+  "@recapSessionsBody": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "recapVolumeTitle": "Levantaste",
+  "recapVolumeDeltaUp": "{pct}% más que en {month}",
+  "@recapVolumeDeltaUp": {
+    "placeholders": {
+      "pct": { "type": "int" },
+      "month": { "type": "String" }
+    }
+  },
+  "recapVolumeDeltaDown": "{pct}% menos que en {month}",
+  "@recapVolumeDeltaDown": {
+    "placeholders": {
+      "pct": { "type": "int" },
+      "month": { "type": "String" }
+    }
+  },
+  "recapVolumeDeltaSame": "Más o menos igual que en {month}",
+  "@recapVolumeDeltaSame": {
+    "placeholders": { "month": { "type": "String" } }
+  },
+  "recapTopRoutineTitle": "Tu favorita",
+  "recapTopRoutineBody": "{count, plural, one{# sesión} other{# sesiones}}",
+  "@recapTopRoutineBody": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "recapTopExerciseTitle": "La estrella del mes",
+  "recapTopExerciseBody": "{sets, plural, one{# set} other{# sets}} · {volume}",
+  "@recapTopExerciseBody": {
+    "placeholders": {
+      "sets": { "type": "int" },
+      "volume": { "type": "String" }
+    }
+  },
+  "recapPRTitle": "¡Nuevo récord!",
+  "recapPRBody": "en {exercise}",
+  "@recapPRBody": {
+    "placeholders": { "exercise": { "type": "String" } }
+  },
+  "recapOutroTitle": "Nos vemos el próximo mes",
+  "recapOutroBody": "Sigue apareciendo.",
+  "recapEntryCardTitle": "Resumen de {month}",
+  "@recapEntryCardTitle": {
+    "placeholders": { "month": { "type": "String" } }
+  },
+  "recapEntryCardSubtitle": "{count} sesiones · {volume}",
+  "@recapEntryCardSubtitle": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "volume": { "type": "String" }
+    }
+  },
+  "recapPastRecaps": "Resúmenes anteriores",
+  "recapPastRecapsEmpty": "Aún no hay resúmenes pasados",
+  "recapPastRecapsSubtitle": "Revisa cualquier mes cerrado",
+  "recapBannerCta": "Ver",
+
+  "share": "Compartir",
+  "shareWorkout": "Compartir entrenamiento",
+  "sharePreviewSubtitle": "Una tarjeta cuadrada para publicar donde quieras"
 }

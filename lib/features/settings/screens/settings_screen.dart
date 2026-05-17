@@ -21,6 +21,7 @@ import '../../../shared/widgets/screen_header.dart';
 import '../../exercises/view_models/exercises_view_model.dart';
 import '../../home/view_models/home_view_model.dart';
 import '../../programs/screens/programs_screen.dart';
+import '../../recap/screens/past_recaps_screen.dart';
 import '../../routines/view_models/routines_view_model.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -358,6 +359,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               onTap: () => Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (_) => const ProgramsScreen(),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          GlassContainer(
+                            radius: 20,
+                            child: _SettingRow(
+                              icon: Icons.auto_awesome_outlined,
+                              title: l10n.recapPastRecaps,
+                              subtitle: l10n.recapPastRecapsSubtitle,
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const PastRecapsScreen(),
                                 ),
                               ),
                             ),

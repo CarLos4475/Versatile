@@ -998,4 +998,115 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get close => 'Close';
+
+  @override
+  String get recapTitle => 'Your month in lifting';
+
+  @override
+  String get recapIntroSubtitle => 'A look back at what you trained.';
+
+  @override
+  String get recapSessionsTitle => 'You showed up';
+
+  @override
+  String recapSessionsBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# workouts',
+      one: '# workout',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recapVolumeTitle => 'You moved';
+
+  @override
+  String recapVolumeDeltaUp(int pct, String month) {
+    return '$pct% more than $month';
+  }
+
+  @override
+  String recapVolumeDeltaDown(int pct, String month) {
+    return '$pct% less than $month';
+  }
+
+  @override
+  String recapVolumeDeltaSame(String month) {
+    return 'About the same as $month';
+  }
+
+  @override
+  String get recapTopRoutineTitle => 'Your go-to';
+
+  @override
+  String recapTopRoutineBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '# sessions',
+      one: '# session',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get recapTopExerciseTitle => 'Star of the show';
+
+  @override
+  String recapTopExerciseBody(int sets, String volume) {
+    String _temp0 = intl.Intl.pluralLogic(
+      sets,
+      locale: localeName,
+      other: '# sets',
+      one: '# set',
+    );
+    return '$_temp0 · $volume';
+  }
+
+  @override
+  String get recapPRTitle => 'New record!';
+
+  @override
+  String recapPRBody(String exercise) {
+    return 'on $exercise';
+  }
+
+  @override
+  String get recapOutroTitle => 'See you next month';
+
+  @override
+  String get recapOutroBody => 'Keep showing up.';
+
+  @override
+  String recapEntryCardTitle(String month) {
+    return '$month recap';
+  }
+
+  @override
+  String recapEntryCardSubtitle(int count, String volume) {
+    return '$count sessions · $volume';
+  }
+
+  @override
+  String get recapPastRecaps => 'Past recaps';
+
+  @override
+  String get recapPastRecapsEmpty => 'No past recaps yet';
+
+  @override
+  String get recapPastRecapsSubtitle => 'Look back at any closed month';
+
+  @override
+  String get recapBannerCta => 'View';
+
+  @override
+  String get share => 'Share';
+
+  @override
+  String get shareWorkout => 'Share workout';
+
+  @override
+  String get sharePreviewSubtitle => 'A square card you can post anywhere';
 }

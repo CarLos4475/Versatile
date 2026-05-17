@@ -414,5 +414,71 @@
   "programsHelpBadgesBody": "When today has a planned routine, the home card shows a PLANNED badge. Deload weeks show DELOAD. The card still works the same — tap Start to begin.",
   "programsHelpOptionalTitle": "100% optional",
   "programsHelpOptionalBody": "If you ignore plans, the app behaves exactly as before. Plans are an extra you can turn on or off any time without losing routines or history.",
-  "close": "Close"
+  "close": "Close",
+
+  "recapTitle": "Your month in lifting",
+  "recapIntroSubtitle": "A look back at what you trained.",
+  "recapSessionsTitle": "You showed up",
+  "recapSessionsBody": "{count, plural, one{# workout} other{# workouts}}",
+  "@recapSessionsBody": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "recapVolumeTitle": "You moved",
+  "recapVolumeDeltaUp": "{pct}% more than {month}",
+  "@recapVolumeDeltaUp": {
+    "placeholders": {
+      "pct": { "type": "int" },
+      "month": { "type": "String" }
+    }
+  },
+  "recapVolumeDeltaDown": "{pct}% less than {month}",
+  "@recapVolumeDeltaDown": {
+    "placeholders": {
+      "pct": { "type": "int" },
+      "month": { "type": "String" }
+    }
+  },
+  "recapVolumeDeltaSame": "About the same as {month}",
+  "@recapVolumeDeltaSame": {
+    "placeholders": { "month": { "type": "String" } }
+  },
+  "recapTopRoutineTitle": "Your go-to",
+  "recapTopRoutineBody": "{count, plural, one{# session} other{# sessions}}",
+  "@recapTopRoutineBody": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "recapTopExerciseTitle": "Star of the show",
+  "recapTopExerciseBody": "{sets, plural, one{# set} other{# sets}} · {volume}",
+  "@recapTopExerciseBody": {
+    "placeholders": {
+      "sets": { "type": "int" },
+      "volume": { "type": "String" }
+    }
+  },
+  "recapPRTitle": "New record!",
+  "recapPRBody": "on {exercise}",
+  "@recapPRBody": {
+    "placeholders": { "exercise": { "type": "String" } }
+  },
+  "recapOutroTitle": "See you next month",
+  "recapOutroBody": "Keep showing up.",
+  "recapEntryCardTitle": "{month} recap",
+  "@recapEntryCardTitle": {
+    "placeholders": { "month": { "type": "String" } }
+  },
+  "recapEntryCardSubtitle": "{count} sessions · {volume}",
+  "@recapEntryCardSubtitle": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "volume": { "type": "String" }
+    }
+  },
+  "recapPastRecaps": "Past recaps",
+  "recapPastRecapsEmpty": "No past recaps yet",
+  "recapPastRecapsSubtitle": "Look back at any closed month",
+  "recapBannerCta": "View",
+
+  "share": "Share",
+  "shareWorkout": "Share workout",
+  "sharePreviewSubtitle": "A square card you can post anywhere"
 }

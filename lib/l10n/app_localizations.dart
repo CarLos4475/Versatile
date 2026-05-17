@@ -1933,6 +1933,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get close;
+
+  /// No description provided for @recapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your month in lifting'**
+  String get recapTitle;
+
+  /// No description provided for @recapIntroSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A look back at what you trained.'**
+  String get recapIntroSubtitle;
+
+  /// No description provided for @recapSessionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You showed up'**
+  String get recapSessionsTitle;
+
+  /// No description provided for @recapSessionsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{# workout} other{# workouts}}'**
+  String recapSessionsBody(int count);
+
+  /// No description provided for @recapVolumeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You moved'**
+  String get recapVolumeTitle;
+
+  /// No description provided for @recapVolumeDeltaUp.
+  ///
+  /// In en, this message translates to:
+  /// **'{pct}% more than {month}'**
+  String recapVolumeDeltaUp(int pct, String month);
+
+  /// No description provided for @recapVolumeDeltaDown.
+  ///
+  /// In en, this message translates to:
+  /// **'{pct}% less than {month}'**
+  String recapVolumeDeltaDown(int pct, String month);
+
+  /// No description provided for @recapVolumeDeltaSame.
+  ///
+  /// In en, this message translates to:
+  /// **'About the same as {month}'**
+  String recapVolumeDeltaSame(String month);
+
+  /// No description provided for @recapTopRoutineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your go-to'**
+  String get recapTopRoutineTitle;
+
+  /// No description provided for @recapTopRoutineBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{# session} other{# sessions}}'**
+  String recapTopRoutineBody(int count);
+
+  /// No description provided for @recapTopExerciseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Star of the show'**
+  String get recapTopExerciseTitle;
+
+  /// No description provided for @recapTopExerciseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{sets, plural, one{# set} other{# sets}} · {volume}'**
+  String recapTopExerciseBody(int sets, String volume);
+
+  /// No description provided for @recapPRTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New record!'**
+  String get recapPRTitle;
+
+  /// No description provided for @recapPRBody.
+  ///
+  /// In en, this message translates to:
+  /// **'on {exercise}'**
+  String recapPRBody(String exercise);
+
+  /// No description provided for @recapOutroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'See you next month'**
+  String get recapOutroTitle;
+
+  /// No description provided for @recapOutroBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep showing up.'**
+  String get recapOutroBody;
+
+  /// No description provided for @recapEntryCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{month} recap'**
+  String recapEntryCardTitle(String month);
+
+  /// No description provided for @recapEntryCardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} sessions · {volume}'**
+  String recapEntryCardSubtitle(int count, String volume);
+
+  /// No description provided for @recapPastRecaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Past recaps'**
+  String get recapPastRecaps;
+
+  /// No description provided for @recapPastRecapsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No past recaps yet'**
+  String get recapPastRecapsEmpty;
+
+  /// No description provided for @recapPastRecapsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Look back at any closed month'**
+  String get recapPastRecapsSubtitle;
+
+  /// No description provided for @recapBannerCta.
+  ///
+  /// In en, this message translates to:
+  /// **'View'**
+  String get recapBannerCta;
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
+
+  /// No description provided for @shareWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'Share workout'**
+  String get shareWorkout;
+
+  /// No description provided for @sharePreviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A square card you can post anywhere'**
+  String get sharePreviewSubtitle;
 }
 
 class _AppLocalizationsDelegate
