@@ -316,5 +316,103 @@
   "coachmarkRestTimerTitle": "Temporizador de descanso",
   "coachmarkRestTimerBody": "Cuenta regresiva entre series. Toca +15s para agregar tiempo o Saltar para continuar antes.",
   "coachmarkProgressToggleTitle": "Cambia la métrica",
-  "coachmarkProgressToggleBody": "Alterna entre 1RM estimado y volumen total para ver tu progreso desde dos ángulos distintos."
+  "coachmarkProgressToggleBody": "Alterna entre 1RM estimado y volumen total para ver tu progreso desde dos ángulos distintos.",
+
+  "trainingPlan": "Plan de entrenamiento",
+  "trainingPlanSubtitle": "Asigna rutinas por día de la semana",
+  "programsSubtitle": "Arma un plan multisemana con días de descanso",
+  "createProgram": "Crear programa",
+  "editProgram": "Editar programa",
+  "noProgramsYet": "Aún no hay programas",
+  "programsEmptyBody": "Crea un plan semanal que asigne una rutina — o un día de descanso — a cada día de la semana.",
+  "deleteProgramTitle": "¿Eliminar programa?",
+  "deleteProgramContent": "Se eliminará permanentemente '{name}'. Tus rutinas e historial no se tocan.",
+  "@deleteProgramContent": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "activateProgram": "Activar",
+  "deactivateProgram": "Desactivar",
+  "programWeeksSummary": "{weeks} {weeks, plural, one{semana} other{semanas}} · {deload} deload",
+  "@programWeeksSummary": {
+    "placeholders": {
+      "weeks": { "type": "int" },
+      "deload": { "type": "int" }
+    }
+  },
+  "pickStartDate": "Elige fecha de inicio",
+  "programName": "Nombre",
+  "programNameHint": "p. ej. Push/Pull/Legs de 4 semanas",
+  "weeksLabel": "Semanas",
+  "weeksCountValue": "{weeks} {weeks, plural, one{semana} other{semanas}}",
+  "@weeksCountValue": {
+    "placeholders": {
+      "weeks": { "type": "int" }
+    }
+  },
+  "scheduleLabel": "Calendario",
+  "deloadWeekLabel": "Descarga",
+  "weekN": "Semana {n}",
+  "@weekN": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "tapToAssign": "Toca para asignar",
+  "routineRemoved": "Rutina eliminada",
+  "save": "Guardar",
+
+  "labelRest": "Descanso",
+  "labelCardio": "Cardio",
+  "labelMobility": "Movilidad",
+  "labelStretch": "Estiramiento",
+  "editDayTitle": "Editar {day}",
+  "@editDayTitle": {
+    "placeholders": {
+      "day": { "type": "String" }
+    }
+  },
+  "clear": "Vaciar",
+  "pickRoutineSection": "Elige una rutina",
+  "pickLabelSection": "O usa una etiqueta",
+  "customLabelSection": "Personalizado",
+  "customLabelHint": "Escribe tu propia etiqueta…",
+  "applyCustomLabel": "Usar etiqueta personalizada",
+
+  "weekdayMon": "Lunes",
+  "weekdayTue": "Martes",
+  "weekdayWed": "Miércoles",
+  "weekdayThu": "Jueves",
+  "weekdayFri": "Viernes",
+  "weekdaySat": "Sábado",
+  "weekdaySun": "Domingo",
+  "weekdayMonShort": "LUN",
+  "weekdayTueShort": "MAR",
+  "weekdayWedShort": "MIÉ",
+  "weekdayThuShort": "JUE",
+  "weekdayFriShort": "VIE",
+  "weekdaySatShort": "SÁB",
+  "weekdaySunShort": "DOM",
+
+  "plannedBadge": "PLANEADO",
+  "plannedDeloadBadge": "DESCARGA",
+  "todayLabel": "HOY",
+  "restDayDescription": "El día de hoy según tu programa activo.",
+
+  "programsHelpTooltip": "Cómo funcionan los planes",
+  "programsHelpTitle": "Cómo funcionan los planes",
+  "programsHelpIntroTitle": "¿Qué es un plan de entrenamiento?",
+  "programsHelpIntroBody": "Un calendario de varias semanas que asigna una rutina o un día de descanso a cada día. Útil para periodizar tipo Push/Pull/Legs o splits de 5 días.",
+  "programsHelpSlotsTitle": "Los días son slots",
+  "programsHelpSlotsBody": "Cada día puede ser una rutina (tu entrenamiento), un día de descanso, o una etiqueta personalizada como Cardio, Movilidad, o lo que quieras.",
+  "programsHelpDeloadTitle": "Semanas de descarga",
+  "programsHelpDeloadBody": "Marca una semana completa como deload (intensidad menor) para recuperación. La home mostrará el badge DESCARGA para recordarte bajar el ritmo.",
+  "programsHelpActivateTitle": "Activar un plan",
+  "programsHelpActivateBody": "Elige una fecha de inicio — normalmente un lunes. Cuando la última semana termina, el plan vuelve automáticamente a la semana 1.",
+  "programsHelpBadgesTitle": "Qué verás en la Home",
+  "programsHelpBadgesBody": "Cuando el día de hoy tiene una rutina planeada, la tarjeta de inicio muestra el badge PLANEADO. Las semanas de descarga muestran DESCARGA. La tarjeta sigue funcionando igual — toca Start para comenzar.",
+  "programsHelpOptionalTitle": "100% opcional",
+  "programsHelpOptionalBody": "Si ignoras los planes, la app funciona exactamente igual que antes. Los planes son un extra que puedes activar o desactivar en cualquier momento sin perder rutinas ni historial.",
+  "close": "Cerrar"
 }

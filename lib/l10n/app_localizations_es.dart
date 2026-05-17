@@ -770,4 +770,235 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get coachmarkProgressToggleBody =>
       'Alterna entre 1RM estimado y volumen total para ver tu progreso desde dos ángulos distintos.';
+
+  @override
+  String get trainingPlan => 'Plan de entrenamiento';
+
+  @override
+  String get trainingPlanSubtitle => 'Asigna rutinas por día de la semana';
+
+  @override
+  String get programsSubtitle =>
+      'Arma un plan multisemana con días de descanso';
+
+  @override
+  String get createProgram => 'Crear programa';
+
+  @override
+  String get editProgram => 'Editar programa';
+
+  @override
+  String get noProgramsYet => 'Aún no hay programas';
+
+  @override
+  String get programsEmptyBody =>
+      'Crea un plan semanal que asigne una rutina — o un día de descanso — a cada día de la semana.';
+
+  @override
+  String get deleteProgramTitle => '¿Eliminar programa?';
+
+  @override
+  String deleteProgramContent(String name) {
+    return 'Se eliminará permanentemente \'$name\'. Tus rutinas e historial no se tocan.';
+  }
+
+  @override
+  String get activateProgram => 'Activar';
+
+  @override
+  String get deactivateProgram => 'Desactivar';
+
+  @override
+  String programWeeksSummary(int weeks, int deload) {
+    String _temp0 = intl.Intl.pluralLogic(
+      weeks,
+      locale: localeName,
+      other: 'semanas',
+      one: 'semana',
+    );
+    return '$weeks $_temp0 · $deload deload';
+  }
+
+  @override
+  String get pickStartDate => 'Elige fecha de inicio';
+
+  @override
+  String get programName => 'Nombre';
+
+  @override
+  String get programNameHint => 'p. ej. Push/Pull/Legs de 4 semanas';
+
+  @override
+  String get weeksLabel => 'Semanas';
+
+  @override
+  String weeksCountValue(int weeks) {
+    String _temp0 = intl.Intl.pluralLogic(
+      weeks,
+      locale: localeName,
+      other: 'semanas',
+      one: 'semana',
+    );
+    return '$weeks $_temp0';
+  }
+
+  @override
+  String get scheduleLabel => 'Calendario';
+
+  @override
+  String get deloadWeekLabel => 'Descarga';
+
+  @override
+  String weekN(int n) {
+    return 'Semana $n';
+  }
+
+  @override
+  String get tapToAssign => 'Toca para asignar';
+
+  @override
+  String get routineRemoved => 'Rutina eliminada';
+
+  @override
+  String get save => 'Guardar';
+
+  @override
+  String get labelRest => 'Descanso';
+
+  @override
+  String get labelCardio => 'Cardio';
+
+  @override
+  String get labelMobility => 'Movilidad';
+
+  @override
+  String get labelStretch => 'Estiramiento';
+
+  @override
+  String editDayTitle(String day) {
+    return 'Editar $day';
+  }
+
+  @override
+  String get clear => 'Vaciar';
+
+  @override
+  String get pickRoutineSection => 'Elige una rutina';
+
+  @override
+  String get pickLabelSection => 'O usa una etiqueta';
+
+  @override
+  String get customLabelSection => 'Personalizado';
+
+  @override
+  String get customLabelHint => 'Escribe tu propia etiqueta…';
+
+  @override
+  String get applyCustomLabel => 'Usar etiqueta personalizada';
+
+  @override
+  String get weekdayMon => 'Lunes';
+
+  @override
+  String get weekdayTue => 'Martes';
+
+  @override
+  String get weekdayWed => 'Miércoles';
+
+  @override
+  String get weekdayThu => 'Jueves';
+
+  @override
+  String get weekdayFri => 'Viernes';
+
+  @override
+  String get weekdaySat => 'Sábado';
+
+  @override
+  String get weekdaySun => 'Domingo';
+
+  @override
+  String get weekdayMonShort => 'LUN';
+
+  @override
+  String get weekdayTueShort => 'MAR';
+
+  @override
+  String get weekdayWedShort => 'MIÉ';
+
+  @override
+  String get weekdayThuShort => 'JUE';
+
+  @override
+  String get weekdayFriShort => 'VIE';
+
+  @override
+  String get weekdaySatShort => 'SÁB';
+
+  @override
+  String get weekdaySunShort => 'DOM';
+
+  @override
+  String get plannedBadge => 'PLANEADO';
+
+  @override
+  String get plannedDeloadBadge => 'DESCARGA';
+
+  @override
+  String get todayLabel => 'HOY';
+
+  @override
+  String get restDayDescription => 'El día de hoy según tu programa activo.';
+
+  @override
+  String get programsHelpTooltip => 'Cómo funcionan los planes';
+
+  @override
+  String get programsHelpTitle => 'Cómo funcionan los planes';
+
+  @override
+  String get programsHelpIntroTitle => '¿Qué es un plan de entrenamiento?';
+
+  @override
+  String get programsHelpIntroBody =>
+      'Un calendario de varias semanas que asigna una rutina o un día de descanso a cada día. Útil para periodizar tipo Push/Pull/Legs o splits de 5 días.';
+
+  @override
+  String get programsHelpSlotsTitle => 'Los días son slots';
+
+  @override
+  String get programsHelpSlotsBody =>
+      'Cada día puede ser una rutina (tu entrenamiento), un día de descanso, o una etiqueta personalizada como Cardio, Movilidad, o lo que quieras.';
+
+  @override
+  String get programsHelpDeloadTitle => 'Semanas de descarga';
+
+  @override
+  String get programsHelpDeloadBody =>
+      'Marca una semana completa como deload (intensidad menor) para recuperación. La home mostrará el badge DESCARGA para recordarte bajar el ritmo.';
+
+  @override
+  String get programsHelpActivateTitle => 'Activar un plan';
+
+  @override
+  String get programsHelpActivateBody =>
+      'Elige una fecha de inicio — normalmente un lunes. Cuando la última semana termina, el plan vuelve automáticamente a la semana 1.';
+
+  @override
+  String get programsHelpBadgesTitle => 'Qué verás en la Home';
+
+  @override
+  String get programsHelpBadgesBody =>
+      'Cuando el día de hoy tiene una rutina planeada, la tarjeta de inicio muestra el badge PLANEADO. Las semanas de descarga muestran DESCARGA. La tarjeta sigue funcionando igual — toca Start para comenzar.';
+
+  @override
+  String get programsHelpOptionalTitle => '100% opcional';
+
+  @override
+  String get programsHelpOptionalBody =>
+      'Si ignoras los planes, la app funciona exactamente igual que antes. Los planes son un extra que puedes activar o desactivar en cualquier momento sin perder rutinas ni historial.';
+
+  @override
+  String get close => 'Cerrar';
 }

@@ -28,4 +28,24 @@ class SettingsRepository {
   Future<void> setLanguageCode(String code) => set('language_code', code);
   Future<String> getAccentColorId() async => (await get('accent_color')) ?? 'orange';
   Future<void> setAccentColorId(String id) => set('accent_color', id);
+
+  Future<String?> getActiveProgramId() => get('active_program_id');
+  Future<void> setActiveProgramId(String id) => set('active_program_id', id);
+  Future<void> clearActiveProgram() async {
+    final db = await DatabaseHelper.instance.database;
+    await db.delete(
+      'settings',
+      where: 'key IN (?, ?)',
+      whereArgs: ['active_program_id', 'active_program_start_date'],
+    );
+  }
+
+  Future<DateTime?> getActiveProgramStartDate() async {
+    final s = await get('active_program_start_date');
+    if (s == null || s.isEmpty) return null;
+    return DateTime.tryParse(s);
+  }
+
+  Future<void> setActiveProgramStartDate(DateTime date) =>
+      set('active_program_start_date', date.toIso8601String().substring(0, 10));
 }

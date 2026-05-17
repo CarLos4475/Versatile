@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/repository_providers.dart';
+import '../../../domain/entities/program.dart';
 import '../../../domain/entities/session.dart';
 import '../../../domain/entities/routine.dart';
+import '../../programs/view_models/programs_view_model.dart';
 import '../../routines/view_models/routines_view_model.dart';
 
 class SessionsAsyncNotifier extends AsyncNotifier<List<Session>> {
@@ -26,6 +28,19 @@ class HomeState {
   final Set<String> workoutDays;
   final Routine? nextRoutine;
   final int? nextRoutineDaysAgo; // null = never done
+  // When the active program assigns a non-routine label to today (Rest,
+  // Cardio, etc.), this carries it. Mutually exclusive with [nextRoutine]
+  // being a program-sourced routine — but a label still leaves [nextRoutine]
+  // null so the hero card switches to label mode.
+  final String? todayLabel;
+  // True when today's hero card came from the active program (either a
+  // routine slot or a label slot), so the UI can show a "planned" badge.
+  final bool plannedFromProgram;
+  // True when today falls inside a deload week of the active program.
+  final bool isDeloadWeek;
+  // True when an active program is running but today has no explicit slot,
+  // so we treat it as a rest day by default.
+  final bool isAutoRestDay;
 
   const HomeState({
     required this.sessions,
@@ -37,6 +52,10 @@ class HomeState {
     this.workoutDays = const {},
     this.nextRoutine,
     this.nextRoutineDaysAgo,
+    this.todayLabel,
+    this.plannedFromProgram = false,
+    this.isDeloadWeek = false,
+    this.isAutoRestDay = false,
   });
 }
 
@@ -97,6 +116,58 @@ final homeProvider = Provider<HomeState>((ref) {
     }
   }
 
+  // If a program is active and configures today, override the LRU suggestion.
+  // Days inside an active program with no explicit slot fall back to rest.
+  String? todayLabel;
+  bool plannedFromProgram = false;
+  bool isDeloadWeek = false;
+  bool isAutoRestDay = false;
+  final planned = ref.watch(todaysPlannedSlotProvider).value;
+  if (planned != null) {
+    isDeloadWeek = planned.isDeloadWeek;
+    if (planned.slot.kind == SlotKind.routine) {
+      Routine? programRoutine;
+      for (final r in routines) {
+        if (r.id == planned.slot.routineId) {
+          programRoutine = r;
+          break;
+        }
+      }
+      // If the referenced routine was deleted, fall back to LRU silently.
+      if (programRoutine != null) {
+        nextRoutine = programRoutine;
+        final lastDate = lastDoneMap[programRoutine.id];
+        nextRoutineDaysAgo = lastDate == null
+            ? null
+            : today.difference(DateTime.parse('${lastDate}T00:00:00')).inDays;
+        plannedFromProgram = true;
+      }
+    } else {
+      todayLabel = planned.slot.labelText;
+      nextRoutine = null;
+      nextRoutineDaysAgo = null;
+      plannedFromProgram = true;
+    }
+  } else {
+    final active = ref.watch(activeProgramProvider).value;
+    if (active != null) {
+      final start = DateTime(
+        active.startDate.year,
+        active.startDate.month,
+        active.startDate.day,
+      );
+      if (!today.isBefore(start)) {
+        final daysSinceStart = today.difference(start).inDays;
+        final weekIndex =
+            (daysSinceStart ~/ 7) % active.program.weeksCount;
+        isDeloadWeek = active.program.deloadWeeks.contains(weekIndex);
+        isAutoRestDay = true;
+        nextRoutine = null;
+        nextRoutineDaysAgo = null;
+      }
+    }
+  }
+
   return HomeState(
     sessions: sessions,
     routines: routines,
@@ -107,6 +178,10 @@ final homeProvider = Provider<HomeState>((ref) {
     workoutDays: allWorkoutDays,
     nextRoutine: nextRoutine,
     nextRoutineDaysAgo: nextRoutineDaysAgo,
+    todayLabel: todayLabel,
+    plannedFromProgram: plannedFromProgram,
+    isDeloadWeek: isDeloadWeek,
+    isAutoRestDay: isAutoRestDay,
   );
 });
 

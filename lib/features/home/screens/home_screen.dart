@@ -225,24 +225,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   delay: const Duration(milliseconds: 60),
                   child: KeyedSubtree(
                     key: _heroCardKey,
-                    child: nextRoutine != null
-                        ? _HeroCard(
-                            routineId: nextRoutine.id,
-                            routineName: nextRoutine.name,
-                            exerciseCount: nextRoutine.exercises.length,
-                            estimatedMin: nextRoutine.estimatedMinutes,
-                            lastDoneText: lastDoneText,
-                            mainExerciseId: heroInfo?.id,
-                            mainExerciseName: heroInfo?.exerciseName,
-                            mainPrKg: heroInfo?.pr,
+                    child: state.todayLabel != null
+                        ? _LabelHeroCard(
+                            label: state.todayLabel!,
+                            isDeload: state.isDeloadWeek,
                           )
-                        : _EmptyHeroCard(
-                            onCreateRoutine: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const CreateRoutineScreen(),
+                        : state.isAutoRestDay
+                        ? _LabelHeroCard(
+                            label: l10n.labelRest,
+                            isDeload: state.isDeloadWeek,
+                          )
+                        : nextRoutine != null
+                            ? _HeroCard(
+                                routineId: nextRoutine.id,
+                                routineName: nextRoutine.name,
+                                exerciseCount: nextRoutine.exercises.length,
+                                estimatedMin: nextRoutine.estimatedMinutes,
+                                lastDoneText: lastDoneText,
+                                mainExerciseId: heroInfo?.id,
+                                mainExerciseName: heroInfo?.exerciseName,
+                                mainPrKg: heroInfo?.pr,
+                                plannedFromProgram: state.plannedFromProgram,
+                                isDeload: state.isDeloadWeek,
+                              )
+                            : _EmptyHeroCard(
+                                onCreateRoutine: () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => const CreateRoutineScreen(),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
                   ),
                 ),
               ),
@@ -548,6 +560,8 @@ class _HeroCard extends StatelessWidget {
     this.mainExerciseId,
     this.mainExerciseName,
     this.mainPrKg,
+    this.plannedFromProgram = false,
+    this.isDeload = false,
   });
 
   final String routineId;
@@ -558,6 +572,8 @@ class _HeroCard extends StatelessWidget {
   final String? mainExerciseId;
   final String? mainExerciseName;
   final double? mainPrKg;
+  final bool plannedFromProgram;
+  final bool isDeload;
 
   @override
   Widget build(BuildContext context) {
@@ -634,6 +650,30 @@ class _HeroCard extends StatelessWidget {
                       letterSpacing: 0.06,
                     ),
                   ),
+                  if (plannedFromProgram) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 7,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.22),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        isDeload
+                            ? l10n.plannedDeloadBadge
+                            : l10n.plannedBadge,
+                        style: const TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 0.08,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
               const SizedBox(height: 10),
@@ -778,6 +818,102 @@ class _PrChip extends StatelessWidget {
               color: prKg != null
                   ? Colors.white
                   : Colors.white.withValues(alpha: 0.6),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LabelHeroCard extends StatelessWidget {
+  const _LabelHeroCard({required this.label, required this.isDeload});
+  final String label;
+  final bool isDeload;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      decoration: BoxDecoration(
+        color: context.colors.glassBg,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: context.colors.glassBorder, width: 0.5),
+        boxShadow: context.colors.glassShadow,
+      ),
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: context.colors.accentTint,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  isDeload ? l10n.plannedDeloadBadge : l10n.plannedBadge,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.08,
+                    color: context.colors.accentDeep,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                l10n.todayLabel,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: context.colors.ink400,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.06,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.spa_outlined,
+                size: 28,
+                color: isDark
+                    ? context.colors.ink700
+                    : context.colors.accentDeep,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: -0.6,
+                    height: 1.05,
+                    color: context.colors.ink900,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.restDayDescription,
+            style: TextStyle(
+              fontSize: 13,
+              color: context.colors.ink500,
+              height: 1.4,
             ),
           ),
         ],

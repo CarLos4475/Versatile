@@ -316,5 +316,103 @@
   "coachmarkRestTimerTitle": "Rest timer",
   "coachmarkRestTimerBody": "This counts down your rest between sets. Tap +15s to extend, or Skip to move on early.",
   "coachmarkProgressToggleTitle": "Switch metrics",
-  "coachmarkProgressToggleBody": "Toggle between estimated 1RM and total volume to track your progress from two different angles."
+  "coachmarkProgressToggleBody": "Toggle between estimated 1RM and total volume to track your progress from two different angles.",
+
+  "trainingPlan": "Training plan",
+  "trainingPlanSubtitle": "Schedule routines across the week",
+  "programsSubtitle": "Build a multi-week plan with rest days",
+  "createProgram": "Create program",
+  "editProgram": "Edit program",
+  "noProgramsYet": "No programs yet",
+  "programsEmptyBody": "Build a weekly plan that assigns a routine — or a rest day — to each day of the week.",
+  "deleteProgramTitle": "Delete program?",
+  "deleteProgramContent": "This will permanently delete '{name}'. Routines and history stay intact.",
+  "@deleteProgramContent": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "activateProgram": "Activate",
+  "deactivateProgram": "Deactivate",
+  "programWeeksSummary": "{weeks} {weeks, plural, one{week} other{weeks}} · {deload} deload",
+  "@programWeeksSummary": {
+    "placeholders": {
+      "weeks": { "type": "int" },
+      "deload": { "type": "int" }
+    }
+  },
+  "pickStartDate": "Pick a start date",
+  "programName": "Name",
+  "programNameHint": "e.g. 4-week Push/Pull/Legs",
+  "weeksLabel": "Weeks",
+  "weeksCountValue": "{weeks} {weeks, plural, one{week} other{weeks}}",
+  "@weeksCountValue": {
+    "placeholders": {
+      "weeks": { "type": "int" }
+    }
+  },
+  "scheduleLabel": "Schedule",
+  "deloadWeekLabel": "Deload",
+  "weekN": "Week {n}",
+  "@weekN": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "tapToAssign": "Tap to assign",
+  "routineRemoved": "Routine removed",
+  "save": "Save",
+
+  "labelRest": "Rest",
+  "labelCardio": "Cardio",
+  "labelMobility": "Mobility",
+  "labelStretch": "Stretching",
+  "editDayTitle": "Edit {day}",
+  "@editDayTitle": {
+    "placeholders": {
+      "day": { "type": "String" }
+    }
+  },
+  "clear": "Clear",
+  "pickRoutineSection": "Pick a routine",
+  "pickLabelSection": "Or use a label",
+  "customLabelSection": "Custom",
+  "customLabelHint": "Write your own label…",
+  "applyCustomLabel": "Use custom label",
+
+  "weekdayMon": "Monday",
+  "weekdayTue": "Tuesday",
+  "weekdayWed": "Wednesday",
+  "weekdayThu": "Thursday",
+  "weekdayFri": "Friday",
+  "weekdaySat": "Saturday",
+  "weekdaySun": "Sunday",
+  "weekdayMonShort": "MON",
+  "weekdayTueShort": "TUE",
+  "weekdayWedShort": "WED",
+  "weekdayThuShort": "THU",
+  "weekdayFriShort": "FRI",
+  "weekdaySatShort": "SAT",
+  "weekdaySunShort": "SUN",
+
+  "plannedBadge": "PLANNED",
+  "plannedDeloadBadge": "DELOAD",
+  "todayLabel": "TODAY",
+  "restDayDescription": "Today's slot from your active program.",
+
+  "programsHelpTooltip": "How training plans work",
+  "programsHelpTitle": "How training plans work",
+  "programsHelpIntroTitle": "What is a training plan?",
+  "programsHelpIntroBody": "A multi-week schedule that assigns a routine or a rest day to each weekday. Useful for periodization like Push/Pull/Legs or 5-day splits.",
+  "programsHelpSlotsTitle": "Days are slots",
+  "programsHelpSlotsBody": "Each day can be a routine (your workout), a rest day, or a custom label like Cardio, Mobility, or anything you want.",
+  "programsHelpDeloadTitle": "Deload weeks",
+  "programsHelpDeloadBody": "Mark a whole week as deload (lighter intensity) for recovery. The home will show a DELOAD badge so you remember to ease off.",
+  "programsHelpActivateTitle": "Activating a plan",
+  "programsHelpActivateBody": "Pick a start date — usually a Monday. When the last week ends, the plan loops back to week 1 automatically.",
+  "programsHelpBadgesTitle": "What you'll see on Home",
+  "programsHelpBadgesBody": "When today has a planned routine, the home card shows a PLANNED badge. Deload weeks show DELOAD. The card still works the same — tap Start to begin.",
+  "programsHelpOptionalTitle": "100% optional",
+  "programsHelpOptionalBody": "If you ignore plans, the app behaves exactly as before. Plans are an extra you can turn on or off any time without losing routines or history.",
+  "close": "Close"
 }

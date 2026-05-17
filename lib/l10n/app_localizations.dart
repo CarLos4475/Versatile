@@ -1531,6 +1531,408 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Toggle between estimated 1RM and total volume to track your progress from two different angles.'**
   String get coachmarkProgressToggleBody;
+
+  /// No description provided for @trainingPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Training plan'**
+  String get trainingPlan;
+
+  /// No description provided for @trainingPlanSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule routines across the week'**
+  String get trainingPlanSubtitle;
+
+  /// No description provided for @programsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Build a multi-week plan with rest days'**
+  String get programsSubtitle;
+
+  /// No description provided for @createProgram.
+  ///
+  /// In en, this message translates to:
+  /// **'Create program'**
+  String get createProgram;
+
+  /// No description provided for @editProgram.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit program'**
+  String get editProgram;
+
+  /// No description provided for @noProgramsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No programs yet'**
+  String get noProgramsYet;
+
+  /// No description provided for @programsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Build a weekly plan that assigns a routine — or a rest day — to each day of the week.'**
+  String get programsEmptyBody;
+
+  /// No description provided for @deleteProgramTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete program?'**
+  String get deleteProgramTitle;
+
+  /// No description provided for @deleteProgramContent.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete \'{name}\'. Routines and history stay intact.'**
+  String deleteProgramContent(String name);
+
+  /// No description provided for @activateProgram.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate'**
+  String get activateProgram;
+
+  /// No description provided for @deactivateProgram.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate'**
+  String get deactivateProgram;
+
+  /// No description provided for @programWeeksSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{weeks} {weeks, plural, one{week} other{weeks}} · {deload} deload'**
+  String programWeeksSummary(int weeks, int deload);
+
+  /// No description provided for @pickStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a start date'**
+  String get pickStartDate;
+
+  /// No description provided for @programName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get programName;
+
+  /// No description provided for @programNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 4-week Push/Pull/Legs'**
+  String get programNameHint;
+
+  /// No description provided for @weeksLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Weeks'**
+  String get weeksLabel;
+
+  /// No description provided for @weeksCountValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{weeks} {weeks, plural, one{week} other{weeks}}'**
+  String weeksCountValue(int weeks);
+
+  /// No description provided for @scheduleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule'**
+  String get scheduleLabel;
+
+  /// No description provided for @deloadWeekLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Deload'**
+  String get deloadWeekLabel;
+
+  /// No description provided for @weekN.
+  ///
+  /// In en, this message translates to:
+  /// **'Week {n}'**
+  String weekN(int n);
+
+  /// No description provided for @tapToAssign.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to assign'**
+  String get tapToAssign;
+
+  /// No description provided for @routineRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Routine removed'**
+  String get routineRemoved;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @labelRest.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest'**
+  String get labelRest;
+
+  /// No description provided for @labelCardio.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardio'**
+  String get labelCardio;
+
+  /// No description provided for @labelMobility.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobility'**
+  String get labelMobility;
+
+  /// No description provided for @labelStretch.
+  ///
+  /// In en, this message translates to:
+  /// **'Stretching'**
+  String get labelStretch;
+
+  /// No description provided for @editDayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {day}'**
+  String editDayTitle(String day);
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// No description provided for @pickRoutineSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a routine'**
+  String get pickRoutineSection;
+
+  /// No description provided for @pickLabelSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Or use a label'**
+  String get pickLabelSection;
+
+  /// No description provided for @customLabelSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get customLabelSection;
+
+  /// No description provided for @customLabelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your own label…'**
+  String get customLabelHint;
+
+  /// No description provided for @applyCustomLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Use custom label'**
+  String get applyCustomLabel;
+
+  /// No description provided for @weekdayMon.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get weekdayMon;
+
+  /// No description provided for @weekdayTue.
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesday'**
+  String get weekdayTue;
+
+  /// No description provided for @weekdayWed.
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesday'**
+  String get weekdayWed;
+
+  /// No description provided for @weekdayThu.
+  ///
+  /// In en, this message translates to:
+  /// **'Thursday'**
+  String get weekdayThu;
+
+  /// No description provided for @weekdayFri.
+  ///
+  /// In en, this message translates to:
+  /// **'Friday'**
+  String get weekdayFri;
+
+  /// No description provided for @weekdaySat.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get weekdaySat;
+
+  /// No description provided for @weekdaySun.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get weekdaySun;
+
+  /// No description provided for @weekdayMonShort.
+  ///
+  /// In en, this message translates to:
+  /// **'MON'**
+  String get weekdayMonShort;
+
+  /// No description provided for @weekdayTueShort.
+  ///
+  /// In en, this message translates to:
+  /// **'TUE'**
+  String get weekdayTueShort;
+
+  /// No description provided for @weekdayWedShort.
+  ///
+  /// In en, this message translates to:
+  /// **'WED'**
+  String get weekdayWedShort;
+
+  /// No description provided for @weekdayThuShort.
+  ///
+  /// In en, this message translates to:
+  /// **'THU'**
+  String get weekdayThuShort;
+
+  /// No description provided for @weekdayFriShort.
+  ///
+  /// In en, this message translates to:
+  /// **'FRI'**
+  String get weekdayFriShort;
+
+  /// No description provided for @weekdaySatShort.
+  ///
+  /// In en, this message translates to:
+  /// **'SAT'**
+  String get weekdaySatShort;
+
+  /// No description provided for @weekdaySunShort.
+  ///
+  /// In en, this message translates to:
+  /// **'SUN'**
+  String get weekdaySunShort;
+
+  /// No description provided for @plannedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'PLANNED'**
+  String get plannedBadge;
+
+  /// No description provided for @plannedDeloadBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'DELOAD'**
+  String get plannedDeloadBadge;
+
+  /// No description provided for @todayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TODAY'**
+  String get todayLabel;
+
+  /// No description provided for @restDayDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s slot from your active program.'**
+  String get restDayDescription;
+
+  /// No description provided for @programsHelpTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'How training plans work'**
+  String get programsHelpTooltip;
+
+  /// No description provided for @programsHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How training plans work'**
+  String get programsHelpTitle;
+
+  /// No description provided for @programsHelpIntroTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What is a training plan?'**
+  String get programsHelpIntroTitle;
+
+  /// No description provided for @programsHelpIntroBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A multi-week schedule that assigns a routine or a rest day to each weekday. Useful for periodization like Push/Pull/Legs or 5-day splits.'**
+  String get programsHelpIntroBody;
+
+  /// No description provided for @programsHelpSlotsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Days are slots'**
+  String get programsHelpSlotsTitle;
+
+  /// No description provided for @programsHelpSlotsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Each day can be a routine (your workout), a rest day, or a custom label like Cardio, Mobility, or anything you want.'**
+  String get programsHelpSlotsBody;
+
+  /// No description provided for @programsHelpDeloadTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Deload weeks'**
+  String get programsHelpDeloadTitle;
+
+  /// No description provided for @programsHelpDeloadBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark a whole week as deload (lighter intensity) for recovery. The home will show a DELOAD badge so you remember to ease off.'**
+  String get programsHelpDeloadBody;
+
+  /// No description provided for @programsHelpActivateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Activating a plan'**
+  String get programsHelpActivateTitle;
+
+  /// No description provided for @programsHelpActivateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a start date — usually a Monday. When the last week ends, the plan loops back to week 1 automatically.'**
+  String get programsHelpActivateBody;
+
+  /// No description provided for @programsHelpBadgesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What you\'ll see on Home'**
+  String get programsHelpBadgesTitle;
+
+  /// No description provided for @programsHelpBadgesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'When today has a planned routine, the home card shows a PLANNED badge. Deload weeks show DELOAD. The card still works the same — tap Start to begin.'**
+  String get programsHelpBadgesBody;
+
+  /// No description provided for @programsHelpOptionalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'100% optional'**
+  String get programsHelpOptionalTitle;
+
+  /// No description provided for @programsHelpOptionalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'If you ignore plans, the app behaves exactly as before. Plans are an extra you can turn on or off any time without losing routines or history.'**
+  String get programsHelpOptionalBody;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
 }
 
 class _AppLocalizationsDelegate

@@ -17,7 +17,7 @@ class DatabaseHelper {
     final filePath = p.join(dbPath, 'versatile.db');
     return openDatabase(
       filePath,
-      version: 6,
+      version: 7,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       onConfigure: (db) async => db.execute('PRAGMA foreign_keys = ON'),
@@ -72,6 +72,33 @@ class DatabaseHelper {
       } on DatabaseException catch (e) {
         if (!e.toString().contains('duplicate column')) rethrow;
       }
+    }
+    if (oldVersion < 7) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS programs (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          color_value INTEGER NOT NULL,
+          icon_code INTEGER NOT NULL DEFAULT 58713,
+          weeks_count INTEGER NOT NULL,
+          deload_weeks TEXT NOT NULL DEFAULT '',
+          created_at TEXT NOT NULL
+        )
+      ''');
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS program_slots (
+          id TEXT PRIMARY KEY,
+          program_id TEXT NOT NULL,
+          week_index INTEGER NOT NULL,
+          weekday INTEGER NOT NULL,
+          slot_kind TEXT NOT NULL,
+          routine_id TEXT,
+          label_text TEXT,
+          UNIQUE(program_id, week_index, weekday),
+          FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE CASCADE,
+          FOREIGN KEY (routine_id) REFERENCES routines(id) ON DELETE SET NULL
+        )
+      ''');
     }
   }
 
@@ -159,6 +186,33 @@ class DatabaseHelper {
       'CREATE TABLE workout_log (date TEXT PRIMARY KEY)',
     );
 
+    await db.execute('''
+      CREATE TABLE programs (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        color_value INTEGER NOT NULL,
+        icon_code INTEGER NOT NULL DEFAULT 58713,
+        weeks_count INTEGER NOT NULL,
+        deload_weeks TEXT NOT NULL DEFAULT '',
+        created_at TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE program_slots (
+        id TEXT PRIMARY KEY,
+        program_id TEXT NOT NULL,
+        week_index INTEGER NOT NULL,
+        weekday INTEGER NOT NULL,
+        slot_kind TEXT NOT NULL,
+        routine_id TEXT,
+        label_text TEXT,
+        UNIQUE(program_id, week_index, weekday),
+        FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE CASCADE,
+        FOREIGN KEY (routine_id) REFERENCES routines(id) ON DELETE SET NULL
+      )
+    ''');
+
     await _seed(db);
   }
 
@@ -243,6 +297,12 @@ class DatabaseHelper {
       await txn.delete('sessions');
       await txn.delete('exercises', where: 'is_custom = ?', whereArgs: [1]);
       await txn.delete('workout_log');
+      await txn.delete('programs');
+      await txn.delete(
+        'settings',
+        where: 'key IN (?, ?)',
+        whereArgs: ['active_program_id', 'active_program_start_date'],
+      );
     });
   }
 }

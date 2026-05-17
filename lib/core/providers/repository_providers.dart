@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/exercise_repository.dart';
+import '../../data/repositories/program_repository.dart';
 import '../../data/repositories/routine_repository.dart';
 import '../../data/repositories/session_repository.dart';
 import '../../data/repositories/settings_repository.dart';
@@ -26,6 +27,10 @@ final settingsRepositoryProvider = Provider<SettingsRepository>(
 
 final workoutLogRepositoryProvider = Provider<WorkoutLogRepository>(
   (_) => WorkoutLogRepository(),
+);
+
+final programRepositoryProvider = Provider<ProgramRepository>(
+  (_) => ProgramRepository(),
 );
 
 final userNameProvider = FutureProvider<String>((ref) async {

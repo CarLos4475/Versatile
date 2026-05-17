@@ -9,6 +9,10 @@
 
 The memory file `project_pending_tasks.md` (indexed in `MEMORY.md`) tracks postponed work. When the user confirms that a pending task is done ("ya quedó listo", "ya está", etc.), **delete that entry from `project_pending_tasks.md`** immediately. If the file ends up empty, remove the file itself and its line from `MEMORY.md`. Do not leave stale pendings — they must reflect only work that is still outstanding.
 
+## DOCUMENTACION folder
+
+The `DOCUMENTACION/` folder contains long-form feature docs (architecture, database, active workout, programs, etc.). **Do NOT read these files unless the user explicitly asks** ("revisa la documentación", "lee DOCUMENTACION/X", etc.). For day-to-day tasks, rely on `MEMORY.md` and reading the actual code — the docs are reference material for production-ready documentation work, not session context. Loading them eagerly wastes the context window.
+
 ## Architecture
 
 - **State management**: Riverpod (`flutter_riverpod`). Providers in `core/providers/`, view models per feature in `features/*/view_models/`.

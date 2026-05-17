@@ -20,6 +20,7 @@ import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../exercises/view_models/exercises_view_model.dart';
 import '../../home/view_models/home_view_model.dart';
+import '../../programs/screens/programs_screen.dart';
 import '../../routines/view_models/routines_view_model.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -336,14 +337,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
                       delay: const Duration(milliseconds: 60),
-                      child: GlassContainer(
-                        radius: 20,
-                        child: _SettingRow(
-                          icon: Icons.person_outline,
-                          title: l10n.userName,
-                          value: (userName == 'there' || userName.isEmpty) ? '' : userName,
-                          onTap: _changeName,
-                        ),
+                      child: Column(
+                        children: [
+                          GlassContainer(
+                            radius: 20,
+                            child: _SettingRow(
+                              icon: Icons.person_outline,
+                              title: l10n.userName,
+                              value: (userName == 'there' || userName.isEmpty) ? '' : userName,
+                              onTap: _changeName,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          GlassContainer(
+                            radius: 20,
+                            child: _SettingRow(
+                              icon: Icons.calendar_month_outlined,
+                              title: l10n.trainingPlan,
+                              subtitle: l10n.trainingPlanSubtitle,
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const ProgramsScreen(),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
