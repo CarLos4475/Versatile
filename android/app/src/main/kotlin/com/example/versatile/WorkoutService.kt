@@ -1,6 +1,8 @@
 package com.example.versatile
 
 import android.app.*
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -15,6 +17,7 @@ class WorkoutService : Service() {
     private var startedAtMs = 0L
     private var routineId: String? = null
     private var routineName: String? = null
+    private var routineColor: Int = 0
     private var subtitle: String? = null
     private val channelId = "workout_channel"
     private val notifId = 1001
@@ -25,6 +28,7 @@ class WorkoutService : Service() {
         const val KEY_STARTED_AT    = "startedAt"
         const val KEY_ROUTINE_ID    = "routineId"
         const val KEY_ROUTINE_NAME  = "routineName"
+        const val KEY_ROUTINE_COLOR = "routineColor"
         const val KEY_SUBTITLE      = "subtitle"
         const val KEY_PROGRESS      = "progress"
         const val ACTION_OPEN       = "com.example.versatile.ACTION_OPEN_WORKOUT"
@@ -37,6 +41,25 @@ class WorkoutService : Service() {
         fun clearPrefs(context: Context) {
             context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 .edit().clear().apply()
+            notifyWidgets(context)
+        }
+
+        fun notifyWidgets(context: Context) {
+            val manager = AppWidgetManager.getInstance(context)
+            val targets = listOf(
+                VersatileWidgetProviderMedium::class.java,
+                VersatileWidgetProviderCompact::class.java,
+            )
+            for (cls in targets) {
+                val component = ComponentName(context, cls)
+                val ids = manager.getAppWidgetIds(component)
+                if (ids.isEmpty()) continue
+                val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
+                    setComponent(component)
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+                }
+                context.sendBroadcast(intent)
+            }
         }
     }
 
@@ -64,20 +87,23 @@ class WorkoutService : Service() {
             startedAtMs  = if (ts > 0L) ts else System.currentTimeMillis()
             routineId    = intent.getStringExtra(KEY_ROUTINE_ID)
             routineName  = intent.getStringExtra(KEY_ROUTINE_NAME)
+            routineColor = intent.getIntExtra(KEY_ROUTINE_COLOR, 0)
             subtitle     = intent.getStringExtra(KEY_SUBTITLE)
 
             prefs.edit()
                 .putLong(KEY_STARTED_AT, startedAtMs)
                 .putString(KEY_ROUTINE_ID, routineId)
                 .putString(KEY_ROUTINE_NAME, routineName)
+                .putInt(KEY_ROUTINE_COLOR, routineColor)
                 .putString(KEY_SUBTITLE, subtitle)
                 .apply()
         } else {
             // Restarted by system — restore from prefs
-            startedAtMs = prefs.getLong(KEY_STARTED_AT, 0L)
-            routineId   = prefs.getString(KEY_ROUTINE_ID, null)
-            routineName = prefs.getString(KEY_ROUTINE_NAME, null)
-            subtitle    = prefs.getString(KEY_SUBTITLE, null)
+            startedAtMs  = prefs.getLong(KEY_STARTED_AT, 0L)
+            routineId    = prefs.getString(KEY_ROUTINE_ID, null)
+            routineName  = prefs.getString(KEY_ROUTINE_NAME, null)
+            routineColor = prefs.getInt(KEY_ROUTINE_COLOR, 0)
+            subtitle     = prefs.getString(KEY_SUBTITLE, null)
 
             if (startedAtMs == 0L || routineId.isNullOrEmpty()) {
                 stopSelf()
@@ -96,6 +122,7 @@ class WorkoutService : Service() {
 
         handler.removeCallbacks(tick)
         handler.post(tick)
+        notifyWidgets(this)
         return START_STICKY
     }
 

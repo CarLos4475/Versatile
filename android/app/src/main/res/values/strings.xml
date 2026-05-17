@@ -10,4 +10,13 @@
     <string name="rest_alert_channel_desc">Rest timer alerts</string>
     <string name="rest_complete">Rest complete!</string>
     <string name="next_exercise">Next: %1$s</string>
+    <string name="widget_today_workout">Today\'s workout</string>
+    <string name="widget_in_progress">In progress</string>
+    <string name="widget_start">Start</string>
+    <string name="widget_no_routine">No routines yet</string>
+    <string name="widget_create">Create</string>
+    <string name="widget_rest_day">Rest day</string>
+    <string name="widget_today_label">TODAY</string>
+    <string name="widget_medium_label">Versatile workout (banner)</string>
+    <string name="widget_compact_label">Versatile workout (compact)</string>
 </resources>

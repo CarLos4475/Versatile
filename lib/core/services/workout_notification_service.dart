@@ -19,11 +19,13 @@ class WorkoutNotificationService {
 
   /// Starts the foreground workout service.
   /// [routineName] is shown in the notification title.
+  /// [routineColor] (ARGB int) tints the home-screen widget while active.
   /// [subtitle] is the localized motivational text.
   static Future<void> start({
     required DateTime startedAt,
     required String routineId,
     String? routineName,
+    int? routineColor,
     String? subtitle,
   }) async {
     try {
@@ -31,6 +33,7 @@ class WorkoutNotificationService {
         'startedAt': startedAt.millisecondsSinceEpoch,
         'routineId': routineId,
         'routineName': routineName ?? '',
+        'routineColor': routineColor ?? 0,
         'subtitle': subtitle ?? '',
       });
     } catch (_) {}

@@ -17,10 +17,14 @@ import 'features/history/screens/history_screen.dart';
 import 'features/active_workout/screens/active_workout_screen.dart';
 import 'features/active_workout/view_models/active_workout_view_model.dart';
 import 'features/exercises/view_models/exercises_view_model.dart';
+import 'features/home/view_models/home_view_model.dart';
 import 'features/splash/screens/splash_screen.dart';
 import 'shared/widgets/coachmark_overlay.dart';
 import 'shared/widgets/motion.dart';
 import 'core/providers/repository_providers.dart';
+import 'core/services/widget_sync_service.dart';
+import 'core/theme/accent_colors.dart';
+import 'core/utils/l10n_utils.dart';
 
 class VersatileApp extends ConsumerWidget {
   const VersatileApp({super.key});
@@ -470,12 +474,43 @@ class _NavBarButton extends StatelessWidget {
 
 // ─── App wrapper ───────────────────────────────────────────────────────────────
 
-class AppWrapper extends StatelessWidget {
+class AppWrapper extends ConsumerWidget {
   const AppWrapper({super.key, required this.child});
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => child;
+  Widget build(BuildContext context, WidgetRef ref) {
+    String? localizedTodayLabel(String? raw) {
+      if (raw == null || raw.isEmpty) return raw;
+      return localizeSlotLabel(context, raw);
+    }
+    ref.listen<HomeState>(homeProvider, (prev, next) {
+      final accentChanged = prev == null;
+      final routineChanged =
+          prev?.nextRoutine?.id != next.nextRoutine?.id ||
+              prev?.nextRoutine?.name != next.nextRoutine?.name ||
+              prev?.nextRoutine?.colorValue != next.nextRoutine?.colorValue;
+      final labelChanged = prev?.todayLabel != next.todayLabel;
+      if (accentChanged || routineChanged || labelChanged) {
+        final accent = ref.read(accentProvider);
+        WidgetSyncService.sync(
+          nextRoutine: next.nextRoutine,
+          todayLabel: localizedTodayLabel(next.todayLabel),
+          accentArgb: accent.color.toARGB32(),
+        );
+      }
+    });
+    ref.listen<AccentOption>(accentProvider, (prev, next) {
+      if (prev?.color == next.color) return;
+      final state = ref.read(homeProvider);
+      WidgetSyncService.sync(
+        nextRoutine: state.nextRoutine,
+        todayLabel: localizedTodayLabel(state.todayLabel),
+        accentArgb: next.color.toARGB32(),
+      );
+    });
+    return child;
+  }
 }
 
 // ─── Active workout overlay — liquid glass ─────────────────────────────────────

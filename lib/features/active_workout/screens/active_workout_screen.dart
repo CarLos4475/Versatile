@@ -124,13 +124,14 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
       if (widget.restoredProgressJson != null) {
         notifier.restoreProgress(widget.restoredProgressJson!);
       }
+      final activeRoutine = ref
+          .read(activeWorkoutProvider(widget.routineId))
+          .routine;
       WorkoutNotificationService.start(
         startedAt: notifier.workoutStartedAt,
         routineId: widget.routineId,
-        routineName: ref
-            .read(activeWorkoutProvider(widget.routineId))
-            .routine
-            .name,
+        routineName: activeRoutine.name,
+        routineColor: activeRoutine.colorValue,
         subtitle: AppLocalizations.of(context)!.notificationSubtitle,
       );
     });

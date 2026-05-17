@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/program.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../shared/widgets/glass_button.dart';
@@ -67,12 +68,21 @@ class _SlotEditorSheet extends ConsumerStatefulWidget {
 
 class _SlotEditorSheetState extends ConsumerState<_SlotEditorSheet> {
   final _customCtrl = TextEditingController();
+  bool _customCtrlSeeded = false;
 
   @override
-  void initState() {
-    super.initState();
-    if (widget.current?.kind == SlotKind.label) {
-      _customCtrl.text = widget.current?.labelText ?? '';
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Seed the custom-label text field once we have a BuildContext for l10n.
+    // Preset labels (Rest/Cardio/Mobility/Stretching) show up as a selected
+    // chip instead of pre-filling the free-text input.
+    if (_customCtrlSeeded) return;
+    _customCtrlSeeded = true;
+    final saved = widget.current?.labelText ?? '';
+    if (widget.current?.kind == SlotKind.label &&
+        saved.isNotEmpty &&
+        !isPresetSlotLabel(context, saved)) {
+      _customCtrl.text = saved;
     }
   }
 
@@ -254,13 +264,20 @@ class _SlotEditorSheetState extends ConsumerState<_SlotEditorSheet> {
                       runSpacing: 8,
                       children: presetLabels
                           .map(
-                            (label) => _LabelChip(
-                              label: label,
-                              selected: widget.current?.kind == SlotKind.label &&
-                                  widget.current?.labelText == label,
-                              onTap: () => Navigator.of(context)
-                                  .pop(SlotEditResult.label(label)),
-                            ),
+                            (label) {
+                              final savedLabel = widget.current?.labelText;
+                              final isSelected =
+                                  widget.current?.kind == SlotKind.label &&
+                                      savedLabel != null &&
+                                      localizeSlotLabel(context, savedLabel) ==
+                                          label;
+                              return _LabelChip(
+                                label: label,
+                                selected: isSelected,
+                                onTap: () => Navigator.of(context)
+                                    .pop(SlotEditResult.label(label)),
+                              );
+                            },
                           )
                           .toList(),
                     ),

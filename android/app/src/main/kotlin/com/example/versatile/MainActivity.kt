@@ -49,15 +49,17 @@ class MainActivity : FlutterActivity() {
         ).setMethodCallHandler { call, result ->
             when (call.method) {
                 "startWorkoutService" -> {
-                    val startedAt   = (call.argument<Any>("startedAt") as? Number)?.toLong() ?: 0L
-                    val routineId   = call.argument<String>("routineId") ?: ""
-                    val routineName = call.argument<String>("routineName") ?: ""
-                    val subtitle    = call.argument<String>("subtitle") ?: ""
+                    val startedAt    = (call.argument<Any>("startedAt") as? Number)?.toLong() ?: 0L
+                    val routineId    = call.argument<String>("routineId") ?: ""
+                    val routineName  = call.argument<String>("routineName") ?: ""
+                    val routineColor = (call.argument<Any>("routineColor") as? Number)?.toInt() ?: 0
+                    val subtitle     = call.argument<String>("subtitle") ?: ""
                     val intent = Intent(this, WorkoutService::class.java).apply {
-                        putExtra(WorkoutService.KEY_STARTED_AT,   startedAt)
-                        putExtra(WorkoutService.KEY_ROUTINE_ID,   routineId)
-                        putExtra(WorkoutService.KEY_ROUTINE_NAME, routineName)
-                        putExtra(WorkoutService.KEY_SUBTITLE,     subtitle)
+                        putExtra(WorkoutService.KEY_STARTED_AT,    startedAt)
+                        putExtra(WorkoutService.KEY_ROUTINE_ID,    routineId)
+                        putExtra(WorkoutService.KEY_ROUTINE_NAME,  routineName)
+                        putExtra(WorkoutService.KEY_ROUTINE_COLOR, routineColor)
+                        putExtra(WorkoutService.KEY_SUBTITLE,      subtitle)
                     }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         startForegroundService(intent)
@@ -81,20 +83,22 @@ class MainActivity : FlutterActivity() {
                     val prefs = getSharedPreferences(
                         WorkoutService.PREFS_NAME, Context.MODE_PRIVATE
                     )
-                    val routineId   = prefs.getString(WorkoutService.KEY_ROUTINE_ID,   null)
-                    val startedAt   = prefs.getLong(WorkoutService.KEY_STARTED_AT,     0L)
-                    val progress    = prefs.getString(WorkoutService.KEY_PROGRESS,     null)
-                    val routineName = prefs.getString(WorkoutService.KEY_ROUTINE_NAME, null)
+                    val routineId    = prefs.getString(WorkoutService.KEY_ROUTINE_ID,   null)
+                    val startedAt    = prefs.getLong(WorkoutService.KEY_STARTED_AT,     0L)
+                    val progress     = prefs.getString(WorkoutService.KEY_PROGRESS,     null)
+                    val routineName  = prefs.getString(WorkoutService.KEY_ROUTINE_NAME, null)
+                    val routineColor = prefs.getInt(WorkoutService.KEY_ROUTINE_COLOR,   0)
                     if (routineId.isNullOrEmpty() || startedAt == 0L) {
                         result.success(null)
                     } else {
                         if (!WorkoutService.isRunning(this)) {
                             val subtitle = prefs.getString(WorkoutService.KEY_SUBTITLE, "")
                             val intent = Intent(this, WorkoutService::class.java).apply {
-                                putExtra(WorkoutService.KEY_STARTED_AT,   startedAt)
-                                putExtra(WorkoutService.KEY_ROUTINE_ID,   routineId)
-                                putExtra(WorkoutService.KEY_ROUTINE_NAME, routineName ?: "")
-                                putExtra(WorkoutService.KEY_SUBTITLE,     subtitle ?: "")
+                                putExtra(WorkoutService.KEY_STARTED_AT,    startedAt)
+                                putExtra(WorkoutService.KEY_ROUTINE_ID,    routineId)
+                                putExtra(WorkoutService.KEY_ROUTINE_NAME,  routineName ?: "")
+                                putExtra(WorkoutService.KEY_ROUTINE_COLOR, routineColor)
+                                putExtra(WorkoutService.KEY_SUBTITLE,      subtitle ?: "")
                             }
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 startForegroundService(intent)

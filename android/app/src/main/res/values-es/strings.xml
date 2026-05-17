@@ -10,4 +10,13 @@
     <string name="rest_alert_channel_desc">Alertas del temporizador de descanso</string>
     <string name="rest_complete">¡Descanso completo!</string>
     <string name="next_exercise">Siguiente: %1$s</string>
+    <string name="widget_today_workout">Hoy entrenas</string>
+    <string name="widget_in_progress">En curso</string>
+    <string name="widget_start">Empezar</string>
+    <string name="widget_no_routine">Sin rutinas</string>
+    <string name="widget_create">Crear</string>
+    <string name="widget_rest_day">Día de descanso</string>
+    <string name="widget_today_label">HOY</string>
+    <string name="widget_medium_label">Entrenamiento Versatile (banner)</string>
+    <string name="widget_compact_label">Entrenamiento Versatile (compacto)</string>
 </resources>

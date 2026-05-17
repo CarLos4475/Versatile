@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/program.dart';
 import '../../../shared/widgets/glass_button.dart';
 import '../../../shared/widgets/glass_container.dart';
@@ -497,7 +498,8 @@ class _DayRow extends StatelessWidget {
       trailingColor = r != null ? colors.ink900 : colors.ink400;
       leading = Icons.fitness_center;
     } else {
-      trailing = slot!.labelText ?? '';
+      final raw = slot!.labelText ?? '';
+      trailing = raw.isEmpty ? '' : localizeSlotLabel(context, raw);
       trailingColor = colors.ink700;
       leading = Icons.coffee_outlined;
     }
