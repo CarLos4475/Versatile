@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/entities/monthly_recap.dart';
 import '../../../domain/entities/session.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/glass_button.dart';
@@ -17,8 +18,16 @@ import '../../recap/view_models/recap_view_model.dart';
 import '../widgets/shareable_session_card.dart';
 
 class ShareSessionScreen extends ConsumerStatefulWidget {
-  const ShareSessionScreen({super.key, required this.session});
+  const ShareSessionScreen({
+    super.key,
+    required this.session,
+    this.precomputedPR,
+  });
   final Session session;
+  /// If supplied, used directly instead of recomputing via [sessionPRProvider].
+  /// Set when reaching this screen from the finish-workout flow, where the
+  /// active workout already detected the PR in realtime.
+  final RecapPersonalRecord? precomputedPR;
 
   @override
   ConsumerState<ShareSessionScreen> createState() => _ShareSessionScreenState();
@@ -91,9 +100,10 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
                                 key: _boundaryKey,
                                 child: ShareableSessionCard(
                                   session: widget.session,
-                                  pr: ref.watch(
-                                    sessionPRProvider(widget.session.id),
-                                  ),
+                                  pr: widget.precomputedPR ??
+                                      ref.watch(
+                                        sessionPRProvider(widget.session.id),
+                                      ),
                                 ),
                               ),
                             ),

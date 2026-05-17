@@ -1151,7 +1151,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Stay focused — tap to return'**
+  /// **'Stay focused. Tap to return'**
   String get notificationSubtitle;
 
   /// No description provided for @accentColor.
@@ -1421,7 +1421,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingPage1Body.
   ///
   /// In en, this message translates to:
-  /// **'A gym tracker that\'s fast, private, and built for you — no logins, no cloud, just your lifts.'**
+  /// **'A gym tracker that\'s fast, private, and built for you. No logins, no cloud, just your lifts.'**
   String get onboardingPage1Body;
 
   /// No description provided for @onboardingPage2Title.
@@ -1457,7 +1457,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingPage4Body.
   ///
   /// In en, this message translates to:
-  /// **'No internet. No account. No subscription. Everything stays on your phone — always.'**
+  /// **'No internet. No account. No subscription. Everything stays on your phone, always.'**
   String get onboardingPage4Body;
 
   /// No description provided for @onboardingNameTitle.
@@ -1469,7 +1469,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingNameSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Optional — you can always skip this.'**
+  /// **'Optional. You can always skip this.'**
   String get onboardingNameSubtitle;
 
   /// No description provided for @onboardingNameHint.
@@ -1571,7 +1571,7 @@ abstract class AppLocalizations {
   /// No description provided for @programsEmptyBody.
   ///
   /// In en, this message translates to:
-  /// **'Build a weekly plan that assigns a routine — or a rest day — to each day of the week.'**
+  /// **'Build a weekly plan that assigns a routine, or a rest day, to each day of the week.'**
   String get programsEmptyBody;
 
   /// No description provided for @deleteProgramTitle.
@@ -1901,7 +1901,7 @@ abstract class AppLocalizations {
   /// No description provided for @programsHelpActivateBody.
   ///
   /// In en, this message translates to:
-  /// **'Pick a start date — usually a Monday. When the last week ends, the plan loops back to week 1 automatically.'**
+  /// **'Pick a start date, usually a Monday. When the last week ends, the plan loops back to week 1 automatically.'**
   String get programsHelpActivateBody;
 
   /// No description provided for @programsHelpBadgesTitle.
@@ -1913,7 +1913,7 @@ abstract class AppLocalizations {
   /// No description provided for @programsHelpBadgesBody.
   ///
   /// In en, this message translates to:
-  /// **'When today has a planned routine, the home card shows a PLANNED badge. Deload weeks show DELOAD. The card still works the same — tap Start to begin.'**
+  /// **'When today has a planned routine, the home card shows a PLANNED badge. Deload weeks show DELOAD. The card still works the same. Tap Start to begin.'**
   String get programsHelpBadgesBody;
 
   /// No description provided for @programsHelpOptionalTitle.
@@ -2029,6 +2029,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep showing up.'**
   String get recapOutroBody;
+
+  /// No description provided for @recapBalanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Movement balance'**
+  String get recapBalanceTitle;
+
+  /// No description provided for @recapBalanceBody.
+  ///
+  /// In en, this message translates to:
+  /// **'How you split your work this month.'**
+  String get recapBalanceBody;
+
+  /// No description provided for @deloadBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for a deload?'**
+  String get deloadBannerTitle;
+
+  /// No description provided for @deloadBannerBodyStagnation.
+  ///
+  /// In en, this message translates to:
+  /// **'Several lifts haven\'t progressed in 3+ weeks.'**
+  String get deloadBannerBodyStagnation;
+
+  /// No description provided for @deloadBannerBodyVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Your weekly volume has dropped recently.'**
+  String get deloadBannerBodyVolume;
+
+  /// No description provided for @deloadBannerBodyBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress has stalled and volume is down. A lighter week could help.'**
+  String get deloadBannerBodyBoth;
+
+  /// No description provided for @deloadBannerCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Open program'**
+  String get deloadBannerCta;
+
+  /// No description provided for @deloadBannerDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get deloadBannerDismiss;
+
+  /// No description provided for @categoryAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get categoryAll;
+
+  /// No description provided for @categoryPush.
+  ///
+  /// In en, this message translates to:
+  /// **'Push'**
+  String get categoryPush;
+
+  /// No description provided for @categoryPull.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull'**
+  String get categoryPull;
+
+  /// No description provided for @categoryLegs.
+  ///
+  /// In en, this message translates to:
+  /// **'Legs'**
+  String get categoryLegs;
+
+  /// No description provided for @categoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get categoryOther;
 
   /// No description provided for @recapEntryCardTitle.
   ///

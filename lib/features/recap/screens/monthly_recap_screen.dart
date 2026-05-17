@@ -2,15 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../domain/entities/monthly_recap.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/motion.dart';
 import '../view_models/recap_view_model.dart';
+import '../widgets/animated_aurora_background.dart';
 import '../widgets/recap_page_dots.dart';
 import '../widgets/recap_slides.dart';
 
 class MonthlyRecapScreen extends ConsumerStatefulWidget {
-  const MonthlyRecapScreen({super.key, required this.monthKey});
+  const MonthlyRecapScreen({
+    super.key,
+    required this.monthKey,
+    this.recapOverride,
+  });
   final MonthKey monthKey;
+  /// Debug-only: when provided, bypasses the provider lookup so a fixture
+  /// recap can be previewed without altering session history or device date.
+  final MonthlyRecap? recapOverride;
 
   @override
   ConsumerState<MonthlyRecapScreen> createState() =>
@@ -28,6 +37,11 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen> {
   }
 
   Future<void> _markSeenAndClose() async {
+    if (widget.recapOverride != null) {
+      // Preview mode — don't persist seen state.
+      if (mounted) Navigator.of(context).pop();
+      return;
+    }
     final key =
         '${widget.monthKey.year.toString().padLeft(4, '0')}-'
         '${widget.monthKey.month.toString().padLeft(2, '0')}';
@@ -57,7 +71,8 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final recap = ref.watch(monthlyRecapProvider(widget.monthKey));
+    final recap = widget.recapOverride ??
+        ref.watch(monthlyRecapProvider(widget.monthKey));
     final colors = context.colors;
 
     if (recap == null) {
@@ -74,10 +89,19 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen> {
       );
     }
 
+    // BalanceSlide only renders when there's tracked push/pull/legs volume.
+    // If a month had only Core / Forearms / custom muscles, skip it.
+    final hasBalanceData = [
+      recap.volumeByCategory['push'] ?? 0,
+      recap.volumeByCategory['pull'] ?? 0,
+      recap.volumeByCategory['legs'] ?? 0,
+    ].any((v) => v > 0);
+
     final slides = <Widget>[
       IntroSlide(recap: recap),
       SessionsSlide(recap: recap),
       VolumeSlide(recap: recap),
+      if (hasBalanceData) BalanceSlide(recap: recap),
       if (recap.topRoutine != null) TopRoutineSlide(recap: recap),
       if (recap.topExercise != null) TopExerciseSlide(recap: recap),
       if (recap.newPR != null) PRSlide(recap: recap),
@@ -88,6 +112,7 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen> {
       backgroundColor: colors.bgApp,
       body: Stack(
         children: [
+          const Positioned.fill(child: AnimatedAuroraBackground()),
           PageView(
             controller: _controller,
             onPageChanged: (i) => setState(() => _current = i),

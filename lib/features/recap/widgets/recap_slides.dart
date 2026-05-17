@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/exercise_category.dart';
 import '../../../core/utils/format_utils.dart';
 import '../../../domain/entities/monthly_recap.dart';
 import '../../../l10n/app_localizations.dart';
@@ -7,43 +8,17 @@ import '../../../shared/widgets/motion.dart';
 import 'month_heatmap.dart';
 
 class _SlideShell extends StatelessWidget {
-  const _SlideShell({
-    required this.child,
-    this.gradientAlpha = 0.35,
-  });
+  const _SlideShell({required this.child});
 
   final Widget child;
-  final double gradientAlpha;
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: IgnorePointer(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    colors.accentTint.withValues(alpha: gradientAlpha),
-                    colors.bgApp,
-                  ],
-                  stops: const [0.0, 0.85],
-                ),
-              ),
-            ),
-          ),
-        ),
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(28, 92, 28, 96),
-            child: child,
-          ),
-        ),
-      ],
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(28, 92, 28, 96),
+        child: child,
+      ),
     );
   }
 }
@@ -100,7 +75,6 @@ class IntroSlide extends StatelessWidget {
     );
 
     return _SlideShell(
-      gradientAlpha: 0.55,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -302,6 +276,156 @@ class VolumeSlide extends StatelessWidget {
   }
 }
 
+class BalanceSlide extends StatelessWidget {
+  const BalanceSlide({super.key, required this.recap});
+  final MonthlyRecap recap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
+
+    final push = recap.volumeByCategory[ExerciseCategory.push.name] ?? 0;
+    final pull = recap.volumeByCategory[ExerciseCategory.pull.name] ?? 0;
+    final legs = recap.volumeByCategory[ExerciseCategory.legs.name] ?? 0;
+    final tracked = push + pull + legs;
+    // Percentages are computed against the tracked total (push + pull + legs).
+    // "Other" volume is excluded so the three rows sum to 100%.
+    final pushPct = tracked > 0 ? (push / tracked) * 100 : 0.0;
+    final pullPct = tracked > 0 ? (pull / tracked) * 100 : 0.0;
+    final legsPct = tracked > 0 ? (legs / tracked) * 100 : 0.0;
+
+    return _SlideShell(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 80),
+            child: _Eyebrow(l10n.recapBalanceTitle),
+          ),
+          const SizedBox(height: 16),
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 200),
+            child: Text(
+              l10n.recapBalanceBody,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: colors.ink900,
+                height: 1.25,
+              ),
+            ),
+          ),
+          const SizedBox(height: 28),
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 320),
+            child: _BalanceRow(
+              label: l10n.categoryPush,
+              percent: pushPct,
+              color: colors.accent,
+            ),
+          ),
+          const SizedBox(height: 16),
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 420),
+            child: _BalanceRow(
+              label: l10n.categoryPull,
+              percent: pullPct,
+              color: colors.accentDeep,
+            ),
+          ),
+          const SizedBox(height: 16),
+          FadeSlideIn(
+            delay: const Duration(milliseconds: 520),
+            child: _BalanceRow(
+              label: l10n.categoryLegs,
+              percent: legsPct,
+              color: colors.accentLight,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BalanceRow extends StatelessWidget {
+  const _BalanceRow({
+    required this.label,
+    required this.percent,
+    required this.color,
+  });
+  final String label;
+  final double percent;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final filled = (percent / 100).clamp(0.0, 1.0);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: colors.ink900,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ),
+            Text(
+              '${percent.round()}%',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: colors.ink700,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        LayoutBuilder(
+          builder: (context, c) {
+            return Stack(
+              children: [
+                Container(
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: colors.glassBg,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: colors.glassBorder,
+                      width: 0.5,
+                    ),
+                  ),
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.easeOutCubic,
+                  height: 10,
+                  width: c.maxWidth * filled,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
 class TopRoutineSlide extends StatelessWidget {
   const TopRoutineSlide({super.key, required this.recap});
   final MonthlyRecap recap;
@@ -459,7 +583,6 @@ class PRSlide extends StatelessWidget {
     final pr = recap.newPR!;
 
     return _SlideShell(
-      gradientAlpha: 0.7,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -529,7 +652,6 @@ class OutroSlide extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     return _SlideShell(
-      gradientAlpha: 0.5,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,

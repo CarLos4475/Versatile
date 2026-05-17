@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/providers/locale_provider.dart';
+import '../../../core/utils/exercise_category.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../routines/view_models/routines_view_model.dart';
@@ -22,6 +23,9 @@ class ExercisesState {
   final String? selectedSubMuscle;
   final ExercisesTab tab;
   final ExerciseLaterality laterality;
+  /// Movement-pattern filter derived from `muscle`. Null means "show all
+  /// categories" — the chip row defaults here and resets when "All" is tapped.
+  final ExerciseCategory? selectedCategory;
   final bool isEditMode;
   final Set<String> selectedIds;
 
@@ -31,6 +35,7 @@ class ExercisesState {
     this.selectedSubMuscle,
     this.tab = ExercisesTab.all,
     this.laterality = ExerciseLaterality.all,
+    this.selectedCategory,
     this.isEditMode = false,
     this.selectedIds = const {},
   });
@@ -42,6 +47,8 @@ class ExercisesState {
     bool clearSubMuscle = false,
     ExercisesTab? tab,
     ExerciseLaterality? laterality,
+    ExerciseCategory? selectedCategory,
+    bool clearCategory = false,
     bool? isEditMode,
     Set<String>? selectedIds,
   }) {
@@ -53,6 +60,9 @@ class ExercisesState {
           : (selectedSubMuscle ?? this.selectedSubMuscle),
       tab: tab ?? this.tab,
       laterality: laterality ?? this.laterality,
+      selectedCategory: clearCategory
+          ? null
+          : (selectedCategory ?? this.selectedCategory),
       isEditMode: isEditMode ?? this.isEditMode,
       selectedIds: selectedIds ?? this.selectedIds,
     );
@@ -83,6 +93,15 @@ class ExercisesNotifier extends StateNotifier<ExercisesState> {
 
   void setLaterality(ExerciseLaterality l) =>
       state = state.copyWith(laterality: l);
+
+  /// Toggle the category chip — selecting the same one clears the filter.
+  void setCategory(ExerciseCategory? c) {
+    if (c == null || state.selectedCategory == c) {
+      state = state.copyWith(clearCategory: true);
+    } else {
+      state = state.copyWith(selectedCategory: c);
+    }
+  }
 
   void toggleEditMode() {
     state = state.copyWith(
@@ -174,6 +193,10 @@ final filteredExercisesProvider = Provider<List<Exercise>>((ref) {
       return false;
     }
     if (state.laterality == ExerciseLaterality.bilateral && e.isUnilateral) {
+      return false;
+    }
+    if (state.selectedCategory != null &&
+        categoryForMuscle(e.muscle) != state.selectedCategory) {
       return false;
     }
     if (state.query.isNotEmpty) {

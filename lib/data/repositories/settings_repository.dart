@@ -53,4 +53,15 @@ class SettingsRepository {
       (await get('recap_seen_$monthKey')) == '1';
   Future<void> setRecapSeen(String monthKey) =>
       set('recap_seen_$monthKey', '1');
+
+  /// ISO date (YYYY-MM-DD) until which the deload suggestion banner stays
+  /// hidden. Null when the user has never dismissed.
+  Future<DateTime?> getDeloadDismissedUntil() async {
+    final s = await get('deload_dismissed_until');
+    if (s == null || s.isEmpty) return null;
+    return DateTime.tryParse(s);
+  }
+
+  Future<void> setDeloadDismissedUntil(DateTime date) =>
+      set('deload_dismissed_until', date.toIso8601String().substring(0, 10));
 }

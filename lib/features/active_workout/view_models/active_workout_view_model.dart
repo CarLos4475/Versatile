@@ -7,10 +7,12 @@ import 'package:uuid/uuid.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/services/workout_notification_service.dart';
 import '../../../domain/entities/exercise.dart';
+import '../../../domain/entities/monthly_recap.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../domain/entities/session.dart';
 import '../../../domain/entities/workout_set.dart';
 import '../../home/view_models/home_view_model.dart';
+import '../../recap/view_models/recap_view_model.dart';
 
 class ExerciseWorkoutState {
   final String exerciseId;
@@ -90,6 +92,12 @@ class RestTimerState {
   }
 }
 
+/// One-shot signal that a PR was just achieved. The `eventId` increments
+/// every time `finishSet` detects a new PR so the UI can observe it via
+/// `select` and trigger an animation even when the underlying [pr] payload
+/// happens to match a previous one (e.g., same exercise hit again).
+typedef PREvent = ({RecapPersonalRecord pr, int eventId});
+
 class ActiveWorkoutState {
   final Routine routine;
   final List<Exercise> exercises;
@@ -98,6 +106,12 @@ class ActiveWorkoutState {
   final List<ExerciseWorkoutState> exerciseStates;
   final RestTimerState? restTimer;
   final bool autoFinish;
+  /// Best PR detected so far in this session (highest estimated 1RM).
+  /// Passed to the share card to skip recomputation.
+  final RecapPersonalRecord? bestPRInSession;
+  /// One-shot signal for the celebration UI. Cleared back to null is not
+  /// necessary — consumers observe `eventId` changes.
+  final PREvent? lastPREvent;
 
   const ActiveWorkoutState({
     required this.routine,
@@ -107,6 +121,8 @@ class ActiveWorkoutState {
     required this.exerciseStates,
     this.restTimer,
     this.autoFinish = false,
+    this.bestPRInSession,
+    this.lastPREvent,
   });
 
   int get totalSets => exerciseStates.fold(0, (s, e) => s + e.targetSets);
@@ -132,6 +148,8 @@ class ActiveWorkoutState {
     RestTimerState? restTimer,
     bool clearRestTimer = false,
     bool? autoFinish,
+    RecapPersonalRecord? bestPRInSession,
+    PREvent? lastPREvent,
   }) {
     return ActiveWorkoutState(
       routine: routine,
@@ -141,6 +159,8 @@ class ActiveWorkoutState {
       exerciseStates: exerciseStates ?? this.exerciseStates,
       restTimer: clearRestTimer ? null : (restTimer ?? this.restTimer),
       autoFinish: autoFinish ?? this.autoFinish,
+      bestPRInSession: bestPRInSession ?? this.bestPRInSession,
+      lastPREvent: lastPREvent ?? this.lastPREvent,
     );
   }
 }
@@ -448,6 +468,29 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
 
     final exerciseName = state.findExercise(e.exerciseId)?.name ?? 'Exercise';
 
+    // ── PR detection ───────────────────────────────────────────────────────
+    // Compare the set just closed against historical sessions strictly
+    // before today AND the sets already completed earlier in this session
+    // for the same exercise (excluding the one we just appended).
+    final pr = _detectPRForSet(
+      exerciseId: e.exerciseId,
+      exerciseName: exerciseName,
+      set: setToSave,
+      priorInSessionSets: e.completedSets,
+    );
+    RecapPersonalRecord? newBestPR = state.bestPRInSession;
+    PREvent? newPREvent = state.lastPREvent;
+    if (pr != null) {
+      HapticFeedback.mediumImpact();
+      if (newBestPR == null || pr.estimatedOneRm > newBestPR.estimatedOneRm) {
+        newBestPR = pr;
+      }
+      newPREvent = (
+        pr: pr,
+        eventId: (state.lastPREvent?.eventId ?? 0) + 1,
+      );
+    }
+
     final allDone = list.every((es) => es.isDone);
 
     if (allDone) {
@@ -455,6 +498,8 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
         exerciseStates: list,
         clearRestTimer: true,
         autoFinish: true,
+        bestPRInSession: newBestPR,
+        lastPREvent: newPREvent,
       );
       _restTicker?.cancel();
       _restEndAt = null;
@@ -469,9 +514,48 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
         remaining: e.restSec,
         exerciseName: exerciseName,
       ),
+      bestPRInSession: newBestPR,
+      lastPREvent: newPREvent,
     );
     _startRestTimer();
     _saveProgress();
+  }
+
+  /// Runs `detectRealtimePR` on the main side of a set (and on the left side
+  /// for unilateral split sets), returning the higher PR of the two if any.
+  RecapPersonalRecord? _detectPRForSet({
+    required String exerciseId,
+    required String exerciseName,
+    required WorkoutSet set,
+    required List<WorkoutSet> priorInSessionSets,
+  }) {
+    final sessions = _ref.read(sessionsAsyncProvider).value ?? const <Session>[];
+    final today = _todayString();
+
+    final right = detectRealtimePR(
+      previousSessions: sessions,
+      currentSessionSetsForExercise: priorInSessionSets,
+      exerciseId: exerciseId,
+      exerciseName: exerciseName,
+      kg: set.kg,
+      reps: set.reps,
+      today: today,
+    );
+    RecapPersonalRecord? left;
+    if (set.leftKg != null && set.leftReps != null) {
+      left = detectRealtimePR(
+        previousSessions: sessions,
+        currentSessionSetsForExercise: priorInSessionSets,
+        exerciseId: exerciseId,
+        exerciseName: exerciseName,
+        kg: set.leftKg!,
+        reps: set.leftReps!,
+        today: today,
+      );
+    }
+    if (right == null) return left;
+    if (left == null) return right;
+    return right.estimatedOneRm >= left.estimatedOneRm ? right : left;
   }
 
   void _startRestTimer() {

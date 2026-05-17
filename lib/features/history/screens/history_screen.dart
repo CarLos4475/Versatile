@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
@@ -7,6 +8,7 @@ import '../../../core/utils/format_utils.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../home/view_models/home_view_model.dart';
+import '../../recap/debug/recap_fixture.dart';
 import '../../recap/screens/monthly_recap_screen.dart';
 import '../../recap/view_models/recap_view_model.dart';
 import '../widgets/history_session_card.dart';
@@ -88,6 +90,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                               color: context.colors.ink400,
                             ),
                           ),
+                          if (kDebugMode) ...[
+                            const SizedBox(height: 20),
+                            const _DebugRecapPreviewPill(),
+                          ],
                         ],
                       ),
                     );
@@ -96,6 +102,11 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   return ListView(
                     padding: const EdgeInsets.fromLTRB(22, 0, 22, 100),
                     children: [
+                      if (kDebugMode)
+                        const Padding(
+                          padding: EdgeInsets.only(bottom: 10),
+                          child: _DebugRecapPreviewPill(),
+                        ),
                       Consumer(
                         builder: (context, ref, _) {
                           final banner =
@@ -229,6 +240,57 @@ class _RecapBanner extends ConsumerWidget {
                   color: Colors.white,
                   letterSpacing: 0.1,
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Debug-only entry point that opens MonthlyRecapScreen with a hardcoded
+/// MonthlyRecap fixture. Lets the team preview the aurora background and
+/// slide composition without touching device date or session data.
+class _DebugRecapPreviewPill extends StatelessWidget {
+  const _DebugRecapPreviewPill();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return PressableScale(
+      onTap: () {
+        final fixture = buildSampleRecap();
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => MonthlyRecapScreen(
+              monthKey: (year: fixture.year, month: fixture.month),
+              recapOverride: fixture,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: colors.glassBg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: colors.accent.withValues(alpha: 0.45),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.science_outlined, size: 16, color: colors.accent),
+            const SizedBox(width: 8),
+            Text(
+              'Preview recap (debug)',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: colors.ink900,
               ),
             ),
           ],

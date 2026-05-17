@@ -8,6 +8,9 @@ import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
+import '../../programs/screens/program_editor_screen.dart';
+import '../../programs/view_models/programs_view_model.dart';
+import '../view_models/deload_view_model.dart';
 import '../view_models/home_view_model.dart';
 import '../widgets/session_card.dart';
 import '../widgets/stat_card.dart';
@@ -260,6 +263,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
 
               const SizedBox(height: 16),
+
+              Consumer(
+                builder: (context, ref, _) {
+                  final suggestion = ref.watch(deloadSuggestionProvider);
+                  if (suggestion == null) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(22, 0, 22, 16),
+                    child: FadeSlideIn(
+                      delay: const Duration(milliseconds: 90),
+                      child: _DeloadBanner(suggestion: suggestion),
+                    ),
+                  );
+                },
+              ),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -976,6 +993,158 @@ class _EmptyHeroCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Soft accent-tinted banner that surfaces a deload suggestion when
+/// [deloadSuggestionProvider] reports both stagnation and/or volume drop.
+/// "Open program" is only shown when the user has an active program — the
+/// CTA navigates to that program's editor so they can mark a deload week.
+class _DeloadBanner extends ConsumerWidget {
+  const _DeloadBanner({required this.suggestion});
+  final DeloadSuggestion suggestion;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
+
+    final String body;
+    if (suggestion.stagnation && suggestion.volumeDrop) {
+      body = l10n.deloadBannerBodyBoth;
+    } else if (suggestion.stagnation) {
+      body = l10n.deloadBannerBodyStagnation;
+    } else {
+      body = l10n.deloadBannerBodyVolume;
+    }
+
+    final active = ref.watch(activeProgramProvider).value;
+
+    Future<void> dismiss() async {
+      final today = DateTime.now();
+      final until = DateTime(today.year, today.month, today.day)
+          .add(const Duration(days: 7));
+      await ref.read(settingsRepositoryProvider).setDeloadDismissedUntil(until);
+      ref.invalidate(deloadDismissedProvider);
+    }
+
+    void openProgram() {
+      if (active == null) return;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => ProgramEditorScreen(programId: active.id),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+      decoration: BoxDecoration(
+        color: colors.accentTint.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: colors.accent.withValues(alpha: 0.35),
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: colors.accent.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.bedtime_outlined,
+                  color: colors.accentDeep,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      l10n.deloadBannerTitle,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: colors.ink900,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      body,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: colors.ink500,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              PressableScale(
+                onTap: dismiss,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  child: Text(
+                    l10n.deloadBannerDismiss,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: colors.ink500,
+                    ),
+                  ),
+                ),
+              ),
+              if (active != null) ...[
+                const SizedBox(width: 6),
+                PressableScale(
+                  onTap: openProgram,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colors.accentDeep,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      l10n.deloadBannerCta,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 0.1,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
       ),
     );
   }

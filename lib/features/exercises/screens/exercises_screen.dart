@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/exercise_category.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../core/providers/repository_providers.dart';
@@ -372,6 +373,36 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                         onTap: () => notifier
                             .setLaterality(ExerciseLaterality.unilateral),
                       ),
+                      const SizedBox(width: 14),
+                      Container(
+                        width: 1,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        color: context.colors.hairline,
+                      ),
+                      const SizedBox(width: 14),
+                      _CategoryChip(
+                        label: l10n.categoryPush,
+                        isActive:
+                            state.selectedCategory == ExerciseCategory.push,
+                        onTap: () =>
+                            notifier.setCategory(ExerciseCategory.push),
+                      ),
+                      const SizedBox(width: 6),
+                      _CategoryChip(
+                        label: l10n.categoryPull,
+                        isActive:
+                            state.selectedCategory == ExerciseCategory.pull,
+                        onTap: () =>
+                            notifier.setCategory(ExerciseCategory.pull),
+                      ),
+                      const SizedBox(width: 6),
+                      _CategoryChip(
+                        label: l10n.categoryLegs,
+                        isActive:
+                            state.selectedCategory == ExerciseCategory.legs,
+                        onTap: () =>
+                            notifier.setCategory(ExerciseCategory.legs),
+                      ),
                     ],
                   ),
                 ),
@@ -737,6 +768,49 @@ class _LateralityChip extends StatelessWidget {
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: isActive ? Colors.white : context.colors.ink700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Movement-pattern chip. Visually distinct from `_LateralityChip` (accent
+/// outline instead of filled) so the user reads them as a separate axis.
+class _CategoryChip extends StatelessWidget {
+  const _CategoryChip({
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return PressableScale(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive
+              ? colors.accent.withValues(alpha: 0.14)
+              : colors.glassBg,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isActive ? colors.accent : colors.glassBorder,
+            width: isActive ? 1 : 0.8,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isActive ? colors.accentDeep : colors.ink700,
           ),
         ),
       ),

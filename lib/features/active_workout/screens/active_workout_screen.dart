@@ -11,6 +11,7 @@ import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../view_models/active_workout_view_model.dart';
 import '../widgets/exercise_card.dart';
+import '../widgets/pr_celebration_banner.dart';
 import '../widgets/rest_timer_bar.dart';
 import 'workout_complete_screen.dart';
 
@@ -161,13 +162,20 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     setState(() => _finishing = true);
     await WorkoutNotificationService.stop();
     final notifier = ref.read(activeWorkoutProvider(widget.routineId).notifier);
+    // Capture the realtime-detected PR before the provider is disposed.
+    final cachedPR = ref
+        .read(activeWorkoutProvider(widget.routineId))
+        .bestPRInSession;
     final session = await notifier.finishWorkout();
     if (!mounted) return;
     ref.read(activeWorkoutRoutineIdProvider.notifier).state = null;
     if (session != null) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => WorkoutCompleteScreen(session: session),
+          builder: (_) => WorkoutCompleteScreen(
+            session: session,
+            precomputedPR: cachedPR,
+          ),
         ),
       );
     } else {
@@ -467,6 +475,12 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                   ),
                 ),
               ],
+            ),
+            Positioned(
+              top: 80,
+              left: 0,
+              right: 0,
+              child: PRCelebrationBanner(routineId: widget.routineId),
             ),
             Positioned(
               left: 12,

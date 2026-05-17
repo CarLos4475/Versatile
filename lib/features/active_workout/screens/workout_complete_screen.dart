@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/format_utils.dart';
+import '../../../domain/entities/monthly_recap.dart';
 import '../../../domain/entities/session.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/glass_button.dart';
@@ -9,9 +10,17 @@ import '../../../shared/widgets/motion.dart';
 import '../../share/screens/share_session_screen.dart';
 
 class WorkoutCompleteScreen extends StatelessWidget {
-  const WorkoutCompleteScreen({super.key, required this.session});
+  const WorkoutCompleteScreen({
+    super.key,
+    required this.session,
+    this.precomputedPR,
+  });
 
   final Session session;
+  /// PR detected during the active workout. Pre-supplied to the share card so
+  /// it doesn't re-iterate session history. Null when this screen is reached
+  /// without a realtime detection (e.g., legacy state).
+  final RecapPersonalRecord? precomputedPR;
 
   @override
   Widget build(BuildContext context) {
@@ -162,8 +171,10 @@ class WorkoutCompleteScreen extends StatelessWidget {
                         PressableScale(
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  ShareSessionScreen(session: session),
+                              builder: (_) => ShareSessionScreen(
+                                session: session,
+                                precomputedPR: precomputedPR,
+                              ),
                             ),
                           ),
                           child: Container(

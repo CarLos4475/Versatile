@@ -10,6 +10,10 @@ class MonthlyRecap {
   final RecapPersonalRecord? newPR;
   final double? volumeDeltaPctVsPrev;
   final String? prevMonthLabel;
+  /// Push / Pull / Legs / Other volume in kg for the month. Drives the
+  /// "Movement balance" slide and is derived from the muscle of each
+  /// exercise via `categoryForMuscle` (no schema change).
+  final Map<String, double> volumeByCategory;
 
   const MonthlyRecap({
     required this.year,
@@ -23,6 +27,7 @@ class MonthlyRecap {
     this.newPR,
     this.volumeDeltaPctVsPrev,
     this.prevMonthLabel,
+    this.volumeByCategory = const {},
   });
 
   String get monthKey =>

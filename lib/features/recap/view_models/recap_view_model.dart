@@ -1,8 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/repository_providers.dart';
+import '../../../core/utils/exercise_category.dart';
 import '../../../core/utils/format_utils.dart';
 import '../../../domain/entities/monthly_recap.dart';
 import '../../../domain/entities/session.dart';
+import '../../../domain/entities/workout_set.dart';
 import '../../home/view_models/home_view_model.dart';
 
 typedef MonthKey = ({int year, int month});
@@ -14,7 +16,9 @@ bool _sessionInMonth(Session s, int year, int month) {
   return y == year && m == month;
 }
 
-double _setOneRm(double kg, int reps) => kg * (1 + reps / 30);
+/// Epley one-rep-max estimator. Public so callers outside the recap module
+/// (active workout PR detection, share card) can reuse the exact formula.
+double epleyOneRm(double kg, int reps) => kg * (1 + reps / 30);
 
 String _firstDayKey(int year, int month) =>
     '${year.toString().padLeft(4, '0')}-${month.toString().padLeft(2, '0')}-01';
@@ -104,7 +108,7 @@ MonthlyRecap? _computeRecap(List<Session> sessions, int year, int month) {
     bool isBeforeMonth,
   ) {
     if (kg <= 0 || reps <= 0) return;
-    final orm = _setOneRm(kg, reps);
+    final orm = epleyOneRm(kg, reps);
     if (isThisMonth) {
       final cur = thisMonthBest1Rm[exId];
       if (cur == null || orm > cur.orm) {
@@ -171,6 +175,16 @@ MonthlyRecap? _computeRecap(List<Session> sessions, int year, int month) {
     );
   }
 
+  // Movement-pattern split derived from each exercise's muscle. Keys are
+  // ExerciseCategory.name so the entity doesn't depend on the enum.
+  final volumeByCategory = <String, double>{};
+  for (final s in monthSessions) {
+    for (final e in s.exercises ?? const <SessionExercise>[]) {
+      final cat = categoryForMuscle(e.muscle).name;
+      volumeByCategory[cat] = (volumeByCategory[cat] ?? 0) + e.volume;
+    }
+  }
+
   return MonthlyRecap(
     year: year,
     month: month,
@@ -183,6 +197,7 @@ MonthlyRecap? _computeRecap(List<Session> sessions, int year, int month) {
     newPR: newPR,
     volumeDeltaPctVsPrev: volumeDeltaPct,
     prevMonthLabel: prevLabel,
+    volumeByCategory: volumeByCategory,
   );
 }
 
@@ -221,6 +236,68 @@ MonthKey lastFinishedMonth(DateTime now) {
   return (year: now.year, month: now.month - 1);
 }
 
+/// Real-time PR detection used during the active workout. Given a set the
+/// user just closed, returns a [RecapPersonalRecord] if its estimated 1RM
+/// beats every prior result for that exercise — both historical sessions
+/// strictly before [today] and sets already completed earlier in the
+/// current session. Returns null if there's no PR.
+///
+/// Callers for unilateral exercises should invoke this twice (main side and
+/// `leftKg`/`leftReps`) and keep the higher PR, mirroring the behaviour of
+/// [_computeSessionPR] which considers each side independently.
+RecapPersonalRecord? detectRealtimePR({
+  required List<Session> previousSessions,
+  required List<WorkoutSet> currentSessionSetsForExercise,
+  required String exerciseId,
+  required String exerciseName,
+  required double kg,
+  required int reps,
+  required String today,
+}) {
+  if (kg <= 0 || reps <= 0) return null;
+  final newOrm = epleyOneRm(kg, reps);
+
+  double bestSoFar = 0;
+  for (final s in previousSessions) {
+    if (s.date.compareTo(today) >= 0) continue;
+    for (final e in s.exercises ?? const <SessionExercise>[]) {
+      if (e.exerciseId != exerciseId) continue;
+      for (final set in e.sets) {
+        if (set.kg > 0 && set.reps > 0) {
+          final orm = epleyOneRm(set.kg, set.reps);
+          if (orm > bestSoFar) bestSoFar = orm;
+        }
+        if (set.leftKg != null && set.leftReps != null &&
+            set.leftKg! > 0 && set.leftReps! > 0) {
+          final orm = epleyOneRm(set.leftKg!, set.leftReps!);
+          if (orm > bestSoFar) bestSoFar = orm;
+        }
+      }
+    }
+  }
+  for (final set in currentSessionSetsForExercise) {
+    if (set.kg > 0 && set.reps > 0) {
+      final orm = epleyOneRm(set.kg, set.reps);
+      if (orm > bestSoFar) bestSoFar = orm;
+    }
+    if (set.leftKg != null && set.leftReps != null &&
+        set.leftKg! > 0 && set.leftReps! > 0) {
+      final orm = epleyOneRm(set.leftKg!, set.leftReps!);
+      if (orm > bestSoFar) bestSoFar = orm;
+    }
+  }
+
+  if (newOrm <= bestSoFar) return null;
+  return RecapPersonalRecord(
+    exerciseId: exerciseId,
+    exerciseName: exerciseName,
+    weightKg: kg,
+    reps: reps,
+    estimatedOneRm: newOrm,
+    date: today,
+  );
+}
+
 /// PR detection for a single session: returns the most impressive new 1RM
 /// achieved in `target` compared to all sessions strictly before its date.
 /// Returns null if no exercise in this session beat its previous best.
@@ -234,7 +311,7 @@ RecapPersonalRecord? _computeSessionPR(List<Session> sessions, Session target) {
     for (final set in e.sets) {
       void consider(double kg, int reps) {
         if (kg <= 0 || reps <= 0) return;
-        final orm = _setOneRm(kg, reps);
+        final orm = epleyOneRm(kg, reps);
         final cur = targetMax[e.exerciseId];
         if (cur == null || orm > cur.orm) {
           targetMax[e.exerciseId] =
@@ -258,7 +335,7 @@ RecapPersonalRecord? _computeSessionPR(List<Session> sessions, Session target) {
       for (final set in e.sets) {
         void consider(double kg, int reps) {
           if (kg <= 0 || reps <= 0) return;
-          final orm = _setOneRm(kg, reps);
+          final orm = epleyOneRm(kg, reps);
           final cur = prevMax[e.exerciseId] ?? 0;
           if (orm > cur) prevMax[e.exerciseId] = orm;
         }

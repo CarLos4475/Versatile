@@ -558,7 +558,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get backToHome => 'Volver al inicio';
 
   @override
-  String get notificationSubtitle => 'Mantén el ritmo — toca para volver';
+  String get notificationSubtitle => 'Mantén el ritmo. Toca para volver';
 
   @override
   String get accentColor => 'Color de acento';
@@ -708,7 +708,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingPage1Body =>
-      'Un registro de gym rápido, privado y hecho para ti — sin cuentas, sin nube, solo tus pesas.';
+      'Un registro de gym rápido, privado y hecho para ti. Sin cuentas, sin nube, solo tus pesas.';
 
   @override
   String get onboardingPage2Title => 'Registra pesos.\nRompe récords.';
@@ -729,13 +729,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingPage4Body =>
-      'Sin internet. Sin cuenta. Sin suscripción. Todo se queda en tu teléfono — siempre.';
+      'Sin internet. Sin cuenta. Sin suscripción. Todo se queda en tu teléfono, siempre.';
 
   @override
   String get onboardingNameTitle => '¿Cómo\nte llamamos?';
 
   @override
-  String get onboardingNameSubtitle => 'Opcional — siempre puedes omitirlo.';
+  String get onboardingNameSubtitle => 'Opcional. Siempre puedes omitirlo.';
 
   @override
   String get onboardingNameHint => 'Tu nombre…';
@@ -792,7 +792,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get programsEmptyBody =>
-      'Crea un plan semanal que asigne una rutina — o un día de descanso — a cada día de la semana.';
+      'Crea un plan semanal que asigne una rutina, o un día de descanso, a cada día de la semana.';
 
   @override
   String get deleteProgramTitle => '¿Eliminar programa?';
@@ -983,14 +983,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get programsHelpActivateBody =>
-      'Elige una fecha de inicio — normalmente un lunes. Cuando la última semana termina, el plan vuelve automáticamente a la semana 1.';
+      'Elige una fecha de inicio, normalmente un lunes. Cuando la última semana termina, el plan vuelve automáticamente a la semana 1.';
 
   @override
   String get programsHelpBadgesTitle => 'Qué verás en la Home';
 
   @override
   String get programsHelpBadgesBody =>
-      'Cuando el día de hoy tiene una rutina planeada, la tarjeta de inicio muestra el badge PLANEADO. Las semanas de descarga muestran DESCARGA. La tarjeta sigue funcionando igual — toca Start para comenzar.';
+      'Cuando el día de hoy tiene una rutina planeada, la tarjeta de inicio muestra el badge PLANEADO. Las semanas de descarga muestran DESCARGA. La tarjeta sigue funcionando igual. Toca Start para comenzar.';
 
   @override
   String get programsHelpOptionalTitle => '100% opcional';
@@ -1081,6 +1081,48 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get recapOutroBody => 'Sigue apareciendo.';
+
+  @override
+  String get recapBalanceTitle => 'Balance de movimiento';
+
+  @override
+  String get recapBalanceBody => 'Cómo repartiste el trabajo este mes.';
+
+  @override
+  String get deloadBannerTitle => '¿Toca semana de descarga?';
+
+  @override
+  String get deloadBannerBodyStagnation =>
+      'Varios lifts no progresan hace 3+ semanas.';
+
+  @override
+  String get deloadBannerBodyVolume =>
+      'Tu volumen semanal ha bajado últimamente.';
+
+  @override
+  String get deloadBannerBodyBoth =>
+      'El progreso está parado y el volumen bajó. Una semana ligera puede ayudar.';
+
+  @override
+  String get deloadBannerCta => 'Abrir programa';
+
+  @override
+  String get deloadBannerDismiss => 'Ahora no';
+
+  @override
+  String get categoryAll => 'Todos';
+
+  @override
+  String get categoryPush => 'Push';
+
+  @override
+  String get categoryPull => 'Pull';
+
+  @override
+  String get categoryLegs => 'Piernas';
+
+  @override
+  String get categoryOther => 'Otros';
 
   @override
   String recapEntryCardTitle(String month) {
