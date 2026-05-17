@@ -10,7 +10,13 @@
       "Bash(Select-Object -First 30)",
       "Bash(Get-Content android/app/build.gradle.kts)",
       "Bash(Select-String -Pattern \"minSdk|targetSdk|compileSdk\")",
-      "Bash(flutter pub *)"
+      "Bash(flutter pub *)",
+      "Bash(gunzip -c \"C:/Users/PC/.claude/projects/C--Users-PC-Documents-PROYECTOS-androidStudio-versatile/ce4ade34-de87-4883-be62-6ca90c9e2697/tool-results/webfetch-1779046115507-s4ei6k.bin\")",
+      "Read(//tmp/**)",
+      "Bash(cp \"C:/Users/PC/.claude/projects/C--Users-PC-Documents-PROYECTOS-androidStudio-versatile/ce4ade34-de87-4883-be62-6ca90c9e2697/tool-results/webfetch-1779046115507-s4ei6k.bin\" /tmp/design.tgz)",
+      "Read(//c/tmp/**)",
+      "Bash(mkdir -p design_unpack)",
+      "Bash(tar xzf *)"
     ]
   }
 }

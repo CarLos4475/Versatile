@@ -1,0 +1,739 @@
+{
+  "version": "1.0",
+  "exportedAt": "2026-05-17T12:00:00.000Z",
+  "settings": { "userName": "Carlos" },
+  "exercises": [
+    {
+      "id": "c-bulgarian",
+      "name": "Bulgarian Split Squat",
+      "muscle": "Quadriceps",
+      "equipment": "Dumbbell",
+      "isUnilateral": true
+    },
+    {
+      "id": "c-zercher",
+      "name": "Zercher Squat",
+      "muscle": "Quadriceps",
+      "equipment": "Barbell",
+      "isUnilateral": false
+    }
+  ],
+  "routines": [
+    {
+      "id": "r-push",
+      "name": "Push",
+      "colorValue": 4292441943,
+      "iconCode": 58713,
+      "exercises": [
+        { "exerciseId": "ex-1",  "targetSets": 4, "targetReps": "8",  "restSeconds": 120 },
+        { "exerciseId": "ex-10", "targetSets": 3, "targetReps": "8",  "restSeconds": 90  },
+        { "exerciseId": "ex-11", "targetSets": 3, "targetReps": "12", "restSeconds": 60  },
+        { "exerciseId": "ex-14", "targetSets": 3, "targetReps": "10", "restSeconds": 60  }
+      ]
+    },
+    {
+      "id": "r-pull",
+      "name": "Pull",
+      "colorValue": 4284382119,
+      "iconCode": 58713,
+      "exercises": [
+        { "exerciseId": "ex-5",  "targetSets": 4, "targetReps": "8",  "restSeconds": 120 },
+        { "exerciseId": "ex-6",  "targetSets": 3, "targetReps": "10", "restSeconds": 90  },
+        { "exerciseId": "ex-13", "targetSets": 3, "targetReps": "10", "restSeconds": 60  },
+        { "exerciseId": "ex-12", "targetSets": 3, "targetReps": "15", "restSeconds": 60  }
+      ]
+    },
+    {
+      "id": "r-legs",
+      "name": "Legs",
+      "colorValue": 4283071343,
+      "iconCode": 58713,
+      "exercises": [
+        { "exerciseId": "ex-7",  "targetSets": 4, "targetReps": "6",  "restSeconds": 180 },
+        { "exerciseId": "ex-8",  "targetSets": 3, "targetReps": "8",  "restSeconds": 120 },
+        { "exerciseId": "ex-9",  "targetSets": 3, "targetReps": "10", "restSeconds": 90  },
+        { "exerciseId": "ex-17", "targetSets": 3, "targetReps": "10", "restSeconds": 60  }
+      ]
+    }
+  ],
+  "sessions": [
+    {
+      "id": "s-20260201-push", "routineId": "r-push", "routineName": "Push",
+      "colorValue": 4292441943, "iconCode": 58713,
+      "date": "2026-02-03", "durationMin": 68, "volumeKg": 4572,
+      "exercises": [
+        { "exerciseId": "ex-1", "name": "Bench Press", "muscle": "Chest", "sets": [
+          {"kg":67.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":67.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":67.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":67.5,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-10", "name": "Overhead Press", "muscle": "Shoulders", "sets": [
+          {"kg":45,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":45,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":45,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-11", "name": "Lateral Raise", "muscle": "Shoulders", "sets": [
+          {"kg":12.5,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":12.5,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":12.5,"reps":12,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-14", "name": "Tricep Pushdown", "muscle": "Triceps", "sets": [
+          {"kg":25,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":25,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":25,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260206-pull", "routineId": "r-pull", "routineName": "Pull",
+      "colorValue": 4284382119, "iconCode": 58713,
+      "date": "2026-02-06", "durationMin": 72, "volumeKg": 4858,
+      "exercises": [
+        { "exerciseId": "ex-5", "name": "Barbell Row", "muscle": "Back", "sets": [
+          {"kg":55,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":55,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":55,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":55,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-6", "name": "Lat Pulldown", "muscle": "Back", "sets": [
+          {"kg":50,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-13", "name": "Bicep Curl", "muscle": "Biceps", "sets": [
+          {"kg":15,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-12", "name": "Face Pull", "muscle": "Shoulders", "sets": [
+          {"kg":20,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":20,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":20,"reps":15,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260213-push", "routineId": "r-push", "routineName": "Push",
+      "colorValue": 4292441943, "iconCode": 58713,
+      "date": "2026-02-13", "durationMin": 70, "volumeKg": 4724,
+      "exercises": [
+        { "exerciseId": "ex-1", "name": "Bench Press", "muscle": "Chest", "sets": [
+          {"kg":70,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":70,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":70,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":70,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-10", "name": "Overhead Press", "muscle": "Shoulders", "sets": [
+          {"kg":47.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":47.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":47.5,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-11", "name": "Lateral Raise", "muscle": "Shoulders", "sets": [
+          {"kg":12.5,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":12.5,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":12.5,"reps":12,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-14", "name": "Tricep Pushdown", "muscle": "Triceps", "sets": [
+          {"kg":27.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":27.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":27.5,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260217-legs", "routineId": "r-legs", "routineName": "Legs",
+      "colorValue": 4283071343, "iconCode": 58713,
+      "date": "2026-02-17", "durationMin": 78, "volumeKg": 7560,
+      "exercises": [
+        { "exerciseId": "ex-7", "name": "Squat", "muscle": "Quadriceps", "sets": [
+          {"kg":90,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":90,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":90,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":90,"reps":6,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-8", "name": "Romanian Deadlift", "muscle": "Hamstrings", "sets": [
+          {"kg":80,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":80,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":80,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-9", "name": "Leg Press", "muscle": "Quadriceps", "sets": [
+          {"kg":140,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":140,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":140,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-17", "name": "Hanging Leg Raise", "muscle": "Core", "sets": [
+          {"kg":0,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260224-push", "routineId": "r-push", "routineName": "Push",
+      "colorValue": 4292441943, "iconCode": 58713,
+      "date": "2026-02-24", "durationMin": 71, "volumeKg": 4880,
+      "exercises": [
+        { "exerciseId": "ex-1", "name": "Bench Press", "muscle": "Chest", "sets": [
+          {"kg":72.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":72.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":72.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":72.5,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-10", "name": "Overhead Press", "muscle": "Shoulders", "sets": [
+          {"kg":47.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":47.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":47.5,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-11", "name": "Lateral Raise", "muscle": "Shoulders", "sets": [
+          {"kg":12.5,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":12.5,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":12.5,"reps":12,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-14", "name": "Tricep Pushdown", "muscle": "Triceps", "sets": [
+          {"kg":27.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":27.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":27.5,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260227-pull", "routineId": "r-pull", "routineName": "Pull",
+      "colorValue": 4284382119, "iconCode": 58713,
+      "date": "2026-02-27", "durationMin": 73, "volumeKg": 5152,
+      "exercises": [
+        { "exerciseId": "ex-5", "name": "Barbell Row", "muscle": "Back", "sets": [
+          {"kg":60,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":60,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":60,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":60,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-6", "name": "Lat Pulldown", "muscle": "Back", "sets": [
+          {"kg":55,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":55,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":55,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-13", "name": "Bicep Curl", "muscle": "Biceps", "sets": [
+          {"kg":17.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":17.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":17.5,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-12", "name": "Face Pull", "muscle": "Shoulders", "sets": [
+          {"kg":20,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":20,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":20,"reps":15,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260306-push", "routineId": "r-push", "routineName": "Push",
+      "colorValue": 4292441943, "iconCode": 58713,
+      "date": "2026-03-06", "durationMin": 71, "volumeKg": 5048,
+      "exercises": [
+        { "exerciseId": "ex-1", "name": "Bench Press", "muscle": "Chest", "sets": [
+          {"kg":75,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":75,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":75,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":75,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-10", "name": "Overhead Press", "muscle": "Shoulders", "sets": [
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-11", "name": "Lateral Raise", "muscle": "Shoulders", "sets": [
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-14", "name": "Tricep Pushdown", "muscle": "Triceps", "sets": [
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260310-legs", "routineId": "r-legs", "routineName": "Legs",
+      "colorValue": 4283071343, "iconCode": 58713,
+      "date": "2026-03-10", "durationMin": 80, "volumeKg": 8200,
+      "exercises": [
+        { "exerciseId": "ex-7", "name": "Squat", "muscle": "Quadriceps", "sets": [
+          {"kg":100,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":100,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":100,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":100,"reps":6,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-8", "name": "Romanian Deadlift", "muscle": "Hamstrings", "sets": [
+          {"kg":85,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":85,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":85,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-9", "name": "Leg Press", "muscle": "Quadriceps", "sets": [
+          {"kg":160,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":160,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":160,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-17", "name": "Hanging Leg Raise", "muscle": "Core", "sets": [
+          {"kg":0,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260313-pull", "routineId": "r-pull", "routineName": "Pull",
+      "colorValue": 4284382119, "iconCode": 58713,
+      "date": "2026-03-13", "durationMin": 72, "volumeKg": 5448,
+      "exercises": [
+        { "exerciseId": "ex-5", "name": "Barbell Row", "muscle": "Back", "sets": [
+          {"kg":65,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":65,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":65,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":65,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-6", "name": "Lat Pulldown", "muscle": "Back", "sets": [
+          {"kg":60,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":60,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":60,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-13", "name": "Bicep Curl", "muscle": "Biceps", "sets": [
+          {"kg":17.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":17.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":17.5,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-12", "name": "Face Pull", "muscle": "Shoulders", "sets": [
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260320-push", "routineId": "r-push", "routineName": "Push",
+      "colorValue": 4292441943, "iconCode": 58713,
+      "date": "2026-03-20", "durationMin": 73, "volumeKg": 5156,
+      "exercises": [
+        { "exerciseId": "ex-1", "name": "Bench Press", "muscle": "Chest", "sets": [
+          {"kg":77.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":77.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":77.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":77.5,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-10", "name": "Overhead Press", "muscle": "Shoulders", "sets": [
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-11", "name": "Lateral Raise", "muscle": "Shoulders", "sets": [
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-14", "name": "Tricep Pushdown", "muscle": "Triceps", "sets": [
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260324-legs", "routineId": "r-legs", "routineName": "Legs",
+      "colorValue": 4283071343, "iconCode": 58713,
+      "date": "2026-03-24", "durationMin": 82, "volumeKg": 9082,
+      "exercises": [
+        { "exerciseId": "ex-7", "name": "Squat", "muscle": "Quadriceps", "sets": [
+          {"kg":110,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":110,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":110,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":110,"reps":6,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-8", "name": "Romanian Deadlift", "muscle": "Hamstrings", "sets": [
+          {"kg":90,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":90,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":90,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-9", "name": "Leg Press", "muscle": "Quadriceps", "sets": [
+          {"kg":170,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":170,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":170,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-17", "name": "Hanging Leg Raise", "muscle": "Core", "sets": [
+          {"kg":0,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260327-pull", "routineId": "r-pull", "routineName": "Pull",
+      "colorValue": 4284382119, "iconCode": 58713,
+      "date": "2026-03-27", "durationMin": 74, "volumeKg": 5742,
+      "exercises": [
+        { "exerciseId": "ex-5", "name": "Barbell Row", "muscle": "Back", "sets": [
+          {"kg":70,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":70,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":70,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":70,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-6", "name": "Lat Pulldown", "muscle": "Back", "sets": [
+          {"kg":62.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":62.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":62.5,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-13", "name": "Bicep Curl", "muscle": "Biceps", "sets": [
+          {"kg":20,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":20,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":20,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-12", "name": "Face Pull", "muscle": "Shoulders", "sets": [
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260403-push", "routineId": "r-push", "routineName": "Push",
+      "colorValue": 4292441943, "iconCode": 58713,
+      "date": "2026-04-03", "durationMin": 73, "volumeKg": 5268,
+      "exercises": [
+        { "exerciseId": "ex-1", "name": "Bench Press", "muscle": "Chest", "sets": [
+          {"kg":80,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":80,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":80,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":80,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-10", "name": "Overhead Press", "muscle": "Shoulders", "sets": [
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-11", "name": "Lateral Raise", "muscle": "Shoulders", "sets": [
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-14", "name": "Tricep Pushdown", "muscle": "Triceps", "sets": [
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260407-pull", "routineId": "r-pull", "routineName": "Pull",
+      "colorValue": 4284382119, "iconCode": 58713,
+      "date": "2026-04-07", "durationMin": 75, "volumeKg": 5890,
+      "exercises": [
+        { "exerciseId": "ex-5", "name": "Barbell Row", "muscle": "Back", "sets": [
+          {"kg":72.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":72.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":72.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":72.5,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-6", "name": "Lat Pulldown", "muscle": "Back", "sets": [
+          {"kg":65,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":65,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":65,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-13", "name": "Bicep Curl", "muscle": "Biceps", "sets": [
+          {"kg":20,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":20,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":20,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-12", "name": "Face Pull", "muscle": "Shoulders", "sets": [
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260410-legs", "routineId": "r-legs", "routineName": "Legs",
+      "colorValue": 4283071343, "iconCode": 58713,
+      "date": "2026-04-10", "durationMin": 84, "volumeKg": 9722,
+      "exercises": [
+        { "exerciseId": "ex-7", "name": "Squat", "muscle": "Quadriceps", "sets": [
+          {"kg":117.5,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":117.5,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":117.5,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":117.5,"reps":6,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-8", "name": "Romanian Deadlift", "muscle": "Hamstrings", "sets": [
+          {"kg":95,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":95,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":95,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-9", "name": "Leg Press", "muscle": "Quadriceps", "sets": [
+          {"kg":180,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":180,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":180,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-17", "name": "Hanging Leg Raise", "muscle": "Core", "sets": [
+          {"kg":0,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":12,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260414-push", "routineId": "r-push", "routineName": "Push",
+      "colorValue": 4292441943, "iconCode": 58713,
+      "date": "2026-04-14", "durationMin": 74, "volumeKg": 5340,
+      "exercises": [
+        { "exerciseId": "ex-1", "name": "Bench Press", "muscle": "Chest", "sets": [
+          {"kg":82.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":82.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":82.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":82.5,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-10", "name": "Overhead Press", "muscle": "Shoulders", "sets": [
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-11", "name": "Lateral Raise", "muscle": "Shoulders", "sets": [
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-14", "name": "Tricep Pushdown", "muscle": "Triceps", "sets": [
+          {"kg":32.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":32.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":32.5,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260417-pull", "routineId": "r-pull", "routineName": "Pull",
+      "colorValue": 4284382119, "iconCode": 58713,
+      "date": "2026-04-17", "durationMin": 76, "volumeKg": 5994,
+      "exercises": [
+        { "exerciseId": "ex-5", "name": "Barbell Row", "muscle": "Back", "sets": [
+          {"kg":75,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":75,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":75,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":75,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-6", "name": "Lat Pulldown", "muscle": "Back", "sets": [
+          {"kg":65,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":65,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":65,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-13", "name": "Bicep Curl", "muscle": "Biceps", "sets": [
+          {"kg":22.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":22.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":22.5,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-12", "name": "Face Pull", "muscle": "Shoulders", "sets": [
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260421-legs", "routineId": "r-legs", "routineName": "Legs",
+      "colorValue": 4283071343, "iconCode": 58713,
+      "date": "2026-04-21", "durationMin": 86, "volumeKg": 10120,
+      "exercises": [
+        { "exerciseId": "ex-7", "name": "Squat", "muscle": "Quadriceps", "sets": [
+          {"kg":120,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":120,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":120,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":120,"reps":6,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-8", "name": "Romanian Deadlift", "muscle": "Hamstrings", "sets": [
+          {"kg":100,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":100,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":100,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-9", "name": "Leg Press", "muscle": "Quadriceps", "sets": [
+          {"kg":190,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":190,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":190,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-17", "name": "Hanging Leg Raise", "muscle": "Core", "sets": [
+          {"kg":0,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":12,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260424-push-PR", "routineId": "r-push", "routineName": "Push",
+      "colorValue": 4292441943, "iconCode": 58713,
+      "date": "2026-04-24", "durationMin": 76, "volumeKg": 5460,
+      "exercises": [
+        { "exerciseId": "ex-1", "name": "Bench Press", "muscle": "Chest", "sets": [
+          {"kg":85,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":85,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":85,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":85,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-10", "name": "Overhead Press", "muscle": "Shoulders", "sets": [
+          {"kg":52.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":52.5,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":52.5,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-11", "name": "Lateral Raise", "muscle": "Shoulders", "sets": [
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-14", "name": "Tricep Pushdown", "muscle": "Triceps", "sets": [
+          {"kg":32.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":32.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":32.5,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260428-legs-PR", "routineId": "r-legs", "routineName": "Legs",
+      "colorValue": 4283071343, "iconCode": 58713,
+      "date": "2026-04-28", "durationMin": 88, "volumeKg": 10560,
+      "exercises": [
+        { "exerciseId": "ex-7", "name": "Squat", "muscle": "Quadriceps", "sets": [
+          {"kg":125,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":125,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":125,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":125,"reps":6,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-8", "name": "Romanian Deadlift", "muscle": "Hamstrings", "sets": [
+          {"kg":100,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":100,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":100,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-9", "name": "Leg Press", "muscle": "Quadriceps", "sets": [
+          {"kg":200,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":200,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":200,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-17", "name": "Hanging Leg Raise", "muscle": "Core", "sets": [
+          {"kg":0,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":12,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260505-push", "routineId": "r-push", "routineName": "Push",
+      "colorValue": 4292441943, "iconCode": 58713,
+      "date": "2026-05-05", "durationMin": 70, "volumeKg": 4950,
+      "exercises": [
+        { "exerciseId": "ex-1", "name": "Bench Press", "muscle": "Chest", "sets": [
+          {"kg":82.5,"reps":7,"leftKg":null,"leftReps":null},
+          {"kg":82.5,"reps":7,"leftKg":null,"leftReps":null},
+          {"kg":82.5,"reps":7,"leftKg":null,"leftReps":null},
+          {"kg":82.5,"reps":7,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-10", "name": "Overhead Press", "muscle": "Shoulders", "sets": [
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-11", "name": "Lateral Raise", "muscle": "Shoulders", "sets": [
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-14", "name": "Tricep Pushdown", "muscle": "Triceps", "sets": [
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260508-legs", "routineId": "r-legs", "routineName": "Legs",
+      "colorValue": 4283071343, "iconCode": 58713,
+      "date": "2026-05-08", "durationMin": 80, "volumeKg": 9720,
+      "exercises": [
+        { "exerciseId": "ex-7", "name": "Squat", "muscle": "Quadriceps", "sets": [
+          {"kg":120,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":120,"reps":6,"leftKg":null,"leftReps":null},
+          {"kg":120,"reps":5,"leftKg":null,"leftReps":null},
+          {"kg":120,"reps":5,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-8", "name": "Romanian Deadlift", "muscle": "Hamstrings", "sets": [
+          {"kg":95,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":95,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":95,"reps":8,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-9", "name": "Leg Press", "muscle": "Quadriceps", "sets": [
+          {"kg":190,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":190,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":190,"reps":9,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-17", "name": "Hanging Leg Raise", "muscle": "Core", "sets": [
+          {"kg":0,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":0,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260512-pull", "routineId": "r-pull", "routineName": "Pull",
+      "colorValue": 4284382119, "iconCode": 58713,
+      "date": "2026-05-12", "durationMin": 71, "volumeKg": 5550,
+      "exercises": [
+        { "exerciseId": "ex-5", "name": "Barbell Row", "muscle": "Back", "sets": [
+          {"kg":72.5,"reps":7,"leftKg":null,"leftReps":null},
+          {"kg":72.5,"reps":7,"leftKg":null,"leftReps":null},
+          {"kg":72.5,"reps":7,"leftKg":null,"leftReps":null},
+          {"kg":72.5,"reps":7,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-6", "name": "Lat Pulldown", "muscle": "Back", "sets": [
+          {"kg":62.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":62.5,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":62.5,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-13", "name": "Bicep Curl", "muscle": "Biceps", "sets": [
+          {"kg":20,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":20,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":20,"reps":10,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-12", "name": "Face Pull", "muscle": "Shoulders", "sets": [
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null},
+          {"kg":22.5,"reps":15,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    },
+    {
+      "id": "s-20260515-push", "routineId": "r-push", "routineName": "Push",
+      "colorValue": 4292441943, "iconCode": 58713,
+      "date": "2026-05-15", "durationMin": 68, "volumeKg": 5200,
+      "exercises": [
+        { "exerciseId": "ex-1", "name": "Bench Press", "muscle": "Chest", "sets": [
+          {"kg":80,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":80,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":80,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":80,"reps":7,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-10", "name": "Overhead Press", "muscle": "Shoulders", "sets": [
+          {"kg":50,"reps":8,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":7,"leftKg":null,"leftReps":null},
+          {"kg":50,"reps":7,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-11", "name": "Lateral Raise", "muscle": "Shoulders", "sets": [
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null},
+          {"kg":15,"reps":12,"leftKg":null,"leftReps":null}
+        ]},
+        { "exerciseId": "ex-14", "name": "Tricep Pushdown", "muscle": "Triceps", "sets": [
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null},
+          {"kg":30,"reps":10,"leftKg":null,"leftReps":null}
+        ]}
+      ]
+    }
+  ],
+  "workoutLog": [
+    "2026-02-03","2026-02-06","2026-02-13","2026-02-17","2026-02-24","2026-02-27",
+    "2026-03-06","2026-03-10","2026-03-13","2026-03-20","2026-03-24","2026-03-27",
+    "2026-04-03","2026-04-07","2026-04-10","2026-04-14","2026-04-17","2026-04-21","2026-04-24","2026-04-28",
+    "2026-05-05","2026-05-08","2026-05-12","2026-05-15"
+  ]
+}
