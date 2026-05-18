@@ -1,5 +1,12 @@
+import 'dart:io';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
@@ -37,6 +44,12 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen>
   late final AnimationController _progress;
   int _current = 0;
   bool _paused = false;
+  bool _sharing = false;
+  final _slideKeys = <int, GlobalKey>{};
+
+  GlobalKey _keyForSlide(int index) {
+    return _slideKeys.putIfAbsent(index, () => GlobalKey());
+  }
 
   @override
   void initState() {
@@ -54,6 +67,32 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen>
   void dispose() {
     _progress.dispose();
     super.dispose();
+  }
+
+  Future<void> _shareCurrentSlide() async {
+    if (_sharing) return;
+    final slides = _slides();
+    final clamped = _current.clamp(0, slides.length - 1);
+    final key = _slideKeys[clamped];
+    if (key?.currentContext == null) return;
+    setState(() => _sharing = true);
+    try {
+      final boundary = key!.currentContext!.findRenderObject()
+          as RenderRepaintBoundary;
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final bytes = byteData!.buffer.asUint8List();
+      final dir = await getTemporaryDirectory();
+      final file = File(
+        '${dir.path}/versatile_recap_${DateTime.now().millisecondsSinceEpoch}.png',
+      );
+      await file.writeAsBytes(bytes, flush: true);
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: 'image/png')],
+      );
+    } finally {
+      if (mounted) setState(() => _sharing = false);
+    }
   }
 
   void _startSlide() {
@@ -174,16 +213,19 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen>
             onLongPressStart: (_) => _pause(),
             onLongPressEnd: (_) => _resume(),
             onLongPressCancel: _resume,
-            child: DefaultTextStyle(
-              style: const TextStyle(
-                color: Color(0xFFF5EFE2),
-                decoration: TextDecoration.none,
+              child: DefaultTextStyle(
+                style: const TextStyle(
+                  color: Color(0xFFF5EFE2),
+                  decoration: TextDecoration.none,
+                ),
+                child: KeyedSubtree(
+                  key: ValueKey(clamped),
+                  child: RepaintBoundary(
+                    key: _keyForSlide(clamped),
+                    child: slides[clamped],
+                  ),
+                ),
               ),
-              child: KeyedSubtree(
-                key: ValueKey(clamped),
-                child: slides[clamped],
-              ),
-            ),
           ),
           Positioned(
             top: 0,
@@ -203,6 +245,13 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen>
                       ),
                     ),
                     const SizedBox(width: 10),
+                    if (clamped > 0 && clamped < slides.length - 1)
+                      _ShareButton(
+                        onTap: _sharing ? null : _shareCurrentSlide,
+                        loading: _sharing,
+                      ),
+                    if (clamped > 0 && clamped < slides.length - 1)
+                      const SizedBox(width: 8),
                     _CloseButton(onTap: _markSeenAndClose),
                   ],
                 ),
@@ -293,6 +342,44 @@ class _CloseButton extends StatelessWidget {
           size: 16,
           color: Color(0xFFF5EFE2),
         ),
+      ),
+    );
+  }
+}
+
+class _ShareButton extends StatelessWidget {
+  const _ShareButton({required this.onTap, this.loading = false});
+  final VoidCallback? onTap;
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: loading
+            ? const Center(
+                child: SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Color(0xFFF5EFE2),
+                  ),
+                ),
+              )
+            : const Icon(
+                Icons.ios_share_rounded,
+                size: 16,
+                color: Color(0xFFF5EFE2),
+              ),
       ),
     );
   }
