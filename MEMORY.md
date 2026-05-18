@@ -4,6 +4,10 @@
 
 See `project_pending_tasks.md`.
 
+### Recap share card (pending design)
+- Current share captures the animated slide on-screen, resulting in incomplete data (counters at 0, empty bars) and no backdrop background.
+- Need a static `ShareableRecapCard` (similar to `ShareableSessionCard`) that renders the recap data without animations, with integrated dark backdrop + branding footer, at a fixed card ratio (not full-screen capture).
+
 ## What is Versatile?
 
 A workout-tracking Flutter app. Users create routines with exercises, start workouts, log sets (weight × reps), and review history. Supports custom exercises, bilateral/unilateral modes, rest timers with alerts, accent color theming, ES/EN localization, and an Android foreground service notification.

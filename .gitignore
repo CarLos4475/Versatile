@@ -43,3 +43,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# AI / dev tooling files (not part of the project)
+AGENTS.md
+MEMORY.md
+project_pending_tasks.md
+UI_SUMMARY.md
+sample_data.json
+.agents/
+*.txt
