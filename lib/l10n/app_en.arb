@@ -491,6 +491,77 @@
   "recapPastRecapsSubtitle": "Look back at any closed month",
   "recapBannerCta": "View",
 
+  "recapHeadline": "Recap",
+  "recapCoverSubtitle": "Your month of training, in numbers.",
+  "recapTapToBegin": "TAP TO BEGIN",
+  "recapSessionsEyebrow": "You showed up",
+  "recapSessionsLabel": "times this month",
+  "recapSessionsDelta": "{delta} more than {month}",
+  "@recapSessionsDelta": {
+    "placeholders": {
+      "delta": { "type": "int" },
+      "month": { "type": "String" }
+    }
+  },
+  "recapSessionsAvg": "That's an average of {perWeek} per week.",
+  "@recapSessionsAvg": {
+    "placeholders": { "perWeek": { "type": "String" } }
+  },
+  "recapVolumeEyebrow": "You moved",
+  "recapVolumeLabel": "of total weight lifted",
+  "recapVolumeDeltaPct": "{pct}% vs {month}",
+  "@recapVolumeDeltaPct": {
+    "placeholders": {
+      "pct": { "type": "int" },
+      "month": { "type": "String" }
+    }
+  },
+  "recapWeekLabel": "W{n}",
+  "@recapWeekLabel": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "recapCalendarEyebrow": "You showed up on",
+  "recapCalendarLabel": "days of the month.",
+  "recapBestWeek": "Best week: {n} sessions",
+  "@recapBestWeek": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "recapTopLiftEyebrow": "Top lift",
+  "recapTopLiftDelta": "+{kg} kg this month",
+  "@recapTopLiftDelta": {
+    "placeholders": { "kg": { "type": "String" } }
+  },
+  "recapWeeklyBestLabel": "WEEKLY BEST · LAST 7 WEEKS",
+  "recapMuscleBalanceEyebrow": "You focused on",
+  "recapMuscleTopBody": "most of all — {pct}% of your work",
+  "@recapMuscleTopBody": {
+    "placeholders": { "pct": { "type": "int" } }
+  },
+  "recapOutroEyebrow": "{month} · in summary",
+  "@recapOutroEyebrow": {
+    "placeholders": { "month": { "type": "String" } }
+  },
+  "recapOutroHeadline": "Keep showing up.",
+  "recapOutroFooter": "{month} is just getting started. See you in the gym.",
+  "@recapOutroFooter": {
+    "placeholders": { "month": { "type": "String" } }
+  },
+  "recapOutroCta": "Back to training",
+  "recapStatSessions": "sessions",
+  "recapStatHours": "hours",
+  "recapStatNewPRs": "new PRs",
+  "recapHomeBannerEyebrow": "Your {month} recap is ready",
+  "@recapHomeBannerEyebrow": {
+    "placeholders": { "month": { "type": "String" } }
+  },
+  "recapHomeBannerTitle": "{sessions} sessions · {volume} moved",
+  "@recapHomeBannerTitle": {
+    "placeholders": {
+      "sessions": { "type": "int" },
+      "volume": { "type": "String" }
+    }
+  },
+
   "share": "Share",
   "shareWorkout": "Share workout",
   "sharePreviewSubtitle": "A square card you can post anywhere"

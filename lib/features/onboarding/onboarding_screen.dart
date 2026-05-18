@@ -332,7 +332,9 @@ class _AnimatedOnboardPageState extends State<_AnimatedOnboardPage>
                       position: _btnSlide,
                       child: _ContinueButton(
                         label: widget.isLast
-                            ? AppLocalizations.of(context)!.onboardingWhatsYourName
+                            ? AppLocalizations.of(
+                                context,
+                              )!.onboardingWhatsYourName
                             : AppLocalizations.of(context)!.onboardingContinue,
                         icon: widget.isLast
                             ? Icons.person_outline
@@ -539,7 +541,9 @@ class _NamePageState extends State<_NamePage>
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            AppLocalizations.of(context)!.onboardingNameSubtitle,
+                            AppLocalizations.of(
+                              context,
+                            )!.onboardingNameSubtitle,
                             style: TextStyle(
                               fontSize: 15,
                               color: context.colors.ink400,
@@ -586,7 +590,9 @@ class _NamePageState extends State<_NamePage>
                           ),
                           const SizedBox(height: 24),
                           _ContinueButton(
-                            label: AppLocalizations.of(context)!.onboardingLetsGo,
+                            label: AppLocalizations.of(
+                              context,
+                            )!.onboardingLetsGo,
                             icon: Icons.check,
                             onTap: widget.onFinish,
                           ),

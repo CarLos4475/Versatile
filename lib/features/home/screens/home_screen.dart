@@ -10,6 +10,8 @@ import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../programs/screens/program_editor_screen.dart';
 import '../../programs/view_models/programs_view_model.dart';
+import '../../recap/screens/monthly_recap_screen.dart';
+import '../../recap/view_models/recap_view_model.dart';
 import '../view_models/deload_view_model.dart';
 import '../view_models/home_view_model.dart';
 import '../widgets/session_card.dart';
@@ -263,6 +265,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
 
               const SizedBox(height: 16),
+
+              Consumer(
+                builder: (context, ref, _) {
+                  final banner = ref.watch(unseenLastRecapProvider).value;
+                  if (banner == null) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(22, 0, 22, 14),
+                    child: FadeSlideIn(
+                      delay: const Duration(milliseconds: 80),
+                      child: _RecapHomeBanner(monthKey: banner),
+                    ),
+                  );
+                },
+              ),
 
               Consumer(
                 builder: (context, ref, _) {
@@ -1145,6 +1161,190 @@ class _DeloadBanner extends ConsumerWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Home entry point into the Monthly Recap. Warm dark gradient + radial
+/// accent glow + sparkle dots — visually distinct from the deload banner
+/// (which is accent-tinted) so the two don't compete on the same screen.
+class _RecapHomeBanner extends ConsumerWidget {
+  const _RecapHomeBanner({required this.monthKey});
+  final MonthKey monthKey;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
+    final recap = ref.watch(monthlyRecapProvider(monthKey));
+    if (recap == null) return const SizedBox.shrink();
+
+    final monthLabel = FormatUtils.monthYear(
+      '${monthKey.year.toString().padLeft(4, '0')}-'
+      '${monthKey.month.toString().padLeft(2, '0')}-01',
+    );
+
+    return PressableScale(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => MonthlyRecapScreen(monthKey: monthKey),
+        ),
+      ),
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF29211A),
+              Color(0xFF3A2A1F),
+              Color(0xFF5C2E1A),
+            ],
+            stops: [0.0, 0.45, 1.0],
+          ),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x4028140A),
+              blurRadius: 22,
+              offset: Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Stack(
+          clipBehavior: Clip.hardEdge,
+          children: [
+            // Radial accent glow in the top-right corner.
+            Positioned(
+              right: -40,
+              top: -50,
+              child: Container(
+                width: 180,
+                height: 180,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      colors.accent.withValues(alpha: 0.55),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.65],
+                  ),
+                ),
+              ),
+            ),
+            // Sparkle dots bottom-right.
+            Positioned(
+              right: 14,
+              bottom: 10,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _Sparkle(size: 3, color: colors.accentLight),
+                  const SizedBox(width: 4),
+                  _Sparkle(size: 5, color: colors.accentLight),
+                  const SizedBox(width: 4),
+                  _Sparkle(size: 3, color: colors.accentLight),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          colors.accentLight,
+                          colors.accent,
+                          colors.accentDeep,
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colors.accentDeep.withValues(alpha: 0.45),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.trending_up_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.recapHomeBannerEyebrow(monthLabel),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.6,
+                            color: colors.accentLight,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          l10n.recapHomeBannerTitle(
+                            recap.sessionsCount,
+                            FormatUtils.volume(recap.totalVolumeKg),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFFF5EFE2),
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    size: 20,
+                    color: const Color(0xFFF5EFE2).withValues(alpha: 0.6),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Sparkle extends StatelessWidget {
+  const _Sparkle({required this.size, required this.color});
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(size / 2),
       ),
     );
   }

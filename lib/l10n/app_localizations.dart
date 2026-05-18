@@ -2144,6 +2144,174 @@ abstract class AppLocalizations {
   /// **'View'**
   String get recapBannerCta;
 
+  /// No description provided for @recapHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Recap'**
+  String get recapHeadline;
+
+  /// No description provided for @recapCoverSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your month of training, in numbers.'**
+  String get recapCoverSubtitle;
+
+  /// No description provided for @recapTapToBegin.
+  ///
+  /// In en, this message translates to:
+  /// **'TAP TO BEGIN'**
+  String get recapTapToBegin;
+
+  /// No description provided for @recapSessionsEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'You showed up'**
+  String get recapSessionsEyebrow;
+
+  /// No description provided for @recapSessionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'times this month'**
+  String get recapSessionsLabel;
+
+  /// No description provided for @recapSessionsDelta.
+  ///
+  /// In en, this message translates to:
+  /// **'{delta} more than {month}'**
+  String recapSessionsDelta(int delta, String month);
+
+  /// No description provided for @recapSessionsAvg.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s an average of {perWeek} per week.'**
+  String recapSessionsAvg(String perWeek);
+
+  /// No description provided for @recapVolumeEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'You moved'**
+  String get recapVolumeEyebrow;
+
+  /// No description provided for @recapVolumeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'of total weight lifted'**
+  String get recapVolumeLabel;
+
+  /// No description provided for @recapVolumeDeltaPct.
+  ///
+  /// In en, this message translates to:
+  /// **'{pct}% vs {month}'**
+  String recapVolumeDeltaPct(int pct, String month);
+
+  /// No description provided for @recapWeekLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'W{n}'**
+  String recapWeekLabel(int n);
+
+  /// No description provided for @recapCalendarEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'You showed up on'**
+  String get recapCalendarEyebrow;
+
+  /// No description provided for @recapCalendarLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'days of the month.'**
+  String get recapCalendarLabel;
+
+  /// No description provided for @recapBestWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Best week: {n} sessions'**
+  String recapBestWeek(int n);
+
+  /// No description provided for @recapTopLiftEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Top lift'**
+  String get recapTopLiftEyebrow;
+
+  /// No description provided for @recapTopLiftDelta.
+  ///
+  /// In en, this message translates to:
+  /// **'+{kg} kg this month'**
+  String recapTopLiftDelta(String kg);
+
+  /// No description provided for @recapWeeklyBestLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'WEEKLY BEST · LAST 7 WEEKS'**
+  String get recapWeeklyBestLabel;
+
+  /// No description provided for @recapMuscleBalanceEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'You focused on'**
+  String get recapMuscleBalanceEyebrow;
+
+  /// No description provided for @recapMuscleTopBody.
+  ///
+  /// In en, this message translates to:
+  /// **'most of all — {pct}% of your work'**
+  String recapMuscleTopBody(int pct);
+
+  /// No description provided for @recapOutroEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'{month} · in summary'**
+  String recapOutroEyebrow(String month);
+
+  /// No description provided for @recapOutroHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep showing up.'**
+  String get recapOutroHeadline;
+
+  /// No description provided for @recapOutroFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'{month} is just getting started. See you in the gym.'**
+  String recapOutroFooter(String month);
+
+  /// No description provided for @recapOutroCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to training'**
+  String get recapOutroCta;
+
+  /// No description provided for @recapStatSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'sessions'**
+  String get recapStatSessions;
+
+  /// No description provided for @recapStatHours.
+  ///
+  /// In en, this message translates to:
+  /// **'hours'**
+  String get recapStatHours;
+
+  /// No description provided for @recapStatNewPRs.
+  ///
+  /// In en, this message translates to:
+  /// **'new PRs'**
+  String get recapStatNewPRs;
+
+  /// No description provided for @recapHomeBannerEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Your {month} recap is ready'**
+  String recapHomeBannerEyebrow(String month);
+
+  /// No description provided for @recapHomeBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{sessions} sessions · {volume} moved'**
+  String recapHomeBannerTitle(int sessions, String volume);
+
   /// No description provided for @share.
   ///
   /// In en, this message translates to:

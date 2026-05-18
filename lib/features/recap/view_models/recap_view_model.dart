@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/utils/exercise_category.dart';
@@ -160,10 +162,12 @@ MonthlyRecap? _computeRecap(List<Session> sessions, int year, int month) {
       : (year: year, month: month - 1);
   var prevVol = 0.0;
   var prevHasData = false;
+  var prevMonthSessionsCount = 0;
   for (final s in sessions) {
     if (_sessionInMonth(s, prevMonth.year, prevMonth.month)) {
       prevVol += s.volumeKg;
       prevHasData = true;
+      prevMonthSessionsCount += 1;
     }
   }
   double? volumeDeltaPct;
@@ -185,6 +189,110 @@ MonthlyRecap? _computeRecap(List<Session> sessions, int year, int month) {
     }
   }
 
+  // Volume grouped into the 6 high-level buckets the Muscle Balance slide
+  // displays. Arms collapses Biceps/Triceps/Forearms, Legs collapses Quads
+  // /Hamstrings/Glutes/Calves; everything else stays as-is.
+  final volumeByMuscle = <String, double>{};
+  for (final s in monthSessions) {
+    for (final e in s.exercises ?? const <SessionExercise>[]) {
+      final bucket = _muscleBucket(e.muscle);
+      if (bucket == null) continue;
+      volumeByMuscle[bucket] = (volumeByMuscle[bucket] ?? 0) + e.volume;
+    }
+  }
+
+  // Week-of-month bucketing for the volume bar chart + best-week badge.
+  // Week 0 = days 1-7, week 1 = 8-14, etc. Last bucket may be partial.
+  final weeksInMonth = ((_daysInMonth(year, month) + 6) / 7).ceil();
+  final weeklyVolume = List<double>.filled(weeksInMonth, 0);
+  final weeklySessionCount = List<int>.filled(weeksInMonth, 0);
+  for (final s in monthSessions) {
+    final day = int.tryParse(s.date.substring(8, 10));
+    if (day == null) continue;
+    final w = ((day - 1) ~/ 7).clamp(0, weeksInMonth - 1);
+    weeklyVolume[w] += s.volumeKg;
+    weeklySessionCount[w] += 1;
+  }
+  final bestWeekSessions =
+      weeklySessionCount.isEmpty ? 0 : weeklySessionCount.reduce(math.max);
+
+  // newPRsCount: count distinct exercises whose best in-month e1RM beat
+  // their pre-month historical best. Reuses the maps we already built.
+  var newPRsCount = 0;
+  for (final entry in thisMonthBest1Rm.entries) {
+    final prev = prevBest1Rm[entry.key] ?? 0;
+    if (entry.value.orm > prev) newPRsCount += 1;
+  }
+
+  // Top lift: exercise with the highest single-set e1RM during the month.
+  // Pulls weekly bests over the last 7 weeks (calendar-anchored Mon→Sun)
+  // for the sparkline. deltaKgVsPrevMonth = bestKg this month minus the
+  // best raw kg of the same exercise in the previous calendar month.
+  RecapTopLift? topLift;
+  if (thisMonthBest1Rm.isNotEmpty) {
+    final topId = thisMonthBest1Rm.entries
+        .reduce((a, b) => a.value.orm >= b.value.orm ? a : b)
+        .key;
+    final best = thisMonthBest1Rm[topId]!;
+    final name = exGroups[topId]?.name ?? '';
+    final muscle = _muscleForExercise(monthSessions, topId);
+
+    // Previous-month best raw kg for the same exercise (used for delta).
+    double prevMonthBestKg = 0;
+    for (final s in sessions) {
+      if (!_sessionInMonth(s, prevMonth.year, prevMonth.month)) continue;
+      for (final e in s.exercises ?? const <SessionExercise>[]) {
+        if (e.exerciseId != topId) continue;
+        for (final set in e.sets) {
+          if (set.kg > prevMonthBestKg) prevMonthBestKg = set.kg;
+          if (set.leftKg != null && set.leftKg! > prevMonthBestKg) {
+            prevMonthBestKg = set.leftKg!;
+          }
+        }
+      }
+    }
+    final deltaKg = prevMonthBestKg > 0 ? (best.kg - prevMonthBestKg) : 0.0;
+
+    // 7-week sparkline ending in the last day of the analysed month. Each
+    // bucket holds the best e1RM seen for this exercise in that ISO week.
+    final lastDay = DateTime(year, month, _daysInMonth(year, month));
+    final weeklyBests = List<double>.filled(7, 0);
+    for (final s in sessions) {
+      final d = DateTime.tryParse('${s.date}T00:00:00');
+      if (d == null) continue;
+      final diff = lastDay.difference(d).inDays;
+      if (diff < 0 || diff >= 49) continue;
+      final bucket = 6 - (diff ~/ 7);
+      if (bucket < 0 || bucket > 6) continue;
+      for (final e in s.exercises ?? const <SessionExercise>[]) {
+        if (e.exerciseId != topId) continue;
+        for (final set in e.sets) {
+          if (set.kg > 0 && set.reps > 0) {
+            final orm = epleyOneRm(set.kg, set.reps);
+            if (orm > weeklyBests[bucket]) weeklyBests[bucket] = orm;
+          }
+          if (set.leftKg != null &&
+              set.leftReps != null &&
+              set.leftKg! > 0 &&
+              set.leftReps! > 0) {
+            final orm = epleyOneRm(set.leftKg!, set.leftReps!);
+            if (orm > weeklyBests[bucket]) weeklyBests[bucket] = orm;
+          }
+        }
+      }
+    }
+    topLift = RecapTopLift(
+      exerciseId: topId,
+      name: name,
+      muscle: muscle,
+      bestKg: best.kg,
+      bestReps: best.reps,
+      estimatedOneRm: best.orm,
+      deltaKgVsPrevMonth: deltaKg,
+      weeklyBests: weeklyBests,
+    );
+  }
+
   return MonthlyRecap(
     year: year,
     month: month,
@@ -198,7 +306,56 @@ MonthlyRecap? _computeRecap(List<Session> sessions, int year, int month) {
     volumeDeltaPctVsPrev: volumeDeltaPct,
     prevMonthLabel: prevLabel,
     volumeByCategory: volumeByCategory,
+    prevSessionsCount: prevMonthSessionsCount,
+    bestWeekSessions: bestWeekSessions,
+    newPRsCount: newPRsCount,
+    weeklyVolumeKg: weeklyVolume,
+    volumeByMuscle: volumeByMuscle,
+    topLift: topLift,
   );
+}
+
+/// Maps an exercise's raw `muscle` field to one of the six recap buckets,
+/// or null when it should be excluded from the Muscle Balance slide.
+String? _muscleBucket(String muscle) {
+  switch (muscle) {
+    case 'Chest':
+      return 'Chest';
+    case 'Back':
+      return 'Back';
+    case 'Shoulders':
+      return 'Shoulders';
+    case 'Biceps':
+    case 'Triceps':
+    case 'Forearms':
+    case 'Arms':
+      return 'Arms';
+    case 'Quadriceps':
+    case 'Hamstrings':
+    case 'Glutes':
+    case 'Calves':
+    case 'Legs':
+      return 'Legs';
+    case 'Core':
+      return 'Core';
+  }
+  return null;
+}
+
+int _daysInMonth(int year, int month) {
+  final firstNext = month == 12
+      ? DateTime(year + 1, 1, 1)
+      : DateTime(year, month + 1, 1);
+  return firstNext.subtract(const Duration(days: 1)).day;
+}
+
+String _muscleForExercise(List<Session> monthSessions, String exerciseId) {
+  for (final s in monthSessions) {
+    for (final e in s.exercises ?? const <SessionExercise>[]) {
+      if (e.exerciseId == exerciseId) return e.muscle;
+    }
+  }
+  return 'Other';
 }
 
 final monthlyRecapProvider =

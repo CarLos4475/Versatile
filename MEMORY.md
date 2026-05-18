@@ -1,5 +1,9 @@
 # MEMORY.md — Versatile Project Overview
 
+## Pending tasks
+
+See `project_pending_tasks.md`.
+
 ## What is Versatile?
 
 A workout-tracking Flutter app. Users create routines with exercises, start workouts, log sets (weight × reps), and review history. Supports custom exercises, bilateral/unilateral modes, rest timers with alerts, accent color theming, ES/EN localization, and an Android foreground service notification.
@@ -108,6 +112,24 @@ lib/
 - On confirm: `skipExercise()` fills `completedSets` with `prevSets` data copied from last session (repeating last prevSet to meet `targetSets`), marks `skipped = true` on the exercise state
 - Skipped card shows only: exercise name (tiny, 11px, top-left) + accent overlay with "SKIPPED" centered — no other UI leaks through
 - Skipped exercises save the filled sets into the session history (no empty gaps)
+
+## Three features added (2026-05-17)
+
+- **PR auto-detect realtime** — `epleyOneRm` + `detectRealtimePR` in `recap_view_model.dart`, hooked into `finishSet()` in `active_workout_view_model.dart`. Celebration banner (`pr_celebration_banner.dart`) with packageless sparkles + haptic feedback. Cached for share card.
+- **Tags Nivel 1** — `ExerciseCategory` enum (push/pull/legs/other) in `exercise_category.dart`. Filter chips in exercises list screen. `volumeByCategory` on `MonthlyRecap`.
+- **Deload sugerido** — `deload_view_model.dart` with stagnation + volume drop signals. Banner on home screen (_DeloadBanner) dismissable 7 days.
+
+## Recap redesign (Stories-style)
+
+Fully rewritten as Instagram/Spotify Stories takeover:
+- **7 slides**: Cover, Sessions, Volume, Calendar, TopLift, MuscleBalance, Outro (`recap_slides.dart:1-1315`).
+- **Stories container**: auto-advance per slide, tap left/right zones, long-press pause, progress bars top (`monthly_recap_screen.dart:1-305`).
+- **Static backdrop**: dark base `#0E0B07` + two radial accent glows + grain texture (`recap_backdrop.dart`). No more animated aurora.
+- **Banner moved to Home** — `_RecapHomeBanner` in `home_screen.dart`. `_DebugRecapPreviewPill` also on Home. History screen cleaned up.
+- **Data model extended**: `MonthlyRecap` gained `prevSessionsCount`, `bestWeekSessions`, `newPRsCount`, `weeklyVolumeKg`, `volumeByMuscle`, `topLift` (new `RecapTopLift` sub-entity).
+- **Key fix**: `_SlideShell` must NOT wrap its content in `Positioned.fill` (it's inside another `Positioned.fill` in the screen, which is already a direct child of Stack). Use `StackFit.expand` on the parent Stack instead.
+- **Key fix**: Use `DefaultTextStyle` (pure override) instead of `DefaultTextStyle.merge` — the merge inherited a background Paint from the app theme that painted over the backdrop.
+- **L10n**: ~20 new ES/EN strings. ES uses Mexican Spanish (no "vos" forms, no "lifts", "PRs" → "Récords", etc.).
 
 ## L10n ARB File Trap
 

@@ -418,7 +418,7 @@
 
   "recapTitle": "Tu mes entrenando",
   "recapIntroSubtitle": "Un vistazo a lo que entrenaste.",
-  "recapSessionsTitle": "Apareciste",
+  "recapSessionsTitle": "Entrenaste",
   "recapSessionsBody": "{count, plural, one{# entrenamiento} other{# entrenamientos}}",
   "@recapSessionsBody": {
     "placeholders": { "count": { "type": "int" } }
@@ -461,11 +461,11 @@
     "placeholders": { "exercise": { "type": "String" } }
   },
   "recapOutroTitle": "Nos vemos el próximo mes",
-  "recapOutroBody": "Sigue apareciendo.",
+  "recapOutroBody": "Sigue entrenando.",
   "recapBalanceTitle": "Balance de movimiento",
   "recapBalanceBody": "Cómo repartiste el trabajo este mes.",
   "deloadBannerTitle": "¿Toca semana de descarga?",
-  "deloadBannerBodyStagnation": "Varios lifts no progresan hace 3+ semanas.",
+  "deloadBannerBodyStagnation": "Varios ejercicios no han progresado en 3+ semanas.",
   "deloadBannerBodyVolume": "Tu volumen semanal ha bajado últimamente.",
   "deloadBannerBodyBoth": "El progreso está parado y el volumen bajó. Una semana ligera puede ayudar.",
   "deloadBannerCta": "Abrir programa",
@@ -490,6 +490,77 @@
   "recapPastRecapsEmpty": "Aún no hay resúmenes pasados",
   "recapPastRecapsSubtitle": "Revisa cualquier mes cerrado",
   "recapBannerCta": "Ver",
+
+  "recapHeadline": "Resumen",
+  "recapCoverSubtitle": "Tu mes de entrenamiento, en números.",
+  "recapTapToBegin": "TOCA PARA COMENZAR",
+  "recapSessionsEyebrow": "Entrenaste",
+  "recapSessionsLabel": "veces este mes",
+  "recapSessionsDelta": "{delta} más que {month}",
+  "@recapSessionsDelta": {
+    "placeholders": {
+      "delta": { "type": "int" },
+      "month": { "type": "String" }
+    }
+  },
+  "recapSessionsAvg": "Un promedio de {perWeek} por semana.",
+  "@recapSessionsAvg": {
+    "placeholders": { "perWeek": { "type": "String" } }
+  },
+  "recapVolumeEyebrow": "Levantaste",
+  "recapVolumeLabel": "en peso total",
+  "recapVolumeDeltaPct": "{pct}% vs {month}",
+  "@recapVolumeDeltaPct": {
+    "placeholders": {
+      "pct": { "type": "int" },
+      "month": { "type": "String" }
+    }
+  },
+  "recapWeekLabel": "Sem {n}",
+  "@recapWeekLabel": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "recapCalendarEyebrow": "Entrenaste",
+  "recapCalendarLabel": "días del mes.",
+  "recapBestWeek": "Mejor semana: {n} sesiones",
+  "@recapBestWeek": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "recapTopLiftEyebrow": "Mejor ejercicio",
+  "recapTopLiftDelta": "+{kg} kg este mes",
+  "@recapTopLiftDelta": {
+    "placeholders": { "kg": { "type": "String" } }
+  },
+  "recapWeeklyBestLabel": "MEJOR SEMANAL · ÚLTIMAS 7 SEMANAS",
+  "recapMuscleBalanceEyebrow": "Trabajaste más",
+  "recapMuscleTopBody": "el {pct}% de tu esfuerzo total",
+  "@recapMuscleTopBody": {
+    "placeholders": { "pct": { "type": "int" } }
+  },
+  "recapOutroEyebrow": "{month} · en resumen",
+  "@recapOutroEyebrow": {
+    "placeholders": { "month": { "type": "String" } }
+  },
+  "recapOutroHeadline": "Sigue entrenando.",
+  "recapOutroFooter": "{month} apenas empieza. Nos vemos en el gym.",
+  "@recapOutroFooter": {
+    "placeholders": { "month": { "type": "String" } }
+  },
+  "recapOutroCta": "Volver a entrenar",
+  "recapStatSessions": "sesiones",
+  "recapStatHours": "horas",
+  "recapStatNewPRs": "Récords nuevos",
+  "recapHomeBannerEyebrow": "Tu resumen de {month} está listo",
+  "@recapHomeBannerEyebrow": {
+    "placeholders": { "month": { "type": "String" } }
+  },
+  "recapHomeBannerTitle": "{sessions} sesiones · {volume} levantados",
+  "@recapHomeBannerTitle": {
+    "placeholders": {
+      "sessions": { "type": "int" },
+      "volume": { "type": "String" }
+    }
+  },
 
   "share": "Compartir",
   "shareWorkout": "Compartir entrenamiento",

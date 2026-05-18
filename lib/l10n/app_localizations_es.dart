@@ -1009,7 +1009,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get recapIntroSubtitle => 'Un vistazo a lo que entrenaste.';
 
   @override
-  String get recapSessionsTitle => 'Apareciste';
+  String get recapSessionsTitle => 'Entrenaste';
 
   @override
   String recapSessionsBody(int count) {
@@ -1080,7 +1080,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get recapOutroTitle => 'Nos vemos el próximo mes';
 
   @override
-  String get recapOutroBody => 'Sigue apareciendo.';
+  String get recapOutroBody => 'Sigue entrenando.';
 
   @override
   String get recapBalanceTitle => 'Balance de movimiento';
@@ -1093,7 +1093,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get deloadBannerBodyStagnation =>
-      'Varios lifts no progresan hace 3+ semanas.';
+      'Varios ejercicios no han progresado en 3+ semanas.';
 
   @override
   String get deloadBannerBodyVolume =>
@@ -1145,6 +1145,112 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get recapBannerCta => 'Ver';
+
+  @override
+  String get recapHeadline => 'Resumen';
+
+  @override
+  String get recapCoverSubtitle => 'Tu mes de entrenamiento, en números.';
+
+  @override
+  String get recapTapToBegin => 'TOCA PARA COMENZAR';
+
+  @override
+  String get recapSessionsEyebrow => 'Entrenaste';
+
+  @override
+  String get recapSessionsLabel => 'veces este mes';
+
+  @override
+  String recapSessionsDelta(int delta, String month) {
+    return '$delta más que $month';
+  }
+
+  @override
+  String recapSessionsAvg(String perWeek) {
+    return 'Un promedio de $perWeek por semana.';
+  }
+
+  @override
+  String get recapVolumeEyebrow => 'Levantaste';
+
+  @override
+  String get recapVolumeLabel => 'en peso total';
+
+  @override
+  String recapVolumeDeltaPct(int pct, String month) {
+    return '$pct% vs $month';
+  }
+
+  @override
+  String recapWeekLabel(int n) {
+    return 'Sem $n';
+  }
+
+  @override
+  String get recapCalendarEyebrow => 'Entrenaste';
+
+  @override
+  String get recapCalendarLabel => 'días del mes.';
+
+  @override
+  String recapBestWeek(int n) {
+    return 'Mejor semana: $n sesiones';
+  }
+
+  @override
+  String get recapTopLiftEyebrow => 'Mejor ejercicio';
+
+  @override
+  String recapTopLiftDelta(String kg) {
+    return '+$kg kg este mes';
+  }
+
+  @override
+  String get recapWeeklyBestLabel => 'MEJOR SEMANAL · ÚLTIMAS 7 SEMANAS';
+
+  @override
+  String get recapMuscleBalanceEyebrow => 'Trabajaste más';
+
+  @override
+  String recapMuscleTopBody(int pct) {
+    return 'el $pct% de tu esfuerzo total';
+  }
+
+  @override
+  String recapOutroEyebrow(String month) {
+    return '$month · en resumen';
+  }
+
+  @override
+  String get recapOutroHeadline => 'Sigue entrenando.';
+
+  @override
+  String recapOutroFooter(String month) {
+    return '$month apenas empieza. Nos vemos en el gym.';
+  }
+
+  @override
+  String get recapOutroCta => 'Volver a entrenar';
+
+  @override
+  String get recapStatSessions => 'sesiones';
+
+  @override
+  String get recapStatHours => 'horas';
+
+  @override
+  String get recapStatNewPRs => 'Récords nuevos';
+
+  @override
+  String recapHomeBannerEyebrow(String month) {
+    return 'Tu resumen de $month está listo';
+  }
+
+  @override
+  String recapHomeBannerTitle(int sessions, String volume) {
+    return '$sessions sesiones · $volume levantados';
+  }
 
   @override
   String get share => 'Compartir';
