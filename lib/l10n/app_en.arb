@@ -287,7 +287,16 @@
   "@programsTotalCount": {
     "placeholders": { "n": { "type": "int" } }
   },
+  "splashEyebrow": "Your gym tracker",
+  "splashTaglinePrefix": "Lift what",
+  "splashTaglineAccent": "you log.",
+  "splashLoading": "Loading",
   "todayYouTrain": "Today you train",
+  "todayYouRest": "Today you",
+  "todayRestWord": "rest",
+  "todayLabelPrefix": "Today:",
+  "templateBannerTitle": "Labels are placeholders",
+  "templateBannerBody": "Tap any day to swap a label for one of your routines. Create the routines first if you don't have them yet.",
   "newProgramTitle": "New program",
   "newProgramSubtitle": "Configure your plan in 4 steps",
   "stepName": "Name",

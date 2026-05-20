@@ -19,8 +19,9 @@ import '../widgets/numbered_step.dart';
 import '../widgets/slot_editor_sheet.dart';
 
 class ProgramEditorScreen extends ConsumerStatefulWidget {
-  const ProgramEditorScreen({super.key, this.programId});
+  const ProgramEditorScreen({super.key, this.programId, this.template});
   final String? programId;
+  final ProgramTemplate? template;
 
   @override
   ConsumerState<ProgramEditorScreen> createState() =>
@@ -50,11 +51,56 @@ class _ProgramEditorScreenState extends ConsumerState<ProgramEditorScreen> {
     if (mounted) setState(() {});
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final template = widget.template;
+    if (template != null &&
+        widget.programId == null &&
+        _nameCtrl.text.isEmpty) {
+      _nameCtrl.text = template.name(AppLocalizations.of(context)!);
+    }
+  }
+
+  List<ProgramSlot> _slotsFromTemplate(
+    String programId,
+    ProgramTemplate template,
+    int weeks,
+  ) {
+    final slots = <ProgramSlot>[];
+    for (var w = 0; w < weeks; w++) {
+      for (final pattern in template.pattern) {
+        if (pattern.isRest) continue;
+        final label = pattern.labelKey ?? '';
+        if (label.isEmpty) continue;
+        slots.add(
+          ProgramSlot(
+            id: const Uuid().v4(),
+            programId: programId,
+            weekIndex: w,
+            weekday: pattern.weekday,
+            kind: SlotKind.label,
+            labelText: label,
+          ),
+        );
+      }
+    }
+    return slots;
+  }
+
   Future<void> _loadOrInit() async {
     if (widget.programId == null) {
+      final id = const Uuid().v4();
+      final template = widget.template;
       setState(() {
-        _id = const Uuid().v4();
+        _id = id;
         _createdAt = DateTime.now();
+        if (template != null) {
+          _color = template.color;
+          _weeks = template.weeksCount;
+          _deload = {...template.deloadWeeks};
+          _slots = _slotsFromTemplate(id, template, _weeks);
+        }
         _loading = false;
       });
       return;
@@ -222,6 +268,16 @@ class _ProgramEditorScreenState extends ConsumerState<ProgramEditorScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (widget.template != null &&
+                        widget.programId == null &&
+                        _slots.any((s) => s.kind == SlotKind.label))
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12, bottom: 8),
+                        child: _TemplateNotice(
+                          title: l10n.templateBannerTitle,
+                          body: l10n.templateBannerBody,
+                        ),
+                      ),
                     NumberedStep(
                       number: 1,
                       label: l10n.stepName,
@@ -331,16 +387,6 @@ class _SaveButton extends StatelessWidget {
                 )
               : null,
           color: enabled ? null : colors.ink900.withValues(alpha: 0.08),
-          boxShadow: enabled
-              ? [
-                  BoxShadow(
-                    color: darkenColor(colors.accent, 0.10)
-                        .withValues(alpha: 0.35),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
         ),
         child: Text(
           label,
@@ -457,21 +503,6 @@ class _ColorStep extends StatelessWidget {
                             end: Alignment.bottomRight,
                             colors: [c, darkenColor(c, 0.18)],
                           ),
-                          boxShadow: active
-                              ? [
-                                  BoxShadow(
-                                    color: c.withValues(alpha: 0.4),
-                                    blurRadius: 14,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ]
-                              : [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.2),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
                         ),
                       ),
                     ),
@@ -674,16 +705,6 @@ class _MinusPlus extends StatelessWidget {
           color: (isPlus && enabled)
               ? null
               : colors.ink900.withValues(alpha: enabled ? 0.06 : 0.03),
-          boxShadow: isPlus && enabled
-              ? [
-                  BoxShadow(
-                    color: darkenColor(colors.accent, 0.10)
-                        .withValues(alpha: 0.35),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
         ),
         child: Icon(
           isPlus ? Icons.add : Icons.remove,
@@ -757,18 +778,6 @@ class _CalendarStep extends StatelessWidget {
                       color: active
                           ? null
                           : colors.ink900.withValues(alpha: 0.06),
-                      boxShadow: active
-                          ? [
-                              BoxShadow(
-                                color: darkenColor(
-                                  colors.accent,
-                                  0.10,
-                                ).withValues(alpha: 0.40),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ]
-                          : null,
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -898,6 +907,66 @@ class _CalendarStep extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _TemplateNotice extends StatelessWidget {
+  const _TemplateNotice({required this.title, required this.body});
+
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      decoration: BoxDecoration(
+        color: colors.accentTint,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: colors.accent.withValues(alpha: 0.22),
+          width: 0.5,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.info_outline_rounded,
+            size: 16,
+            color: colors.accentDeep,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.08,
+                    color: colors.accentDeep,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  body,
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.35,
+                    color: colors.ink500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

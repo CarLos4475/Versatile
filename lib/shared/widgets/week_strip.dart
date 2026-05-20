@@ -152,7 +152,7 @@ class _LargeCell extends StatelessWidget {
                 ? Icon(
                     Icons.bedtime_outlined,
                     size: 14,
-                    color: Colors.white.withValues(alpha: 0.35),
+                    color: context.colors.ink400,
                   )
                 : Text(
                     cell.label!.substring(0, 1).toUpperCase(),
@@ -190,35 +190,18 @@ class _GlossyCell extends StatelessWidget {
     final isRest = cell.isRest;
     final base = cell.color;
     final r = radius + 2;
+    final colors = context.colors;
     return Container(
       decoration: BoxDecoration(
         gradient: isRest ? null : cellGradient(base!),
-        color: isRest ? Colors.white.withValues(alpha: 0.05) : null,
+        color: isRest ? colors.ink900.withValues(alpha: 0.06) : null,
         borderRadius: BorderRadius.circular(r),
         border: isRest
             ? Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
+                color: colors.hairline,
                 width: 0.5,
               )
             : null,
-        boxShadow: isRest
-            ? null
-            : [
-                // Soft ambient halo around the entire cell — eliminates the
-                // "hard cut" feel at the rounded-rect edges so the gradient
-                // perceptually bleeds out instead of stopping abruptly.
-                BoxShadow(
-                  color: base!.withValues(alpha: 0.32),
-                  blurRadius: 18,
-                  spreadRadius: -2,
-                ),
-                // Drop shadow for vertical depth.
-                BoxShadow(
-                  color: darkenColor(base, 0.22).withValues(alpha: 0.55),
-                  blurRadius: 16,
-                  offset: const Offset(0, 8),
-                ),
-              ],
       ),
       foregroundDecoration: isToday
           ? BoxDecoration(
@@ -286,7 +269,7 @@ class _CompactCell extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.5,
                 color: cell.isRest
-                    ? Colors.white.withValues(alpha: 0.4)
+                    ? context.colors.ink400
                     : Colors.white.withValues(alpha: 0.80),
               ),
             ),
@@ -296,7 +279,7 @@ class _CompactCell extends StatelessWidget {
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: cell.isRest
-                  ? Colors.white.withValues(alpha: 0.4)
+                  ? context.colors.ink500
                   : Colors.white,
             ),
           ),
@@ -327,7 +310,7 @@ class _MiniCell extends StatelessWidget {
                   darkenColor(cell.color!, 0.10),
                 ],
               ),
-        color: cell.isRest ? hairline.withValues(alpha: 0.3) : null,
+        color: cell.isRest ? context.colors.ink900.withValues(alpha: 0.08) : null,
       ),
     );
   }

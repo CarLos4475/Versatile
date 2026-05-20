@@ -287,7 +287,16 @@
   "@programsTotalCount": {
     "placeholders": { "n": { "type": "int" } }
   },
+  "splashEyebrow": "Tu gym tracker",
+  "splashTaglinePrefix": "Pesa lo que",
+  "splashTaglineAccent": "levantas.",
+  "splashLoading": "Cargando",
   "todayYouTrain": "Hoy te toca",
+  "todayYouRest": "Hoy te toca",
+  "todayRestWord": "descansar",
+  "todayLabelPrefix": "Hoy te toca",
+  "templateBannerTitle": "Las etiquetas son temporales",
+  "templateBannerBody": "Toca cualquier día para cambiar la etiqueta por una de tus rutinas. Crea las rutinas primero si todavía no las tienes.",
   "newProgramTitle": "Nuevo programa",
   "newProgramSubtitle": "Configura tu plan en 4 pasos",
   "stepName": "Nombre",

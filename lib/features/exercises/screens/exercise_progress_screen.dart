@@ -63,6 +63,25 @@ String _fmtValue(double v, _Metric metric) {
   return v.toStringAsFixed(0);
 }
 
+List<ExerciseProgressPoint> _filterByRange(
+  List<ExerciseProgressPoint> points,
+  String range,
+) {
+  final now = DateTime.now();
+  final cutoff = switch (range) {
+    '1M' => DateTime(now.year, now.month - 1, now.day),
+    '3M' => DateTime(now.year, now.month - 3, now.day),
+    '6M' => DateTime(now.year, now.month - 6, now.day),
+    '1A' => DateTime(now.year - 1, now.month, now.day),
+    _ => null,
+  };
+  if (cutoff == null) return points.toList();
+
+  final cutoffStr =
+      '${cutoff.year}-${cutoff.month.toString().padLeft(2, '0')}-${cutoff.day.toString().padLeft(2, '0')}';
+  return points.where((p) => p.date.compareTo(cutoffStr) >= 0).toList();
+}
+
 enum _Metric { oneRm, volume }
 
 // ═══════════════════════════════════════════════════════════════
@@ -89,6 +108,7 @@ class ExerciseProgressScreen extends ConsumerStatefulWidget {
 class _ExerciseProgressScreenState
     extends ConsumerState<ExerciseProgressScreen> {
   _Metric _metric = _Metric.oneRm;
+  String _range = '3M';
   final _metricToggleKey = GlobalKey();
   bool _coachmarkShown = false;
 
@@ -156,13 +176,14 @@ class _ExerciseProgressScreenState
                 ),
                 error: (e, _) => Center(child: Text('$e')),
                 data: (points) {
-                  if (points.isEmpty) {
+                  final filteredPoints = _filterByRange(points, _range);
+                  if (filteredPoints.isEmpty) {
                     return _EmptyState(asset: asset, l10n: l10n);
                   }
 
                   final values = _metric == _Metric.oneRm
-                      ? points.map((p) => p.estimatedOneRm).toList()
-                      : points.map((p) => p.volume).toList();
+                      ? filteredPoints.map((p) => p.estimatedOneRm).toList()
+                      : filteredPoints.map((p) => p.volume).toList();
 
                   final latest = values.last;
                   final previous = values.length > 1 ? values[values.length - 2] : latest;
@@ -176,11 +197,11 @@ class _ExerciseProgressScreenState
 
                   // PR index
                   final bestIdx = values.indexOf(best);
-                  final prDate = points[bestIdx].date;
+                  final prDate = filteredPoints[bestIdx].date;
 
                   // Recent (last 5-6, reversed)
-                  final recentCount = min(6, points.length);
-                  final recentPoints = points.sublist(points.length - recentCount);
+                  final recentCount = min(6, filteredPoints.length);
+                  final recentPoints = filteredPoints.sublist(filteredPoints.length - recentCount);
                   final recentValues = values.sublist(values.length - recentCount);
                   final recentMax = recentValues.reduce(max);
 
@@ -196,23 +217,25 @@ class _ExerciseProgressScreenState
                         l10n: l10n,
                       ),
                       const SizedBox(height: 18),
-                      _MetricGrid(
+                       _MetricGrid(
                         latest: latest,
                         best: best,
                         avg: avg,
-                        sessions: points.length,
+                        sessions: filteredPoints.length,
                         delta: delta,
                         isPos: isPos,
                         deltaPct: deltaPct,
                         metric: _metric,
-                        points: points,
+                        points: filteredPoints,
                         prDate: prDate,
                       ),
                       const SizedBox(height: 20),
                       _ChartSection(
-                        points: points,
+                        points: filteredPoints,
                         values: values,
                         bestIdx: bestIdx,
+                        selectedRange: _range,
+                        onRangeChanged: (r) => setState(() => _range = r),
                         metric: _metric,
                         l10n: l10n,
                       ),
@@ -841,12 +864,16 @@ class _ChartSection extends StatelessWidget {
     required this.points,
     required this.values,
     required this.bestIdx,
+    required this.selectedRange,
+    required this.onRangeChanged,
     required this.metric,
     required this.l10n,
   });
   final List<ExerciseProgressPoint> points;
   final List<double> values;
   final int bestIdx;
+  final String selectedRange;
+  final ValueChanged<String> onRangeChanged;
   final _Metric metric;
   final AppLocalizations l10n;
 
@@ -885,7 +912,10 @@ class _ChartSection extends StatelessWidget {
                   color: context.colors.ink400,
                 ),
               ),
-              _RangeMicro(),
+               _RangeMicro(
+                 selected: selectedRange,
+                 onChanged: onRangeChanged,
+               ),
             ],
           ),
         ),
@@ -1154,30 +1184,37 @@ class _PrDotPainter extends FlDotPainter {
 }
 
 class _RangeMicro extends StatelessWidget {
+  const _RangeMicro({required this.selected, required this.onChanged});
+  final String selected;
+  final ValueChanged<String> onChanged;
+
   @override
   Widget build(BuildContext context) {
-    final ranges = const ['1M', '3M', '6M', '1A'];
+    final ranges = const ['1M', '3M', '6M', '1A', 'Todo'];
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: ranges.map((r) {
-        final isActive = r == '3M';
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: isActive
-                ? context.colors.accent.withValues(alpha: 0.15)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Text(
-            r,
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.04,
+        final isActive = r == selected;
+        return PressableScale(
+          onTap: () => onChanged(r),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
               color: isActive
-                  ? context.colors.accentSoft
-                  : context.colors.ink400,
+                  ? context.colors.accent.withValues(alpha: 0.15)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              r,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.04,
+                color: isActive
+                    ? context.colors.accentSoft
+                    : context.colors.ink400,
+              ),
             ),
           ),
         );
@@ -1222,27 +1259,14 @@ class _RecentSessions extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                l10n.recentSessions.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.08,
-                  color: context.colors.ink400,
-                ),
-              ),
-              Text(
-                l10n.viewAll,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: context.colors.ink400,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+          child: Text(
+            l10n.recentSessions.toUpperCase(),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.08,
+              color: context.colors.ink400,
+            ),
           ),
         ),
         Column(

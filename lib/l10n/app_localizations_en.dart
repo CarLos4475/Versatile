@@ -635,7 +635,35 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get splashEyebrow => 'Your gym tracker';
+
+  @override
+  String get splashTaglinePrefix => 'Lift what';
+
+  @override
+  String get splashTaglineAccent => 'you log.';
+
+  @override
+  String get splashLoading => 'Loading';
+
+  @override
   String get todayYouTrain => 'Today you train';
+
+  @override
+  String get todayYouRest => 'Today you';
+
+  @override
+  String get todayRestWord => 'rest';
+
+  @override
+  String get todayLabelPrefix => 'Today:';
+
+  @override
+  String get templateBannerTitle => 'Labels are placeholders';
+
+  @override
+  String get templateBannerBody =>
+      'Tap any day to swap a label for one of your routines. Create the routines first if you don\'t have them yet.';
 
   @override
   String get newProgramTitle => 'New program';

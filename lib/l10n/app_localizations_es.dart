@@ -636,7 +636,35 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get splashEyebrow => 'Tu gym tracker';
+
+  @override
+  String get splashTaglinePrefix => 'Pesa lo que';
+
+  @override
+  String get splashTaglineAccent => 'levantas.';
+
+  @override
+  String get splashLoading => 'Cargando';
+
+  @override
   String get todayYouTrain => 'Hoy te toca';
+
+  @override
+  String get todayYouRest => 'Hoy te toca';
+
+  @override
+  String get todayRestWord => 'descansar';
+
+  @override
+  String get todayLabelPrefix => 'Hoy te toca';
+
+  @override
+  String get templateBannerTitle => 'Las etiquetas son temporales';
+
+  @override
+  String get templateBannerBody =>
+      'Toca cualquier día para cambiar la etiqueta por una de tus rutinas. Crea las rutinas primero si todavía no las tienes.';
 
   @override
   String get newProgramTitle => 'Nuevo programa';

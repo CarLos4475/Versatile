@@ -386,6 +386,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         totalHours: stats?.totalHours,
                         prCount: stats?.prCount,
                         onEdit: _changeName,
+                        profileLabel: l10n.profile,
                         sessionsLabel: l10n.profileSessionsLabel.toUpperCase(),
                         timeLabel: l10n.profileTimeLabel.toUpperCase(),
                         prsLabel: l10n.profilePrsLabel.toUpperCase(),

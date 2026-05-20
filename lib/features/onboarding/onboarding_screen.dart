@@ -419,7 +419,6 @@ class _OnboardB1State extends State<_OnboardB1>
     final l10n = widget.l10n;
     final colors = context.colors;
     final compact = MediaQuery.sizeOf(context).height < 780;
-    final isEs = Localizations.localeOf(context).languageCode == 'es';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -434,7 +433,7 @@ class _OnboardB1State extends State<_OnboardB1>
               _Eyebrow(text: l10n.obB1Eyebrow),
               const Spacer(flex: 3),
               _SplitDisplayTitle(
-                top: 'Tu gym,',
+                top: l10n.onboardingPage1Title.split('\n').first,
                 bottom: l10n.onboardingPage1Title.split('\n').last,
                 bottomColor: colors.accentLight,
                 size: compact ? 54 : 60,
@@ -492,6 +491,7 @@ class _OnboardB2State extends State<_OnboardB2>
     final compact = MediaQuery.sizeOf(context).height < 780;
     final isEs = Localizations.localeOf(context).languageCode == 'es';
 
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: FadeTransition(
@@ -547,7 +547,7 @@ class _OnboardB2State extends State<_OnboardB2>
               ),
               const SizedBox(height: 18),
               _SplitDisplayTitle(
-                top: 'Pesa lo que',
+                top: l10n.onboardingPage2Title.split('\n').first,
                 bottom: l10n.onboardingPage2Title.split('\n').last,
                 bottomColor: colors.accentLight,
                 size: compact ? 42 : 46,
@@ -651,11 +651,11 @@ class _OnboardB3State extends State<_OnboardB3>
     final colors = context.colors;
     final compact = MediaQuery.sizeOf(context).height < 780;
     final days = [
-      ('LUN', 'Upper', colors.accentSoft, false),
-      ('MAR', 'Lower', colors.accentLight, false),
-      ('MIÉ', 'Descanso', colors.ink400, true),
-      ('JUE', 'Pull', colors.accent, false),
-      ('VIE', 'Push', colors.accentSoft, false),
+      (l10n.weekdayMonShort, 'Upper', colors.accentSoft, false),
+      (l10n.weekdayTueShort, 'Lower', colors.accentLight, false),
+      (l10n.weekdayWedShort, l10n.labelRest, colors.ink400, true),
+      (l10n.weekdayThuShort, 'Pull', colors.accent, false),
+      (l10n.weekdayFriShort, 'Push', colors.accentSoft, false),
     ];
 
     return Padding(
@@ -684,7 +684,7 @@ class _OnboardB3State extends State<_OnboardB3>
               ),
               const SizedBox(height: 22),
               _SplitDisplayTitle(
-                top: 'La semana,',
+                top: l10n.onboardingPage3Title.split('\n').first,
                 bottom: l10n.onboardingPage3Title.split('\n').last,
                 bottomColor: colors.accentLight,
                 size: compact ? 42 : 46,
@@ -801,6 +801,7 @@ class _OnboardB4State extends State<_OnboardB4>
     final colors = context.colors;
     final compact = MediaQuery.sizeOf(context).height < 780;
     final isEs = Localizations.localeOf(context).languageCode == 'es';
+
     final items = [
       (l10n.obB4ItemAccounts, true),
       (l10n.obB4ItemCloud, true),
@@ -914,6 +915,7 @@ class _OnboardB5State extends State<_OnboardB5>
     final colors = context.colors;
     final compact = MediaQuery.sizeOf(context).height < 780;
     final isEs = Localizations.localeOf(context).languageCode == 'es';
+
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/color_utils.dart';
+import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/program.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../shared/widgets/glass_container.dart';
@@ -245,31 +245,16 @@ class ProgramsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _createFromTemplate(
+  void _createFromTemplate(
     BuildContext context,
     WidgetRef ref,
     ProgramTemplate template,
-  ) async {
-    // Templates only set the program shell (name, color, weeksCount,
-    // deloadWeeks). Training days are left unassigned so the user picks real
-    // routines in the editor. Pre-filling them as labels would cause the home
-    // screen to treat them as non-workout days.
-    final l10n = AppLocalizations.of(context)!;
-    final programId = const Uuid().v4();
-    final program = Program(
-      id: programId,
-      name: template.name(l10n),
-      colorValue: template.color.toARGB32(),
-      iconCode: Icons.calendar_month_rounded.codePoint,
-      weeksCount: template.weeksCount,
-      deloadWeeks: template.deloadWeeks,
-      createdAt: DateTime.now(),
-      slots: const [],
+  ) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ProgramEditorScreen(template: template),
+      ),
     );
-    await ref.read(programRepositoryProvider).insert(program);
-    ref.invalidate(programsListProvider);
-    if (!context.mounted) return;
-    _openEditor(context, programId);
   }
 
   Future<void> _activate(
@@ -398,10 +383,28 @@ class _ThisWeekHero extends StatelessWidget {
       );
     });
 
-    final todayCell = cells[today.weekday - 1];
-    final todayLabel = todayCell.isRest
-        ? l10n.labelRest
-        : (todayCell.label ?? '');
+    final todaySlot = program.slotAt(weekIndex, today.weekday);
+    final todayRoutine = todaySlot != null && todaySlot.kind == SlotKind.routine
+        ? routinesById[todaySlot.routineId]
+        : null;
+    final todayLabelText = todaySlot?.labelText ?? '';
+    final todayIsRest = todaySlot == null ||
+        (todaySlot.kind == SlotKind.routine && todayRoutine == null) ||
+        (todaySlot.kind == SlotKind.label &&
+            (todayLabelText.isEmpty ||
+                todayLabelText.toLowerCase() == 'rest'));
+    final String todayPrefix;
+    final String todayAccent;
+    if (todayIsRest) {
+      todayPrefix = l10n.todayYouRest;
+      todayAccent = l10n.todayRestWord;
+    } else if (todayRoutine != null) {
+      todayPrefix = l10n.todayYouTrain;
+      todayAccent = todayRoutine.name;
+    } else {
+      todayPrefix = l10n.todayLabelPrefix;
+      todayAccent = localizeSlotLabel(context, todayLabelText);
+    }
 
     return Padding(
       padding: const EdgeInsets.only(top: 4),
@@ -420,117 +423,97 @@ class _ThisWeekHero extends StatelessWidget {
               ),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  colors.accent.withValues(alpha: 0.18),
-                  colors.ink900.withValues(alpha: 0.05),
-                ],
-                stops: const [0.0, 0.60],
-              ),
-              border: Border.all(
-                color: colors.accentSoft.withValues(alpha: 0.20),
-                width: 0.5,
-              ),
-            ),
-            clipBehavior: Clip.hardEdge,
-            child: Stack(
-              children: [
-                Positioned(
-                  right: -40,
-                  top: -40,
-                  child: Container(
-                    width: 160,
-                    height: 160,
+          GlassContainer(
+            radius: 22,
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    width: 4,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          colors.accent.withValues(alpha: 0.30),
-                          colors.accent.withValues(alpha: 0),
-                        ],
-                      ),
+                      color: colors.accent,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colors.accentTint,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            l10n
-                                .programWeekProgress(
-                                  weekIndex + 1,
-                                  program.weeksCount,
-                                )
-                                .toUpperCase(),
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.8,
-                              color: colors.accentDeep,
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colors.accentTint,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                l10n
+                                    .programWeekProgress(
+                                      weekIndex + 1,
+                                      program.weeksCount,
+                                    )
+                                    .toUpperCase(),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.8,
+                                  color: colors.accentDeep,
+                                ),
+                              ),
                             ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                program.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: colors.ink500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        RichText(
+                          text: TextSpan(
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: -0.52,
+                              color: colors.ink900,
+                              height: 1.1,
+                            ),
+                            children: [
+                              TextSpan(text: '$todayPrefix '),
+                              TextSpan(
+                                text: todayAccent,
+                                style: TextStyle(color: colors.accentDeep),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            program.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: colors.ink500,
-                            ),
-                          ),
+                        const SizedBox(height: 16),
+                        WeekStrip(
+                          cells: cells,
+                          todayIndex: today.weekday - 1,
+                          variant: WeekStripVariant.large,
+                          dayLabels: const ['L', 'M', 'X', 'J', 'V', 'S', 'D'],
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
-                    RichText(
-                      text: TextSpan(
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: -0.52,
-                          color: colors.ink900,
-                          height: 1.1,
-                        ),
-                        children: [
-                          TextSpan(text: '${l10n.todayYouTrain} '),
-                          TextSpan(
-                            text: todayLabel,
-                            style: TextStyle(color: colors.accentDeep),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    WeekStrip(
-                      cells: cells,
-                      todayIndex: today.weekday - 1,
-                      variant: WeekStripVariant.large,
-                      dayLabels: const ['L', 'M', 'X', 'J', 'V', 'S', 'D'],
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -737,13 +720,6 @@ class _FabButton extends StatelessWidget {
               darkenColor(accent, 0.12),
             ],
           ),
-          boxShadow: [
-            BoxShadow(
-              color: darkenColor(accent, 0.12).withValues(alpha: 0.45),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -859,13 +835,6 @@ class _EmptyState extends StatelessWidget {
                     darkenColor(colors.accent, 0.12),
                   ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: darkenColor(colors.accent, 0.12).withValues(alpha: 0.45),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -979,16 +948,23 @@ class _EmptyHero extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  color: Colors.white.withValues(alpha: 0.05),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xFF8DA4B5),
+                      Color(0xFF5B7A8C),
+                    ],
+                  ),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.08),
+                    color: const Color(0xFF5B7A8C).withValues(alpha: 0.35),
                     width: 0.5,
                   ),
                 ),
                 child: Icon(
                   Icons.bedtime_outlined,
                   size: 28,
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: Colors.white.withValues(alpha: 0.75),
                 ),
               ),
             ),
@@ -1012,13 +988,6 @@ class _EmptyHero extends StatelessWidget {
                       darkenColor(accent, 0.12),
                     ],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: darkenColor(accent, 0.10).withValues(alpha: 0.40),
-                      blurRadius: 28,
-                      offset: const Offset(0, 14),
-                    ),
-                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1092,13 +1061,6 @@ class _TemplateCard extends StatelessWidget {
                     darkenColor(template.color, 0.18),
                   ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: template.color.withValues(alpha: 0.40),
-                    blurRadius: 14,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
               ),
               child: const Icon(
                 Icons.calendar_month_outlined,

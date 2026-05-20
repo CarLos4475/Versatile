@@ -69,7 +69,7 @@ lib/
 
 ## Theme System
 
-- `AccentColors` defines 8 presets (orange default, blue, green, purple, red, teal, pink, gray)
+- **AccentColors**: 8 presets. Colors changed (2026-05-19): rust→pink (`#D9687E`), coral→wine (`#9B3A4A`)
 - Each preset has `soften()`, `deepen()`, `lighten()` HSL-based variants
 - `AppColors` is a `ThemeExtension` with 25+ named properties: `accent`, `accentSoft`, `accentDeep`, `accentLight`, `accentTint`, `bgApp`, `bgFrame`, `glassBg`, `glassBorder`, `hairline`, `press`, `fieldBg`, `doneTint`, etc.
 - `AppTheme.light(accentColor)` / `AppTheme.dark(accentColor)` builds the full ThemeData
@@ -138,3 +138,30 @@ Fully rewritten as Instagram/Spotify Stories takeover:
 ## L10n ARB File Trap
 
 The `.dart` l10n files are auto-generated on build from the `.arb` files. Adding getters directly to the `.dart` files WILL be reverted on the next build. Always edit `app_en.arb` and `app_es.arb` first, then run `flutter gen-l10n` or let the build regenerate.
+
+## Font
+
+Uses `GoogleFonts.interTextTheme()` (Inter is Geist's fallback from the design reference CSS). Set in `lib/core/theme/app_theme.dart` lines 115 and 147.
+
+## Recent redesigns (2026-05-19)
+
+### Progress screen — V3 Compact Dashboard
+`lib/features/exercises/screens/exercise_progress_screen.dart`
+- Grid 2×2 metrics (Última, Récord, Promedio, Sesiones)
+- fl_chart with area gradient, PR badge on max point via custom `FlDotPainter`
+- Range pills (1M/3M/6M/1A/Todo) filter data via `_filterByRange()`
+- Recent sessions list with progress bars
+- "View all" button removed
+- Works light/dark + any accent
+
+### Onboarding — Direction B Editorial Bold
+`lib/features/onboarding/onboarding_screen.dart`
+- 5 slides: Welcome, Track, Routines, Privacy, Name
+- B1: bold typography + tag bullets
+- B2: huge "+46 kg" + sparkline bars
+- B3: day grid LUN–VIE with colored dots
+- B4: strikethrough list (cuentas/nube/anuncios) + green check
+- B5: "Carlos" hint, accent glow input
+- Progress bar at bottom (labeled + gradient bar with FractionallySizedBox)
+- Per-page fade/slide animations via `_PageAnimState` mixin
+- l10n strings: `obCtaStart`, `obCtaAlmostReady`, `obTagWeights`, `obTagRoutines`, `obTagLocal`, `obB1Eyebrow`–`obB5Eyebrow`, `obB4ItemAccounts`–`obB4ItemLocal`, `obB5NameLabel`, `obB5SavedLocally`

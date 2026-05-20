@@ -1292,11 +1292,65 @@ abstract class AppLocalizations {
   /// **'{n} total'**
   String programsTotalCount(int n);
 
+  /// No description provided for @splashEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Your gym tracker'**
+  String get splashEyebrow;
+
+  /// No description provided for @splashTaglinePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Lift what'**
+  String get splashTaglinePrefix;
+
+  /// No description provided for @splashTaglineAccent.
+  ///
+  /// In en, this message translates to:
+  /// **'you log.'**
+  String get splashTaglineAccent;
+
+  /// No description provided for @splashLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading'**
+  String get splashLoading;
+
   /// No description provided for @todayYouTrain.
   ///
   /// In en, this message translates to:
   /// **'Today you train'**
   String get todayYouTrain;
+
+  /// No description provided for @todayYouRest.
+  ///
+  /// In en, this message translates to:
+  /// **'Today you'**
+  String get todayYouRest;
+
+  /// No description provided for @todayRestWord.
+  ///
+  /// In en, this message translates to:
+  /// **'rest'**
+  String get todayRestWord;
+
+  /// No description provided for @todayLabelPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Today:'**
+  String get todayLabelPrefix;
+
+  /// No description provided for @templateBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Labels are placeholders'**
+  String get templateBannerTitle;
+
+  /// No description provided for @templateBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap any day to swap a label for one of your routines. Create the routines first if you don\'t have them yet.'**
+  String get templateBannerBody;
 
   /// No description provided for @newProgramTitle.
   ///
