@@ -112,7 +112,7 @@ class AppTheme {
         onSurface: colors.ink900,
       ),
       extensions: <ThemeExtension<dynamic>>[colors],
-      textTheme: GoogleFonts.nunitoTextTheme(
+      textTheme: GoogleFonts.interTextTheme(
         base.textTheme,
       ).apply(bodyColor: colors.ink900, displayColor: colors.ink900),
       appBarTheme: AppBarTheme(
@@ -144,7 +144,7 @@ class AppTheme {
         onSurface: colors.ink900,
       ),
       extensions: <ThemeExtension<dynamic>>[colors],
-      textTheme: GoogleFonts.nunitoTextTheme(
+      textTheme: GoogleFonts.interTextTheme(
         base.textTheme,
       ).apply(bodyColor: colors.ink900, displayColor: colors.ink900),
       appBarTheme: AppBarTheme(

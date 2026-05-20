@@ -859,35 +859,35 @@ class AppLocalizationsEs extends AppLocalizations {
   String get onboardingWhatsYourName => '¿Cómo te llamas?';
 
   @override
-  String get onboardingPage1Title => 'Creado para\ncada rep.';
+  String get onboardingPage1Title => 'Tu gym,\nen bruto.';
 
   @override
   String get onboardingPage1Body =>
-      'Un registro de gym rápido, privado y hecho para ti. Sin cuentas, sin nube, solo tus pesas.';
+      'Registro rápido, privado y hecho para ti. Sin cuentas. Sin nube. Solo tus pesas.';
 
   @override
-  String get onboardingPage2Title => 'Registra pesos.\nRompe récords.';
+  String get onboardingPage2Title => 'Pesa lo que\nlevantas.';
 
   @override
   String get onboardingPage2Body =>
-      'Anota cada serie, repetición y peso. Observa cómo tu 1RM estimado sube con el tiempo.';
+      'Cada serie, cada repetición. Mira tu 1RM estimado subir semana a semana.';
 
   @override
-  String get onboardingPage3Title => 'Rutinas a\ntu manera.';
+  String get onboardingPage3Title => 'La semana,\na tu medida.';
 
   @override
   String get onboardingPage3Body =>
-      'Crea entrenamientos con los ejercicios que necesitas. Reordénalos, ajusta las series y sigue evolucionando.';
+      'Crea rutinas, ordena ejercicios y deja descansos donde toque.';
 
   @override
-  String get onboardingPage4Title => 'Tus datos,\ntu dispositivo.';
+  String get onboardingPage4Title => 'Tu data,\nse queda aquí.';
 
   @override
   String get onboardingPage4Body =>
-      'Sin internet. Sin cuenta. Sin suscripción. Todo se queda en tu teléfono, siempre.';
+      'Sin internet. Sin cuenta. Sin nube. Todo se queda en tu teléfono.';
 
   @override
-  String get onboardingNameTitle => '¿Cómo\nte llamamos?';
+  String get onboardingNameTitle => 'Hola,\n¿Cómo te llamas?';
 
   @override
   String get onboardingNameSubtitle => 'Opcional. Siempre puedes omitirlo.';
@@ -897,6 +897,67 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get onboardingLetsGo => '¡Vamos!';
+
+  @override
+  String get obCtaStart => 'Empezar';
+
+  @override
+  String get obCtaAlmostReady => 'Casi listo';
+
+  @override
+  String get obTagWeights => 'Pesos & PRs';
+
+  @override
+  String get obTagRoutines => 'Rutinas';
+
+  @override
+  String get obTagLocal => '100% local';
+
+  @override
+  String get obB2DeltaNote => 'en 11 sem.';
+
+  @override
+  String get obB4Banner => 'Sin internet · Sin cuenta · Sin nube';
+
+  @override
+  String get obB5Body =>
+      'Opcional. Puedes saltarlo o cambiarlo cuando quieras.';
+
+  @override
+  String get obB5Footnote => 'Se guarda solo en este dispositivo';
+
+  @override
+  String get obB1Eyebrow => 'Versatile · Bienvenido';
+
+  @override
+  String get obB2Eyebrow => 'Registra · Récord';
+
+  @override
+  String get obB3Eyebrow => 'Rutinas · Tu plan';
+
+  @override
+  String get obB4Eyebrow => 'Privado · 100% local';
+
+  @override
+  String get obB5Eyebrow => 'Lo último · ¿Quién entrena?';
+
+  @override
+  String get obB4ItemAccounts => 'Cuentas y suscripciones';
+
+  @override
+  String get obB4ItemCloud => 'Sincronización a la nube';
+
+  @override
+  String get obB4ItemAds => 'Anuncios y rastreo';
+
+  @override
+  String get obB4ItemLocal => 'Todo en tu teléfono';
+
+  @override
+  String get obB5NameLabel => 'Tu nombre';
+
+  @override
+  String get obB5SavedLocally => 'Se guarda solo en este dispositivo';
 
   @override
   String get coachmarkHistoryFirstCardTitle => 'Toca para ver los detalles';

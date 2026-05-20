@@ -1697,55 +1697,55 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingPage1Title.
   ///
   /// In en, this message translates to:
-  /// **'Built for\nevery rep.'**
+  /// **'Your gym,\nunfiltered.'**
   String get onboardingPage1Title;
 
   /// No description provided for @onboardingPage1Body.
   ///
   /// In en, this message translates to:
-  /// **'A gym tracker that\'s fast, private, and built for you. No logins, no cloud, just your lifts.'**
+  /// **'Fast, private tracking built for you. No account. No cloud. Just your lifts.'**
   String get onboardingPage1Body;
 
   /// No description provided for @onboardingPage2Title.
   ///
   /// In en, this message translates to:
-  /// **'Log weights.\nBreak records.'**
+  /// **'Weigh what\nyou lift.'**
   String get onboardingPage2Title;
 
   /// No description provided for @onboardingPage2Body.
   ///
   /// In en, this message translates to:
-  /// **'Record every set, rep, and weight. Watch your estimated 1-rep max climb over time.'**
+  /// **'Every set, every rep. Watch your estimated 1RM climb week after week.'**
   String get onboardingPage2Body;
 
   /// No description provided for @onboardingPage3Title.
   ///
   /// In en, this message translates to:
-  /// **'Routines\nyour way.'**
+  /// **'Your week,\nyour way.'**
   String get onboardingPage3Title;
 
   /// No description provided for @onboardingPage3Body.
   ///
   /// In en, this message translates to:
-  /// **'Build custom workouts with exactly the exercises you need. Reorder them, adjust sets, and keep evolving.'**
+  /// **'Build routines, order exercises, and place rest exactly where it belongs.'**
   String get onboardingPage3Body;
 
   /// No description provided for @onboardingPage4Title.
   ///
   /// In en, this message translates to:
-  /// **'Your data,\nyour device.'**
+  /// **'Your data,\nstays here.'**
   String get onboardingPage4Title;
 
   /// No description provided for @onboardingPage4Body.
   ///
   /// In en, this message translates to:
-  /// **'No internet. No account. No subscription. Everything stays on your phone, always.'**
+  /// **'No internet. No account. No cloud. Everything stays on your phone.'**
   String get onboardingPage4Body;
 
   /// No description provided for @onboardingNameTitle.
   ///
   /// In en, this message translates to:
-  /// **'What should\nwe call you?'**
+  /// **'Hi,\nwhat\'s your name?'**
   String get onboardingNameTitle;
 
   /// No description provided for @onboardingNameSubtitle.
@@ -1765,6 +1765,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Let\'s go'**
   String get onboardingLetsGo;
+
+  /// No description provided for @obCtaStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start'**
+  String get obCtaStart;
+
+  /// No description provided for @obCtaAlmostReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Almost ready'**
+  String get obCtaAlmostReady;
+
+  /// No description provided for @obTagWeights.
+  ///
+  /// In en, this message translates to:
+  /// **'Weights & PRs'**
+  String get obTagWeights;
+
+  /// No description provided for @obTagRoutines.
+  ///
+  /// In en, this message translates to:
+  /// **'Routines'**
+  String get obTagRoutines;
+
+  /// No description provided for @obTagLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'100% local'**
+  String get obTagLocal;
+
+  /// No description provided for @obB2DeltaNote.
+  ///
+  /// In en, this message translates to:
+  /// **'in 11 wk.'**
+  String get obB2DeltaNote;
+
+  /// No description provided for @obB4Banner.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet · No account · No cloud'**
+  String get obB4Banner;
+
+  /// No description provided for @obB5Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. You can skip it now or change it later.'**
+  String get obB5Body;
+
+  /// No description provided for @obB5Footnote.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved only on this device'**
+  String get obB5Footnote;
+
+  /// No description provided for @obB1Eyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Versatile · Welcome'**
+  String get obB1Eyebrow;
+
+  /// No description provided for @obB2Eyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Log · Record'**
+  String get obB2Eyebrow;
+
+  /// No description provided for @obB3Eyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Routines · Your plan'**
+  String get obB3Eyebrow;
+
+  /// No description provided for @obB4Eyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Private · 100% local'**
+  String get obB4Eyebrow;
+
+  /// No description provided for @obB5Eyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'One last thing · Who trains?'**
+  String get obB5Eyebrow;
+
+  /// No description provided for @obB4ItemAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Accounts & subscriptions'**
+  String get obB4ItemAccounts;
+
+  /// No description provided for @obB4ItemCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud sync'**
+  String get obB4ItemCloud;
+
+  /// No description provided for @obB4ItemAds.
+  ///
+  /// In en, this message translates to:
+  /// **'Ads & tracking'**
+  String get obB4ItemAds;
+
+  /// No description provided for @obB4ItemLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything on your phone'**
+  String get obB4ItemLocal;
+
+  /// No description provided for @obB5NameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get obB5NameLabel;
+
+  /// No description provided for @obB5SavedLocally.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved only on this device'**
+  String get obB5SavedLocally;
 
   /// No description provided for @coachmarkHistoryFirstCardTitle.
   ///
