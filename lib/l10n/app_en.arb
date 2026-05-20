@@ -249,14 +249,89 @@
   "notificationSubtitle": "Stay focused. Tap to return",
 
   "accentColor": "Accent color",
-  "colorOrange": "Orange",
-  "colorBlue": "Blue",
-  "colorGreen": "Green",
-  "colorPurple": "Purple",
-  "colorRed": "Red",
-  "colorTeal": "Teal",
+  "colorEmber": "Ember",
   "colorPink": "Pink",
-  "colorAmber": "Amber",
+  "colorWine": "Wine",
+  "colorBrick": "Brick",
+  "colorCamel": "Camel",
+  "colorOlive": "Olive",
+  "colorSlate": "Slate",
+  "colorPlum": "Plum",
+
+  "profileSessionsLabel": "sessions",
+  "profileTimeLabel": "time",
+  "profilePrsLabel": "PRs",
+  "planActiveSection": "Active plan",
+  "noActivePlanTitle": "No active plan",
+  "noActivePlanSubtitle": "Pick a program to get started",
+  "programWeekProgress": "Week {current} of {total}",
+  "@programWeekProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "programDeloadNone": "no deload",
+  "programDeloadCount": "{n} deload",
+  "@programDeloadCount": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "activeBadge": "ACTIVE",
+  "aboutBy": "by",
+
+  "thisWeekSection": "This week",
+  "yourProgramsSection": "Your programs",
+  "programsTotalCount": "{n} total",
+  "@programsTotalCount": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "todayYouTrain": "Today you train",
+  "newProgramTitle": "New program",
+  "newProgramSubtitle": "Configure your plan in 4 steps",
+  "stepName": "Name",
+  "stepColor": "Color",
+  "stepWeeks": "Weeks",
+  "stepCalendar": "Calendar",
+  "weeksUnit": "weeks",
+  "weeksUnitOne": "week",
+  "deloadShort": "DELOAD",
+  "calendarHint": "Tap any day to assign a routine, rest, or label.",
+  "editDayEyebrow": "Week {week} · {day}",
+  "@editDayEyebrow": {
+    "placeholders": {
+      "week": { "type": "int" },
+      "day": { "type": "String" }
+    }
+  },
+  "whatTodayQuestion": "What's on for {day}?",
+  "@whatTodayQuestion": {
+    "placeholders": { "day": { "type": "String" } }
+  },
+  "restDayCta": "Rest day",
+  "restDayCtaSubtitle": "Recover for the next one",
+  "orPickRoutine": "Or pick a routine",
+  "orUseLabel": "Or use a label",
+  "saveSelection": "Save selection",
+  "labelYoga": "Yoga",
+  "customLabelChip": "Custom…",
+  "routineExerciseCount": "{n} exercises",
+  "@routineExerciseCount": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "designYourWeek": "Design your ideal week",
+  "designYourWeekBody": "Assign a routine to each day — and rest where it fits. The app will tell you what to do today.",
+  "createFromScratch": "Create from scratch",
+  "orStartFromTemplate": "Or start with a template",
+  "recommendedBadge": "RECOMMENDED",
+  "templateUpperLowerName": "Upper / Lower",
+  "templateUpperLowerSub": "4 days · sensible rest",
+  "templatePplName": "Push · Pull · Legs",
+  "templatePplSub": "6 days · classic",
+  "templateFullBodyName": "Full Body 3×",
+  "templateFullBodySub": "3 days · beginners",
+  "colorPreviewHint": "this is how it'll look in the list",
 
   "progressTitle": "Progress",
   "estimatedOneRm": "Est. 1RM",
@@ -564,5 +639,13 @@
 
   "share": "Share",
   "shareWorkout": "Share workout",
-  "sharePreviewSubtitle": "A square card you can post anywhere"
+  "sharePreviewSubtitle": "A square card you can post anywhere",
+
+  "recordLabel": "Record",
+  "averageLabel": "Average",
+  "sessionsLabel": "Sessions",
+  "progressionLabel": "Progression",
+  "viewAll": "View all",
+  "formulaEpley": "Epley formula",
+  "vsPrevious": "vs previous"
 }

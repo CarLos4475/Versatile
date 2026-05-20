@@ -16,7 +16,15 @@
       "Bash(cp \"C:/Users/PC/.claude/projects/C--Users-PC-Documents-PROYECTOS-androidStudio-versatile/ce4ade34-de87-4883-be62-6ca90c9e2697/tool-results/webfetch-1779046115507-s4ei6k.bin\" /tmp/design.tgz)",
       "Read(//c/tmp/**)",
       "Bash(mkdir -p design_unpack)",
-      "Bash(tar xzf *)"
+      "Bash(tar xzf *)",
+      "PowerShell($path = \"C:\\\\Users\\\\PC\\\\.claude\\\\projects\\\\C--Users-PC-Documents-PROYECTOS-androidStudio-versatile\\\\d3ac7432-0a19-42d7-8681-8dc2ef2800ff\\\\tool-results\\\\webfetch-1779163266408-c6vukv.bin\"; $bytes = [System.IO.File]::ReadAllBytes\\($path\\); $ms = New-Object System.IO.MemoryStream\\(,$bytes\\); $gz = New-Object System.IO.Compression.GZipStream\\($ms, [System.IO.Compression.CompressionMode]::Decompress\\); $reader = New-Object System.IO.StreamReader\\($gz\\); $content = $reader.ReadToEnd\\(\\); $reader.Close\\(\\); $out = \"C:\\\\Users\\\\PC\\\\Documents\\\\PROYECTOS\\\\androidStudio\\\\versatile\\\\html_components\\\\plan_ajustes_redesign.html\"; [System.IO.File]::WriteAllText\\($out, $content\\); \"saved\")",
+      "PowerShell($path = \"C:\\\\Users\\\\PC\\\\Documents\\\\PROYECTOS\\\\androidStudio\\\\versatile\\\\html_components\\\\plan_ajustes_redesign.html\"; $content = [System.IO.File]::ReadAllText\\($path\\); $matches = [regex]::Matches\\($content, \"versatile/[^\\\\s\\\\0]+\\\\.\\(html|css|js|md\\)\"\\); $seen = @{}; foreach \\($m in $matches\\) { if \\(-not $seen.ContainsKey\\($m.Value\\)\\) { $seen[$m.Value] = $true; $m.Value } })",
+      "PowerShell($path = \"C:\\\\Users\\\\PC\\\\Documents\\\\PROYECTOS\\\\androidStudio\\\\versatile\\\\html_components\\\\plan_ajustes_redesign.html\"; $content = [System.IO.File]::ReadAllText\\($path\\); $files = @\\(\"versatile/project/redesign-plan.js\",\"versatile/project/redesign-settings.js\",\"versatile/project/styles.css\",\"versatile/project/Versatile.html\"\\); foreach \\($f in $files\\) { $idx = $content.IndexOf\\($f\\); \"$f -> $idx\" })",
+      "PowerShell($path = \"C:\\\\Users\\\\PC\\\\Documents\\\\PROYECTOS\\\\androidStudio\\\\versatile\\\\html_components\\\\plan_ajustes_redesign.html\"; $content = [System.IO.File]::ReadAllText\\($path\\); $start = 210976; $end = 249841; $section = $content.Substring\\($start, $end - $start\\); $outPath = \"C:\\\\Users\\\\PC\\\\Documents\\\\PROYECTOS\\\\androidStudio\\\\versatile\\\\html_components\\\\_redesign_plan.js\"; [System.IO.File]::WriteAllText\\($outPath, $section\\); $section.Length)",
+      "PowerShell($path = \"C:\\\\Users\\\\PC\\\\Documents\\\\PROYECTOS\\\\androidStudio\\\\versatile\\\\html_components\\\\plan_ajustes_redesign.html\"; $content = [System.IO.File]::ReadAllText\\($path\\); $start = 249841; $end = 290526; $section = $content.Substring\\($start, $end - $start\\); $outPath = \"C:\\\\Users\\\\PC\\\\Documents\\\\PROYECTOS\\\\androidStudio\\\\versatile\\\\html_components\\\\_redesign_settings.js\"; [System.IO.File]::WriteAllText\\($outPath, $section\\); $section.Length)",
+      "Bash(findstr *)",
+      "Bash(grep *)",
+      "Bash(flutter gen-l10n *)"
     ]
   }
 }

@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/color_utils.dart';
 import '../../../domain/entities/program.dart';
-import '../../../shared/widgets/glass_button.dart';
+import '../../../domain/entities/routine.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
+import '../../../shared/widgets/week_strip.dart';
+import '../../routines/view_models/routines_view_model.dart';
+import '../data/program_templates.dart';
 import '../view_models/programs_view_model.dart';
 import 'program_editor_screen.dart';
 
@@ -19,69 +24,121 @@ class ProgramsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final programsAsync = ref.watch(programsListProvider);
     final activeAsync = ref.watch(activeProgramProvider);
+    final routines = ref.watch(routinesProvider).value ?? const <Routine>[];
     final activeId = activeAsync.value?.id;
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            ScreenHeader(
-              title: l10n.trainingPlan,
-              subtitle: l10n.programsSubtitle,
-              onBack: () => Navigator.of(context).pop(),
-              accentBack: true,
-              trailing: _HelpButton(
-                tooltip: l10n.programsHelpTooltip,
-                onTap: () => _showHelpDialog(context),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: programsAsync.when(
-                loading: () =>
-                    Center(child: CircularProgressIndicator(color: context.colors.accent)),
-                error: (e, _) => Center(
-                  child: Text('$e', style: TextStyle(color: context.colors.ink500)),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ScreenHeader(
+                  title: l10n.trainingPlan,
+                  subtitle: l10n.programsSubtitle,
+                  onBack: () => Navigator.of(context).pop(),
+                  accentBack: true,
+                  trailing: _HelpButton(
+                    tooltip: l10n.programsHelpTooltip,
+                    onTap: () => _showHelpDialog(context),
+                  ),
                 ),
-                data: (programs) {
-                  if (programs.isEmpty) {
-                    return _EmptyState(
-                      onCreate: () => _openEditor(context, null),
-                    );
-                  }
-                  return ListView(
-                    padding: const EdgeInsets.only(bottom: 24),
-                    children: [
-                      for (final p in programs)
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(22, 0, 22, 10),
-                          child: _ProgramCard(
-                            program: p,
-                            isActive: p.id == activeId,
-                            onTap: () => _openEditor(context, p.id),
-                            onActivate: () => _activate(context, ref, p),
-                            onDeactivate: () => _deactivate(ref),
-                            onDelete: () => _delete(context, ref, p),
-                          ),
-                        ),
-                      const SizedBox(height: 16),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 22),
-                        child: GlassButton(
-                          label: l10n.createProgram,
-                          leading: const Icon(Icons.add, color: Colors.white, size: 18),
-                          variant: GlassButtonVariant.primary,
-                          size: GlassButtonSize.md,
-                          expand: true,
-                          onPressed: () => _openEditor(context, null),
-                        ),
+                Expanded(
+                  child: programsAsync.when(
+                    loading: () => Center(
+                      child: CircularProgressIndicator(
+                        color: context.colors.accent,
                       ),
-                    ],
-                  );
-                },
-              ),
+                    ),
+                    error: (e, _) => Center(
+                      child: Text(
+                        '$e',
+                        style: TextStyle(color: context.colors.ink500),
+                      ),
+                    ),
+                    data: (programs) {
+                      if (programs.isEmpty) {
+                        return _EmptyState(
+                          onCreate: () => _openEditor(context, null),
+                          onTemplate: (t) => _createFromTemplate(context, ref, t),
+                        );
+                      }
+                      return ListView(
+                        padding: const EdgeInsets.fromLTRB(22, 8, 22, 110),
+                        children: [
+                          if (activeAsync.value != null) ...[
+                            _ThisWeekHero(
+                              active: activeAsync.value!,
+                              routines: routines,
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 4,
+                              right: 4,
+                              bottom: 10,
+                            ),
+                            child: Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  l10n.yourProgramsSection.toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 1.1,
+                                    color: context.colors.ink400,
+                                  ),
+                                ),
+                                Text(
+                                  l10n.programsTotalCount(programs.length),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: context.colors.ink500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          for (final p in programs)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: _ProgramCard(
+                                program: p,
+                                isActive: p.id == activeId,
+                                routines: routines,
+                                onTap: () => _openEditor(context, p.id),
+                                onActivate: () => _activate(context, ref, p),
+                                onDeactivate: () => _deactivate(ref),
+                                onDelete: () => _delete(context, ref, p),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            // FAB
+            programsAsync.maybeWhen(
+              data: (programs) {
+                if (programs.isEmpty) return const SizedBox.shrink();
+                return Positioned(
+                  left: 22,
+                  right: 22,
+                  bottom: 22,
+                  child: _FabButton(
+                    label: l10n.createProgram,
+                    onTap: () => _openEditor(context, null),
+                  ),
+                );
+              },
+              orElse: () => const SizedBox.shrink(),
             ),
           ],
         ),
@@ -188,11 +245,41 @@ class ProgramsScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _activate(BuildContext context, WidgetRef ref, Program p) async {
+  Future<void> _createFromTemplate(
+    BuildContext context,
+    WidgetRef ref,
+    ProgramTemplate template,
+  ) async {
+    // Templates only set the program shell (name, color, weeksCount,
+    // deloadWeeks). Training days are left unassigned so the user picks real
+    // routines in the editor. Pre-filling them as labels would cause the home
+    // screen to treat them as non-workout days.
+    final l10n = AppLocalizations.of(context)!;
+    final programId = const Uuid().v4();
+    final program = Program(
+      id: programId,
+      name: template.name(l10n),
+      colorValue: template.color.toARGB32(),
+      iconCode: Icons.calendar_month_rounded.codePoint,
+      weeksCount: template.weeksCount,
+      deloadWeeks: template.deloadWeeks,
+      createdAt: DateTime.now(),
+      slots: const [],
+    );
+    await ref.read(programRepositoryProvider).insert(program);
+    ref.invalidate(programsListProvider);
+    if (!context.mounted) return;
+    _openEditor(context, programId);
+  }
+
+  Future<void> _activate(
+    BuildContext context,
+    WidgetRef ref,
+    Program p,
+  ) async {
     final l10n = AppLocalizations.of(context)!;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    // Default to Monday of this week so weekIndex/weekday math is intuitive.
     final defaultStart = today.subtract(Duration(days: today.weekday - 1));
 
     final picked = await showDatePicker(
@@ -218,14 +305,21 @@ class ProgramsScreen extends ConsumerWidget {
     ref.invalidate(todaysPlannedSlotProvider);
   }
 
-  Future<void> _delete(BuildContext context, WidgetRef ref, Program p) async {
+  Future<void> _delete(
+    BuildContext context,
+    WidgetRef ref,
+    Program p,
+  ) async {
     final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: context.colors.bgFrame,
         scrollable: true,
-        title: Text(l10n.deleteProgramTitle, style: TextStyle(color: context.colors.ink900)),
+        title: Text(
+          l10n.deleteProgramTitle,
+          style: TextStyle(color: context.colors.ink900),
+        ),
         content: Text(
           l10n.deleteProgramContent(p.name),
           style: TextStyle(color: context.colors.ink500, height: 1.5),
@@ -233,22 +327,215 @@ class ProgramsScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(l10n.cancel, style: TextStyle(color: context.colors.ink400)),
+            child: Text(
+              l10n.cancel,
+              style: TextStyle(color: context.colors.ink400),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n.delete, style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
+            child: Text(
+              l10n.delete,
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
     );
     if (confirmed != true) return;
     await ref.read(programRepositoryProvider).delete(p.id);
-    // Repository CASCADE handles slots; settings cleanup happens lazily via
-    // activeProgramProvider's stale-pointer detection.
     ref.invalidate(programsListProvider);
     ref.invalidate(activeProgramProvider);
     ref.invalidate(todaysPlannedSlotProvider);
+  }
+}
+
+class _ThisWeekHero extends StatelessWidget {
+  final ActiveProgramInfo active;
+  final List<Routine> routines;
+
+  const _ThisWeekHero({required this.active, required this.routines});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
+    final program = active.program;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final start = DateTime(
+      active.startDate.year,
+      active.startDate.month,
+      active.startDate.day,
+    );
+    final daysSinceStart = today.isBefore(start)
+        ? 0
+        : today.difference(start).inDays;
+    final weeksElapsed = daysSinceStart ~/ 7;
+    final weekIndex = weeksElapsed % program.weeksCount;
+
+    final routinesById = {for (final r in routines) r.id: r};
+    final cells = List<WeekStripCell>.generate(7, (i) {
+      final weekday = i + 1;
+      final slot = program.slotAt(weekIndex, weekday);
+      if (slot == null) return const WeekStripCell.rest();
+      if (slot.kind == SlotKind.routine) {
+        final r = routinesById[slot.routineId];
+        if (r == null) return const WeekStripCell.rest();
+        return WeekStripCell.routine(label: r.name, color: Color(r.colorValue));
+      }
+      final label = slot.labelText ?? '';
+      if (label.isEmpty || label.toLowerCase() == 'rest') {
+        return const WeekStripCell.rest();
+      }
+      return WeekStripCell.label(
+        label: label,
+        color: Color(program.colorValue),
+      );
+    });
+
+    final todayCell = cells[today.weekday - 1];
+    final todayLabel = todayCell.isRest
+        ? l10n.labelRest
+        : (todayCell.label ?? '');
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 4, right: 4, bottom: 10),
+            child: Text(
+              l10n.thisWeekSection.toUpperCase(),
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.1,
+                color: colors.ink400,
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(22),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colors.accent.withValues(alpha: 0.18),
+                  colors.ink900.withValues(alpha: 0.05),
+                ],
+                stops: const [0.0, 0.60],
+              ),
+              border: Border.all(
+                color: colors.accentSoft.withValues(alpha: 0.20),
+                width: 0.5,
+              ),
+            ),
+            clipBehavior: Clip.hardEdge,
+            child: Stack(
+              children: [
+                Positioned(
+                  right: -40,
+                  top: -40,
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          colors.accent.withValues(alpha: 0.30),
+                          colors.accent.withValues(alpha: 0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colors.accentTint,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            l10n
+                                .programWeekProgress(
+                                  weekIndex + 1,
+                                  program.weeksCount,
+                                )
+                                .toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                              color: colors.accentDeep,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            program.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: colors.ink500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    RichText(
+                      text: TextSpan(
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.52,
+                          color: colors.ink900,
+                          height: 1.1,
+                        ),
+                        children: [
+                          TextSpan(text: '${l10n.todayYouTrain} '),
+                          TextSpan(
+                            text: todayLabel,
+                            style: TextStyle(color: colors.accentDeep),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    WeekStrip(
+                      cells: cells,
+                      todayIndex: today.weekday - 1,
+                      variant: WeekStripVariant.large,
+                      dayLabels: const ['L', 'M', 'X', 'J', 'V', 'S', 'D'],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -256,6 +543,7 @@ class _ProgramCard extends StatelessWidget {
   const _ProgramCard({
     required this.program,
     required this.isActive,
+    required this.routines,
     required this.onTap,
     required this.onActivate,
     required this.onDeactivate,
@@ -264,6 +552,7 @@ class _ProgramCard extends StatelessWidget {
 
   final Program program;
   final bool isActive;
+  final List<Routine> routines;
   final VoidCallback onTap;
   final VoidCallback onActivate;
   final VoidCallback onDeactivate;
@@ -272,108 +561,203 @@ class _ProgramCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
     final color = Color(program.colorValue);
+    final routinesById = {for (final r in routines) r.id: r};
+
+    final cells = List<WeekStripCell>.generate(7, (i) {
+      final weekday = i + 1;
+      final slot = program.slotAt(0, weekday);
+      if (slot == null) return const WeekStripCell.rest();
+      if (slot.kind == SlotKind.routine) {
+        final r = routinesById[slot.routineId];
+        if (r == null) return const WeekStripCell.rest();
+        return WeekStripCell.routine(label: r.name, color: Color(r.colorValue));
+      }
+      final label = slot.labelText ?? '';
+      if (label.isEmpty || label.toLowerCase() == 'rest') {
+        return const WeekStripCell.rest();
+      }
+      return WeekStripCell.label(label: label, color: color);
+    });
+
     return PressableScale(
       onTap: onTap,
       child: GlassContainer(
-        radius: 20,
-        padding: const EdgeInsets.all(18),
-        child: Row(
+        radius: 18,
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [color.withValues(alpha: 0.9), color],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            Row(
+              children: [
+                Container(
+                  width: 4,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(2),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [color, darkenColor(color, 0.14)],
+                    ),
+                  ),
                 ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                IconData(program.iconCode, fontFamily: 'MaterialIcons'),
-                color: Colors.white,
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Flexible(
-                        child: Text(
-                          program.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: context.colors.ink900,
-                          ),
-                        ),
-                      ),
-                      if (isActive) ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: context.colors.accentTint,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            l10n.active,
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.08,
-                              color: context.colors.accentDeep,
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              program.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: colors.ink900,
+                                letterSpacing: -0.16,
+                              ),
                             ),
                           ),
+                          if (isActive) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colors.accentTint,
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Text(
+                                l10n.activeBadge,
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.8,
+                                  color: colors.accentDeep,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        l10n.programWeeksSummary(
+                          program.weeksCount,
+                          program.deloadWeeks.length,
                         ),
-                      ],
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: colors.ink500,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    l10n.programWeeksSummary(
-                      program.weeksCount,
-                      program.deloadWeeks.length,
-                    ),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: context.colors.ink500,
-                    ),
+                ),
+                PopupMenuButton<String>(
+                  icon: Icon(
+                    Icons.more_horiz,
+                    color: colors.ink500,
+                    size: 18,
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 4),
-            PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert, color: context.colors.ink500, size: 20),
-              color: context.colors.bgFrame,
-              onSelected: (v) {
-                if (v == 'activate') onActivate();
-                if (v == 'deactivate') onDeactivate();
-                if (v == 'delete') onDelete();
-              },
-              itemBuilder: (ctx) => [
-                if (!isActive)
-                  PopupMenuItem(value: 'activate', child: Text(l10n.activateProgram)),
-                if (isActive)
-                  PopupMenuItem(value: 'deactivate', child: Text(l10n.deactivateProgram)),
-                PopupMenuItem(
-                  value: 'delete',
-                  child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+                  color: colors.bgFrame,
+                  iconSize: 18,
+                  padding: EdgeInsets.zero,
+                  splashRadius: 18,
+                  onSelected: (v) {
+                    if (v == 'activate') onActivate();
+                    if (v == 'deactivate') onDeactivate();
+                    if (v == 'delete') onDelete();
+                  },
+                  itemBuilder: (ctx) => [
+                    if (!isActive)
+                      PopupMenuItem(
+                        value: 'activate',
+                        child: Text(l10n.activateProgram),
+                      ),
+                    if (isActive)
+                      PopupMenuItem(
+                        value: 'deactivate',
+                        child: Text(l10n.deactivateProgram),
+                      ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Text(
+                        l10n.delete,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ],
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+            WeekStrip(
+              cells: cells,
+              variant: WeekStripVariant.mini,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FabButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _FabButton({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = context.colors.accent;
+    return PressableScale(
+      onTap: onTap,
+      child: Container(
+        height: 54,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              lightenColor(accent, 0.06),
+              accent,
+              darkenColor(accent, 0.12),
+            ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: darkenColor(accent, 0.12).withValues(alpha: 0.45),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.add, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.16,
+              ),
             ),
           ],
         ),
@@ -418,54 +802,369 @@ class _HelpButton extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.onCreate});
+  const _EmptyState({required this.onCreate, required this.onTemplate});
   final VoidCallback onCreate;
+  final void Function(ProgramTemplate) onTemplate;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    final colors = context.colors;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(22, 16, 22, 40),
+      children: [
+        SizedBox(
+          height: 160,
+          child: Center(child: _EmptyHero(accent: colors.accent)),
+        ),
+        const SizedBox(height: 24),
+        Text(
+          l10n.designYourWeek,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w500,
+            letterSpacing: -0.48,
+            color: colors.ink900,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            l10n.designYourWeekBody,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              color: colors.ink500,
+              height: 1.45,
+            ),
+          ),
+        ),
+        const SizedBox(height: 22),
+        Center(
+          child: PressableScale(
+            onTap: onCreate,
+            child: Container(
+              height: 50,
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    lightenColor(colors.accent, 0.06),
+                    colors.accent,
+                    darkenColor(colors.accent, 0.12),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: darkenColor(colors.accent, 0.12).withValues(alpha: 0.45),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.add, color: Colors.white, size: 16),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.createFromScratch,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 10),
+          child: Row(
+            children: [
+              Icon(
+                Icons.auto_awesome,
+                size: 13,
+                color: colors.ink400,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                l10n.orStartFromTemplate.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.1,
+                  color: colors.ink400,
+                ),
+              ),
+            ],
+          ),
+        ),
+        for (final t in kProgramTemplates)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: _TemplateCard(template: t, onTap: () => onTemplate(t)),
+          ),
+      ],
+    );
+  }
+}
+
+class _EmptyHero extends StatelessWidget {
+  final Color accent;
+  const _EmptyHero({required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 220,
+      height: 140,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Positioned(
+            left: 30,
+            top: 30,
+            child: Transform.rotate(
+              angle: -0.14,
+              child: Container(
+                width: 80,
+                height: 100,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      const Color(0xFF7AA0CC).withValues(alpha: 0.35),
+                      const Color(0xFF4A6E94).withValues(alpha: 0.20),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: const Color(0xFF7AA0CC).withValues(alpha: 0.30),
+                    width: 0.5,
+                  ),
+                ),
+                child: const Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    'D',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            right: 30,
+            top: 10,
+            child: Transform.rotate(
+              angle: 0.10,
+              child: Container(
+                width: 80,
+                height: 100,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.white.withValues(alpha: 0.05),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    width: 0.5,
+                  ),
+                ),
+                child: Icon(
+                  Icons.bedtime_outlined,
+                  size: 28,
+                  color: Colors.white.withValues(alpha: 0.5),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 67,
+            top: 0,
+            child: Transform.rotate(
+              angle: -0.03,
+              child: Container(
+                width: 86,
+                height: 110,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      lightenColor(accent, 0.04),
+                      darkenColor(accent, 0.12),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: darkenColor(accent, 0.10).withValues(alpha: 0.40),
+                      blurRadius: 28,
+                      offset: const Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'UPPER',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'U',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w500,
+                        height: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TemplateCard extends StatelessWidget {
+  final ProgramTemplate template;
+  final VoidCallback onTap;
+
+  const _TemplateCard({required this.template, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
+    final cells = template.pattern.map((p) {
+      if (p.isRest) return const WeekStripCell.rest();
+      return WeekStripCell.label(
+        label: p.labelKey ?? '',
+        color: template.color,
+      );
+    }).toList();
+
+    return PressableScale(
+      onTap: onTap,
+      child: GlassContainer(
+        radius: 16,
+        padding: const EdgeInsets.all(14),
+        child: Row(
           children: [
             Container(
-              width: 72,
-              height: 72,
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: context.colors.accentTint,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    template.color,
+                    darkenColor(template.color, 0.18),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: template.color.withValues(alpha: 0.40),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.calendar_month_outlined,
-                size: 32,
-                color: context.colors.accentDeep,
+                size: 18,
+                color: Colors.white,
               ),
             ),
-            const SizedBox(height: 18),
-            Text(
-              l10n.noProgramsYet,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: context.colors.ink900,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          template.name(l10n),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: colors.ink900,
+                            letterSpacing: -0.07,
+                          ),
+                        ),
+                      ),
+                      if (template.recommended) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colors.accentTint,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            l10n.recommendedBadge,
+                            style: TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                              color: colors.accentDeep,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    template.sub(l10n),
+                    style: TextStyle(fontSize: 11, color: colors.ink500),
+                  ),
+                  const SizedBox(height: 8),
+                  WeekStrip(cells: cells, variant: WeekStripVariant.mini),
+                ],
               ),
             ),
-            const SizedBox(height: 6),
-            Text(
-              l10n.programsEmptyBody,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: context.colors.ink500, height: 1.4),
-            ),
-            const SizedBox(height: 22),
-            GlassButton(
-              label: l10n.createProgram,
-              leading: const Icon(Icons.add, color: Colors.white, size: 18),
-              variant: GlassButtonVariant.primary,
-              size: GlassButtonSize.md,
-              onPressed: onCreate,
+            Icon(
+              Icons.chevron_right,
+              size: 16,
+              color: colors.ink400,
             ),
           ],
         ),

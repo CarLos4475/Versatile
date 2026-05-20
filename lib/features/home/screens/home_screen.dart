@@ -917,7 +917,9 @@ class _LabelHeroCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Icon(
-                Icons.spa_outlined,
+                isPresetSlotLabel(context, label)
+                    ? Icons.spa_outlined
+                    : Icons.fitness_center,
                 size: 28,
                 color: isDark
                     ? context.colors.ink700

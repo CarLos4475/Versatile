@@ -172,10 +172,8 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     if (session != null) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => WorkoutCompleteScreen(
-            session: session,
-            precomputedPR: cachedPR,
-          ),
+          builder: (_) =>
+              WorkoutCompleteScreen(session: session, precomputedPR: cachedPR),
         ),
       );
     } else {
@@ -183,7 +181,11 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     }
   }
 
-  void _confirmDiscard(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
+  void _confirmDiscard(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) {
     showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -197,13 +199,18 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(l10n.discard, style: const TextStyle(color: Colors.redAccent)),
+            child: Text(
+              l10n.discard,
+              style: const TextStyle(color: Colors.redAccent),
+            ),
           ),
         ],
       ),
     ).then((confirmed) async {
       if (confirmed != true || !mounted) return;
-      ref.read(activeWorkoutProvider(widget.routineId).notifier).cancelWorkout();
+      ref
+          .read(activeWorkoutProvider(widget.routineId).notifier)
+          .cancelWorkout();
       await WorkoutNotificationService.stop();
       if (!mounted) return;
       ref.read(activeWorkoutRoutineIdProvider.notifier).state = null;
@@ -231,7 +238,9 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
       ),
     ).then((confirmed) {
       if (confirmed != true || !mounted) return;
-      ref.read(activeWorkoutProvider(widget.routineId).notifier).skipExercise(index);
+      ref
+          .read(activeWorkoutProvider(widget.routineId).notifier)
+          .skipExercise(index);
     });
   }
 
@@ -441,7 +450,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                         if (ex == null) return const SizedBox.shrink();
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10),
-                           child: ExerciseCard(
+                          child: ExerciseCard(
                             index: i,
                             data: e,
                             exercise: ex,

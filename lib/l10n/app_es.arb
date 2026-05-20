@@ -249,14 +249,89 @@
   "notificationSubtitle": "Mantén el ritmo. Toca para volver",
 
   "accentColor": "Color de acento",
-  "colorOrange": "Naranja",
-  "colorBlue": "Azul",
-  "colorGreen": "Verde",
-  "colorPurple": "Púrpura",
-  "colorRed": "Rojo",
-  "colorTeal": "Turquesa",
-  "colorPink": "Rosa",
-  "colorAmber": "Ámbar",
+  "colorEmber": "Brasa",
+  "colorPink": "Rosado",
+  "colorWine": "Vino",
+  "colorBrick": "Ladrillo",
+  "colorCamel": "Camello",
+  "colorOlive": "Oliva",
+  "colorSlate": "Pizarra",
+  "colorPlum": "Ciruela",
+
+  "profileSessionsLabel": "sesiones",
+  "profileTimeLabel": "tiempo",
+  "profilePrsLabel": "PRs",
+  "planActiveSection": "Plan activo",
+  "noActivePlanTitle": "Sin plan activo",
+  "noActivePlanSubtitle": "Elige un programa para empezar",
+  "programWeekProgress": "Semana {current} de {total}",
+  "@programWeekProgress": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "programDeloadNone": "sin deload",
+  "programDeloadCount": "{n} deload",
+  "@programDeloadCount": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "activeBadge": "ACTIVO",
+  "aboutBy": "por",
+
+  "thisWeekSection": "Esta semana",
+  "yourProgramsSection": "Tus programas",
+  "programsTotalCount": "{n} totales",
+  "@programsTotalCount": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "todayYouTrain": "Hoy te toca",
+  "newProgramTitle": "Nuevo programa",
+  "newProgramSubtitle": "Configura tu plan en 4 pasos",
+  "stepName": "Nombre",
+  "stepColor": "Color",
+  "stepWeeks": "Semanas",
+  "stepCalendar": "Calendario",
+  "weeksUnit": "semanas",
+  "weeksUnitOne": "semana",
+  "deloadShort": "DELOAD",
+  "calendarHint": "Toca cualquier día para asignar rutina, descanso o etiqueta.",
+  "editDayEyebrow": "Semana {week} · {day}",
+  "@editDayEyebrow": {
+    "placeholders": {
+      "week": { "type": "int" },
+      "day": { "type": "String" }
+    }
+  },
+  "whatTodayQuestion": "¿Qué toca el {day}?",
+  "@whatTodayQuestion": {
+    "placeholders": { "day": { "type": "String" } }
+  },
+  "restDayCta": "Día de descanso",
+  "restDayCtaSubtitle": "Recupera para el siguiente",
+  "orPickRoutine": "O asigna una rutina",
+  "orUseLabel": "O usa una etiqueta",
+  "saveSelection": "Guardar selección",
+  "labelYoga": "Yoga",
+  "customLabelChip": "Personalizado…",
+  "routineExerciseCount": "{n} ejercicios",
+  "@routineExerciseCount": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "designYourWeek": "Diseña tu semana ideal",
+  "designYourWeekBody": "Asigna una rutina a cada día — y descansos donde toque. La app te dirá qué hacer hoy.",
+  "createFromScratch": "Crear desde cero",
+  "orStartFromTemplate": "O empieza con una plantilla",
+  "recommendedBadge": "RECOMENDADO",
+  "templateUpperLowerName": "Upper / Lower",
+  "templateUpperLowerSub": "4 días · descansos lógicos",
+  "templatePplName": "Push · Pull · Legs",
+  "templatePplSub": "6 días · clásico",
+  "templateFullBodyName": "Full Body 3×",
+  "templateFullBodySub": "3 días · principiantes",
+  "colorPreviewHint": "así se verá en la lista",
 
   "progressTitle": "Progreso",
   "estimatedOneRm": "1RM Est.",
@@ -564,5 +639,13 @@
 
   "share": "Compartir",
   "shareWorkout": "Compartir entrenamiento",
-  "sharePreviewSubtitle": "Una tarjeta cuadrada para publicar donde quieras"
+  "sharePreviewSubtitle": "Una tarjeta cuadrada para publicar donde quieras",
+
+  "recordLabel": "Récord",
+  "averageLabel": "Promedio",
+  "sessionsLabel": "Sesiones",
+  "progressionLabel": "Progresión",
+  "viewAll": "Ver todas",
+  "formulaEpley": "Fórmula Epley",
+  "vsPrevious": "vs anterior"
 }

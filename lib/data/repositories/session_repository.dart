@@ -157,6 +157,56 @@ class SessionRepository {
     return result;
   }
 
+  Future<({int sessionCount, int totalMinutes})> getSessionAggregates() async {
+    final db = await DatabaseHelper.instance.database;
+    final rows = await db.rawQuery(
+      'SELECT COUNT(*) AS cnt, COALESCE(SUM(duration_min),0) AS dur FROM sessions',
+    );
+    final r = rows.first;
+    return (
+      sessionCount: (r['cnt'] as num).toInt(),
+      totalMinutes: (r['dur'] as num).toInt(),
+    );
+  }
+
+  Future<int> getPrCount() async {
+    final db = await DatabaseHelper.instance.database;
+    final rows = await db.rawQuery('''
+      SELECT se.exercise_id AS ex_id, ss.kg AS kg, ss.reps AS reps,
+             ss.left_kg AS left_kg, ss.left_reps AS left_reps,
+             s.date AS date, s.id AS sid, ss.set_index AS set_index
+      FROM session_sets ss
+      JOIN session_exercises se ON se.id = ss.session_exercise_id
+      JOIN sessions s ON s.id = se.session_id
+      WHERE ss.kg > 0 AND ss.reps > 0
+      ORDER BY s.date ASC, s.id ASC, se.sort_order ASC, ss.set_index ASC
+    ''');
+    final best = <String, double>{};
+    var prs = 0;
+    for (final r in rows) {
+      final exId = r['ex_id'] as String;
+      final kg = (r['kg'] as num).toDouble();
+      final reps = r['reps'] as int;
+      final orm = kg * (1 + reps / 30);
+      final prev = best[exId] ?? 0;
+      if (orm > prev) {
+        best[exId] = orm;
+        if (prev > 0) prs++;
+      }
+      final leftKg = r['left_kg'];
+      final leftReps = r['left_reps'];
+      if (leftKg != null && leftReps != null) {
+        final lOrm = (leftKg as num).toDouble() * (1 + (leftReps as int) / 30);
+        final lPrev = best[exId] ?? 0;
+        if (lOrm > lPrev) {
+          best[exId] = lOrm;
+          if (lPrev > 0) prs++;
+        }
+      }
+    }
+    return prs;
+  }
+
   Future<List<SessionExercise>> _loadExercises(String sessionId) async {
     final db = await DatabaseHelper.instance.database;
     final seRows = await db.query(

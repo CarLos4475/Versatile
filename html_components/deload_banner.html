@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deload Banner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0f0f14;
+    font-family: 'Inter', -apple-system, sans-serif;
+    padding: 24px;
+  }
+
+  .banner {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px 20px 16px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(120, 80, 255, 0.90), rgba(100, 60, 230, 0.85));
+    box-shadow: 0 8px 24px -4px rgba(100, 60, 230, 0.35);
+    position: relative;
+    overflow: hidden;
+    color: white;
+  }
+
+  .glow {
+    position: absolute;
+    top: -30px;
+    right: -20px;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.25), rgba(255,255,255,0.13) 45%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .top-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .icon-box {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.10));
+    border: 0.8px solid rgba(255,255,255,0.30);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .icon-box svg {
+    width: 22px;
+    height: 22px;
+    fill: white;
+  }
+
+  .text-group {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .title {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+    color: white;
+    margin-bottom: 4px;
+  }
+
+  .body {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .btn-secondary {
+    padding: 8px 14px;
+    border-radius: 12px;
+    border: 0.8px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  .btn-primary {
+    padding: 8px 16px;
+    border-radius: 12px;
+    border: none;
+    background: white;
+    color: #5438cc;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1px;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .btn-primary:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.20);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.97);
+  }
+
+  /* States */
+  .variant-stagnation .icon-box svg { fill: white; }
+  .variant-volume .icon-box svg { fill: white; }
+  .variant-both .icon-box svg { fill: white; }
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <div class="glow"></div>
+  <div class="content">
+    <div class="top-row">
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9.823 2.157a.75.75 0 0 1 .284.864l-.039.11a4.059 4.059 0 0 0 4.99 5.275.75.75 0 0 1 .897.9 5.559 5.559 0 0 1-5.598 4.194H9.87a5.56 5.56 0 0 1-5.008-5.249l-.008-.115a5.56 5.56 0 0 1 .487-2.741.75.75 0 0 1 .633-.415 3.583 3.583 0 0 0 3.85-2.873l.008-.042a.75.75 0 0 1 .99-.498ZM11.56 16.5a6.985 6.985 0 0 0 4.482-1.923l.175-.17A.75.75 0 0 0 16 13H9.75a.75.75 0 0 0 0 1.5h2.872l-.395.395a.75.75 0 0 0-.417.859 6.939 6.939 0 0 0 .431 1.147.75.75 0 0 0 .32.599Z"/>
+        </svg>
+      </div>
+      <div class="text-group">
+        <div class="title">Time for a deload?</div>
+        <div class="body">Your best lifts haven&#8217;t moved up in 3+ weeks. A deload week can help you come back stronger.</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn-secondary">Not now</button>
+      <button class="btn-primary">Open program</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

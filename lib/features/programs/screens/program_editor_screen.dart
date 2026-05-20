@@ -4,28 +4,19 @@ import 'package:uuid/uuid.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/color_utils.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/program.dart';
-import '../../../shared/widgets/glass_button.dart';
+import '../../../domain/entities/routine.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
-import '../../../domain/entities/routine.dart';
-import '../../routines/widgets/routine_color_picker.dart';
 import '../../routines/view_models/routines_view_model.dart';
+import '../data/program_templates.dart';
 import '../view_models/programs_view_model.dart';
+import '../widgets/day_box.dart';
+import '../widgets/numbered_step.dart';
 import '../widgets/slot_editor_sheet.dart';
-
-const _kProgramColors = [
-  Color(0xFFD97757),
-  Color(0xFFB85432),
-  Color(0xFFE89A7E),
-  Color(0xFFB48C64),
-  Color(0xFF4A7B6F),
-  Color(0xFF7B5EA7),
-  Color(0xFF5E7BA7),
-  Color(0xFF9B7850),
-];
 
 class ProgramEditorScreen extends ConsumerStatefulWidget {
   const ProgramEditorScreen({super.key, this.programId});
@@ -38,12 +29,13 @@ class ProgramEditorScreen extends ConsumerStatefulWidget {
 
 class _ProgramEditorScreenState extends ConsumerState<ProgramEditorScreen> {
   final _nameCtrl = TextEditingController();
-  Color _color = _kProgramColors.first;
+  Color _color = kProgramColors.first;
   int _weeks = 4;
   Set<int> _deload = {};
   List<ProgramSlot> _slots = [];
   String? _id;
   DateTime? _createdAt;
+  int _activeWeekTab = 0;
   bool _saving = false;
   bool _loading = true;
 
@@ -83,6 +75,7 @@ class _ProgramEditorScreenState extends ConsumerState<ProgramEditorScreen> {
       _deload = {...program.deloadWeeks};
       _slots = [...program.slots];
       _createdAt = program.createdAt;
+      _activeWeekTab = 0;
       _loading = false;
     });
   }
@@ -97,9 +90,19 @@ class _ProgramEditorScreenState extends ConsumerState<ProgramEditorScreen> {
   void _changeWeeks(int newWeeks) {
     setState(() {
       _weeks = newWeeks;
-      // Drop slots and deload markers from removed weeks
       _slots.removeWhere((s) => s.weekIndex >= newWeeks);
       _deload.removeWhere((w) => w >= newWeeks);
+      if (_activeWeekTab >= newWeeks) _activeWeekTab = newWeeks - 1;
+    });
+  }
+
+  void _toggleDeload(int weekIndex) {
+    setState(() {
+      if (_deload.contains(weekIndex)) {
+        _deload.remove(weekIndex);
+      } else {
+        _deload.add(weekIndex);
+      }
     });
   }
 
@@ -191,6 +194,9 @@ class _ProgramEditorScreenState extends ConsumerState<ProgramEditorScreen> {
       );
     }
 
+    final canSave = _nameCtrl.text.trim().isNotEmpty && !_saving;
+    final routines = ref.watch(routinesProvider).value ?? const <Routine>[];
+
     return Scaffold(
       backgroundColor: context.colors.bgApp,
       body: SafeArea(
@@ -199,83 +205,87 @@ class _ProgramEditorScreenState extends ConsumerState<ProgramEditorScreen> {
           children: [
             ScreenHeader(
               title: widget.programId == null
-                  ? l10n.createProgram
+                  ? l10n.newProgramTitle
                   : l10n.editProgram,
+              subtitle: l10n.newProgramSubtitle,
               onBack: () => Navigator.of(context).pop(),
               accentBack: true,
+              trailing: _SaveButton(
+                label: _saving ? l10n.saving : l10n.save,
+                enabled: canSave,
+                onTap: canSave ? _save : null,
+              ),
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(22, 16, 22, 24),
+                padding: const EdgeInsets.fromLTRB(22, 0, 22, 40),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _SectionLabel(l10n.programName),
-                    const SizedBox(height: 8),
-                    GlassContainer(
-                      radius: 16,
-                      padding: const EdgeInsets.symmetric(horizontal: 14),
-                      child: TextField(
-                        controller: _nameCtrl,
-                        textCapitalization: TextCapitalization.words,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: context.colors.ink900,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: l10n.programNameHint,
-                          hintStyle: TextStyle(color: context.colors.ink300),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    NumberedStep(
+                      number: 1,
+                      label: l10n.stepName,
+                      child: GlassContainer(
+                        radius: 14,
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        child: TextField(
+                          controller: _nameCtrl,
+                          textCapitalization: TextCapitalization.words,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: context.colors.ink900,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: l10n.programNameHint,
+                            hintStyle: TextStyle(
+                              color: context.colors.ink300,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                              vertical: 14,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    _SectionLabel(l10n.color_label),
-                    const SizedBox(height: 12),
-                    RoutineColorPicker(
-                      colors: _kProgramColors,
-                      selectedColorValue: _color.toARGB32(),
-                      onSelected: (c) => setState(() => _color = c),
+                    NumberedStep(
+                      number: 2,
+                      label: l10n.stepColor,
+                      child: _ColorStep(
+                        selected: _color,
+                        programName: _nameCtrl.text.trim().isEmpty
+                            ? (widget.programId == null
+                                ? l10n.newProgramTitle
+                                : l10n.editProgram)
+                            : _nameCtrl.text.trim(),
+                        onSelected: (c) => setState(() => _color = c),
+                      ),
                     ),
-                    const SizedBox(height: 24),
-                    _SectionLabel(l10n.weeksLabel),
-                    const SizedBox(height: 10),
-                    _WeeksStepper(
-                      value: _weeks,
-                      min: 1,
-                      max: 12,
-                      onChanged: _changeWeeks,
+                    NumberedStep(
+                      number: 3,
+                      label: l10n.stepWeeks,
+                      child: _WeeksStep(
+                        weeks: _weeks,
+                        deload: _deload,
+                        onChangeWeeks: _changeWeeks,
+                        onToggleDeload: _toggleDeload,
+                      ),
                     ),
-                    const SizedBox(height: 24),
-                    _SectionLabel(l10n.scheduleLabel),
-                    const SizedBox(height: 10),
-                    ...List.generate(_weeks, (w) => _WeekSection(
-                      weekIndex: w,
-                      isDeload: _deload.contains(w),
-                      onToggleDeload: () => setState(() {
-                        if (_deload.contains(w)) {
-                          _deload.remove(w);
-                        } else {
-                          _deload.add(w);
-                        }
-                      }),
-                      slots: _slots
-                          .where((s) => s.weekIndex == w)
-                          .toList(),
-                      onEditSlot: (weekday) => _editSlot(w, weekday),
-                    )),
-                    const SizedBox(height: 24),
-                    GlassButton(
-                      label: _saving ? l10n.saving : l10n.save,
-                      variant: GlassButtonVariant.primary,
-                      size: GlassButtonSize.md,
-                      expand: true,
-                      loading: _saving,
-                      onPressed: _saving || _nameCtrl.text.trim().isEmpty
-                          ? null
-                          : _save,
+                    NumberedStep(
+                      number: 4,
+                      label: l10n.stepCalendar,
+                      child: _CalendarStep(
+                        weeks: _weeks,
+                        activeWeek: _activeWeekTab,
+                        deload: _deload,
+                        slots: _slots,
+                        routines: routines,
+                        programColor: _color,
+                        onSelectWeek: (w) =>
+                            setState(() => _activeWeekTab = w),
+                        onEditSlot: (wd) => _editSlot(_activeWeekTab, wd),
+                      ),
                     ),
                   ],
                 ),
@@ -288,62 +298,202 @@ class _ProgramEditorScreenState extends ConsumerState<ProgramEditorScreen> {
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
-  final String text;
+class _SaveButton extends StatelessWidget {
+  final String label;
+  final bool enabled;
+  final VoidCallback? onTap;
+
+  const _SaveButton({
+    required this.label,
+    required this.enabled,
+    required this.onTap,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text.toUpperCase(),
-      style: TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 0.08,
-        color: context.colors.ink400,
+    final colors = context.colors;
+    return PressableScale(
+      onTap: onTap,
+      child: Container(
+        height: 36,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          gradient: enabled
+              ? LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    lightenColor(colors.accent, 0.04),
+                    darkenColor(colors.accent, 0.10),
+                  ],
+                )
+              : null,
+          color: enabled ? null : colors.ink900.withValues(alpha: 0.08),
+          boxShadow: enabled
+              ? [
+                  BoxShadow(
+                    color: darkenColor(colors.accent, 0.10)
+                        .withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.07,
+            color: enabled ? Colors.white : colors.ink400,
+          ),
+        ),
       ),
     );
   }
 }
 
-class _WeeksStepper extends StatelessWidget {
-  const _WeeksStepper({
-    required this.value,
-    required this.min,
-    required this.max,
-    required this.onChanged,
+class _ColorStep extends StatelessWidget {
+  final Color selected;
+  final String programName;
+  final ValueChanged<Color> onSelected;
+
+  const _ColorStep({
+    required this.selected,
+    required this.programName,
+    required this.onSelected,
   });
-  final int value;
-  final int min;
-  final int max;
-  final ValueChanged<int> onChanged;
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context)!;
     return GlassContainer(
       radius: 14,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      child: Row(
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Text(
-              AppLocalizations.of(context)!.weeksCountValue(value),
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: context.colors.ink900,
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [selected, darkenColor(selected, 0.18)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: selected.withValues(alpha: 0.40),
+                      blurRadius: 14,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.fitness_center,
+                  size: 18,
+                  color: Colors.white,
+                ),
               ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      programName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: colors.ink900,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.colorPreviewHint,
+                      style: TextStyle(fontSize: 11, color: colors.ink500),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 8,
+              mainAxisSpacing: 6,
+              crossAxisSpacing: 6,
+              childAspectRatio: 1,
             ),
-          ),
-          _StepBtn(
-            icon: Icons.remove,
-            enabled: value > min,
-            onTap: () => onChanged(value - 1),
-          ),
-          const SizedBox(width: 12),
-          _StepBtn(
-            icon: Icons.add,
-            enabled: value < max,
-            onTap: () => onChanged(value + 1),
+            itemCount: kProgramColors.length,
+            itemBuilder: (context, i) {
+              final c = kProgramColors[i];
+              final active = c.toARGB32() == selected.toARGB32();
+              return PressableScale(
+                onTap: () => onSelected(c),
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [c, darkenColor(c, 0.18)],
+                          ),
+                          boxShadow: active
+                              ? [
+                                  BoxShadow(
+                                    color: c.withValues(alpha: 0.4),
+                                    blurRadius: 14,
+                                    offset: const Offset(0, 6),
+                                  ),
+                                ]
+                              : [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                        ),
+                      ),
+                    ),
+                    if (active)
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Icon(
+                            Icons.check,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -351,217 +501,403 @@ class _WeeksStepper extends StatelessWidget {
   }
 }
 
-class _StepBtn extends StatelessWidget {
-  const _StepBtn({
-    required this.icon,
-    required this.enabled,
-    required this.onTap,
+class _WeeksStep extends StatelessWidget {
+  final int weeks;
+  final Set<int> deload;
+  final ValueChanged<int> onChangeWeeks;
+  final ValueChanged<int> onToggleDeload;
+
+  const _WeeksStep({
+    required this.weeks,
+    required this.deload,
+    required this.onChangeWeeks,
+    required this.onToggleDeload,
   });
-  final IconData icon;
-  final bool enabled;
-  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return PressableScale(
-      onTap: enabled ? onTap : null,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: enabled
-              ? context.colors.accentTint
-              : context.colors.press,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(
-          icon,
-          size: 16,
-          color: enabled
-              ? context.colors.accentDeep
-              : context.colors.ink300,
-        ),
-      ),
-    );
-  }
-}
-
-class _WeekSection extends ConsumerWidget {
-  const _WeekSection({
-    required this.weekIndex,
-    required this.isDeload,
-    required this.onToggleDeload,
-    required this.slots,
-    required this.onEditSlot,
-  });
-
-  final int weekIndex;
-  final bool isDeload;
-  final VoidCallback onToggleDeload;
-  final List<ProgramSlot> slots;
-  final ValueChanged<int> onEditSlot;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = context.colors;
     final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: GlassContainer(
-        radius: 16,
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n.weekN(weekIndex + 1),
+    return GlassContainer(
+      radius: 14,
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: RichText(
+                  text: TextSpan(
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: context.colors.ink900,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.56,
+                      color: colors.ink900,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                    children: [
+                      TextSpan(text: '$weeks '),
+                      TextSpan(
+                        text: weeks == 1 ? l10n.weeksUnitOne : l10n.weeksUnit,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: colors.ink500,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              _MinusPlus(
+                isPlus: false,
+                enabled: weeks > 1,
+                onTap: () => onChangeWeeks(weeks - 1),
+              ),
+              const SizedBox(width: 6),
+              _MinusPlus(
+                isPlus: true,
+                enabled: weeks < 12,
+                onTap: () => onChangeWeeks(weeks + 1),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: List.generate(weeks, (w) {
+              final isDeload = deload.contains(w);
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(right: w == weeks - 1 ? 0 : 4),
+                  child: PressableScale(
+                    onTap: () => onToggleDeload(w),
+                    child: Container(
+                      height: 26,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: isDeload
+                              ? [
+                                  const Color(0xFF7A8C5B).withValues(alpha: 0.45),
+                                  const Color(0xFF4A5A38).withValues(alpha: 0.30),
+                                ]
+                              : [
+                                  context.colors.accent.withValues(alpha: 0.30),
+                                  context.colors.accent.withValues(alpha: 0.15),
+                                ],
+                        ),
+                        border: Border.all(
+                          color: context.colors.hairline.withValues(alpha: 0.5),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'W${w + 1}',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: colors.ink700,
+                                letterSpacing: 0.4,
+                                fontFeatures: const [
+                                  FontFeature.tabularFigures(),
+                                ],
+                              ),
+                            ),
+                            if (isDeload) ...[
+                              const SizedBox(width: 4),
+                              Text(
+                                '· ${l10n.deloadShort}',
+                                style: const TextStyle(
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFFA6BE82),
+                                  letterSpacing: 0.6,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                Text(
-                  l10n.deloadWeekLabel,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: context.colors.ink500,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Switch(
-                  value: isDeload,
-                  onChanged: (_) => onToggleDeload(),
-                  activeThumbColor: context.colors.accent,
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            for (int wd = 1; wd <= 7; wd++)
-              _DayRow(
-                weekday: wd,
-                slot: _slotForDay(wd),
-                onTap: () => onEditSlot(wd),
-                routines:
-                    ref.watch(routinesProvider).value ?? const <Routine>[],
-              ),
-          ],
-        ),
+              );
+            }),
+          ),
+        ],
       ),
     );
-  }
-
-  ProgramSlot? _slotForDay(int weekday) {
-    for (final s in slots) {
-      if (s.weekday == weekday) return s;
-    }
-    return null;
   }
 }
 
-class _DayRow extends StatelessWidget {
-  const _DayRow({
-    required this.weekday,
-    required this.slot,
-    required this.onTap,
-    required this.routines,
-  });
-  final int weekday;
-  final ProgramSlot? slot;
+class _MinusPlus extends StatelessWidget {
+  final bool isPlus;
+  final bool enabled;
   final VoidCallback onTap;
-  final List<Routine> routines;
+
+  const _MinusPlus({
+    required this.isPlus,
+    required this.enabled,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
-
-    String trailing;
-    Color? trailingColor;
-    IconData? leading;
-    if (slot == null) {
-      trailing = l10n.labelRest;
-      trailingColor = colors.ink400;
-      leading = Icons.coffee_outlined;
-    } else if (slot!.kind == SlotKind.routine) {
-      Routine? r;
-      for (final candidate in routines) {
-        if (candidate.id == slot!.routineId) {
-          r = candidate;
-          break;
-        }
-      }
-      trailing = r != null ? r.name : l10n.routineRemoved;
-      trailingColor = r != null ? colors.ink900 : colors.ink400;
-      leading = Icons.fitness_center;
-    } else {
-      final raw = slot!.labelText ?? '';
-      trailing = raw.isEmpty ? '' : localizeSlotLabel(context, raw);
-      trailingColor = colors.ink700;
-      leading = Icons.coffee_outlined;
-    }
-
     return PressableScale(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 36,
-              child: Text(
-                _weekdayShort(context, weekday),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.08,
-                  color: colors.ink400,
-                ),
-              ),
-            ),
-            Icon(leading, size: 14, color: colors.ink400),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                trailing,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: slot == null ? FontWeight.w400 : FontWeight.w600,
-                  color: trailingColor,
-                ),
-              ),
-            ),
-            Icon(Icons.chevron_right, size: 16, color: colors.ink300),
-          ],
+      onTap: enabled ? onTap : null,
+      child: Container(
+        width: 36,
+        height: 36,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          gradient: isPlus && enabled
+              ? LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    lightenColor(colors.accent, 0.04),
+                    darkenColor(colors.accent, 0.10),
+                  ],
+                )
+              : null,
+          color: (isPlus && enabled)
+              ? null
+              : colors.ink900.withValues(alpha: enabled ? 0.06 : 0.03),
+          boxShadow: isPlus && enabled
+              ? [
+                  BoxShadow(
+                    color: darkenColor(colors.accent, 0.10)
+                        .withValues(alpha: 0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Icon(
+          isPlus ? Icons.add : Icons.remove,
+          size: 16,
+          color: isPlus && enabled
+              ? Colors.white
+              : (enabled ? colors.ink700 : colors.ink300),
         ),
       ),
     );
   }
+}
 
-  String _weekdayShort(BuildContext context, int weekday) {
+class _CalendarStep extends StatelessWidget {
+  final int weeks;
+  final int activeWeek;
+  final Set<int> deload;
+  final List<ProgramSlot> slots;
+  final List<Routine> routines;
+  final Color programColor;
+  final ValueChanged<int> onSelectWeek;
+  final ValueChanged<int> onEditSlot;
+
+  const _CalendarStep({
+    required this.weeks,
+    required this.activeWeek,
+    required this.deload,
+    required this.slots,
+    required this.routines,
+    required this.programColor,
+    required this.onSelectWeek,
+    required this.onEditSlot,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
     final l10n = AppLocalizations.of(context)!;
-    switch (weekday) {
-      case 1:
-        return l10n.weekdayMonShort;
-      case 2:
-        return l10n.weekdayTueShort;
-      case 3:
-        return l10n.weekdayWedShort;
-      case 4:
-        return l10n.weekdayThuShort;
-      case 5:
-        return l10n.weekdayFriShort;
-      case 6:
-        return l10n.weekdaySatShort;
-      case 7:
-        return l10n.weekdaySunShort;
-      default:
-        return '';
-    }
+    final routinesById = {for (final r in routines) r.id: r};
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: List.generate(weeks, (w) {
+              final active = w == activeWeek;
+              final isDeload = deload.contains(w);
+              return Padding(
+                padding: EdgeInsets.only(right: w == weeks - 1 ? 0 : 6),
+                child: PressableScale(
+                  onTap: () => onSelectWeek(w),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: active
+                          ? LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                lightenColor(colors.accent, 0.04),
+                                darkenColor(colors.accent, 0.10),
+                              ],
+                            )
+                          : null,
+                      color: active
+                          ? null
+                          : colors.ink900.withValues(alpha: 0.06),
+                      boxShadow: active
+                          ? [
+                              BoxShadow(
+                                color: darkenColor(
+                                  colors.accent,
+                                  0.10,
+                                ).withValues(alpha: 0.40),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                          : null,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          l10n.weekN(w + 1),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.07,
+                            color: active ? Colors.white : colors.ink500,
+                          ),
+                        ),
+                        if (isDeload) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 1,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF7A8C5B)
+                                  .withValues(alpha: 0.55),
+                              borderRadius: BorderRadius.circular(3),
+                            ),
+                            child: Text(
+                              l10n.deloadShort,
+                              style: const TextStyle(
+                                fontSize: 8,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                                letterSpacing: 0.7,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: List.generate(7, (i) {
+            final weekday = i + 1;
+            final slot = slots.firstWhere(
+              (s) => s.weekIndex == activeWeek && s.weekday == weekday,
+              orElse: () => ProgramSlot(
+                id: '',
+                programId: '',
+                weekIndex: activeWeek,
+                weekday: weekday,
+                kind: SlotKind.label,
+              ),
+            );
+            final hasSlot = slot.id.isNotEmpty;
+            String? routineLabel;
+            Color? routineColor;
+            bool isRest = !hasSlot;
+            if (hasSlot) {
+              if (slot.kind == SlotKind.routine) {
+                final r = routinesById[slot.routineId];
+                if (r != null) {
+                  routineLabel = r.name;
+                  routineColor = Color(r.colorValue);
+                } else {
+                  isRest = true;
+                }
+              } else {
+                final lbl = slot.labelText ?? '';
+                if (lbl.isEmpty || lbl.toLowerCase() == 'rest') {
+                  isRest = true;
+                } else {
+                  routineLabel = localizeSlotLabel(context, lbl);
+                  routineColor = programColor;
+                }
+              }
+            }
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(right: i == 6 ? 0 : 6),
+                child: DayBox(
+                  dayLabel: const ['L', 'M', 'X', 'J', 'V', 'S', 'D'][i],
+                  routineLabel: routineLabel,
+                  routineColor: routineColor,
+                  isRest: isRest,
+                  restShortLabel: l10n.labelRest.toUpperCase(),
+                  onTap: () => onEditSlot(weekday),
+                ),
+              ),
+            );
+          }),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: colors.accent.withValues(alpha: 0.08),
+            border: Border.all(
+              color: colors.accent.withValues(alpha: 0.18),
+              width: 0.5,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 13,
+                color: colors.accentDeep,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  l10n.calendarHint,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: colors.ink500,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

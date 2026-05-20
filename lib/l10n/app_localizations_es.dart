@@ -564,28 +564,183 @@ class AppLocalizationsEs extends AppLocalizations {
   String get accentColor => 'Color de acento';
 
   @override
-  String get colorOrange => 'Naranja';
+  String get colorEmber => 'Brasa';
 
   @override
-  String get colorBlue => 'Azul';
+  String get colorPink => 'Rosado';
 
   @override
-  String get colorGreen => 'Verde';
+  String get colorWine => 'Vino';
 
   @override
-  String get colorPurple => 'Púrpura';
+  String get colorBrick => 'Ladrillo';
 
   @override
-  String get colorRed => 'Rojo';
+  String get colorCamel => 'Camello';
 
   @override
-  String get colorTeal => 'Turquesa';
+  String get colorOlive => 'Oliva';
 
   @override
-  String get colorPink => 'Rosa';
+  String get colorSlate => 'Pizarra';
 
   @override
-  String get colorAmber => 'Ámbar';
+  String get colorPlum => 'Ciruela';
+
+  @override
+  String get profileSessionsLabel => 'sesiones';
+
+  @override
+  String get profileTimeLabel => 'tiempo';
+
+  @override
+  String get profilePrsLabel => 'PRs';
+
+  @override
+  String get planActiveSection => 'Plan activo';
+
+  @override
+  String get noActivePlanTitle => 'Sin plan activo';
+
+  @override
+  String get noActivePlanSubtitle => 'Elige un programa para empezar';
+
+  @override
+  String programWeekProgress(int current, int total) {
+    return 'Semana $current de $total';
+  }
+
+  @override
+  String get programDeloadNone => 'sin deload';
+
+  @override
+  String programDeloadCount(int n) {
+    return '$n deload';
+  }
+
+  @override
+  String get activeBadge => 'ACTIVO';
+
+  @override
+  String get aboutBy => 'por';
+
+  @override
+  String get thisWeekSection => 'Esta semana';
+
+  @override
+  String get yourProgramsSection => 'Tus programas';
+
+  @override
+  String programsTotalCount(int n) {
+    return '$n totales';
+  }
+
+  @override
+  String get todayYouTrain => 'Hoy te toca';
+
+  @override
+  String get newProgramTitle => 'Nuevo programa';
+
+  @override
+  String get newProgramSubtitle => 'Configura tu plan en 4 pasos';
+
+  @override
+  String get stepName => 'Nombre';
+
+  @override
+  String get stepColor => 'Color';
+
+  @override
+  String get stepWeeks => 'Semanas';
+
+  @override
+  String get stepCalendar => 'Calendario';
+
+  @override
+  String get weeksUnit => 'semanas';
+
+  @override
+  String get weeksUnitOne => 'semana';
+
+  @override
+  String get deloadShort => 'DELOAD';
+
+  @override
+  String get calendarHint =>
+      'Toca cualquier día para asignar rutina, descanso o etiqueta.';
+
+  @override
+  String editDayEyebrow(int week, String day) {
+    return 'Semana $week · $day';
+  }
+
+  @override
+  String whatTodayQuestion(String day) {
+    return '¿Qué toca el $day?';
+  }
+
+  @override
+  String get restDayCta => 'Día de descanso';
+
+  @override
+  String get restDayCtaSubtitle => 'Recupera para el siguiente';
+
+  @override
+  String get orPickRoutine => 'O asigna una rutina';
+
+  @override
+  String get orUseLabel => 'O usa una etiqueta';
+
+  @override
+  String get saveSelection => 'Guardar selección';
+
+  @override
+  String get labelYoga => 'Yoga';
+
+  @override
+  String get customLabelChip => 'Personalizado…';
+
+  @override
+  String routineExerciseCount(int n) {
+    return '$n ejercicios';
+  }
+
+  @override
+  String get designYourWeek => 'Diseña tu semana ideal';
+
+  @override
+  String get designYourWeekBody =>
+      'Asigna una rutina a cada día — y descansos donde toque. La app te dirá qué hacer hoy.';
+
+  @override
+  String get createFromScratch => 'Crear desde cero';
+
+  @override
+  String get orStartFromTemplate => 'O empieza con una plantilla';
+
+  @override
+  String get recommendedBadge => 'RECOMENDADO';
+
+  @override
+  String get templateUpperLowerName => 'Upper / Lower';
+
+  @override
+  String get templateUpperLowerSub => '4 días · descansos lógicos';
+
+  @override
+  String get templatePplName => 'Push · Pull · Legs';
+
+  @override
+  String get templatePplSub => '6 días · clásico';
+
+  @override
+  String get templateFullBodyName => 'Full Body 3×';
+
+  @override
+  String get templateFullBodySub => '3 días · principiantes';
+
+  @override
+  String get colorPreviewHint => 'así se verá en la lista';
 
   @override
   String get progressTitle => 'Progreso';
@@ -1261,4 +1416,25 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get sharePreviewSubtitle =>
       'Una tarjeta cuadrada para publicar donde quieras';
+
+  @override
+  String get recordLabel => 'Récord';
+
+  @override
+  String get averageLabel => 'Promedio';
+
+  @override
+  String get sessionsLabel => 'Sesiones';
+
+  @override
+  String get progressionLabel => 'Progresión';
+
+  @override
+  String get viewAll => 'Ver todas';
+
+  @override
+  String get formulaEpley => 'Fórmula Epley';
+
+  @override
+  String get vsPrevious => 'vs anterior';
 }

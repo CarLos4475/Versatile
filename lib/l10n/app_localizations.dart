@@ -1160,41 +1160,11 @@ abstract class AppLocalizations {
   /// **'Accent color'**
   String get accentColor;
 
-  /// No description provided for @colorOrange.
+  /// No description provided for @colorEmber.
   ///
   /// In en, this message translates to:
-  /// **'Orange'**
-  String get colorOrange;
-
-  /// No description provided for @colorBlue.
-  ///
-  /// In en, this message translates to:
-  /// **'Blue'**
-  String get colorBlue;
-
-  /// No description provided for @colorGreen.
-  ///
-  /// In en, this message translates to:
-  /// **'Green'**
-  String get colorGreen;
-
-  /// No description provided for @colorPurple.
-  ///
-  /// In en, this message translates to:
-  /// **'Purple'**
-  String get colorPurple;
-
-  /// No description provided for @colorRed.
-  ///
-  /// In en, this message translates to:
-  /// **'Red'**
-  String get colorRed;
-
-  /// No description provided for @colorTeal.
-  ///
-  /// In en, this message translates to:
-  /// **'Teal'**
-  String get colorTeal;
+  /// **'Ember'**
+  String get colorEmber;
 
   /// No description provided for @colorPink.
   ///
@@ -1202,11 +1172,323 @@ abstract class AppLocalizations {
   /// **'Pink'**
   String get colorPink;
 
-  /// No description provided for @colorAmber.
+  /// No description provided for @colorWine.
   ///
   /// In en, this message translates to:
-  /// **'Amber'**
-  String get colorAmber;
+  /// **'Wine'**
+  String get colorWine;
+
+  /// No description provided for @colorBrick.
+  ///
+  /// In en, this message translates to:
+  /// **'Brick'**
+  String get colorBrick;
+
+  /// No description provided for @colorCamel.
+  ///
+  /// In en, this message translates to:
+  /// **'Camel'**
+  String get colorCamel;
+
+  /// No description provided for @colorOlive.
+  ///
+  /// In en, this message translates to:
+  /// **'Olive'**
+  String get colorOlive;
+
+  /// No description provided for @colorSlate.
+  ///
+  /// In en, this message translates to:
+  /// **'Slate'**
+  String get colorSlate;
+
+  /// No description provided for @colorPlum.
+  ///
+  /// In en, this message translates to:
+  /// **'Plum'**
+  String get colorPlum;
+
+  /// No description provided for @profileSessionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'sessions'**
+  String get profileSessionsLabel;
+
+  /// No description provided for @profileTimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'time'**
+  String get profileTimeLabel;
+
+  /// No description provided for @profilePrsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'PRs'**
+  String get profilePrsLabel;
+
+  /// No description provided for @planActiveSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Active plan'**
+  String get planActiveSection;
+
+  /// No description provided for @noActivePlanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No active plan'**
+  String get noActivePlanTitle;
+
+  /// No description provided for @noActivePlanSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a program to get started'**
+  String get noActivePlanSubtitle;
+
+  /// No description provided for @programWeekProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Week {current} of {total}'**
+  String programWeekProgress(int current, int total);
+
+  /// No description provided for @programDeloadNone.
+  ///
+  /// In en, this message translates to:
+  /// **'no deload'**
+  String get programDeloadNone;
+
+  /// No description provided for @programDeloadCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} deload'**
+  String programDeloadCount(int n);
+
+  /// No description provided for @activeBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'ACTIVE'**
+  String get activeBadge;
+
+  /// No description provided for @aboutBy.
+  ///
+  /// In en, this message translates to:
+  /// **'by'**
+  String get aboutBy;
+
+  /// No description provided for @thisWeekSection.
+  ///
+  /// In en, this message translates to:
+  /// **'This week'**
+  String get thisWeekSection;
+
+  /// No description provided for @yourProgramsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Your programs'**
+  String get yourProgramsSection;
+
+  /// No description provided for @programsTotalCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} total'**
+  String programsTotalCount(int n);
+
+  /// No description provided for @todayYouTrain.
+  ///
+  /// In en, this message translates to:
+  /// **'Today you train'**
+  String get todayYouTrain;
+
+  /// No description provided for @newProgramTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New program'**
+  String get newProgramTitle;
+
+  /// No description provided for @newProgramSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure your plan in 4 steps'**
+  String get newProgramSubtitle;
+
+  /// No description provided for @stepName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get stepName;
+
+  /// No description provided for @stepColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Color'**
+  String get stepColor;
+
+  /// No description provided for @stepWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'Weeks'**
+  String get stepWeeks;
+
+  /// No description provided for @stepCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar'**
+  String get stepCalendar;
+
+  /// No description provided for @weeksUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'weeks'**
+  String get weeksUnit;
+
+  /// No description provided for @weeksUnitOne.
+  ///
+  /// In en, this message translates to:
+  /// **'week'**
+  String get weeksUnitOne;
+
+  /// No description provided for @deloadShort.
+  ///
+  /// In en, this message translates to:
+  /// **'DELOAD'**
+  String get deloadShort;
+
+  /// No description provided for @calendarHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap any day to assign a routine, rest, or label.'**
+  String get calendarHint;
+
+  /// No description provided for @editDayEyebrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Week {week} · {day}'**
+  String editDayEyebrow(int week, String day);
+
+  /// No description provided for @whatTodayQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s on for {day}?'**
+  String whatTodayQuestion(String day);
+
+  /// No description provided for @restDayCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest day'**
+  String get restDayCta;
+
+  /// No description provided for @restDayCtaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover for the next one'**
+  String get restDayCtaSubtitle;
+
+  /// No description provided for @orPickRoutine.
+  ///
+  /// In en, this message translates to:
+  /// **'Or pick a routine'**
+  String get orPickRoutine;
+
+  /// No description provided for @orUseLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Or use a label'**
+  String get orUseLabel;
+
+  /// No description provided for @saveSelection.
+  ///
+  /// In en, this message translates to:
+  /// **'Save selection'**
+  String get saveSelection;
+
+  /// No description provided for @labelYoga.
+  ///
+  /// In en, this message translates to:
+  /// **'Yoga'**
+  String get labelYoga;
+
+  /// No description provided for @customLabelChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom…'**
+  String get customLabelChip;
+
+  /// No description provided for @routineExerciseCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} exercises'**
+  String routineExerciseCount(int n);
+
+  /// No description provided for @designYourWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'Design your ideal week'**
+  String get designYourWeek;
+
+  /// No description provided for @designYourWeekBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign a routine to each day — and rest where it fits. The app will tell you what to do today.'**
+  String get designYourWeekBody;
+
+  /// No description provided for @createFromScratch.
+  ///
+  /// In en, this message translates to:
+  /// **'Create from scratch'**
+  String get createFromScratch;
+
+  /// No description provided for @orStartFromTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Or start with a template'**
+  String get orStartFromTemplate;
+
+  /// No description provided for @recommendedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'RECOMMENDED'**
+  String get recommendedBadge;
+
+  /// No description provided for @templateUpperLowerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Upper / Lower'**
+  String get templateUpperLowerName;
+
+  /// No description provided for @templateUpperLowerSub.
+  ///
+  /// In en, this message translates to:
+  /// **'4 days · sensible rest'**
+  String get templateUpperLowerSub;
+
+  /// No description provided for @templatePplName.
+  ///
+  /// In en, this message translates to:
+  /// **'Push · Pull · Legs'**
+  String get templatePplName;
+
+  /// No description provided for @templatePplSub.
+  ///
+  /// In en, this message translates to:
+  /// **'6 days · classic'**
+  String get templatePplSub;
+
+  /// No description provided for @templateFullBodyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Body 3×'**
+  String get templateFullBodyName;
+
+  /// No description provided for @templateFullBodySub.
+  ///
+  /// In en, this message translates to:
+  /// **'3 days · beginners'**
+  String get templateFullBodySub;
+
+  /// No description provided for @colorPreviewHint.
+  ///
+  /// In en, this message translates to:
+  /// **'this is how it\'ll look in the list'**
+  String get colorPreviewHint;
 
   /// No description provided for @progressTitle.
   ///
@@ -2329,6 +2611,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A square card you can post anywhere'**
   String get sharePreviewSubtitle;
+
+  /// No description provided for @recordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Record'**
+  String get recordLabel;
+
+  /// No description provided for @averageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Average'**
+  String get averageLabel;
+
+  /// No description provided for @sessionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sessions'**
+  String get sessionsLabel;
+
+  /// No description provided for @progressionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Progression'**
+  String get progressionLabel;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View all'**
+  String get viewAll;
+
+  /// No description provided for @formulaEpley.
+  ///
+  /// In en, this message translates to:
+  /// **'Epley formula'**
+  String get formulaEpley;
+
+  /// No description provided for @vsPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'vs previous'**
+  String get vsPrevious;
 }
 
 class _AppLocalizationsDelegate
