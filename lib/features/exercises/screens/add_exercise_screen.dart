@@ -5,8 +5,6 @@ import 'package:uuid/uuid.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../core/utils/l10n_utils.dart';
-import '../../../shared/widgets/glass_button.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../view_models/exercises_view_model.dart';
@@ -77,7 +75,7 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
                   itemBuilder: (ctx, i) {
                     final m = subs[i];
                     final dummy = Exercise(id: '', name: '', muscle: m, equipment: '');
-                    return _ChoiceChip(
+                    return _MagChoiceChip(
                       label: dummy.getLocalizedMuscle(context),
                       isActive: _selectedSubMuscle == m,
                       onTap: () => setState(() => _selectedSubMuscle = m),
@@ -92,8 +90,9 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
     return Scaffold(
-      backgroundColor: context.colors.bgApp,
+      backgroundColor: colors.bgApp,
       body: SafeArea(
         child: Column(
           children: [
@@ -108,96 +107,155 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
               onBack: () => Navigator.of(context).pop(),
               accentBack: true,
             ),
+            const _GridDivider(),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _Label(l10n.exerciseName),
-                    const SizedBox(height: 10),
-                    GlassContainer(
-                      radius: 14,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: TextField(
-                        controller: _nameCtrl,
-                        style: TextStyle(color: context.colors.ink900),
-                        decoration: InputDecoration(
-                          hintText: l10n.egBenchPress,
-                          hintStyle: TextStyle(color: context.colors.ink400),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    _MagFieldBlock(
+                      eyebrow: l10n.exerciseName,
+                      child: Container(
+                        height: 48,
+                        color: colors.bgFrame,
+                        padding: const EdgeInsets.symmetric(horizontal: 22),
+                        child: TextField(
+                          controller: _nameCtrl,
+                          style: TextStyle(
+                            color: colors.ink900,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: l10n.egBenchPress,
+                            hintStyle: TextStyle(color: colors.ink400),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 28),
-                    _Label(l10n.muscleGroup),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      height: 36,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _mainMuscles.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 8),
-                        itemBuilder: (ctx, i) {
-                          final m = _mainMuscles[i];
-                          final dummy = Exercise(id: '', name: '', muscle: m, equipment: '');
-                          return _ChoiceChip(
-                            label: dummy.getLocalizedMuscle(context),
-                            isActive: _selectedMuscle == m,
-                            onTap: () => setState(() {
-                              _selectedMuscle = m;
-                              _selectedSubMuscle = null;
-                            }),
-                          );
-                        },
+                    const _GridDivider(),
+                    _MagFieldBlock(
+                      eyebrow: l10n.muscleGroup,
+                      child: SizedBox(
+                        height: 36,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 22),
+                          itemCount: _mainMuscles.length,
+                          separatorBuilder: (_, __) => const SizedBox(width: 8),
+                          itemBuilder: (ctx, i) {
+                            final m = _mainMuscles[i];
+                            final dummy = Exercise(id: '', name: '', muscle: m, equipment: '');
+                            return _MagChoiceChip(
+                              label: dummy.getLocalizedMuscle(context),
+                              isActive: _selectedMuscle == m,
+                              onTap: () => setState(() {
+                                _selectedMuscle = m;
+                                _selectedSubMuscle = null;
+                              }),
+                            );
+                          },
+                        ),
+                      ),
+                      extra: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 22),
+                        child: _buildSubMuscleRow(),
                       ),
                     ),
-                    _buildSubMuscleRow(),
-                    const SizedBox(height: 28),
-                    _Label(l10n.category),
-                    const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _equipments.map((e) {
-                        final dummy = Exercise(id: '', name: '', muscle: '', equipment: e);
-                        return _ChoiceChip(
-                          label: dummy.getLocalizedEquipment(context),
-                          isActive: _selectedEquip == e,
-                          onTap: () => setState(() => _selectedEquip = e),
-                        );
-                      }).toList(),
-                    ),
-                    const SizedBox(height: 28),
-                    Row(
-                      children: [
-                        _ChoiceChip(
-                          label: l10n.bilateral,
-                          isActive: !_isUnilateral,
-                          onTap: () => setState(() => _isUnilateral = false),
+                    const _GridDivider(),
+                    _MagFieldBlock(
+                      eyebrow: l10n.category,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 22),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: _equipments.map((e) {
+                            final dummy = Exercise(id: '', name: '', muscle: '', equipment: e);
+                            return _MagChoiceChip(
+                              label: dummy.getLocalizedEquipment(context),
+                              isActive: _selectedEquip == e,
+                              onTap: () => setState(() => _selectedEquip = e),
+                            );
+                          }).toList(),
                         ),
-                        const SizedBox(width: 8),
-                        _ChoiceChip(
-                          label: l10n.unilateral,
-                          isActive: _isUnilateral,
-                          onTap: () => setState(() => _isUnilateral = true),
-                        ),
-                      ],
+                      ),
                     ),
+                    const _GridDivider(),
+                    _MagFieldBlock(
+                      eyebrow: l10n.bilateral,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 22),
+                        child: Row(
+                          children: [
+                            _MagChoiceChip(
+                              label: l10n.bilateral,
+                              isActive: !_isUnilateral,
+                              onTap: () => setState(() => _isUnilateral = false),
+                            ),
+                            const SizedBox(width: 8),
+                            _MagChoiceChip(
+                              label: l10n.unilateral,
+                              isActive: _isUnilateral,
+                              onTap: () => setState(() => _isUnilateral = true),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const _GridDivider(),
                   ],
                 ),
               ),
             ),
+            const _GridDivider(),
             Padding(
               padding: const EdgeInsets.all(22),
-              child: GlassButton(
-                label: l10n.saveExercise,
-                variant: GlassButtonVariant.primary,
-                size: GlassButtonSize.lg,
-                expand: true,
-                loading: _saving,
-                onPressed: _save,
+              child: PressableScale(
+                onTap: _saving ? null : _save,
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 180),
+                  opacity: _saving ? 0.6 : 1,
+                  child: Container(
+                    width: double.infinity,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: colors.accent,
+                      border: Border.all(
+                        color: colors.accentDeep.withValues(alpha: 0.6),
+                        width: 0.6,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (_saving)
+                          SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 1.5,
+                              color: Colors.white,
+                            ),
+                          )
+                        else
+                          const Icon(Icons.check, color: Colors.white, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.saveExercise.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -207,39 +265,103 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
   }
 }
 
-class _Label extends StatelessWidget {
-  const _Label(this.text);
-  final String text;
+class _GridDivider extends StatelessWidget {
+  const _GridDivider();
   @override
-  Widget build(BuildContext context) => Text(
-    text,
-    style: TextStyle(
-      fontSize: 11,
-      fontWeight: FontWeight.w600,
-      letterSpacing: 0.05,
-      color: context.colors.ink400,
-    ),
-  );
+  Widget build(BuildContext context) {
+    return Container(height: 0.6, color: context.colors.hairline);
+  }
 }
 
-class _ChoiceChip extends StatelessWidget {
-  const _ChoiceChip({required this.label, required this.isActive, required this.onTap});
+class _MagEyebrow extends StatelessWidget {
+  const _MagEyebrow({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Row(
+      children: [
+        Container(
+          width: 22,
+          height: 1,
+          color: colors.ink400.withValues(alpha: 0.55),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              color: colors.ink500,
+              letterSpacing: 0.18,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MagFieldBlock extends StatelessWidget {
+  const _MagFieldBlock({
+    required this.eyebrow,
+    required this.child,
+    this.extra,
+  });
+
+  final String eyebrow;
+  final Widget child;
+  final Widget? extra;
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeSlideIn(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: _MagEyebrow(text: eyebrow),
+            ),
+            const SizedBox(height: 14),
+            child,
+            if (extra != null) extra!,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MagChoiceChip extends StatelessWidget {
+  const _MagChoiceChip({
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
   final String label;
   final bool isActive;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return PressableScale(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? context.colors.accentDeep : context.colors.glassBg,
-          borderRadius: BorderRadius.circular(10),
+          color: isActive ? colors.accentDeep : Colors.transparent,
           border: Border.all(
-            color: isActive ? Colors.transparent : context.colors.glassBorder,
+            color: isActive ? Colors.transparent : colors.hairline,
+            width: 0.8,
           ),
         ),
         child: Text(
@@ -247,7 +369,7 @@ class _ChoiceChip extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: isActive ? Colors.white : context.colors.ink700,
+            color: isActive ? Colors.white : colors.ink700,
           ),
         ),
       ),

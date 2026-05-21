@@ -6,9 +6,6 @@ import '../../../core/utils/exercise_category.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../core/providers/repository_providers.dart';
-import '../../../shared/widgets/filter_chip_widget.dart';
-import '../../../shared/widgets/glass_button.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../active_workout/view_models/active_workout_view_model.dart';
@@ -107,7 +104,6 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
     final allExercises = allAsync.value ?? [];
     final myCount = allExercises.where((e) => e.isCustom).length;
 
-    // Synchronize controller with state query (useful when cleared from outside)
     if (_searchCtrl.text != state.query) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
@@ -136,195 +132,60 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                       ? Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            PressableScale(
+                            _MagIconButton(
+                              icon: state.isEditMode
+                                  ? Icons.close
+                                  : Icons.checklist_rtl_rounded,
+                              isActive: state.isEditMode,
                               onTap: notifier.toggleEditMode,
-                              child: Container(
-                                width: 38,
-                                height: 38,
-                                decoration: BoxDecoration(
-                                  color: state.isEditMode
-                                      ? context.colors.accent
-                                      : Theme.of(context).brightness == Brightness.dark
-                                          ? context.colors.glassBg
-                                          : Colors.white,
-                                  border: Border.all(
-                                    color: state.isEditMode
-                                        ? Colors.transparent
-                                        : context.colors.glassBorder,
-                                    width: 0.5,
-                                  ),
-                                  boxShadow: state.isEditMode
-                                      ? [
-                                          BoxShadow(
-                                            color: context.colors.accentDeep
-                                                .withValues(alpha: 0.3),
-                                            blurRadius: 12,
-                                            offset: const Offset(0, 4),
-                                          ),
-                                        ]
-                                      : context.colors.glassShadow,
-                                ),
-                                child: Icon(
-                                  state.isEditMode
-                                      ? Icons.close
-                                      : Icons.checklist_rtl_rounded,
-                                  size: 20,
-                                  color: state.isEditMode
-                                      ? Colors.white
-                                      : context.colors.ink700,
-                                ),
-                              ),
                             ),
                             const SizedBox(width: 8),
                             KeyedSubtree(
                               key: _addBtnKey,
-                              child: IconCircleButton(
-                                icon: const Icon(Icons.add),
-                                onPressed: () => Navigator.of(context).push(
+                              child: _MagIconButton(
+                                icon: Icons.add,
+                                isActive: true,
+                                onTap: () => Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (_) => const AddExerciseScreen(),
                                   ),
                                 ),
-                                accent: true,
                               ),
                             ),
                           ],
                         )
                       : KeyedSubtree(
                           key: _addBtnKey,
-                          child: IconCircleButton(
-                            icon: const Icon(Icons.add),
-                            onPressed: () => Navigator.of(context).push(
+                          child: _MagIconButton(
+                            icon: Icons.add,
+                            isActive: true,
+                            onTap: () => Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (_) => const AddExerciseScreen(),
                               ),
                             ),
-                            accent: true,
                           ),
                         ),
                 ),
                 const SizedBox(height: 14),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22),
-                  child: GlassContainer(
-                    radius: 14,
-                    padding: const EdgeInsets.all(4),
-                    child: Stack(
-                      children: [
-                        AnimatedAlign(
-                          duration: const Duration(milliseconds: 280),
-                          curve: Curves.easeOutCubic,
-                          alignment: state.tab == ExercisesTab.all
-                              ? Alignment.centerLeft
-                              : Alignment.centerRight,
-                          child: FractionallySizedBox(
-                            widthFactor: 0.5,
-                            child: Container(
-                              height: 36,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [context.colors.accentLight, context.colors.accent],
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: context.colors.accentDeep
-                                        .withValues(alpha: 0.25),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            _TabButton(
-                              label: l10n.all,
-                              count: allExercises.length,
-                              isActive: state.tab == ExercisesTab.all,
-                              onTap: () => notifier.setTab(ExercisesTab.all),
-                            ),
-                            _TabButton(
-                              label: l10n.custom,
-                              count: myCount,
-                              isActive: state.tab == ExercisesTab.mine,
-                              onTap: () => notifier.setTab(ExercisesTab.mine),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+                const _GridDivider(),
+                _MagTabSwitcher(
+                  allLabel: l10n.all,
+                  allCount: allExercises.length,
+                  mineLabel: l10n.custom,
+                  mineCount: myCount,
+                  activeTab: state.tab,
+                  onTabChanged: notifier.setTab,
                 ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22),
-                  child: GlassContainer(
-                    radius: 14,
-                    height: 44,
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 12),
-                          child: Icon(
-                            Icons.search,
-                            size: 16,
-                            color: context.colors.ink400,
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: TextField(
-                            controller: _searchCtrl,
-                            onChanged: notifier.setQuery,
-                            decoration: InputDecoration(
-                              hintText: l10n.search,
-                              hintStyle: TextStyle(
-                                fontSize: 14,
-                                color: context.colors.ink400,
-                              ),
-                              border: InputBorder.none,
-                              isDense: true,
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: context.colors.ink900,
-                            ),
-                          ),
-                        ),
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 180),
-                          child: state.query.isNotEmpty
-                              ? PressableScale(
-                                  key: const ValueKey('clear-query'),
-                                  onTap: () => notifier.setQuery(''),
-                                  child: Container(
-                                    width: 22,
-                                    height: 22,
-                                    margin: const EdgeInsets.only(right: 10),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0x14000000),
-                                      borderRadius: BorderRadius.circular(11),
-                                    ),
-                                    child: Icon(
-                                      Icons.close,
-                                      size: 12,
-                                      color: context.colors.ink500,
-                                    ),
-                                  ),
-                                )
-                              : const SizedBox.shrink(key: ValueKey('no-query')),
-                        ),
-                      ],
-                    ),
-                  ),
+                const _GridDivider(),
+                _MagSearchBar(
+                  controller: _searchCtrl,
+                  hint: l10n.search,
+                  query: state.query,
+                  onChanged: notifier.setQuery,
                 ),
-                const SizedBox(height: 12),
+                const _GridDivider(),
+                const SizedBox(height: 10),
                 SizedBox(
                   height: 32,
                   child: ListView.separated(
@@ -336,7 +197,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                     itemBuilder: (context, i) {
                       final m = _kMuscleGroups[i];
                       final dummy = Exercise(id: '', name: '', muscle: m, equipment: '');
-                      return VersatileChip(
+                      return _MagChip(
                         label: dummy.getLocalizedMuscle(context),
                         isActive: state.selectedMuscle == m,
                         onTap: () => notifier.setMuscle(m),
@@ -357,14 +218,14 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     children: [
-                      _LateralityChip(
+                      _MagChip(
                         label: l10n.all,
                         isActive: state.laterality == ExerciseLaterality.all,
                         onTap: () =>
                             notifier.setLaterality(ExerciseLaterality.all),
                       ),
                       const SizedBox(width: 6),
-                      _LateralityChip(
+                      _MagChip(
                         label: l10n.bilateral,
                         isActive:
                             state.laterality == ExerciseLaterality.bilateral,
@@ -372,7 +233,7 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                             .setLaterality(ExerciseLaterality.bilateral),
                       ),
                       const SizedBox(width: 6),
-                      _LateralityChip(
+                      _MagChip(
                         label: l10n.unilateral,
                         isActive:
                             state.laterality == ExerciseLaterality.unilateral,
@@ -386,33 +247,37 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                         color: context.colors.hairline,
                       ),
                       const SizedBox(width: 14),
-                      _CategoryChip(
+                      _MagChip(
                         label: l10n.categoryPush,
                         isActive:
                             state.selectedCategory == ExerciseCategory.push,
                         onTap: () =>
                             notifier.setCategory(ExerciseCategory.push),
+                        outline: true,
                       ),
                       const SizedBox(width: 6),
-                      _CategoryChip(
+                      _MagChip(
                         label: l10n.categoryPull,
                         isActive:
                             state.selectedCategory == ExerciseCategory.pull,
                         onTap: () =>
                             notifier.setCategory(ExerciseCategory.pull),
+                        outline: true,
                       ),
                       const SizedBox(width: 6),
-                      _CategoryChip(
+                      _MagChip(
                         label: l10n.categoryLegs,
                         isActive:
                             state.selectedCategory == ExerciseCategory.legs,
                         onTap: () =>
                             notifier.setCategory(ExerciseCategory.legs),
+                        outline: true,
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 10),
+                const _GridDivider(),
                 Expanded(
                   child: allAsync.isLoading
                       ? Center(
@@ -431,25 +296,22 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                             ),
                           ),
                         )
-                      : ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(22, 0, 22, 96),
-                          itemCount: filtered.length,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 6),
-                          itemBuilder: (context, i) {
-                            final exercise = filtered[i];
-                            return _ExerciseRow(
-                              exercise: exercise,
-                              isEditMode: state.isEditMode,
-                              isSelected: state.selectedIds.contains(
-                                exercise.id,
-                              ),
-                              onSelect: () => notifier.toggleSelection(
-                                exercise.id,
-                              ),
-                              containerKey: i == 0 ? _firstExerciseKey : null,
-                            );
-                          },
+                      : FadeSlideIn(
+                          child: ListView.separated(
+                            padding: const EdgeInsets.only(bottom: 96),
+                            itemCount: filtered.length,
+                            separatorBuilder: (_, __) => const _GridDivider(),
+                            itemBuilder: (context, index) {
+                              final ex = filtered[index];
+                              return _ExerciseRow(
+                                exercise: ex,
+                                isEditMode: state.isEditMode,
+                                isSelected: state.selectedIds.contains(ex.id),
+                                onSelect: () => notifier.toggleSelection(ex.id),
+                                containerKey: ex == filtered.first ? _firstExerciseKey : null,
+                              );
+                            },
+                          ),
                         ),
                 ),
               ],
@@ -458,21 +320,12 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
               Positioned(
                 left: 22,
                 right: 22,
-                // Raise the delete button above the active workout overlay when one is present
                 bottom: ref.watch(activeWorkoutRoutineIdProvider) != null ? 166 : 94,
                 child: FadeSlideIn(
                   offset: const Offset(0, 0.1),
-                  child: GlassButton(
+                  child: _MagDeleteButton(
                     label: '${l10n.delete} (${state.selectedIds.length})',
-                    variant: GlassButtonVariant.primary,
-                    size: GlassButtonSize.lg,
-                    expand: true,
                     onPressed: () => _confirmDelete(state.selectedIds),
-                    leading: const Icon(
-                      Icons.delete_outline,
-                      color: Colors.white,
-                      size: 20,
-                    ),
                   ),
                 ),
               ),
@@ -483,8 +336,99 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
   }
 }
 
-class _TabButton extends StatelessWidget {
-  const _TabButton({
+class _GridDivider extends StatelessWidget {
+  const _GridDivider();
+  @override
+  Widget build(BuildContext context) {
+    return Container(height: 0.6, color: context.colors.hairline);
+  }
+}
+
+class _MagIconButton extends StatelessWidget {
+  const _MagIconButton({
+    required this.icon,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return PressableScale(
+      onTap: onTap,
+      child: Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          color: isActive
+              ? colors.accent
+              : colors.ink900.withValues(alpha: 0.04),
+          border: Border.all(
+            color: isActive
+                ? colors.accentDeep.withValues(alpha: 0.6)
+                : colors.hairline,
+            width: 0.6,
+          ),
+        ),
+        child: Icon(
+          icon,
+          size: 20,
+          color: isActive ? Colors.white : colors.ink700,
+        ),
+      ),
+    );
+  }
+}
+
+class _MagTabSwitcher extends StatelessWidget {
+  const _MagTabSwitcher({
+    required this.allLabel,
+    required this.allCount,
+    required this.mineLabel,
+    required this.mineCount,
+    required this.activeTab,
+    required this.onTabChanged,
+  });
+
+  final String allLabel;
+  final int allCount;
+  final String mineLabel;
+  final int mineCount;
+  final ExercisesTab activeTab;
+  final void Function(ExercisesTab) onTabChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return SizedBox(
+      height: 48,
+      child: Row(
+        children: [
+          _MagTab(
+            label: allLabel,
+            count: allCount,
+            isActive: activeTab == ExercisesTab.all,
+            onTap: () => onTabChanged(ExercisesTab.all),
+          ),
+          Container(width: 0.6, color: colors.hairline),
+          _MagTab(
+            label: mineLabel,
+            count: mineCount,
+            isActive: activeTab == ExercisesTab.mine,
+            onTap: () => onTabChanged(ExercisesTab.mine),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MagTab extends StatelessWidget {
+  const _MagTab({
     required this.label,
     required this.count,
     required this.isActive,
@@ -498,50 +442,160 @@ class _TabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Expanded(
       child: PressableScale(
         onTap: onTap,
-        child: Container(
-          height: 36,
-          decoration: const BoxDecoration(
-            color: Colors.transparent,
-          ),
-          child: Row(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          color: isActive ? colors.bgFrame : Colors.transparent,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 280),
+                duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOutCubic,
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: isActive ? Colors.white : context.colors.ink500,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.18,
+                  color: isActive ? colors.accentDeep : colors.ink400,
                 ),
-                child: Text(label),
+                child: Text(label.toUpperCase()),
               ),
-              const SizedBox(width: 6),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 280),
+              const SizedBox(height: 2),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOutCubic,
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                decoration: BoxDecoration(
-                  color: isActive
-                      ? Colors.white.withValues(alpha: 0.2)
-                      : const Color(0x0D000000),
-                  borderRadius: BorderRadius.circular(6),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -0.55,
+                  color: isActive ? colors.ink900 : colors.ink400,
+                  fontFeatures: const [FontFeature.tabularFigures()],
                 ),
-                child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 280),
-                  curve: Curves.easeOutCubic,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: isActive ? Colors.white : context.colors.ink400,
-                  ),
-                  child: Text('$count'),
-                ),
+                child: Text('$count'),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MagSearchBar extends StatelessWidget {
+  const _MagSearchBar({
+    required this.controller,
+    required this.hint,
+    required this.query,
+    required this.onChanged,
+  });
+
+  final TextEditingController controller;
+  final String hint;
+  final String query;
+  final void Function(String) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      height: 46,
+      color: colors.bgFrame,
+      padding: const EdgeInsets.symmetric(horizontal: 22),
+      child: Row(
+        children: [
+          Icon(Icons.search, size: 16, color: colors.ink400),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              onChanged: onChanged,
+              decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: TextStyle(
+                  fontSize: 14,
+                  color: colors.ink400,
+                ),
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+              style: TextStyle(
+                fontSize: 14,
+                color: colors.ink900,
+              ),
+            ),
+          ),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 180),
+            child: query.isNotEmpty
+                ? PressableScale(
+                    key: const ValueKey('clear-query'),
+                    onTap: () => onChanged(''),
+                    child: Container(
+                      width: 22,
+                      height: 22,
+                      color: colors.ink900.withValues(alpha: 0.06),
+                      child: Icon(
+                        Icons.close,
+                        size: 12,
+                        color: colors.ink500,
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(key: ValueKey('no-query')),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MagChip extends StatelessWidget {
+  const _MagChip({
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+    this.outline = false,
+  });
+
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+  final bool outline;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return PressableScale(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive
+              ? (outline ? colors.accent.withValues(alpha: 0.14) : colors.accentDeep)
+              : Colors.transparent,
+          border: Border.all(
+            color: isActive
+                ? (outline ? colors.accent : Colors.transparent)
+                : colors.hairline,
+            width: 0.8,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isActive
+                ? (outline ? colors.accentDeep : Colors.white)
+                : colors.ink700,
           ),
         ),
       ),
@@ -588,22 +642,22 @@ class _ExerciseRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final asset = _muscleAsset;
-    return FadeSlideIn(
-      child: GlassContainer(
-        key: containerKey,
-        radius: 14,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        onTap: isEditMode
-            ? onSelect
-            : () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ExerciseProgressScreen(
-                      exerciseId: exercise.id,
-                      exerciseName: exercise.name,
-                      muscle: exercise.muscle,
-                    ),
+    final colors = context.colors;
+    return PressableScale(
+      onTap: isEditMode
+          ? onSelect
+          : () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ExerciseProgressScreen(
+                    exerciseId: exercise.id,
+                    exerciseName: exercise.name,
+                    muscle: exercise.muscle,
                   ),
                 ),
+              ),
+      child: Container(
+        key: containerKey,
+        padding: const EdgeInsets.fromLTRB(22, 16, 22, 16),
         child: Row(
           children: [
             AnimatedSwitcher(
@@ -621,13 +675,12 @@ class _ExerciseRow extends StatelessWidget {
                         height: 22,
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? context.colors.accent
-                              : context.colors.fieldBg,
-                          borderRadius: BorderRadius.circular(6),
+                              ? colors.accent
+                              : colors.fieldBg,
                           border: Border.all(
                             color: isSelected
                                 ? Colors.transparent
-                                : context.colors.glassBorder,
+                                : colors.hairline,
                             width: 1,
                           ),
                         ),
@@ -646,8 +699,7 @@ class _ExerciseRow extends StatelessWidget {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: context.colors.accentTint,
-                borderRadius: BorderRadius.circular(11),
+                color: colors.accent,
               ),
               child: asset != null
                   ? Padding(
@@ -657,13 +709,14 @@ class _ExerciseRow extends StatelessWidget {
                   : Icon(
                       Icons.fitness_center,
                       size: 18,
-                      color: context.colors.accentDeep,
+                      color: Colors.white,
                     ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
                     children: [
@@ -673,10 +726,10 @@ class _ExerciseRow extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 17,
                             fontWeight: FontWeight.w600,
-                            color: context.colors.ink900,
-                            letterSpacing: -0.07,
+                            color: colors.ink900,
+                            letterSpacing: -0.17,
                           ),
                         ),
                       ),
@@ -688,15 +741,14 @@ class _ExerciseRow extends StatelessWidget {
                             vertical: 1,
                           ),
                           decoration: BoxDecoration(
-                            color: context.colors.accentTint,
-                            borderRadius: BorderRadius.circular(4),
+                            color: colors.accent,
                           ),
                           child: Text(
                             AppLocalizations.of(context)!.custom,
                             style: TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w700,
-                              color: context.colors.accentDeep,
+                              color: Colors.white,
                               letterSpacing: 0.05,
                             ),
                           ),
@@ -709,9 +761,8 @@ class _ExerciseRow extends StatelessWidget {
                             horizontal: 5,
                             vertical: 1,
                           ),
-                          decoration: BoxDecoration(
-                            color: const Color(0x1A5E7BA7),
-                            borderRadius: BorderRadius.circular(4),
+                          decoration: const BoxDecoration(
+                            color: Color(0x1A5E7BA7),
                           ),
                           child: Text(
                             AppLocalizations.of(context)!.unilateral_label,
@@ -726,13 +777,10 @@ class _ExerciseRow extends StatelessWidget {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 1),
+                  const SizedBox(height: 3),
                   Text(
                     '${exercise.getLocalizedMuscle(context)} · ${exercise.getLocalizedEquipment(context)}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: context.colors.ink500,
-                    ),
+                    style: TextStyle(fontSize: 12, color: colors.ink500),
                   ),
                 ],
               ),
@@ -744,80 +792,43 @@ class _ExerciseRow extends StatelessWidget {
   }
 }
 
-class _LateralityChip extends StatelessWidget {
-  const _LateralityChip({
+class _MagDeleteButton extends StatelessWidget {
+  const _MagDeleteButton({
     required this.label,
-    required this.isActive,
-    required this.onTap,
+    required this.onPressed,
   });
+
   final String label;
-  final bool isActive;
-  final VoidCallback onTap;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     return PressableScale(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      onTap: onPressed,
+      child: Container(
+        height: 52,
         decoration: BoxDecoration(
-          color: isActive ? context.colors.accentDeep : context.colors.glassBg,
-          borderRadius: BorderRadius.circular(10),
+          color: const Color(0xFFD93B3B),
           border: Border.all(
-            color: isActive ? Colors.transparent : context.colors.glassBorder,
+            color: const Color(0xFFAA2020),
+            width: 0.6,
           ),
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: isActive ? Colors.white : context.colors.ink700,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Movement-pattern chip. Visually distinct from `_LateralityChip` (accent
-/// outline instead of filled) so the user reads them as a separate axis.
-class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    return PressableScale(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isActive
-              ? colors.accent.withValues(alpha: 0.14)
-              : colors.glassBg,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isActive ? colors.accent : colors.glassBorder,
-            width: isActive ? 1 : 0.8,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: isActive ? colors.accentDeep : colors.ink700,
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.delete_outline, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Text(
+              label.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.4,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -866,38 +877,10 @@ Widget _subMuscleRow(ExercisesState state, ExercisesNotifier notifier) {
                     equipment: '',
                   );
 
-                  return PressableScale(
+                  return _MagChip(
+                    label: dummy.getLocalizedMuscle(context),
+                    isActive: isActive,
                     onTap: () => notifier.setSubMuscle(m),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 180),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isActive
-                            ? context.colors.accent
-                            : context.colors.glassBg,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: isActive
-                              ? Colors.transparent
-                              : context.colors.glassBorder,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          dummy.getLocalizedMuscle(context),
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: isActive
-                                ? Colors.white
-                                : context.colors.ink500,
-                          ),
-                        ),
-                      ),
-                    ),
                   );
                 },
               ),

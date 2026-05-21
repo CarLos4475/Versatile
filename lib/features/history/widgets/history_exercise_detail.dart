@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/format_utils.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../domain/entities/session.dart';
 import '../../../domain/entities/workout_set.dart';
@@ -41,6 +40,7 @@ class HistoryExerciseDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final sets = exercise.sets;
+    final colors = context.colors;
     final dummy = Exercise(
       id: exercise.exerciseId,
       name: exercise.name,
@@ -49,30 +49,28 @@ class HistoryExerciseDetail extends StatelessWidget {
     );
     final asset = _muscleAsset(exercise.muscle);
 
-    return GlassContainer(
-      radius: 16,
-      padding: const EdgeInsets.all(14),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                width: 40,
-                height: 40,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
-                  color: context.colors.accentTint,
-                  borderRadius: BorderRadius.circular(12),
+                  color: colors.accent,
                 ),
                 child: asset != null
                     ? Padding(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(7),
                         child: Image.asset(asset, fit: BoxFit.contain),
                       )
                     : Icon(
                         Icons.fitness_center,
                         size: 18,
-                        color: context.colors.accentDeep,
+                        color: Colors.white,
                       ),
               ),
               const SizedBox(width: 12),
@@ -83,10 +81,10 @@ class HistoryExerciseDetail extends StatelessWidget {
                     Text(
                       dummy.getLocalizedName(context),
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: context.colors.ink900,
-                        letterSpacing: -0.14,
+                        color: colors.ink900,
+                        letterSpacing: -0.15,
                       ),
                     ),
                     const SizedBox(height: 1),
@@ -94,7 +92,7 @@ class HistoryExerciseDetail extends StatelessWidget {
                       dummy.getLocalizedMuscle(context),
                       style: TextStyle(
                         fontSize: 11,
-                        color: context.colors.ink400,
+                        color: colors.ink400,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -116,13 +114,16 @@ class HistoryExerciseDetail extends StatelessWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: context.colors.accentTint,
-                      borderRadius: BorderRadius.circular(10),
+                      color: colors.ink900.withValues(alpha: 0.04),
+                      border: Border.all(
+                        color: colors.hairline,
+                        width: 0.6,
+                      ),
                     ),
                     child: Icon(
                       Icons.show_chart_rounded,
                       size: 16,
-                      color: context.colors.accentDeep,
+                      color: colors.accentDeep,
                     ),
                   ),
                 );
@@ -133,15 +134,14 @@ class HistoryExerciseDetail extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Divider(color: context.colors.hairline, thickness: 0.5, height: 1),
+          Container(height: 0.5, color: colors.hairline),
           const SizedBox(height: 8),
           _ColumnHeaders(l10n: l10n),
           ...List.generate(sets.length, (i) => Column(
             children: [
-              Divider(
-                color: context.colors.accent.withValues(alpha: 0.25),
-                thickness: 0.5,
-                height: 10,
+              Container(
+                height: 0.5,
+                color: colors.accent.withValues(alpha: 0.18),
               ),
               _SetRow(setIndex: i, set: sets[i]),
             ],

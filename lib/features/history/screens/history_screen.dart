@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../home/view_models/home_view_model.dart';
 import '../widgets/history_session_card.dart';
@@ -49,7 +50,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   ? '${sessionsAsync.value!.length} ${l10n.total}'
                   : null,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
+            Container(height: 0.6, color: context.colors.hairline),
             Expanded(
               child: sessionsAsync.when(
                 loading: () => Center(
@@ -94,20 +96,17 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                     );
                   }
 
-                  return ListView(
-                    padding: const EdgeInsets.fromLTRB(22, 0, 22, 100),
-                    children: [
-                      for (var i = 0; i < sessions.length; i++)
-                        Padding(
-                          padding: EdgeInsets.only(
-                            bottom: i < sessions.length - 1 ? 10 : 0,
-                          ),
-                          child: HistorySessionCard(
-                            session: sessions[i],
-                            containerKey: i == 0 ? _firstCardKey : null,
-                          ),
-                        ),
-                    ],
+                  return FadeSlideIn(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 100),
+                      itemCount: sessions.length,
+                      separatorBuilder: (_, __) =>
+                          Container(height: 0.6, color: context.colors.hairline),
+                      itemBuilder: (context, i) => HistorySessionCard(
+                        session: sessions[i],
+                        containerKey: i == 0 ? _firstCardKey : null,
+                      ),
+                    ),
                   );
                 },
               ),
