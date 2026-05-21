@@ -123,9 +123,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _Eyebrow(text: l10n.splashEyebrow),
-                            const SizedBox(height: 18),
-                            _Wordmark(compact: isCompact),
                             const SizedBox(height: 22),
+                            _Wordmark(compact: isCompact),
+                            const SizedBox(height: 28),
                             _Tagline(
                               prefix: l10n.splashTaglinePrefix,
                               accent: l10n.splashTaglineAccent,
@@ -243,16 +243,16 @@ class _Eyebrow extends StatelessWidget {
     return Row(
       children: [
         _PulsingDot(color: colors.accentLight),
-        const SizedBox(width: 10),
+        const SizedBox(width: 11),
         Flexible(
           child: Text(
             text.toUpperCase(),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: FontWeight.w700,
-              letterSpacing: 1.8,
+              letterSpacing: 2.0,
               color: colors.accentLight,
             ),
           ),
@@ -324,32 +324,42 @@ class _Wordmark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final size = compact ? 92.0 : 108.0;
-    return Text.rich(
-      TextSpan(
-        children: [
+    final size = compact ? 118.0 : 138.0;
+    final baseStyle = TextStyle(
+      fontSize: size,
+      fontWeight: FontWeight.w500,
+      letterSpacing: -size * 0.055,
+      height: 0.86,
+      color: colors.ink900,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('Versa', style: baseStyle),
+        Text(
+          '-',
+          style: baseStyle.copyWith(letterSpacing: 0, height: 0.5),
+        ),
+        Text.rich(
           TextSpan(
-            text: 'Versa-\ntile',
-            style: TextStyle(
-              fontSize: size,
-              fontWeight: FontWeight.w500,
-              letterSpacing: -size * 0.055,
-              height: 0.86,
-              color: colors.ink900,
-            ),
+            children: [
+              TextSpan(text: 'tile', style: baseStyle),
+              TextSpan(
+                text: '.',
+                style: TextStyle(
+                  fontSize: size,
+                  fontWeight: FontWeight.w400,
+                  fontStyle: FontStyle.italic,
+                  letterSpacing: -size * 0.06,
+                  height: 0.86,
+                  color: colors.accentLight,
+                ),
+              ),
+            ],
           ),
-          TextSpan(
-            text: '.',
-            style: TextStyle(
-              fontSize: size,
-              fontWeight: FontWeight.w400,
-              fontStyle: FontStyle.italic,
-              letterSpacing: -size * 0.06,
-              color: colors.accentLight,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -364,12 +374,12 @@ class _Tagline extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 280),
+      constraints: const BoxConstraints(maxWidth: 310),
       child: Text.rich(
         TextSpan(
           style: TextStyle(
-            fontSize: 17,
-            height: 1.4,
+            fontSize: 20,
+            height: 1.36,
             fontWeight: FontWeight.w400,
             color: colors.ink500,
           ),

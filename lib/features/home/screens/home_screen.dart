@@ -7,7 +7,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
-import '../../../shared/widgets/screen_header.dart';
 import '../../programs/screens/program_editor_screen.dart';
 import '../../programs/view_models/programs_view_model.dart';
 import '../../recap/screens/monthly_recap_screen.dart';
@@ -173,9 +172,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       lastDoneText = l10n.lastDoneDaysAgo(daysAgo);
     }
 
-    final greeting = state.userName == 'there' || state.userName.isEmpty
-        ? l10n.helloThere
-        : '${l10n.hello}, ${state.userName}';
+    final hasName = state.userName != 'there' && state.userName.isNotEmpty;
+    final dateLabel = FormatUtils.date(
+      now.toIso8601String().substring(0, 10),
+      locale: Localizations.localeOf(context).languageCode,
+    );
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
@@ -185,42 +186,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ScreenHeader(
-                title: greeting,
-                subtitle: FormatUtils.date(
-                  now.toIso8601String().substring(0, 10),
-                  locale: Localizations.localeOf(context).languageCode,
-                ),
-                titleStyle: TextStyle(
-                  fontSize: 38,
-                  fontWeight: FontWeight.w700,
-                  color: context.colors.ink900,
-                  letterSpacing: -0.76,
-                  height: 1.05,
-                ),
-                trailing: PressableScale(
-                  onTap: () => Navigator.of(
-                    context,
-                  ).push(AppRoute(page: const SettingsScreen())),
-                  child: Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: context.colors.glassBg,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: context.colors.glassBorder,
-                        width: 0.5,
-                      ),
-                      boxShadow: context.colors.glassShadow,
-                    ),
-                    child: Icon(
-                      Icons.settings_outlined,
-                      color: context.colors.ink700,
-                      size: 20,
-                    ),
-                  ),
-                ),
+              _HomeMagazineHeader(
+                hello: l10n.hello,
+                helloThere: l10n.helloThere,
+                userName: state.userName,
+                hasName: hasName,
+                dateLabel: dateLabel,
+                onSettings: () => Navigator.of(
+                  context,
+                ).push(AppRoute(page: const SettingsScreen())),
               ),
               const SizedBox(height: 20),
 
@@ -400,6 +374,132 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeMagazineHeader extends StatelessWidget {
+  const _HomeMagazineHeader({
+    required this.hello,
+    required this.helloThere,
+    required this.userName,
+    required this.hasName,
+    required this.dateLabel,
+    required this.onSettings,
+  });
+
+  final String hello;
+  final String helloThere;
+  final String userName;
+  final bool hasName;
+  final String dateLabel;
+  final VoidCallback onSettings;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final compact = MediaQuery.sizeOf(context).height < 780;
+    final titleSize = compact ? 52.0 : 60.0;
+
+    return FadeSlideIn(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(22, 8, 22, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 44,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 1,
+                        color: colors.ink400.withValues(alpha: 0.55),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        dateLabel.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: colors.ink500,
+                          letterSpacing: 0.18,
+                        ),
+                      ),
+                    ],
+                  ),
+                  PressableScale(
+                    onTap: onSettings,
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: colors.glassBg,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: colors.glassBorder,
+                          width: 0.5,
+                        ),
+                        boxShadow: colors.glassShadow,
+                      ),
+                      child: Icon(
+                        Icons.settings_outlined,
+                        color: colors.ink700,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 6),
+            if (hasName)
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '$hello,\n',
+                      style: TextStyle(
+                        fontSize: titleSize,
+                        height: 0.94,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: -0.055,
+                        color: colors.ink900,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '$userName.',
+                      style: TextStyle(
+                        fontSize: titleSize,
+                        height: 0.94,
+                        fontWeight: FontWeight.w400,
+                        fontStyle: FontStyle.italic,
+                        letterSpacing: -0.05,
+                        color: colors.accentLight,
+                      ),
+                    ),
+                  ],
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              )
+            else
+              Text(
+                helloThere,
+                style: TextStyle(
+                  fontSize: titleSize,
+                  height: 0.94,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -0.055,
+                  color: colors.ink900,
+                ),
+              ),
+          ],
         ),
       ),
     );

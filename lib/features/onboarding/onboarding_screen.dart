@@ -431,23 +431,23 @@ class _OnboardB1State extends State<_OnboardB1>
             children: [
               const SizedBox(height: 22),
               _Eyebrow(text: l10n.obB1Eyebrow),
-              const Spacer(flex: 3),
+              const Spacer(flex: 2),
               _SplitDisplayTitle(
                 top: l10n.onboardingPage1Title.split('\n').first,
                 bottom: l10n.onboardingPage1Title.split('\n').last,
                 bottomColor: colors.accentLight,
-                size: compact ? 54 : 60,
+                size: compact ? 72 : 82,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               Text(
                 l10n.onboardingPage1Body,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 15.5,
                   height: 1.42,
                   color: colors.ink500,
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -457,7 +457,7 @@ class _OnboardB1State extends State<_OnboardB1>
                   _Tag(label: l10n.obTagLocal),
                 ],
               ),
-              const Spacer(flex: 4),
+              const Spacer(flex: 3),
               _OBButton(
                 label: l10n.obCtaStart,
                 icon: Icons.arrow_forward_rounded,
@@ -503,30 +503,30 @@ class _OnboardB2State extends State<_OnboardB2>
             children: [
               const SizedBox(height: 22),
               _Eyebrow(text: l10n.obB2Eyebrow),
-              const Spacer(flex: 3),
+              const Spacer(flex: 2),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     '+46',
                     style: TextStyle(
-                      fontSize: compact ? 82 : 92,
-                      height: 0.88,
+                      fontSize: compact ? 110 : 128,
+                      height: 0.86,
                       fontWeight: FontWeight.w600,
-                      letterSpacing: -0.055,
+                      letterSpacing: -0.06,
                       color: colors.ink900,
                       fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 6, bottom: 10),
+                    padding: const EdgeInsets.only(left: 8, bottom: 14),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'kg',
                           style: TextStyle(
-                            fontSize: 22,
+                            fontSize: 28,
                             fontWeight: FontWeight.w500,
                             color: colors.ink700,
                           ),
@@ -534,9 +534,9 @@ class _OnboardB2State extends State<_OnboardB2>
                         Text(
                           (isEs ? 'en 11 sem.' : 'in 11 wk.').toUpperCase(),
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 10.5,
                             fontWeight: FontWeight.w700,
-                            letterSpacing: 0.12,
+                            letterSpacing: 0.14,
                             color: colors.doneStrong,
                           ),
                         ),
@@ -545,25 +545,25 @@ class _OnboardB2State extends State<_OnboardB2>
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
               _SplitDisplayTitle(
                 top: l10n.onboardingPage2Title.split('\n').first,
                 bottom: l10n.onboardingPage2Title.split('\n').last,
                 bottomColor: colors.accentLight,
-                size: compact ? 42 : 46,
+                size: compact ? 54 : 60,
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               Text(
                 l10n.onboardingPage2Body,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 15.5,
                   height: 1.42,
                   color: colors.ink500,
                 ),
               ),
               const SizedBox(height: 22),
               const _MiniBars(),
-              const Spacer(flex: 4),
+              const Spacer(flex: 3),
               _OBButton(
                 label: l10n.onboardingContinue,
                 icon: Icons.arrow_forward_rounded,
@@ -682,23 +682,23 @@ class _OnboardB3State extends State<_OnboardB3>
                     )
                     .toList(),
               ),
-              const SizedBox(height: 22),
+              const SizedBox(height: 26),
               _SplitDisplayTitle(
                 top: l10n.onboardingPage3Title.split('\n').first,
                 bottom: l10n.onboardingPage3Title.split('\n').last,
                 bottomColor: colors.accentLight,
-                size: compact ? 42 : 46,
+                size: compact ? 54 : 60,
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               Text(
                 l10n.onboardingPage3Body,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 15.5,
                   height: 1.42,
                   color: colors.ink500,
                 ),
               ),
-              const Spacer(flex: 3),
+              const Spacer(flex: 2),
               _OBButton(
                 label: l10n.onboardingContinue,
                 icon: Icons.arrow_forward_rounded,
@@ -730,18 +730,18 @@ class _RoutineLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: colors.hairline, width: 0.6)),
       ),
       child: Row(
         children: [
           SizedBox(
-            width: 38,
+            width: 44,
             child: Text(
               day,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: 10.5,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.16,
                 color: colors.ink500,
@@ -752,10 +752,10 @@ class _RoutineLine extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: muted ? 19 : 20,
+                fontSize: muted ? 24 : 26,
                 fontWeight: FontWeight.w500,
                 height: 1.1,
-                letterSpacing: -0.03,
+                letterSpacing: -0.04,
                 color: muted ? colors.ink500 : colors.ink900,
                 fontStyle: muted ? FontStyle.italic : FontStyle.normal,
               ),
@@ -820,31 +820,31 @@ class _OnboardB4State extends State<_OnboardB4>
             children: [
               const SizedBox(height: 22),
               _Eyebrow(text: l10n.obB4Eyebrow),
-              const Spacer(flex: 3),
+              const Spacer(flex: 2),
               Text(
                 (isEs
                         ? 'Sin internet · Sin cuenta · Sin nube'
                         : 'No internet · No account · No cloud')
                     .toUpperCase(),
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 10.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.14,
                   color: colors.doneStrong,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               _SplitDisplayTitle(
                 top: l10n.onboardingPage4Title.split('\n').first,
                 bottom: l10n.onboardingPage4Title.split('\n').last,
                 bottomColor: colors.doneStrong,
-                size: compact ? 50 : 56,
+                size: compact ? 66 : 74,
               ),
-              const SizedBox(height: 22),
+              const SizedBox(height: 24),
               ...items.map(
                 (item) => _PrivacyLine(label: item.$1, blocked: item.$2),
               ),
-              const Spacer(flex: 4),
+              const Spacer(flex: 3),
               _OBButton(
                 label: l10n.obCtaAlmostReady,
                 icon: Icons.arrow_forward_rounded,
@@ -869,19 +869,19 @@ class _PrivacyLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 9),
+      padding: const EdgeInsets.only(bottom: 11),
       child: Row(
         children: [
           Icon(
             blocked ? Icons.radio_button_unchecked_rounded : Icons.check_circle,
-            size: 13,
+            size: 14,
             color: blocked ? colors.ink500 : colors.doneStrong,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 11),
           Text(
             label,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 14.5,
               height: 1.3,
               color: blocked ? colors.ink500 : colors.ink900,
             ),
@@ -928,25 +928,25 @@ class _OnboardB5State extends State<_OnboardB5>
             children: [
               const SizedBox(height: 22),
               _Eyebrow(text: l10n.obB5Eyebrow),
-              const Spacer(flex: 3),
+              const Spacer(flex: 2),
               _SplitDisplayTitle(
                 top: l10n.onboardingNameTitle.split('\n').first,
                 bottom: l10n.onboardingNameTitle.split('\n').last,
                 bottomColor: colors.accentLight,
-                size: compact ? 48 : 54,
+                size: compact ? 62 : 70,
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               Text(
                 isEs
                     ? 'Opcional. Puedes saltarlo o cambiarlo cuando quieras.'
                     : 'Optional. You can skip it now or change it later.',
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 14.5,
                   height: 1.38,
                   color: colors.ink500,
                 ),
               ),
-              const SizedBox(height: 22),
+              const SizedBox(height: 24),
               _NameCard(
                 controller: widget.controller,
                 label: l10n.obB5NameLabel,
@@ -960,11 +960,11 @@ class _OnboardB5State extends State<_OnboardB5>
                     isEs
                         ? 'Se guarda solo en este dispositivo'
                         : 'Saved only on this device',
-                    style: TextStyle(fontSize: 10.5, color: colors.ink500),
+                    style: TextStyle(fontSize: 11, color: colors.ink500),
                   ),
                 ],
               ),
-              const Spacer(flex: 4),
+              const Spacer(flex: 3),
               _OBButton(
                 label: l10n.onboardingLetsGo,
                 icon: Icons.check_rounded,
@@ -1024,18 +1024,18 @@ class _NameCard extends StatelessWidget {
             textCapitalization: TextCapitalization.words,
             cursorColor: colors.accent,
             style: TextStyle(
-              fontSize: 30,
+              fontSize: 36,
               height: 1,
               fontWeight: FontWeight.w500,
-              letterSpacing: -0.03,
+              letterSpacing: -0.04,
               color: colors.ink900,
             ),
             decoration: InputDecoration(
               hintText: '',
               hintStyle: TextStyle(
-                fontSize: 30,
+                fontSize: 36,
                 fontWeight: FontWeight.w500,
-                letterSpacing: -0.03,
+                letterSpacing: -0.04,
                 color: colors.ink300,
               ),
               border: InputBorder.none,
@@ -1065,31 +1065,40 @@ class _SplitDisplayTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Text.rich(
-      TextSpan(
-        children: [
+    return SizedBox(
+      width: double.infinity,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: Text.rich(
           TextSpan(
-            text: '$top\n',
-            style: TextStyle(
-              fontSize: size,
-              height: 0.92,
-              fontWeight: FontWeight.w500,
-              letterSpacing: -0.055,
-              color: colors.ink900,
-            ),
+            children: [
+              TextSpan(
+                text: '$top\n',
+                style: TextStyle(
+                  fontSize: size,
+                  height: 0.92,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -0.055,
+                  color: colors.ink900,
+                ),
+              ),
+              TextSpan(
+                text: bottom,
+                style: TextStyle(
+                  fontSize: size,
+                  height: 0.92,
+                  fontWeight: FontWeight.w400,
+                  fontStyle: FontStyle.italic,
+                  letterSpacing: -0.05,
+                  color: bottomColor,
+                ),
+              ),
+            ],
           ),
-          TextSpan(
-            text: bottom,
-            style: TextStyle(
-              fontSize: size,
-              height: 0.92,
-              fontWeight: FontWeight.w400,
-              fontStyle: FontStyle.italic,
-              letterSpacing: -0.05,
-              color: bottomColor,
-            ),
-          ),
-        ],
+          softWrap: false,
+          maxLines: 2,
+        ),
       ),
     );
   }
@@ -1112,10 +1121,10 @@ class _OBButton extends StatelessWidget {
     return PressableScale(
       onTap: onTap,
       child: Container(
-        height: 50,
+        height: 56,
         width: double.infinity,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -1135,14 +1144,14 @@ class _OBButton extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 15.5,
                 fontWeight: FontWeight.w700,
                 letterSpacing: -0.02,
                 color: Colors.white,
               ),
             ),
-            const SizedBox(width: 7),
-            Icon(icon, size: 15, color: Colors.white),
+            const SizedBox(width: 8),
+            Icon(icon, size: 16, color: Colors.white),
           ],
         ),
       ),
@@ -1161,21 +1170,21 @@ class _Eyebrow extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 24,
+          width: 28,
           height: 1,
           color: colors.ink400.withValues(alpha: 0.55),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 10),
         Expanded(
           child: Text(
             text.toUpperCase(),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 9.5,
+              fontSize: 10.5,
               fontWeight: FontWeight.w800,
               color: colors.ink500,
-              letterSpacing: 0.18,
+              letterSpacing: 0.2,
             ),
           ),
         ),
