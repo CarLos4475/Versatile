@@ -283,12 +283,7 @@ class _TopBar extends StatelessWidget {
           width: 54,
           height: 54,
           decoration: BoxDecoration(
-            color: context.colors.accentTint,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: context.colors.accentSoft.withValues(alpha: 0.22),
-              width: 0.5,
-            ),
+            color: context.colors.accent,
           ),
           child: asset != null
               ? Padding(
@@ -298,7 +293,7 @@ class _TopBar extends StatelessWidget {
               : Icon(
                   Icons.fitness_center,
                   size: 24,
-                  color: context.colors.accentDeep,
+                  color: Colors.white,
                 ),
         ),
         const SizedBox(width: 14),
@@ -362,64 +357,40 @@ class _MetricToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassContainer(
-      radius: 14,
-      padding: const EdgeInsets.all(4),
-      child: Stack(
-        children: [
-          AnimatedAlign(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeOutCubic,
-            alignment: metric == _Metric.oneRm
-                ? Alignment.centerLeft
-                : Alignment.centerRight,
-            child: FractionallySizedBox(
-              widthFactor: 0.5,
-              child: Container(
-                height: 38,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      context.colors.accentLight,
-                      context.colors.accent,
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: context.colors.accentDeep.withValues(alpha: 0.25),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-              ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.15)
+              : Colors.black.withValues(alpha: 0.08),
+          width: 0.6,
+        ),
+      ),
+      child: SizedBox(
+        height: 48,
+        child: Row(
+          children: [
+            _MagTab(
+              label: l10n.estimatedOneRm,
+              isActive: metric == _Metric.oneRm,
+              onTap: () => onChanged(_Metric.oneRm),
             ),
-          ),
-          Row(
-            children: [
-              _ToggleBtn(
-                label: l10n.estimatedOneRm,
-                isActive: metric == _Metric.oneRm,
-                onTap: () => onChanged(_Metric.oneRm),
-              ),
-              _ToggleBtn(
-                label: l10n.volume,
-                isActive: metric == _Metric.volume,
-                onTap: () => onChanged(_Metric.volume),
-              ),
-            ],
-          ),
-        ],
+            Container(width: 0.6, color: context.colors.hairline),
+            _MagTab(
+              label: l10n.volume,
+              isActive: metric == _Metric.volume,
+              onTap: () => onChanged(_Metric.volume),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _ToggleBtn extends StatelessWidget {
-  const _ToggleBtn({
+class _MagTab extends StatelessWidget {
+  const _MagTab({
     required this.label,
     required this.isActive,
     required this.onTap,
@@ -430,22 +401,31 @@ class _ToggleBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Expanded(
       child: PressableScale(
         onTap: onTap,
-        child: SizedBox(
-          height: 38,
-          child: Center(
-            child: AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutCubic,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: isActive ? Colors.white : context.colors.ink500,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          color: isActive ? colors.accent : Colors.transparent,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.18,
+                  color: isActive ? Colors.white : colors.ink400,
+                ),
+                child: Text(label.toUpperCase()),
               ),
-              child: Text(label),
-            ),
+            ],
           ),
         ),
       ),
@@ -490,25 +470,16 @@ class _MetricGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
+      mainAxisSpacing: 0,
+      crossAxisSpacing: 0,
       childAspectRatio: 1.35,
       children: [
         // ── Latest (accent) ──
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                context.colors.accent.withValues(alpha: 0.18),
-                context.colors.bgFrame.withValues(alpha: 0.35),
-              ],
-            ),
             border: Border.all(
-              color: context.colors.accentSoft.withValues(alpha: 0.25),
+              color: context.colors.hairline,
               width: 0.5,
             ),
           ),
@@ -631,9 +602,15 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassContainer(
-      radius: 18,
+    final colors = context.colors;
+    return Container(
       padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: colors.hairline,
+          width: 0.5,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -644,7 +621,7 @@ class _MetricCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w600,
-              color: context.colors.ink900,
+              color: colors.ink900,
               letterSpacing: -0.025,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
@@ -654,7 +631,7 @@ class _MetricCard extends StatelessWidget {
               unit,
               style: TextStyle(
                 fontSize: 13,
-                color: context.colors.ink500,
+                color: colors.ink500,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -664,7 +641,7 @@ class _MetricCard extends StatelessWidget {
               sub!,
               style: TextStyle(
                 fontSize: 11,
-                color: context.colors.ink400,
+                color: colors.ink400,
               ),
             ),
           ],
@@ -701,7 +678,6 @@ class _DeltaPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: borderColor, width: 0.5),
       ),
       child: Row(
@@ -924,7 +900,7 @@ class _ChartSection extends StatelessWidget {
         ),
         GlassContainer(
           strong: true,
-          radius: 22,
+          radius: 0,
           padding: const EdgeInsets.fromLTRB(2, 20, 20, 8),
           child: SizedBox(
             height: 220,
@@ -1039,7 +1015,7 @@ class _ChartSection extends StatelessWidget {
                   touchTooltipData: LineTouchTooltipData(
                     getTooltipColor: (_) =>
                         context.colors.bgFrame.withValues(alpha: 0.96),
-                    tooltipRoundedRadius: 10,
+                    tooltipRoundedRadius: 0,
                     tooltipPadding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 8,
@@ -1138,10 +1114,6 @@ class _PrDotPainter extends FlDotPainter {
     // PR badge bg
     final badgeRect = RRect.fromRectAndCorners(
       Rect.fromCenter(center: Offset(c.dx, c.dy - 19), width: 30, height: 16),
-      topLeft: const Radius.circular(4),
-      topRight: const Radius.circular(4),
-      bottomLeft: const Radius.circular(4),
-      bottomRight: const Radius.circular(4),
     );
     final badgePaint = Paint()
       ..shader = LinearGradient(
@@ -1206,7 +1178,6 @@ class _RangeMicro extends StatelessWidget {
               color: isActive
                   ? context.colors.accent.withValues(alpha: 0.15)
                   : Colors.transparent,
-              borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               r,
@@ -1280,24 +1251,10 @@ class _RecentSessions extends StatelessWidget {
             final w = recentMax > 0 ? (v / recentMax) * 100 : 0;
 
             return Container(
-              margin: const EdgeInsets.only(bottom: 6),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                gradient: isPr
-                    ? LinearGradient(
-                        colors: [
-                          context.colors.accentSoft.withValues(alpha: 0.10),
-                          context.colors.accent.withValues(alpha: 0.05),
-                        ],
-                      )
-                    : null,
-                color: isPr ? null : context.colors.glassBg,
-                border: Border.all(
-                  color: isPr
-                      ? context.colors.accentSoft.withValues(alpha: 0.25)
-                      : context.colors.glassBorder,
-                  width: 0.5,
+                border: Border(
+                  top: BorderSide(color: context.colors.hairline, width: 0.5),
                 ),
               ),
               child: Row(
@@ -1319,14 +1276,12 @@ class _RecentSessions extends StatelessWidget {
                       height: 8,
                       decoration: BoxDecoration(
                         color: context.colors.ink300.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: FractionallySizedBox(
                         alignment: Alignment.centerLeft,
                         widthFactor: w.clamp(0.0, 1.0).toDouble(),
                         child: Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
                             gradient: LinearGradient(
                               colors: isPr
                                   ? [
@@ -1353,7 +1308,7 @@ class _RecentSessions extends StatelessWidget {
                   ),
                   const SizedBox(width: 12),
                   SizedBox(
-                    width: 72,
+                    width: 86,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -1407,39 +1362,55 @@ class _FormulaChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: context.colors.accentTint,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: context.colors.accent.withValues(alpha: 0.18),
-          width: 0.5,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            l10n.formulaEpley.toUpperCase(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 6),
+          child: Text(
+            l10n.formulaEpleyDescription,
             style: TextStyle(
               fontSize: 11,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.06,
-              color: context.colors.accentSoft,
+              fontWeight: FontWeight.w600,
+              color: context.colors.accentDeep,
+              height: 1.3,
             ),
           ),
-          Text(
-            '1RM ≈ kg × (1 + reps / 30)',
-            style: TextStyle(
-              fontSize: 12,
-              color: context.colors.ink700,
-              fontFamily: 'monospace',
-              fontFeatures: const [FontFeature.tabularFigures()],
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: context.colors.accentSoft,
+            border: Border.all(
+              color: context.colors.accent.withValues(alpha: 0.18),
+              width: 0.5,
             ),
           ),
-        ],
-      ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.formulaEpley.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.06,
+                  color: context.colors.accentDeep,
+                ),
+              ),
+              Text(
+                '1RM ≈ kg × (1 + reps / 30)',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: context.colors.ink700,
+                  fontFamily: 'monospace',
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

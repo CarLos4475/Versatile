@@ -1525,5 +1525,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formulaEpley => 'Fórmula Epley';
 
   @override
+  String get formulaEpleyDescription =>
+      'El 1RM estimado se calcula basándose en la fórmula Epley:';
+
+  @override
   String get vsPrevious => 'vs anterior';
 }

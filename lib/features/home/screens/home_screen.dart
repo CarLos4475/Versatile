@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/navigation/app_page_transitions.dart';
 import '../../../core/providers/repository_providers.dart';
@@ -420,11 +421,11 @@ class _HomeMagazineHeader extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: '$hello,\n',
-                      style: TextStyle(
+                      style: GoogleFonts.playfairDisplay(
                         fontSize: titleSize,
-                        height: 0.94,
+                        height: 0.92,
                         fontWeight: FontWeight.w500,
-                        letterSpacing: -0.055,
+                        letterSpacing: -0.08,
                         color: colors.ink900,
                       ),
                     ),
@@ -447,11 +448,11 @@ class _HomeMagazineHeader extends StatelessWidget {
             else
               Text(
                 helloThere,
-                style: TextStyle(
+                style: GoogleFonts.playfairDisplay(
                   fontSize: titleSize,
-                  height: 0.94,
+                  height: 0.92,
                   fontWeight: FontWeight.w500,
-                  letterSpacing: -0.055,
+                  letterSpacing: -0.08,
                   color: colors.ink900,
                 ),
               ),
@@ -467,46 +468,42 @@ class _MagazineTitleSplit extends StatelessWidget {
     required this.prefix,
     required this.accent,
     this.size = 40,
-    this.textAlign = TextAlign.start,
   });
 
   final String prefix;
   final String accent;
   final double size;
-  final TextAlign textAlign;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Text.rich(
-      TextSpan(
-        children: [
-          TextSpan(
-            text: '$prefix\n',
-            style: TextStyle(
-              fontSize: size,
-              height: 0.94,
-              fontWeight: FontWeight.w500,
-              letterSpacing: -0.05,
-              color: colors.ink900,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          prefix.trimRight(),
+          textAlign: TextAlign.left,
+          style: GoogleFonts.playfairDisplay(
+            fontSize: size,
+            height: 0.92,
+            fontWeight: FontWeight.w500,
+            letterSpacing: -0.08,
+            color: colors.ink900,
           ),
-          TextSpan(
-            text: accent,
-            style: TextStyle(
-              fontSize: size,
-              height: 0.94,
-              fontWeight: FontWeight.w400,
-              fontStyle: FontStyle.italic,
-              letterSpacing: -0.045,
-              color: colors.accentLight,
-            ),
+        ),
+        Text(
+          accent,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: size,
+            height: 0.94,
+            fontWeight: FontWeight.w400,
+            fontStyle: FontStyle.italic,
+            letterSpacing: -0.045,
+            color: colors.accentLight,
           ),
-        ],
-      ),
-      textAlign: textAlign,
-      maxLines: 3,
-      overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 }
@@ -576,8 +573,7 @@ class _HomeHeroBlock extends StatelessWidget {
             _MagazineTitleSplit(
               prefix: todayPrefix,
               accent: '$routineName.',
-              size: 42,
-              textAlign: TextAlign.center,
+              size: 44,
             ),
             const SizedBox(height: 12),
             Text(
@@ -726,8 +722,7 @@ class _HomeLabelHeroBlock extends StatelessWidget {
             _MagazineTitleSplit(
               prefix: todayPrefix,
               accent: '$localizedLabel.',
-              size: 42,
-              textAlign: TextAlign.center,
+              size: 44,
             ),
             const SizedBox(height: 12),
             Text(
@@ -779,7 +774,6 @@ class _HomeEmptyHeroBlock extends StatelessWidget {
                 prefix: prefix,
                 accent: accent,
                 size: 40,
-                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 22),
               Row(
@@ -1128,7 +1122,7 @@ class _RecentSessionsBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final visible = sessions.take(4).toList();
+    final recent = sessions.take(4).toList();
     return FadeSlideIn(
       delay: const Duration(milliseconds: 220),
       child: Column(
@@ -1140,9 +1134,9 @@ class _RecentSessionsBlock extends StatelessWidget {
               text: '$recentLabel · ${sessions.length} $totalLabel',
             ),
           ),
-          for (var i = 0; i < visible.length; i++) ...[
+          for (var i = 0; i < recent.length; i++) ...[
             const _GridDivider(),
-            _HomeSessionRow(session: visible[i]),
+            _HomeSessionRow(session: recent[i]),
           ],
         ],
       ),

@@ -677,5 +677,6 @@
   "progressionLabel": "Progresión",
   "viewAll": "Ver todas",
   "formulaEpley": "Fórmula Epley",
+  "formulaEpleyDescription": "El 1RM estimado se calcula basándose en la fórmula Epley:",
   "vsPrevious": "vs anterior"
 }

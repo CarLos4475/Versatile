@@ -2822,6 +2822,12 @@ abstract class AppLocalizations {
   /// **'Epley formula'**
   String get formulaEpley;
 
+  /// No description provided for @formulaEpleyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated 1RM is calculated using the Epley formula:'**
+  String get formulaEpleyDescription;
+
   /// No description provided for @vsPrevious.
   ///
   /// In en, this message translates to:
