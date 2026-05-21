@@ -56,7 +56,7 @@ class SeedData {
     Routine(
       id: 'r-3',
       name: 'Legs',
-      colorValue: 0xFFE89A7E,
+      colorValue: 0xFF7A8C5B,
       exercises: [
         RoutineExercise(exerciseId: 'ex-7',  targetSets: 5, targetReps: '5',     restSeconds: 180),
         RoutineExercise(exerciseId: 'ex-8',  targetSets: 3, targetReps: '8-10',  restSeconds: 120),
@@ -89,11 +89,11 @@ class SeedData {
         ]),
       ],
     ),
-    Session(id: 's-6', routineId: 'r-2', routineName: 'Pull Day', date: '2026-04-27', durationMin: 62, volumeKg: 3940),
-    Session(id: 's-5', routineId: 'r-3', routineName: 'Legs',     date: '2026-04-25', durationMin: 71, volumeKg: 6120),
+    Session(id: 's-6', routineId: 'r-2', routineName: 'Pull Day', date: '2026-04-27', durationMin: 62, volumeKg: 3940, colorValue: 0xFFB85432),
+    Session(id: 's-5', routineId: 'r-3', routineName: 'Legs',     date: '2026-04-25', durationMin: 71, volumeKg: 6120, colorValue: 0xFF7A8C5B),
     Session(id: 's-4', routineId: 'r-1', routineName: 'Push Day', date: '2026-04-22', durationMin: 55, volumeKg: 4150),
-    Session(id: 's-3', routineId: 'r-2', routineName: 'Pull Day', date: '2026-04-20', durationMin: 60, volumeKg: 3820),
-    Session(id: 's-2', routineId: 'r-3', routineName: 'Legs',     date: '2026-04-18', durationMin: 68, volumeKg: 5980),
+    Session(id: 's-3', routineId: 'r-2', routineName: 'Pull Day', date: '2026-04-20', durationMin: 60, volumeKg: 3820, colorValue: 0xFFB85432),
+    Session(id: 's-2', routineId: 'r-3', routineName: 'Legs',     date: '2026-04-18', durationMin: 68, volumeKg: 5980, colorValue: 0xFF7A8C5B),
     Session(id: 's-1', routineId: 'r-1', routineName: 'Push Day', date: '2026-04-15', durationMin: 56, volumeKg: 4020),
   ];
 

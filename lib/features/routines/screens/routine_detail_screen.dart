@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/providers/repository_providers.dart';
+import '../../../core/theme/accent_colors.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
@@ -16,16 +17,7 @@ import '../widgets/routine_color_picker.dart';
 import '../widgets/routine_icon_picker.dart';
 import 'exercise_picker_screen.dart';
 
-const _kColors = [
-  Color(0xFFD97757),
-  Color(0xFFB85432),
-  Color(0xFFE89A7E),
-  Color(0xFFB48C64),
-  Color(0xFF9B7850),
-  Color(0xFF4A7B6F),
-  Color(0xFF7B5EA7),
-  Color(0xFF5E7BA7),
-];
+final _kColors = AccentColors.options.map((o) => o.color).toList();
 
 const _kIcons = [
   Icons.fitness_center,
@@ -277,6 +269,7 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
                 ScreenHeader(
                   prefix: isEs ? 'Rutina —' : 'Routine —',
                   accent: '${routine.name}.',
+                  accentColor: Color(currentColorValue),
                   eyebrow:
                       '${routine.exercises.length} ${l10n.exercisesLabel}',
                   onBack: () => Navigator.of(context).pop(),

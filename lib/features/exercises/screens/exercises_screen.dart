@@ -144,8 +144,9 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                                 decoration: BoxDecoration(
                                   color: state.isEditMode
                                       ? context.colors.accent
-                                      : context.colors.glassBg,
-                                  borderRadius: BorderRadius.circular(12),
+                                      : Theme.of(context).brightness == Brightness.dark
+                                          ? context.colors.glassBg
+                                          : Colors.white,
                                   border: Border.all(
                                     color: state.isEditMode
                                         ? Colors.transparent

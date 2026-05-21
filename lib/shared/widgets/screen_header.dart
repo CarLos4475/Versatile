@@ -23,6 +23,7 @@ class ScreenHeader extends StatelessWidget {
     this.trailing,
     this.onBack,
     this.accentBack = false,
+    this.accentColor,
     this.titleSize,
   });
 
@@ -32,6 +33,7 @@ class ScreenHeader extends StatelessWidget {
   final Widget? trailing;
   final VoidCallback? onBack;
   final bool accentBack;
+  final Color? accentColor;
   final double? titleSize;
 
   @override
@@ -111,6 +113,9 @@ class ScreenHeader extends StatelessWidget {
                     style: TextStyle(
                       fontSize: size,
                       height: 0.94,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.05,
+                      color: colors.ink900,
                     ),
                   ),
                   TextSpan(
@@ -121,7 +126,7 @@ class ScreenHeader extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                       fontStyle: FontStyle.italic,
                       letterSpacing: -0.045,
-                      color: colors.accentLight,
+                      color: accentColor ?? colors.accentLight,
                     ),
                   ),
                 ],

@@ -68,6 +68,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
                   ? 'Sesión —'
                   : 'Session —',
               accent: '${session.routineName}.',
+              accentColor: color,
               eyebrow: FormatUtils.date(
                 session.date,
                 locale: Localizations.localeOf(context).languageCode,
