@@ -7,14 +7,13 @@ import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../core/utils/l10n_utils.dart';
-import '../../../shared/widgets/glass_button.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../active_workout/screens/active_workout_screen.dart';
 import '../../exercises/view_models/exercises_view_model.dart';
 import '../view_models/routines_view_model.dart';
 import '../widgets/routine_color_picker.dart';
+import '../widgets/routine_icon_picker.dart';
 import 'exercise_picker_screen.dart';
 
 const _kColors = [
@@ -209,28 +208,6 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
     ref.read(routinesProvider.notifier).reorderExercises(routine.id, exercises);
   }
 
-  Widget _muscleIcon(String muscle) {
-    final asset = _muscleAsset(muscle);
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        color: context.colors.accentTint,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: asset != null
-          ? Padding(
-              padding: const EdgeInsets.all(7),
-              child: Image.asset(asset, fit: BoxFit.contain),
-            )
-          : Icon(
-              Icons.fitness_center,
-              size: 16,
-              color: context.colors.accentDeep,
-            ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -288,86 +265,9 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
           WidgetsBinding.instance.addPostFrameCallback((_) => _checkCoachmark());
         }
 
+        final isEs = Localizations.localeOf(context).languageCode == 'es';
         final currentColorValue = _editColorValue ?? routine.colorValue;
         final currentIconCode = _editIconCode ?? routine.iconCode;
-
-        final trailing = Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_editMode)
-              PressableScale(
-                onTap: () => _confirmDelete(routine),
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  margin: const EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(
-                    color: context.colors.accentTint,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: context.colors.accent.withValues(alpha: 0.4),
-                      width: 0.5,
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.delete_outline,
-                    size: 18,
-                    color: context.colors.accentDeep,
-                  ),
-                ),
-              ),
-            KeyedSubtree(
-              key: _editBtnKey,
-              child: PressableScale(
-              onTap: () => _toggleEdit(routine),
-              child: Container(
-                height: 36,
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                decoration: BoxDecoration(
-                  gradient: _editMode
-                      ? null
-                      : LinearGradient(
-                          colors: [context.colors.accentLight, context.colors.accent],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                  color: _editMode ? context.colors.accentTint : null,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: _editMode
-                        ? context.colors.accent.withValues(alpha: 0.4)
-                        : context.colors.accentDeep.withValues(alpha: 0.2),
-                    width: 0.5,
-                  ),
-                  boxShadow: _editMode
-                      ? null
-                      : [
-                          BoxShadow(
-                            color: context.colors.accentDeep.withValues(
-                              alpha: 0.25,
-                            ),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                ),
-                child: Center(
-                  child: Text(
-                    _editMode ? l10n.done : l10n.edit,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: _editMode
-                          ? context.colors.accentDeep
-                          : Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            ),
-          ],
-        );
 
         return Scaffold(
           backgroundColor: context.colors.bgApp,
@@ -375,394 +275,766 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
             child: Column(
               children: [
                 ScreenHeader(
-                  prefix: Localizations.localeOf(context).languageCode == 'es'
-                      ? 'Rutina —'
-                      : 'Routine —',
+                  prefix: isEs ? 'Rutina —' : 'Routine —',
                   accent: '${routine.name}.',
                   eyebrow:
                       '${routine.exercises.length} ${l10n.exercisesLabel}',
                   onBack: () => Navigator.of(context).pop(),
-                  trailing: trailing,
+                  trailing: _HeaderActions(
+                    editKey: _editBtnKey,
+                    editMode: _editMode,
+                    editLabel: l10n.edit,
+                    doneLabel: l10n.done,
+                    onToggleEdit: () => _toggleEdit(routine),
+                    onDelete: _editMode
+                        ? () => _confirmDelete(routine)
+                        : null,
+                  ),
                   accentBack: true,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 10),
                 Expanded(
                   child: _editMode
-                      ? ReorderableListView(
-                          padding: const EdgeInsets.fromLTRB(22, 8, 22, 8),
-                          onReorder: (old, neu) =>
-                              _onReorder(routine, old, neu),
-                          children: routine.exercises.asMap().entries.map((
-                            entry,
-                          ) {
-                            final re = entry.value;
-                            final ex = findEx(re.exerciseId);
-                            if (ex == null) {
-                              return SizedBox.shrink(
-                                key: ValueKey(re.dbId ?? re.exerciseId),
-                              );
-                            }
-                            return Padding(
-                              key: ValueKey(re.dbId ?? re.exerciseId),
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: GlassContainer(
-                                radius: 16,
-                                padding: const EdgeInsets.all(14),
-                                child: Row(
-                                  children: [
-                                    ReorderableDragStartListener(
-                                      index: entry.key,
-                                      child: Icon(
-                                        Icons.drag_handle,
-                                        size: 18,
-                                        color: context.colors.ink300,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    _muscleIcon(ex.muscle),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            ex.getLocalizedName(context),
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: context.colors.ink900,
-                                            ),
-                                          ),
-                                          Text(
-                                            '${re.targetSets} × ${re.targetReps} · ${re.restSeconds}s ${l10n.rest}',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: context.colors.ink500,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    PressableScale(
-                                      onTap: re.dbId != null
-                                          ? () => _showEditDialog(
-                                                context,
-                                                routine.id,
-                                                re,
-                                                ex.getLocalizedName(context),
-                                              )
-                                          : null,
-                                      child: Container(
-                                        width: 32,
-                                        height: 32,
-                                        margin: const EdgeInsets.only(right: 6),
-                                        decoration: BoxDecoration(
-                                          color: context.colors.accentTint,
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        child: Icon(
-                                          Icons.edit_outlined,
-                                          size: 15,
-                                          color: context.colors.accentDeep,
-                                        ),
-                                      ),
-                                    ),
-                                    PressableScale(
-                                      onTap: re.dbId != null
-                                          ? () => ref
-                                                .read(routinesProvider.notifier)
-                                                .removeExercise(
-                                                  routine.id,
-                                                  re.dbId!,
-                                                )
-                                          : null,
-                                      child: Container(
-                                        width: 32,
-                                        height: 32,
-                                        decoration: BoxDecoration(
-                                          color: context.colors.accentTint,
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                        child: Icon(
-                                          Icons.delete_outline,
-                                          size: 15,
-                                          color: context.colors.accentDeep,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        )
-                      : ListView(
-                          padding: const EdgeInsets.fromLTRB(22, 8, 22, 8),
-                          children: routine.exercises.asMap().entries.map((
-                            entry,
-                          ) {
-                            final re = entry.value;
-                            final ex = findEx(re.exerciseId);
-                            if (ex == null) return const SizedBox.shrink();
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
-                              child: GlassContainer(
-                                radius: 16,
-                                padding: const EdgeInsets.all(14),
-                                child: Row(
-                                  children: [
-                                    _muscleIcon(ex.muscle),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            ex.getLocalizedName(context),
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w600,
-                                              color: context.colors.ink900,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            '${re.targetSets} ${l10n.sets} · ${re.targetReps} reps · ${re.restSeconds}s ${l10n.rest}',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: context.colors.ink500,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 7,
-                                        vertical: 3,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0x0A000000),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        ex.getLocalizedMuscle(context),
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: context.colors.ink400,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                ),
-                if (_editMode)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(22, 8, 22, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.name_label,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.06,
-                            color: context.colors.ink400,
+                      ? _EditBody(
+                          routine: routine,
+                          findEx: findEx,
+                          onReorder: (a, b) => _onReorder(routine, a, b),
+                          onEditExercise: (re, exName) => _showEditDialog(
+                            context,
+                            routine.id,
+                            re,
+                            exName,
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        GlassContainer(
-                          radius: 14,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 4,
-                          ),
-                          child: TextField(
-                            controller: _nameCtrl,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: context.colors.ink900,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            decoration: InputDecoration(
-                              hintStyle: TextStyle(
-                                fontSize: 16,
-                                color: context.colors.ink400,
-                              ),
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 14,
-                              ),
-                            ),
-                            onSubmitted: (v) {
-                              final name = v.trim();
-                              if (name.isNotEmpty && name != routine.name) {
-                                ref
-                                    .read(routinesProvider.notifier)
-                                    .updateName(routine.id, name);
-                              }
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          l10n.color_label,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.06,
-                            color: context.colors.ink400,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        RoutineColorPicker(
-                          colors: _kColors,
+                          onRemoveExercise: (dbId) => ref
+                              .read(routinesProvider.notifier)
+                              .removeExercise(routine.id, dbId),
+                          nameCtrl: _nameCtrl!,
+                          nameLabel: l10n.name_label,
+                          colorLabel: l10n.color_label,
+                          iconLabel: l10n.icon_label,
+                          sectionExercises:
+                              isEs ? 'Ejercicios' : 'Exercises',
+                          setsLabel: l10n.sets,
+                          restLabel: l10n.rest,
                           selectedColorValue: currentColorValue,
-                          onSelected: (color) {
-                            setState(() => _editColorValue = color.toARGB32());
-                            ref
-                                .read(routinesProvider.notifier)
-                                .updateMeta(
+                          selectedIconCode: currentIconCode,
+                          onColorSelected: (color) {
+                            setState(
+                              () => _editColorValue = color.toARGB32(),
+                            );
+                            ref.read(routinesProvider.notifier).updateMeta(
                                   routine.id,
                                   color.toARGB32(),
                                   currentIconCode,
                                 );
                           },
+                          onIconSelected: (icon) {
+                            setState(() => _editIconCode = icon.codePoint);
+                            ref.read(routinesProvider.notifier).updateMeta(
+                                  routine.id,
+                                  currentColorValue,
+                                  icon.codePoint,
+                                );
+                          },
+                          onNameSubmitted: (v) {
+                            final name = v.trim();
+                            if (name.isNotEmpty && name != routine.name) {
+                              ref
+                                  .read(routinesProvider.notifier)
+                                  .updateName(routine.id, name);
+                            }
+                          },
+                        )
+                      : _ViewBody(
+                          routine: routine,
+                          findEx: findEx,
+                          setsLabel: l10n.sets,
+                          restLabel: l10n.rest,
+                          emptyText: isEs
+                              ? 'Aún no hay ejercicios.'
+                              : 'No exercises yet.',
                         ),
-                        const SizedBox(height: 14),
-                        Text(
-                          l10n.icon_label,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.06,
-                            color: context.colors.ink400,
+                ),
+                _BottomCta(
+                  label: _editMode
+                      ? l10n.addExercise
+                      : l10n.startThisWorkout,
+                  icon: _editMode ? Icons.add_rounded : Icons.play_arrow,
+                  onTap: _editMode
+                      ? () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => ExercisePickerScreen(
+                                routineId: routine.id,
+                              ),
+                            ),
+                          )
+                      : () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => ActiveWorkoutScreen(
+                                routineId: routine.id,
+                              ),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: _kIcons.map((icon) {
-                              final active = icon.codePoint == currentIconCode;
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: PressableScale(
-                                  onTap: () {
-                                    setState(
-                                      () => _editIconCode = icon.codePoint,
-                                    );
-                                    ref
-                                        .read(routinesProvider.notifier)
-                                        .updateMeta(
-                                          routine.id,
-                                          currentColorValue,
-                                          icon.codePoint,
-                                        );
-                                  },
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 180),
-                                    width: 38,
-                                    height: 38,
-                                    decoration: BoxDecoration(
-                                      color: active
-                                          ? context.colors.accent
-                                          : context.colors.glassBg,
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: active
-                                          ? Border.all(
-                                              color: Colors.white,
-                                              width: 2,
-                                            )
-                                          : Border.all(
-                                              color: context.colors.glassBorder,
-                                              width: 0.5,
-                                            ),
-                                      boxShadow: active
-                                          ? [
-                                              BoxShadow(
-                                                color: context.colors.accentDeep
-                                                    .withValues(alpha: 0.3),
-                                                blurRadius: 10,
-                                                offset: const Offset(0, 3),
-                                              ),
-                                            ]
-                                          : null,
-                                    ),
-                                    child: Icon(
-                                      icon,
-                                      size: 18,
-                                      color: active
-                                          ? Colors.white
-                                          : context.colors.ink700,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                      ],
-                    ),
-                  ),
-                if (_editMode)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
-                    child: GlassButton(
-                      label: l10n.addExercise,
-                      variant: GlassButtonVariant.primary,
-                      size: GlassButtonSize.md,
-                      expand: true,
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              ExercisePickerScreen(routineId: routine.id),
-                        ),
-                      ),
-                      leading: const Icon(
-                        Icons.add_rounded,
-                        size: 18,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                if (!_editMode)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
-                    child: GlassButton(
-                      label: l10n.startThisWorkout,
-                      variant: GlassButtonVariant.primary,
-                      size: GlassButtonSize.lg,
-                      expand: true,
-                      leading: const Icon(
-                        Icons.play_arrow,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                      onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              ActiveWorkoutScreen(routineId: routine.id),
-                        ),
-                      ),
-                    ),
-                  ),
+                ),
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class _GridDivider extends StatelessWidget {
+  const _GridDivider();
+  @override
+  Widget build(BuildContext context) {
+    return Container(height: 0.6, color: context.colors.hairline);
+  }
+}
+
+class _SectionEyebrow extends StatelessWidget {
+  const _SectionEyebrow({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Row(
+      children: [
+        Container(
+          width: 22,
+          height: 1,
+          color: colors.ink400.withValues(alpha: 0.55),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              color: colors.ink500,
+              letterSpacing: 0.18,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MuscleIcon extends StatelessWidget {
+  const _MuscleIcon({required this.muscle});
+  final String muscle;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final asset = _muscleAsset(muscle);
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: colors.accentSoft,
+      ),
+      child: asset != null
+          ? Padding(
+              padding: const EdgeInsets.all(6),
+              child: Image.asset(asset, fit: BoxFit.contain),
+            )
+          : Icon(
+              Icons.fitness_center,
+              size: 16,
+              color: colors.ink500,
+            ),
+    );
+  }
+}
+
+class _HeaderActions extends StatelessWidget {
+  const _HeaderActions({
+    required this.editKey,
+    required this.editMode,
+    required this.editLabel,
+    required this.doneLabel,
+    required this.onToggleEdit,
+    this.onDelete,
+  });
+
+  final GlobalKey editKey;
+  final bool editMode;
+  final String editLabel;
+  final String doneLabel;
+  final VoidCallback onToggleEdit;
+  final VoidCallback? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (onDelete != null)
+          PressableScale(
+            onTap: onDelete,
+            child: Container(
+              width: 38,
+              height: 38,
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                color: colors.ink900.withValues(alpha: 0.04),
+                border: Border.all(color: colors.hairline, width: 0.6),
+              ),
+              child: Icon(
+                Icons.delete_outline,
+                size: 18,
+                color: colors.ink700,
+              ),
+            ),
+          ),
+        KeyedSubtree(
+          key: editKey,
+          child: PressableScale(
+            onTap: onToggleEdit,
+            child: Container(
+              height: 38,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: editMode
+                    ? colors.ink900.withValues(alpha: 0.04)
+                    : colors.accent,
+                border: Border.all(
+                  color: editMode
+                      ? colors.hairline
+                      : colors.accentDeep.withValues(alpha: 0.6),
+                  width: 0.6,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  (editMode ? doneLabel : editLabel).toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: editMode ? colors.ink700 : Colors.white,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ViewBody extends StatelessWidget {
+  const _ViewBody({
+    required this.routine,
+    required this.findEx,
+    required this.setsLabel,
+    required this.restLabel,
+    required this.emptyText,
+  });
+
+  final Routine routine;
+  final Exercise? Function(String) findEx;
+  final String setsLabel;
+  final String restLabel;
+  final String emptyText;
+
+  @override
+  Widget build(BuildContext context) {
+    if (routine.exercises.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Text(
+            emptyText.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              color: context.colors.ink400,
+              letterSpacing: 0.18,
+            ),
+          ),
+        ),
+      );
+    }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        children: [
+          const _GridDivider(),
+          for (final re in routine.exercises) ...[
+            if (findEx(re.exerciseId) != null) ...[
+              _ExerciseRow(
+                exercise: findEx(re.exerciseId)!,
+                re: re,
+                setsLabel: setsLabel,
+                restLabel: restLabel,
+              ),
+              const _GridDivider(),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _ExerciseRow extends StatelessWidget {
+  const _ExerciseRow({
+    required this.exercise,
+    required this.re,
+    required this.setsLabel,
+    required this.restLabel,
+  });
+
+  final Exercise exercise;
+  final RoutineExercise re;
+  final String setsLabel;
+  final String restLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(22, 16, 22, 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _MuscleIcon(muscle: exercise.muscle),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  exercise.getLocalizedMuscle(context).toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    color: colors.ink400,
+                    letterSpacing: 0.18,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  exercise.getLocalizedName(context),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: colors.ink900,
+                    letterSpacing: -0.15,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  '${re.targetSets} $setsLabel · ${re.targetReps} reps · ${re.restSeconds}s $restLabel',
+                  style: TextStyle(fontSize: 12, color: colors.ink500),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EditBody extends StatelessWidget {
+  const _EditBody({
+    required this.routine,
+    required this.findEx,
+    required this.onReorder,
+    required this.onEditExercise,
+    required this.onRemoveExercise,
+    required this.nameCtrl,
+    required this.nameLabel,
+    required this.colorLabel,
+    required this.iconLabel,
+    required this.sectionExercises,
+    required this.setsLabel,
+    required this.restLabel,
+    required this.selectedColorValue,
+    required this.selectedIconCode,
+    required this.onColorSelected,
+    required this.onIconSelected,
+    required this.onNameSubmitted,
+  });
+
+  final Routine routine;
+  final Exercise? Function(String) findEx;
+  final void Function(int, int) onReorder;
+  final void Function(RoutineExercise, String) onEditExercise;
+  final void Function(int) onRemoveExercise;
+  final TextEditingController nameCtrl;
+  final String nameLabel;
+  final String colorLabel;
+  final String iconLabel;
+  final String sectionExercises;
+  final String setsLabel;
+  final String restLabel;
+  final int selectedColorValue;
+  final int selectedIconCode;
+  final ValueChanged<Color> onColorSelected;
+  final ValueChanged<IconData> onIconSelected;
+  final ValueChanged<String> onNameSubmitted;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _GridDivider(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 18, 22, 8),
+            child: _SectionEyebrow(text: sectionExercises),
+          ),
+          if (routine.exercises.isEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 10, 22, 18),
+              child: Text(
+                'Toca + abajo para agregar ejercicios.',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: context.colors.ink500,
+                ),
+              ),
+            )
+          else
+            ReorderableListView(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.zero,
+              buildDefaultDragHandles: false,
+              onReorder: onReorder,
+              children: [
+                for (var i = 0; i < routine.exercises.length; i++)
+                  _EditableExerciseRow(
+                    key: ValueKey(
+                      routine.exercises[i].dbId ??
+                          routine.exercises[i].exerciseId,
+                    ),
+                    index: i,
+                    exercise: findEx(routine.exercises[i].exerciseId),
+                    re: routine.exercises[i],
+                    setsLabel: setsLabel,
+                    restLabel: restLabel,
+                    onEdit: () {
+                      final ex = findEx(routine.exercises[i].exerciseId);
+                      if (ex == null) return;
+                      onEditExercise(
+                        routine.exercises[i],
+                        ex.getLocalizedName(context),
+                      );
+                    },
+                    onRemove: routine.exercises[i].dbId != null
+                        ? () => onRemoveExercise(
+                              routine.exercises[i].dbId!,
+                            )
+                        : null,
+                  ),
+              ],
+            ),
+          const _GridDivider(),
+          _NameSection(
+            label: nameLabel,
+            controller: nameCtrl,
+            onSubmitted: onNameSubmitted,
+          ),
+          const _GridDivider(),
+          _ColorSection(
+            label: colorLabel,
+            selectedValue: selectedColorValue,
+            onSelected: onColorSelected,
+          ),
+          const _GridDivider(),
+          _IconSection(
+            label: iconLabel,
+            selectedCode: selectedIconCode,
+            onSelected: onIconSelected,
+          ),
+          const _GridDivider(),
+        ],
+      ),
+    );
+  }
+}
+
+class _EditableExerciseRow extends StatelessWidget {
+  const _EditableExerciseRow({
+    super.key,
+    required this.index,
+    required this.exercise,
+    required this.re,
+    required this.setsLabel,
+    required this.restLabel,
+    required this.onEdit,
+    this.onRemove,
+  });
+
+  final int index;
+  final Exercise? exercise;
+  final RoutineExercise re;
+  final String setsLabel;
+  final String restLabel;
+  final VoidCallback onEdit;
+  final VoidCallback? onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    if (exercise == null) {
+      return const SizedBox.shrink();
+    }
+    return Container(
+      key: ValueKey('row-${re.dbId ?? re.exerciseId}'),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: colors.hairline, width: 0.6),
+        ),
+      ),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      child: Row(
+        children: [
+          ReorderableDragStartListener(
+            index: index,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Icon(
+                Icons.drag_handle,
+                size: 18,
+                color: colors.ink400,
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          _MuscleIcon(muscle: exercise!.muscle),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  exercise!.getLocalizedName(context),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: colors.ink900,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${re.targetSets} × ${re.targetReps} · ${re.restSeconds}s $restLabel',
+                  style: TextStyle(fontSize: 12, color: colors.ink500),
+                ),
+              ],
+            ),
+          ),
+          PressableScale(
+            onTap: re.dbId != null ? onEdit : null,
+            child: Container(
+              width: 32,
+              height: 32,
+              margin: const EdgeInsets.only(left: 6),
+              decoration: BoxDecoration(
+                color: colors.accentSoft,
+              ),
+              child: Icon(
+                Icons.edit_outlined,
+                size: 14,
+                color: colors.accentDeep,
+              ),
+            ),
+          ),
+          PressableScale(
+            onTap: onRemove,
+            child: Container(
+              width: 32,
+              height: 32,
+              margin: const EdgeInsets.only(left: 6),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.08),
+              ),
+              child: Icon(
+                Icons.delete_outline,
+                size: 14,
+                color: Colors.red.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NameSection extends StatelessWidget {
+  const _NameSection({
+    required this.label,
+    required this.controller,
+    required this.onSubmitted,
+  });
+
+  final String label;
+  final TextEditingController controller;
+  final ValueChanged<String> onSubmitted;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionEyebrow(text: label),
+          const SizedBox(height: 10),
+          TextField(
+            controller: controller,
+            cursorColor: colors.accent,
+            style: TextStyle(
+              fontSize: 22,
+              color: colors.ink900,
+              fontWeight: FontWeight.w500,
+              letterSpacing: -0.25,
+            ),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
+            ),
+            onSubmitted: onSubmitted,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ColorSection extends StatelessWidget {
+  const _ColorSection({
+    required this.label,
+    required this.selectedValue,
+    required this.onSelected,
+  });
+
+  final String label;
+  final int selectedValue;
+  final ValueChanged<Color> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionEyebrow(text: label),
+          const SizedBox(height: 14),
+          RoutineColorPicker(
+            colors: _kColors,
+            selectedColorValue: selectedValue,
+            onSelected: onSelected,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _IconSection extends StatelessWidget {
+  const _IconSection({
+    required this.label,
+    required this.selectedCode,
+    required this.onSelected,
+  });
+
+  final String label;
+  final int selectedCode;
+  final ValueChanged<IconData> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionEyebrow(text: label),
+          const SizedBox(height: 14),
+          RoutineIconPicker(
+            icons: _kIcons,
+            selectedCode: selectedCode,
+            onSelected: onSelected,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BottomCta extends StatelessWidget {
+  const _BottomCta({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return PressableScale(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: 60,
+        decoration: BoxDecoration(
+          color: colors.accent,
+          border: Border(
+            top: BorderSide(
+              color: colors.accentDeep.withValues(alpha: 0.4),
+              width: 0.6,
+            ),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: Colors.white, size: 18),
+            const SizedBox(width: 10),
+            Text(
+              label.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 13,
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.4,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

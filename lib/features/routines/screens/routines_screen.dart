@@ -7,7 +7,6 @@ import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../shared/widgets/glass_button.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../exercises/view_models/exercises_view_model.dart';
@@ -66,6 +65,7 @@ class _RoutinesScreenState extends ConsumerState<RoutinesScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 14),
             Expanded(
               child: routinesAsync.when(
                 loading: () => _LoadingBody(label: l10n.preparingWorkout),
@@ -76,26 +76,8 @@ class _RoutinesScreenState extends ConsumerState<RoutinesScreen> {
                   ),
                 ),
                 data: (routines) => routines.isEmpty
-                    ? const _EmptyRoutines()
-                    : SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 96),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(22, 16, 22, 0),
-                          child: Column(
-                            children: routines
-                                .map(
-                                  (r) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 12),
-                                    child: _RoutineCard(
-                                      routine: r,
-                                      exercises: exercises,
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ),
-                      ),
+                    ? _EmptyRoutines(isEs: isEs)
+                    : _RoutinesList(routines: routines, exercises: exercises),
               ),
             ),
           ],
@@ -105,46 +87,32 @@ class _RoutinesScreenState extends ConsumerState<RoutinesScreen> {
   }
 }
 
-class _EmptyRoutines extends StatelessWidget {
-  const _EmptyRoutines();
+class _GridDivider extends StatelessWidget {
+  const _GridDivider();
+  @override
+  Widget build(BuildContext context) {
+    return Container(height: 0.6, color: context.colors.hairline);
+  }
+}
+
+class _RoutinesList extends StatelessWidget {
+  const _RoutinesList({required this.routines, required this.exercises});
+
+  final List<Routine> routines;
+  final List<Exercise> exercises;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 60),
+    return FadeSlideIn(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 96),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 72,
-              height: 72,
-              decoration: BoxDecoration(
-                color: context.colors.accentTint,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Icon(
-                Icons.fitness_center,
-                size: 34,
-                color: context.colors.accentDeep,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              l10n.noRoutinesYet,
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: context.colors.ink900,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              l10n.createFirstOne,
-              style: TextStyle(fontSize: 13, color: context.colors.ink400),
-              textAlign: TextAlign.center,
-            ),
+            const _GridDivider(),
+            for (final r in routines) ...[
+              _RoutineRow(routine: r, exercises: exercises),
+              const _GridDivider(),
+            ],
           ],
         ),
       ),
@@ -152,14 +120,16 @@ class _EmptyRoutines extends StatelessWidget {
   }
 }
 
-class _RoutineCard extends StatelessWidget {
-  const _RoutineCard({required this.routine, required this.exercises});
+class _RoutineRow extends StatelessWidget {
+  const _RoutineRow({required this.routine, required this.exercises});
+
   final Routine routine;
   final List<Exercise> exercises;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
     final color = Color(routine.colorValue);
     final muscles = routine.exercises
         .map((re) {
@@ -174,108 +144,147 @@ class _RoutineCard extends StatelessWidget {
         .toSet()
         .toList();
 
-    return FadeSlideIn(
-      child: GlassContainer(
-        radius: 20,
-        padding: const EdgeInsets.all(16),
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => RoutineDetailScreen(routineId: routine.id),
-          ),
+    return PressableScale(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => RoutineDetailScreen(routineId: routine.id),
         ),
-        child: Column(
+      ),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(22, 18, 22, 18),
+        child: Row(
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [color, color.withValues(alpha: 0.85)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.35),
-                        blurRadius: 14,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    IconData(routine.iconCode, fontFamily: 'MaterialIcons'),
-                    color: Colors.white,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        routine.name,
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: -0.17,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${routine.exercises.length} ${l10n.exercisesLabel} · ~${routine.estimatedMinutes} min',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: context.colors.ink500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.chevron_right,
-                  size: 16,
-                  color: color.withValues(alpha: 0.4),
-                ),
-              ],
+            Container(width: 3, height: 52, color: color),
+            const SizedBox(width: 14),
+            Icon(
+              IconData(routine.iconCode, fontFamily: 'MaterialIcons'),
+              size: 18,
+              color: colors.ink700,
             ),
-            if (muscles.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 6,
-                runSpacing: 4,
-                children: muscles
-                    .map(
-                      (m) => Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: color.withValues(alpha: 0.25),
-                            width: 0.5,
-                          ),
-                        ),
-                        child: Text(
-                          m,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: color,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    routine.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: colors.ink900,
+                      letterSpacing: -0.17,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '${routine.exercises.length} ${l10n.exercisesLabel} · ~${routine.estimatedMinutes} min',
+                    style: TextStyle(fontSize: 12, color: colors.ink500),
+                  ),
+                  if (muscles.isNotEmpty) ...[
+                    const SizedBox(height: 7),
+                    Text(
+                      muscles.join(' · ').toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        color: colors.ink400,
+                        letterSpacing: 0.18,
                       ),
-                    )
-                    .toList(),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.chevron_right,
+              size: 16,
+              color: colors.ink900.withValues(alpha: 0.3),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyRoutines extends StatelessWidget {
+  const _EmptyRoutines({required this.isEs});
+
+  final bool isEs;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
+    final prefix = isEs ? 'Crea' : 'Create';
+    final accent = isEs ? 'tu primera rutina.' : 'your first one.';
+
+    return FadeSlideIn(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.noRoutinesYet.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  color: colors.ink400,
+                  letterSpacing: 0.18,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '$prefix\n',
+                      style: TextStyle(
+                        fontSize: 42,
+                        height: 0.94,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: -0.05,
+                        color: colors.ink900,
+                      ),
+                    ),
+                    TextSpan(
+                      text: accent,
+                      style: TextStyle(
+                        fontSize: 42,
+                        height: 0.94,
+                        fontWeight: FontWeight.w400,
+                        fontStyle: FontStyle.italic,
+                        letterSpacing: -0.045,
+                        color: colors.accentLight,
+                      ),
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 3,
+              ),
+              const SizedBox(height: 22),
+              Text(
+                isEs
+                    ? 'Toca + arriba para empezar.'
+                    : 'Tap + above to start.',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: colors.ink500,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -292,14 +301,23 @@ class _LoadingBody extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CircularProgressIndicator(
-            color: context.colors.accent,
-            strokeWidth: 2,
+          SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+              color: context.colors.accent,
+              strokeWidth: 1.5,
+            ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Text(
-            label,
-            style: TextStyle(fontSize: 13, color: context.colors.ink400),
+            label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              color: context.colors.ink400,
+              letterSpacing: 0.18,
+            ),
           ),
         ],
       ),

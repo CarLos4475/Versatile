@@ -102,7 +102,7 @@ class ScreenHeader extends StatelessWidget {
                   ],
                 ),
               ),
-            SizedBox(height: !hasBack && hasInlineRow ? 10 : 0),
+            SizedBox(height: 0),
             Text.rich(
               TextSpan(
                 children: [
@@ -111,9 +111,6 @@ class ScreenHeader extends StatelessWidget {
                     style: TextStyle(
                       fontSize: size,
                       height: 0.94,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: -0.05,
-                      color: colors.ink900,
                     ),
                   ),
                   TextSpan(

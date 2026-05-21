@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../shared/widgets/motion.dart';
 
+/// Brutalist color swatches: square blocks, active state shows a 3px inset
+/// white border and a check mark. No radius, no shadows.
 class RoutineColorPicker extends StatelessWidget {
   const RoutineColorPicker({
     super.key,
@@ -17,32 +19,24 @@ class RoutineColorPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      spacing: 12,
-      runSpacing: 12,
+      spacing: 10,
+      runSpacing: 10,
       children: colors.map((color) {
         final active = color.toARGB32() == selectedColorValue;
         return PressableScale(
           onTap: () => onSelected(color),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            width: 44,
-            height: 44,
+            duration: const Duration(milliseconds: 160),
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
               color: color,
-              shape: BoxShape.circle,
-              border: active ? Border.all(color: Colors.white, width: 3) : null,
-              boxShadow: active
-                  ? [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.5),
-                        blurRadius: 14,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
+              border: active
+                  ? Border.all(color: Colors.white, width: 3)
                   : null,
             ),
             child: active
-                ? const Icon(Icons.check, color: Colors.white, size: 20)
+                ? const Icon(Icons.check, color: Colors.white, size: 18)
                 : null,
           ),
         );

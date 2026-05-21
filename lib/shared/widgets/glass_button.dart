@@ -253,7 +253,6 @@ class IconCircleButton extends StatelessWidget {
     required this.icon,
     required this.onPressed,
     this.size = 38.0,
-    this.radius = 12.0,
     this.accent = false,
     this.subtle = false,
   });
@@ -261,12 +260,12 @@ class IconCircleButton extends StatelessWidget {
   final Widget icon;
   final VoidCallback onPressed;
   final double size;
-  final double radius;
   final bool accent;
   final bool subtle;
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return PressableScale(
       onTap: onPressed,
       behavior: HitTestBehavior.opaque,
@@ -274,38 +273,20 @@ class IconCircleButton extends StatelessWidget {
         width: size,
         height: size,
         decoration: BoxDecoration(
-          gradient: accent
-              ? LinearGradient(
-                  colors: [context.colors.accentLight, context.colors.accent],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )
-              : null,
           color: accent
-              ? null
-              : subtle
-              ? context.colors.press
-              : context.colors.glassBg,
-          borderRadius: BorderRadius.circular(radius),
-          border: accent || subtle
-              ? null
-              : Border.all(color: context.colors.glassBorder, width: 0.5),
-          boxShadow: accent
-              ? [
-                  BoxShadow(
-                    color: context.colors.accentDeep.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : subtle
-              ? null
-              : context.colors.glassShadow,
+              ? colors.accent
+              : colors.ink900.withValues(alpha: 0.04),
+          border: Border.all(
+            color: accent
+                ? colors.accentDeep.withValues(alpha: 0.6)
+                : colors.hairline,
+            width: 0.6,
+          ),
         ),
         child: Center(
           child: IconTheme(
             data: IconThemeData(
-              color: accent ? Colors.white : context.colors.ink700,
+              color: accent ? Colors.white : colors.ink700,
               size: size * 0.52,
             ),
             child: icon,

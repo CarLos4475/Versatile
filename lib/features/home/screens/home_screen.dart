@@ -5,6 +5,7 @@ import '../../../core/navigation/app_page_transitions.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/coachmark_overlay.dart';
+import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../programs/screens/program_editor_screen.dart';
 import '../../programs/view_models/programs_view_model.dart';
@@ -1279,42 +1280,35 @@ class _DeloadBlock extends ConsumerWidget {
       );
     }
 
-    final isEs = Localizations.localeOf(context).languageCode == 'es';
     return FadeSlideIn(
       delay: const Duration(milliseconds: 90),
-      child: Container(
-        width: double.infinity,
-        color: colors.accentDeep,
-        padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+      child: GlassContainer(
+        radius: 20,
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _Eyebrow(
-              text: isEs ? 'Sugerencia · Deload' : 'Suggested · Deload',
-              color: Colors.white.withValues(alpha: 0.75),
-            ),
-            const SizedBox(height: 12),
             Text(
               l10n.deloadBannerTitle,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: colors.ink900,
                 height: 1.1,
                 letterSpacing: -0.4,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               body,
               style: TextStyle(
                 fontSize: 13,
-                color: Colors.white.withValues(alpha: 0.85),
+                color: colors.ink500,
                 height: 1.4,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -1330,7 +1324,7 @@ class _DeloadBlock extends ConsumerWidget {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white.withValues(alpha: 0.75),
+                        color: colors.ink500,
                         letterSpacing: 1.2,
                       ),
                     ),
@@ -1345,8 +1339,9 @@ class _DeloadBlock extends ConsumerWidget {
                         horizontal: 16,
                         vertical: 10,
                       ),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
+                      decoration: BoxDecoration(
+                        color: colors.accent.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         l10n.deloadBannerCta.toUpperCase(),
