@@ -449,7 +449,7 @@ class _MagTab extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOutCubic,
-          color: isActive ? colors.bgFrame : Colors.transparent,
+          color: isActive ? colors.accent : Colors.transparent,
           padding: const EdgeInsets.symmetric(horizontal: 14),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -462,7 +462,7 @@ class _MagTab extends StatelessWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.18,
-                  color: isActive ? colors.accentDeep : colors.ink400,
+                  color: isActive ? Colors.white : colors.ink400,
                 ),
                 child: Text(label.toUpperCase()),
               ),
@@ -474,7 +474,7 @@ class _MagTab extends StatelessWidget {
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
                   letterSpacing: -0.55,
-                  color: isActive ? colors.ink900 : colors.ink400,
+                  color: isActive ? Colors.white : colors.ink400,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
                 child: Text('$count'),
