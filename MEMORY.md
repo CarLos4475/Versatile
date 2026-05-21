@@ -8,6 +8,37 @@ See `project_pending_tasks.md`.
 - Current share captures the animated slide on-screen, resulting in incomplete data (counters at 0, empty bars) and no backdrop background.
 - Need a static `ShareableRecapCard` (similar to `ShareableSessionCard`) that renders the recap data without animations, with integrated dark backdrop + branding footer, at a fixed card ratio (not full-screen capture).
 
+## Magazine Visual Identity (2026-05-20)
+
+A brutalist / editorial magazine style applied across all list and detail screens:
+
+### Core principles
+- **Square everything** — no `BorderRadius.circular()` on chips, buttons, cards, containers, or icons. Zero radius.
+- **Flat lists** — items use `Container` with `EdgeInsets.fromLTRB(22, 18, 22, 18)` and `_GridDivider` (0.6px `hairline` line) between rows instead of `GlassContainer` cards or `SizedBox` gaps.
+- **ScreenHeader** stays at top (sticky in Column, not scrollable). When both `onBack` and `eyebrow` are present, they share a single row: `[← back] [eyebrow] [trailing]` — no duplicate trailing, no dead space.
+- **Muscle icon squares** — 38×38 or 54×54 squares with `colors.accent` background, white fallback icon. No border, no radius.
+- **Filter chips** — `_MagChip` with `Colors.transparent` / `accentDeep` backgrounds, `hairline` border, no radius.
+
+### Affected screens
+
+| Screen | File | Key changes |
+|---|---|---|
+| **Exercises list** | `exercises_screen.dart` | `ListView.separated` → `SingleChildScrollView` + `Column` + `_GridDivider`. `_ExerciseRow` uses flat `Container` (no `GlassContainer`). All chips square (`_MagChip`, `_MagTab`). Muscle icon: `accentSoft` → `accent`. |
+| **Add exercise** | `add_exercise_screen.dart` | `_ChoiceChip` square. `GlassContainer` for TextField without `radius`. |
+| **Exercise progress** | `exercise_progress_screen.dart` | `_MetricGrid` uses `mainAxisSpacing/crossAxisSpacing: 0` with `hairline` borders. `_MetricCard` uses flat `Container`. Chart `GlassContainer` with `radius: 0`. `_RecentSessions` items flat with `hairline` top border. `_FormulaChip` flat with `accentSoft` bg. `_DeltaPill` / `_RangeMicro` / `_PrDotPainter` badge — all square. `_MetricToggle` replaced with `_MagTab` (flat, accent bg when active, hairline divider). Outer border on toggle: black (light) / white (dark). |
+| **History session detail** | `history_exercise_detail.dart` | Muscle icon square with `accent`. |
+| **Home / stats / heatmap** | `home_screen.dart` | `_ActivityBlock` heatmap centered. `_DeloadBlock` fully square with `accent` bg and white text (like start-workout button). `_MagazineTitleSplit` uses `Column` with left-aligned prefix and center-aligned accent. Prefix uses `GoogleFonts.playfairDisplay`. |
+| **Routine detail / edit** | `routine_detail_screen.dart` | Muscle icon square with `accentSoft`. Edit/delete buttons colored (edit = `accentSoft`, delete = red tint). Routine name in header uses `accentColor: Color(routine.colorValue)`. Color picker uses `AccentColors.options`. |
+| **ScreenHeader** | `screen_header.dart` | New optional `accentColor` param for custom accent text color. |
+
+### Typography
+- **Inter** (via `GoogleFonts.interTextTheme`) — default UI font.
+- **Playfair Display** (via `GoogleFonts.playfairDisplay`) — used for magazine-style headings: greeting ("Hello," / "Hola,"), hero card prefix ("Today —" / "Hoy —"), and deload banner title.
+- Playfair Display settings: `height: 0.92`, `letterSpacing: -0.08`.
+
+### Seed data colors
+Routine colors updated to match `AccentColors.options`: Push Day → ember, Pull Day → brick, Legs → olive. Session `colorValue` fields synced with their parent routine.
+
 ## What is Versatile?
 
 A workout-tracking Flutter app. Users create routines with exercises, start workouts, log sets (weight × reps), and review history. Supports custom exercises, bilateral/unilateral modes, rest timers with alerts, accent color theming, ES/EN localization, and an Android foreground service notification.

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/navigation/app_page_transitions.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/coachmark_overlay.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../programs/screens/program_editor_screen.dart';
 import '../../programs/view_models/programs_view_model.dart';
@@ -946,22 +946,6 @@ class _ActivityBlock extends StatelessWidget {
   final String activityLabel;
   final String sessionsLastYearLabel;
 
-  static const _months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-  static const _dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  static const int _numWeeks = 26;
   static const double _cell = 10;
   static const double _gap = 2;
   static const double _slot = _cell + _gap;
@@ -975,6 +959,15 @@ class _ActivityBlock extends StatelessWidget {
     final today = DateTime(now.year, now.month, now.day);
     final currentMonday = today.subtract(Duration(days: today.weekday - 1));
     final colors = context.colors;
+    final locale = Localizations.localeOf(context).languageCode;
+    final months = List.generate(12, (i) {
+      final m = DateFormat.MMM(locale).format(DateTime(2024, i + 1));
+      return '${m[0].toUpperCase()}${m.substring(1)}';
+    });
+    final dayLabels = List.generate(7, (i) {
+      final d = DateFormat.E(locale).format(DateTime(2024, 1, i + 1));
+      return '${d[0].toUpperCase()}${d.substring(1)}';
+    });
 
     return FadeSlideIn(
       delay: const Duration(milliseconds: 180),
@@ -987,7 +980,7 @@ class _ActivityBlock extends StatelessWidget {
               (horizontalPad * 2) -
               dayLabelWidth -
               labelGap;
-          final numWeeks = (weeksAreaWidth / _slot).floor().clamp(4, _numWeeks);
+          final numWeeks = (weeksAreaWidth / _slot).floor().clamp(4, 26);
 
           final gridStart = currentMonday.subtract(
             Duration(days: 7 * (numWeeks - 1)),
@@ -1008,6 +1001,7 @@ class _ActivityBlock extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
@@ -1016,7 +1010,7 @@ class _ActivityBlock extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: _slot + 2),
-                          ..._dayLabels.map(
+                          ...dayLabels.map(
                             (label) => SizedBox(
                               height: _slot,
                               child: Align(
@@ -1053,7 +1047,7 @@ class _ActivityBlock extends StatelessWidget {
                                 height: _slot,
                                 child: showMonth
                                     ? Text(
-                                        _months[monday.month - 1],
+                                        months[monday.month - 1],
                                         style: TextStyle(
                                           fontSize: 7,
                                           color: colors.ink400,
@@ -1276,18 +1270,24 @@ class _DeloadBlock extends ConsumerWidget {
 
     return FadeSlideIn(
       delay: const Duration(milliseconds: 90),
-      child: GlassContainer(
-        radius: 20,
-        padding: const EdgeInsets.all(20),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+        decoration: BoxDecoration(
+          color: colors.accent,
+          border: Border.all(
+            color: colors.accentDeep.withValues(alpha: 0.6),
+            width: 0.6,
+          ),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               l10n.deloadBannerTitle,
-              style: TextStyle(
+              style: GoogleFonts.playfairDisplay(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: colors.ink900,
+                color: Colors.white,
                 height: 1.1,
                 letterSpacing: -0.4,
               ),
@@ -1297,12 +1297,12 @@ class _DeloadBlock extends ConsumerWidget {
               body,
               style: TextStyle(
                 fontSize: 13,
-                color: colors.ink500,
+                color: Colors.white.withValues(alpha: 0.85),
                 height: 1.4,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -1313,36 +1313,35 @@ class _DeloadBlock extends ConsumerWidget {
                       horizontal: 6,
                       vertical: 8,
                     ),
-                    child: Text(
-                      l10n.deloadBannerDismiss.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: colors.ink500,
-                        letterSpacing: 1.2,
+                      child: Text(
+                        l10n.deloadBannerDismiss.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white.withValues(alpha: 0.75),
+                          letterSpacing: 1.2,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                if (active != null) ...[
-                  const SizedBox(width: 14),
-                  PressableScale(
-                    onTap: openProgram,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colors.accent.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                  if (active != null) ...[
+                    const SizedBox(width: 14),
+                    PressableScale(
+                      onTap: openProgram,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                        ),
                       child: Text(
                         l10n.deloadBannerCta.toUpperCase(),
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
-                          color: colors.accentDeep,
+                          color: colors.accent,
                           letterSpacing: 1.2,
                         ),
                       ),
