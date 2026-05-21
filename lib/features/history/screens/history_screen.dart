@@ -39,8 +39,13 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ScreenHeader(
-              title: l10n.history,
-              subtitle: sessionsAsync.value != null
+              prefix: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'Tu'
+                  : 'Your',
+              accent: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'historial.'
+                  : 'history.',
+              eyebrow: sessionsAsync.value != null
                   ? '${sessionsAsync.value!.length} ${l10n.total}'
                   : null,
             ),

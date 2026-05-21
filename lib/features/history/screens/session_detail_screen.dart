@@ -64,8 +64,11 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
         child: Column(
           children: [
             ScreenHeader(
-              title: l10n.sessionDetail,
-              subtitle: FormatUtils.date(
+              prefix: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'Sesión —'
+                  : 'Session —',
+              accent: '${session.routineName}.',
+              eyebrow: FormatUtils.date(
                 session.date,
                 locale: Localizations.localeOf(context).languageCode,
               ),

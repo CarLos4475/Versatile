@@ -329,8 +329,13 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
         child: Column(
           children: [
             ScreenHeader(
-              title: l10n.addExerciseTitle,
-              subtitle: l10n.inLibrary(allExercises.length),
+              prefix: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'Añade'
+                  : 'Add',
+              accent: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'un ejercicio.'
+                  : 'an exercise.',
+              eyebrow: l10n.inLibrary(allExercises.length),
               onBack: () => Navigator.of(context).pop(),
               accentBack: true,
               trailing: PressableScale(

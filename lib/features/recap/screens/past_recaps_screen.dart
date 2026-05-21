@@ -25,8 +25,13 @@ class PastRecapsScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ScreenHeader(
-              title: l10n.recapPastRecaps,
-              subtitle: l10n.recapPastRecapsSubtitle,
+              prefix: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'Resúmenes'
+                  : 'Past',
+              accent: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'anteriores.'
+                  : 'recaps.',
+              eyebrow: l10n.recapPastRecapsSubtitle,
               onBack: () => Navigator.of(context).pop(),
               accentBack: true,
             ),

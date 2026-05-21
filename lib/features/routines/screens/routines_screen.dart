@@ -38,6 +38,7 @@ class _RoutinesScreenState extends ConsumerState<RoutinesScreen> {
     final l10n = AppLocalizations.of(context)!;
     final routinesAsync = ref.watch(routinesProvider);
     final exercises = ref.watch(exercisesAsyncProvider).value ?? [];
+    final isEs = Localizations.localeOf(context).languageCode == 'es';
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
@@ -46,10 +47,11 @@ class _RoutinesScreenState extends ConsumerState<RoutinesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ScreenHeader(
-              title: l10n.routines,
-              subtitle: routinesAsync.maybeWhen(
+              prefix: isEs ? 'Tus' : 'Your',
+              accent: '${l10n.routines.toLowerCase()}.',
+              eyebrow: routinesAsync.maybeWhen(
                 data: (r) => l10n.routinesInLibrary(r.length),
-                orElse: () => '',
+                orElse: () => null,
               ),
               trailing: KeyedSubtree(
                 key: _addBtnKey,

@@ -36,8 +36,13 @@ class ProgramsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ScreenHeader(
-                  title: l10n.trainingPlan,
-                  subtitle: l10n.programsSubtitle,
+                  prefix: Localizations.localeOf(context).languageCode == 'es'
+                      ? 'Plan de'
+                      : 'Training',
+                  accent: Localizations.localeOf(context).languageCode == 'es'
+                      ? 'entrenamiento.'
+                      : 'plan.',
+                  eyebrow: l10n.programsSubtitle,
                   onBack: () => Navigator.of(context).pop(),
                   accentBack: true,
                   trailing: _HelpButton(

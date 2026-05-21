@@ -161,8 +161,11 @@ class _ExerciseProgressScreenState
         child: Column(
           children: [
             ScreenHeader(
-              title: dummy.getLocalizedName(context),
-              subtitle: dummy.getLocalizedMuscle(context),
+              prefix: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'Progreso —'
+                  : 'Progress —',
+              accent: '${dummy.getLocalizedName(context)}.',
+              eyebrow: dummy.getLocalizedMuscle(context),
               onBack: () => Navigator.of(context).pop(),
               accentBack: true,
             ),

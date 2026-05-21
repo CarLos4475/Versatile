@@ -5,7 +5,6 @@ import '../../../core/navigation/app_page_transitions.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/coachmark_overlay.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../programs/screens/program_editor_screen.dart';
 import '../../programs/view_models/programs_view_model.dart';
@@ -13,8 +12,6 @@ import '../../recap/screens/monthly_recap_screen.dart';
 import '../../recap/view_models/recap_view_model.dart';
 import '../view_models/deload_view_model.dart';
 import '../view_models/home_view_model.dart';
-import '../widgets/session_card.dart';
-import '../widgets/stat_card.dart';
 import '../../active_workout/screens/active_workout_screen.dart';
 import '../../history/screens/session_detail_screen.dart';
 import '../../routines/screens/create_routine_screen.dart';
@@ -22,6 +19,7 @@ import '../../settings/screens/settings_screen.dart';
 import '../../../core/utils/format_utils.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/exercise.dart';
+import '../../../domain/entities/session.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -133,10 +131,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(homeProvider);
-
-    // Subscribe to route changes so we rebuild when the home screen becomes
-    // current again (e.g. after popping back from the workout completion screen).
     final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? true;
+    final isEs = Localizations.localeOf(context).languageCode == 'es';
 
     ref.listen<int>(
       homeProvider.select((s) => s.sessions.length),
@@ -147,7 +143,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       },
     );
 
-    // Show the history coachmark only once we're back on the home screen.
     if (_pendingHistoryCoachmark && isCurrentRoute) {
       _pendingHistoryCoachmark = false;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -156,7 +151,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     final now = DateTime.now();
-
     final nextRoutine = state.nextRoutine;
     final heroInfo = ref.watch(heroCardInfoProvider).value;
     final daysAgo = state.nextRoutineDaysAgo;
@@ -178,6 +172,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       locale: Localizations.localeOf(context).languageCode,
     );
 
+    final recapBanner = ref.watch(unseenLastRecapProvider).value;
+    final deloadSuggestion = ref.watch(deloadSuggestionProvider);
+
     return Scaffold(
       backgroundColor: context.colors.bgApp,
       body: SafeArea(
@@ -196,26 +193,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   context,
                 ).push(AppRoute(page: const SettingsScreen())),
               ),
-              const SizedBox(height: 20),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: FadeSlideIn(
-                  delay: const Duration(milliseconds: 60),
-                  child: KeyedSubtree(
-                    key: _heroCardKey,
-                    child: state.todayLabel != null
-                        ? _LabelHeroCard(
-                            label: state.todayLabel!,
-                            isDeload: state.isDeloadWeek,
-                          )
-                        : state.isAutoRestDay
-                        ? _LabelHeroCard(
+              const SizedBox(height: 24),
+              const _GridDivider(),
+              KeyedSubtree(
+                key: _heroCardKey,
+                child: state.todayLabel != null
+                    ? _HomeLabelHeroBlock(
+                        label: state.todayLabel!,
+                        isDeload: state.isDeloadWeek,
+                        isEs: isEs,
+                      )
+                    : state.isAutoRestDay
+                        ? _HomeLabelHeroBlock(
                             label: l10n.labelRest,
                             isDeload: state.isDeloadWeek,
+                            isEs: isEs,
                           )
                         : nextRoutine != null
-                            ? _HeroCard(
+                            ? _HomeHeroBlock(
                                 routineId: nextRoutine.id,
                                 routineName: nextRoutine.name,
                                 exerciseCount: nextRoutine.exercises.length,
@@ -226,156 +221,117 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 mainPrKg: heroInfo?.pr,
                                 plannedFromProgram: state.plannedFromProgram,
                                 isDeload: state.isDeloadWeek,
+                                isEs: isEs,
                               )
-                            : _EmptyHeroCard(
+                            : _HomeEmptyHeroBlock(
                                 onCreateRoutine: () => Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (_) => const CreateRoutineScreen(),
                                   ),
                                 ),
+                                isEs: isEs,
                               ),
-                  ),
-                ),
               ),
-
-              const SizedBox(height: 16),
-
-              Consumer(
-                builder: (context, ref, _) {
-                  final banner = ref.watch(unseenLastRecapProvider).value;
-                  if (banner == null) return const SizedBox.shrink();
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(22, 0, 22, 14),
-                    child: FadeSlideIn(
-                      delay: const Duration(milliseconds: 80),
-                      child: _RecapHomeBanner(monthKey: banner),
-                    ),
-                  );
-                },
+              if (recapBanner != null) ...[
+                const _GridDivider(),
+                _RecapBlock(monthKey: recapBanner),
+              ],
+              if (deloadSuggestion != null) ...[
+                const _GridDivider(),
+                _DeloadBlock(suggestion: deloadSuggestion),
+              ],
+              const _GridDivider(),
+              _StatsRow(
+                weekSessions: state.weekSessions,
+                weekVolume: state.weekVolume,
+                avgTimeMins: state.avgTimeMins,
+                thisWeekLabel: l10n.thisWeek,
+                sessionsLabel: l10n.sessions,
+                volumeLabel: l10n.volume,
+                avgTimeLabel: l10n.avgTime,
               ),
-
-              Consumer(
-                builder: (context, ref, _) {
-                  final suggestion = ref.watch(deloadSuggestionProvider);
-                  if (suggestion == null) return const SizedBox.shrink();
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(22, 0, 22, 16),
-                    child: FadeSlideIn(
-                      delay: const Duration(milliseconds: 90),
-                      child: _DeloadBanner(suggestion: suggestion),
-                    ),
-                  );
-                },
+              const _GridDivider(),
+              _ActivityBlock(
+                workoutDays: state.workoutDays,
+                sessionCount: state.sessions.length,
+                activityLabel: l10n.activity,
+                sessionsLastYearLabel: l10n.sessionsLastYear,
               ),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: FadeSlideIn(
-                  delay: const Duration(milliseconds: 120),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: StatCard(
-                          label: l10n.thisWeek,
-                          value: state.weekSessions.toString(),
-                          unit: l10n.sessions,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: StatCard(
-                          label: l10n.volume,
-                          value: state.weekVolume >= 1000
-                              ? (state.weekVolume / 1000).toStringAsFixed(1)
-                              : state.weekVolume.toStringAsFixed(0),
-                          unit: state.weekVolume >= 1000 ? 'k kg' : 'kg',
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: StatCard(
-                          label: l10n.avgTime,
-                          value: '${state.avgTimeMins}',
-                          unit: 'min',
-                          accent: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: FadeSlideIn(
-                  delay: const Duration(milliseconds: 180),
-                  child: _ActivityGrid(
-                    workoutDays: state.workoutDays,
-                    sessionCount: state.sessions.length,
-                  ),
-                ),
-              ),
-
               if (state.sessions.isNotEmpty) ...[
-                const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22),
-                  child: FadeSlideIn(
-                    delay: const Duration(milliseconds: 220),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          l10n.recentSessions,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.18,
-                            color: context.colors.ink900,
-                          ),
-                        ),
-                        Text(
-                          '${state.sessions.length} ${l10n.total}',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: context.colors.ink400,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22),
-                  child: Column(
-                    children: state.sessions
-                        .take(4)
-                        .map(
-                          (s) => Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: SessionCard(
-                              session: s,
-                              onTap: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      SessionDetailScreen(session: s),
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
+                const _GridDivider(),
+                _RecentSessionsBlock(
+                  sessions: state.sessions,
+                  recentLabel: l10n.recentSessions,
+                  totalLabel: l10n.total,
                 ),
               ],
+              const _GridDivider(),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _GridDivider extends StatelessWidget {
+  const _GridDivider();
+  @override
+  Widget build(BuildContext context) {
+    return Container(height: 0.6, color: context.colors.hairline);
+  }
+}
+
+class _VGridDivider extends StatelessWidget {
+  const _VGridDivider();
+  @override
+  Widget build(BuildContext context) {
+    return Container(width: 0.6, color: context.colors.hairline);
+  }
+}
+
+class _Eyebrow extends StatelessWidget {
+  const _Eyebrow({required this.text, this.color, this.center = false});
+  final String text;
+  final Color? color;
+  final bool center;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final c = color ?? colors.ink500;
+    if (center) {
+      return Text(
+        text.toUpperCase(),
+        textAlign: TextAlign.center,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+          color: c,
+          letterSpacing: 0.18,
+        ),
+      );
+    }
+    return Row(
+      children: [
+        Container(width: 22, height: 1, color: c.withValues(alpha: 0.55)),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              color: c,
+              letterSpacing: 0.18,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -429,6 +385,7 @@ class _HomeMagazineHeader extends StatelessWidget {
                           fontWeight: FontWeight.w800,
                           color: colors.ink500,
                           letterSpacing: 0.18,
+                          fontFeatures: const [FontFeature.tabularFigures()],
                         ),
                       ),
                     ],
@@ -439,25 +396,23 @@ class _HomeMagazineHeader extends StatelessWidget {
                       width: 38,
                       height: 38,
                       decoration: BoxDecoration(
-                        color: colors.glassBg,
-                        borderRadius: BorderRadius.circular(12),
+                        color: colors.ink900.withValues(alpha: 0.04),
                         border: Border.all(
-                          color: colors.glassBorder,
-                          width: 0.5,
+                          color: colors.hairline,
+                          width: 0.6,
                         ),
-                        boxShadow: colors.glassShadow,
                       ),
                       child: Icon(
                         Icons.settings_outlined,
                         color: colors.ink700,
-                        size: 20,
+                        size: 18,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 2),
             if (hasName)
               Text.rich(
                 TextSpan(
@@ -506,11 +461,495 @@ class _HomeMagazineHeader extends StatelessWidget {
   }
 }
 
-class _ActivityGrid extends StatelessWidget {
-  const _ActivityGrid({required this.workoutDays, required this.sessionCount});
+class _MagazineTitleSplit extends StatelessWidget {
+  const _MagazineTitleSplit({
+    required this.prefix,
+    required this.accent,
+    this.size = 40,
+    this.textAlign = TextAlign.start,
+  });
+
+  final String prefix;
+  final String accent;
+  final double size;
+  final TextAlign textAlign;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: '$prefix\n',
+            style: TextStyle(
+              fontSize: size,
+              height: 0.94,
+              fontWeight: FontWeight.w500,
+              letterSpacing: -0.05,
+              color: colors.ink900,
+            ),
+          ),
+          TextSpan(
+            text: accent,
+            style: TextStyle(
+              fontSize: size,
+              height: 0.94,
+              fontWeight: FontWeight.w400,
+              fontStyle: FontStyle.italic,
+              letterSpacing: -0.045,
+              color: colors.accentLight,
+            ),
+          ),
+        ],
+      ),
+      textAlign: textAlign,
+      maxLines: 3,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+class _HomeHeroBlock extends StatelessWidget {
+  const _HomeHeroBlock({
+    required this.routineId,
+    required this.routineName,
+    required this.exerciseCount,
+    required this.estimatedMin,
+    required this.lastDoneText,
+    this.mainExerciseId,
+    this.mainExerciseName,
+    this.mainPrKg,
+    this.plannedFromProgram = false,
+    this.isDeload = false,
+    required this.isEs,
+  });
+
+  final String routineId;
+  final String routineName;
+  final int exerciseCount;
+  final int estimatedMin;
+  final String lastDoneText;
+  final String? mainExerciseId;
+  final String? mainExerciseName;
+  final double? mainPrKg;
+  final bool plannedFromProgram;
+  final bool isDeload;
+  final bool isEs;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
+    String displayExName = mainExerciseName ?? '';
+    if (mainExerciseId != null && !mainExerciseId!.startsWith('custom-')) {
+      final dummy = Exercise(
+        id: mainExerciseId!,
+        name: mainExerciseName ?? '',
+        muscle: '',
+        equipment: '',
+      );
+      displayExName = dummy.getLocalizedName(context);
+    }
+
+    final eyebrowParts = <String>[
+      l10n.todaysSession,
+      '$exerciseCount ${l10n.exercisesLabel}',
+      '~$estimatedMin min',
+      if (plannedFromProgram)
+        isDeload ? l10n.plannedDeloadBadge : l10n.plannedBadge,
+    ];
+    final todayPrefix = isEs ? 'Hoy —' : 'Today —';
+
+    return FadeSlideIn(
+      delay: const Duration(milliseconds: 60),
+      child: Container(
+        width: double.infinity,
+        color: colors.bgFrame,
+        padding: const EdgeInsets.fromLTRB(22, 26, 22, 26),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _Eyebrow(text: eyebrowParts.join(' · '), center: true),
+            const SizedBox(height: 16),
+            _MagazineTitleSplit(
+              prefix: todayPrefix,
+              accent: '$routineName.',
+              size: 42,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              lastDoneText,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                color: colors.ink500,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            if (mainExerciseName != null) ...[
+              const SizedBox(height: 18),
+              _HeroPrRow(name: displayExName, prKg: mainPrKg),
+            ],
+            const SizedBox(height: 22),
+            PressableScale(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ActiveWorkoutScreen(routineId: routineId),
+                ),
+              ),
+              child: Container(
+                height: 52,
+                decoration: BoxDecoration(
+                  color: colors.accent,
+                  border: Border.all(
+                    color: colors.accentDeep.withValues(alpha: 0.6),
+                    width: 0.6,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.play_arrow, color: Colors.white, size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.startWorkout.toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroPrRow extends StatelessWidget {
+  const _HeroPrRow({required this.name, this.prKg});
+
+  final String name;
+  final double? prKg;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
+    final prStr = prKg == null
+        ? l10n.noRecordYet
+        : prKg! % 1 == 0
+            ? '${prKg!.toInt()} kg'
+            : '${prKg!.toStringAsFixed(1)} kg';
+
+    return Row(
+      children: [
+        Text(
+          'PR',
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            color: colors.ink500,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Container(width: 1, height: 12, color: colors.hairline),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            name,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              color: colors.ink700,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          prStr,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: prKg != null ? FontWeight.w700 : FontWeight.w400,
+            color: prKg != null ? colors.ink900 : colors.ink500,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _HomeLabelHeroBlock extends StatelessWidget {
+  const _HomeLabelHeroBlock({
+    required this.label,
+    required this.isDeload,
+    required this.isEs,
+  });
+
+  final String label;
+  final bool isDeload;
+  final bool isEs;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
+    final todayPrefix = isEs ? 'Hoy —' : 'Today —';
+    final localizedLabel = localizeSlotLabel(context, label).toLowerCase();
+    final eyebrowParts = <String>[
+      l10n.todayLabel,
+      if (isDeload) l10n.plannedDeloadBadge else l10n.plannedBadge,
+    ];
+
+    return FadeSlideIn(
+      delay: const Duration(milliseconds: 60),
+      child: Container(
+        width: double.infinity,
+        color: colors.bgFrame,
+        padding: const EdgeInsets.fromLTRB(22, 30, 22, 32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _Eyebrow(text: eyebrowParts.join(' · '), center: true),
+            const SizedBox(height: 16),
+            _MagazineTitleSplit(
+              prefix: todayPrefix,
+              accent: '$localizedLabel.',
+              size: 42,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n.restDayDescription,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: colors.ink500,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HomeEmptyHeroBlock extends StatelessWidget {
+  const _HomeEmptyHeroBlock({
+    required this.onCreateRoutine,
+    required this.isEs,
+  });
+
+  final VoidCallback onCreateRoutine;
+  final bool isEs;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
+    final prefix = isEs ? 'Crea —' : 'Create —';
+    final accent = isEs ? 'tu primera rutina.' : 'your first routine.';
+
+    return FadeSlideIn(
+      delay: const Duration(milliseconds: 60),
+      child: PressableScale(
+        onTap: onCreateRoutine,
+        child: Container(
+          width: double.infinity,
+          color: colors.bgFrame,
+          padding: const EdgeInsets.fromLTRB(22, 28, 22, 30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _Eyebrow(text: l10n.noRoutinesYet, center: true),
+              const SizedBox(height: 16),
+              _MagazineTitleSplit(
+                prefix: prefix,
+                accent: accent,
+                size: 40,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 22),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add,
+                    size: 14,
+                    color: colors.accentDeep,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    l10n.createRoutine.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: colors.accentDeep,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatsRow extends StatelessWidget {
+  const _StatsRow({
+    required this.weekSessions,
+    required this.weekVolume,
+    required this.avgTimeMins,
+    required this.thisWeekLabel,
+    required this.sessionsLabel,
+    required this.volumeLabel,
+    required this.avgTimeLabel,
+  });
+
+  final int weekSessions;
+  final double weekVolume;
+  final int avgTimeMins;
+  final String thisWeekLabel;
+  final String sessionsLabel;
+  final String volumeLabel;
+  final String avgTimeLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final volStr = weekVolume >= 1000
+        ? (weekVolume / 1000).toStringAsFixed(1)
+        : weekVolume.toStringAsFixed(0);
+    final volUnit = weekVolume >= 1000 ? 'k kg' : 'kg';
+
+    return FadeSlideIn(
+      delay: const Duration(milliseconds: 120),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: _StatCell(
+                label: thisWeekLabel,
+                value: weekSessions.toString(),
+                unit: sessionsLabel,
+              ),
+            ),
+            const _VGridDivider(),
+            Expanded(
+              child: _StatCell(
+                label: volumeLabel,
+                value: volStr,
+                unit: volUnit,
+              ),
+            ),
+            const _VGridDivider(),
+            Expanded(
+              child: _StatCell(
+                label: avgTimeLabel,
+                value: '$avgTimeMins',
+                unit: 'min',
+                accent: true,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatCell extends StatelessWidget {
+  const _StatCell({
+    required this.label,
+    required this.value,
+    required this.unit,
+    this.accent = false,
+  });
+
+  final String label;
+  final String value;
+  final String unit;
+  final bool accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 16, 14, 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              color: colors.ink500,
+              letterSpacing: 0.18,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Flexible(
+                child: Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: -0.55,
+                    color: accent ? colors.accentDeep : colors.ink900,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 3),
+              Text(
+                unit,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: colors.ink400,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActivityBlock extends StatelessWidget {
+  const _ActivityBlock({
+    required this.workoutDays,
+    required this.sessionCount,
+    required this.activityLabel,
+    required this.sessionsLastYearLabel,
+  });
 
   final Set<String> workoutDays;
   final int sessionCount;
+  final String activityLabel;
+  final String sessionsLastYearLabel;
 
   static const _months = [
     'Jan',
@@ -540,574 +979,261 @@ class _ActivityGrid extends StatelessWidget {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final currentMonday = today.subtract(Duration(days: today.weekday - 1));
-    final l10n = AppLocalizations.of(context)!;
+    final colors = context.colors;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const overhead = 32.0 + 22.0 + 2.0;
-        final weeksAreaWidth = constraints.maxWidth - overhead;
-        final numWeeks = (weeksAreaWidth / _slot).floor().clamp(4, _numWeeks);
+    return FadeSlideIn(
+      delay: const Duration(milliseconds: 180),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          const horizontalPad = 22.0;
+          const dayLabelWidth = 22.0;
+          const labelGap = 2.0;
+          final weeksAreaWidth = constraints.maxWidth -
+              (horizontalPad * 2) -
+              dayLabelWidth -
+              labelGap;
+          final numWeeks = (weeksAreaWidth / _slot).floor().clamp(4, _numWeeks);
 
-        final gridStart = currentMonday.subtract(
-          Duration(days: 7 * (numWeeks - 1)),
-        );
-        final weeks = List.generate(
-          numWeeks,
-          (w) => gridStart.add(Duration(days: 7 * w)),
-        );
+          final gridStart = currentMonday.subtract(
+            Duration(days: 7 * (numWeeks - 1)),
+          );
+          final weeks = List.generate(
+            numWeeks,
+            (w) => gridStart.add(Duration(days: 7 * w)),
+          );
 
-        return GlassContainer(
-          radius: 20,
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.activity,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.06,
-                  color: context.colors.ink400,
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(horizontalPad, 18, horizontalPad, 22),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _Eyebrow(
+                  text:
+                      '$activityLabel · $sessionCount $sessionsLastYearLabel',
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                '$sessionCount ${l10n.sessionsLastYear}',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400,
-                  letterSpacing: -0.4,
-                  color: context.colors.ink900,
-                  height: 1.1,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 22,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: _slot + 2),
-                        ..._dayLabels.map(
-                          (label) => SizedBox(
-                            height: _slot,
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                label,
-                                style: TextStyle(
-                                  fontSize: 8,
-                                  color: context.colors.ink400,
-                                  fontWeight: FontWeight.w500,
+                const SizedBox(height: 14),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: dayLabelWidth,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: _slot + 2),
+                          ..._dayLabels.map(
+                            (label) => SizedBox(
+                              height: _slot,
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  label,
+                                  style: TextStyle(
+                                    fontSize: 8,
+                                    color: colors.ink400,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 2),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: weeks.asMap().entries.map((entry) {
-                      final w = entry.key;
-                      final monday = entry.value;
-                      final showMonth =
-                          w == 0 || monday.month != weeks[w - 1].month;
+                    const SizedBox(width: labelGap),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: weeks.asMap().entries.map((entry) {
+                        final w = entry.key;
+                        final monday = entry.value;
+                        final showMonth =
+                            w == 0 || monday.month != weeks[w - 1].month;
 
-                      return SizedBox(
-                        width: _slot,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: _slot,
-                              child: showMonth
-                                  ? Text(
-                                      _months[monday.month - 1],
-                                      style: TextStyle(
-                                        fontSize: 7,
-                                        color: context.colors.ink400,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      overflow: TextOverflow.visible,
-                                      softWrap: false,
-                                    )
-                                  : null,
-                            ),
-                            const SizedBox(height: 2),
-                            ...List.generate(7, (d) {
-                              final day = monday.add(Duration(days: d));
-                              final isFuture = day.isAfter(today);
-                              final trained =
-                                  !isFuture && workoutDays.contains(_fmt(day));
-                              return Container(
-                                width: _cell,
-                                height: _cell,
-                                margin: const EdgeInsets.only(bottom: _gap),
-                                decoration: BoxDecoration(
-                                  color: isFuture
-                                      ? Colors.transparent
-                                      : trained
-                                      ? context.colors.accentDeep
-                                      : const Color(0x0F000000),
-                                  borderRadius: BorderRadius.circular(2),
-                                  border: isFuture
-                                      ? null
-                                      : Border.all(
-                                          color: trained
-                                              ? Colors.transparent
-                                              : const Color(0x14000000),
-                                          width: 0.5,
+                        return SizedBox(
+                          width: _slot,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: _slot,
+                                child: showMonth
+                                    ? Text(
+                                        _months[monday.month - 1],
+                                        style: TextStyle(
+                                          fontSize: 7,
+                                          color: colors.ink400,
+                                          fontWeight: FontWeight.w500,
                                         ),
-                                ),
-                              );
-                            }),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
+                                        overflow: TextOverflow.visible,
+                                        softWrap: false,
+                                      )
+                                    : null,
+                              ),
+                              const SizedBox(height: 2),
+                              ...List.generate(7, (d) {
+                                final day = monday.add(Duration(days: d));
+                                final isFuture = day.isAfter(today);
+                                final trained = !isFuture &&
+                                    workoutDays.contains(_fmt(day));
+                                return Container(
+                                  width: _cell,
+                                  height: _cell,
+                                  margin: const EdgeInsets.only(bottom: _gap),
+                                  decoration: BoxDecoration(
+                                    color: isFuture
+                                        ? Colors.transparent
+                                        : trained
+                                            ? colors.accentDeep
+                                            : colors.ink900
+                                                .withValues(alpha: 0.06),
+                                    border: isFuture
+                                        ? null
+                                        : Border.all(
+                                            color: trained
+                                                ? Colors.transparent
+                                                : colors.ink900
+                                                    .withValues(alpha: 0.08),
+                                            width: 0.5,
+                                          ),
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }
 
-class _HeroCard extends StatelessWidget {
-  const _HeroCard({
-    required this.routineId,
-    required this.routineName,
-    required this.exerciseCount,
-    required this.estimatedMin,
-    required this.lastDoneText,
-    this.mainExerciseId,
-    this.mainExerciseName,
-    this.mainPrKg,
-    this.plannedFromProgram = false,
-    this.isDeload = false,
+class _RecentSessionsBlock extends StatelessWidget {
+  const _RecentSessionsBlock({
+    required this.sessions,
+    required this.recentLabel,
+    required this.totalLabel,
   });
 
-  final String routineId;
-  final String routineName;
-  final int exerciseCount;
-  final int estimatedMin;
-  final String lastDoneText;
-  final String? mainExerciseId;
-  final String? mainExerciseName;
-  final double? mainPrKg;
-  final bool plannedFromProgram;
-  final bool isDeload;
+  final List<Session> sessions;
+  final String recentLabel;
+  final String totalLabel;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    String displayExName = mainExerciseName ?? '';
-    if (mainExerciseId != null && !mainExerciseId!.startsWith('custom-')) {
-      final dummy = Exercise(
-        id: mainExerciseId!,
-        name: mainExerciseName ?? '',
-        muscle: '',
-        equipment: '',
-      );
-      displayExName = dummy.getLocalizedName(context);
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [context.colors.accentLight, context.colors.accent, context.colors.accentDeep],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: context.colors.accentDeep.withValues(alpha: 0.35),
-            blurRadius: 36,
-            offset: const Offset(0, 18),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(22),
-      child: Stack(
-        clipBehavior: Clip.none,
+    final visible = sessions.take(4).toList();
+    return FadeSlideIn(
+      delay: const Duration(milliseconds: 220),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Positioned(
-            right: -60,
-            top: -60,
-            child: Container(
-              width: 280,
-              height: 280,
-              decoration: const BoxDecoration(
-                gradient: RadialGradient(
-                  colors: [
-                    Color(0x55FFFFFF),
-                    Color(0x22FFFFFF),
-                    Color(0x00FFFFFF),
-                  ],
-                  stops: [0.0, 0.45, 1.0],
-                ),
-              ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 18, 22, 14),
+            child: _Eyebrow(
+              text: '$recentLabel · ${sessions.length} $totalLabel',
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+          for (var i = 0; i < visible.length; i++) ...[
+            const _GridDivider(),
+            _HomeSessionRow(session: visible[i]),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeSessionRow extends StatelessWidget {
+  const _HomeSessionRow({required this.session});
+
+  final Session session;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final locale = Localizations.localeOf(context).languageCode;
+    final accentColor = Color(session.colorValue);
+    return PressableScale(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => SessionDetailScreen(session: session),
+        ),
+      ),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+        child: Row(
+          children: [
+            Container(width: 3, height: 38, color: accentColor),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    l10n.todaysSession,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.06,
-                    ),
-                  ),
-                  if (plannedFromProgram) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 7,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.22),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        isDeload
-                            ? l10n.plannedDeloadBadge
-                            : l10n.plannedBadge,
-                        style: const TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          letterSpacing: 0.08,
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 10),
-              Text(
-                routineName,
-                style: const TextStyle(
-                  fontSize: 34,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w400,
-                  letterSpacing: -0.68,
-                  height: 1.05,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '$exerciseCount ${l10n.exercisesLabel} · ~$estimatedMin min',
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                lastDoneText,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.white.withValues(alpha: 0.6),
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              if (mainExerciseName != null) ...[
-                const SizedBox(height: 14),
-                _PrChip(exerciseName: displayExName, prKg: mainPrKg),
-              ],
-              const SizedBox(height: 16),
-              PressableScale(
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ActiveWorkoutScreen(routineId: routineId),
-                  ),
-                ),
-                child: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      width: 0.5,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Row(
                     children: [
-                      const Icon(
-                        Icons.play_arrow,
-                        color: Colors.white,
-                        size: 16,
+                      Expanded(
+                        child: Text(
+                          session.routineName,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: colors.ink900,
+                            letterSpacing: -0.15,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        l10n.startWorkout,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
+                        FormatUtils.date(session.date, locale: locale),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: colors.ink400,
+                          fontFeatures: const [FontFeature.tabularFigures()],
                         ),
                       ),
                     ],
                   ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PrChip extends StatelessWidget {
-  const _PrChip({required this.exerciseName, this.prKg});
-
-  final String exerciseName;
-  final double? prKg;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final prStr = prKg == null
-        ? l10n.noRecordYet
-        : prKg! % 1 == 0
-        ? '${prKg!.toInt()} kg'
-        : '${prKg!.toStringAsFixed(1)} kg';
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.25),
-          width: 0.5,
-        ),
-      ),
-      child: Row(
-        children: [
-          Text(
-            'PR',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              color: Colors.white.withValues(alpha: 0.6),
-              letterSpacing: 0.5,
-            ),
-          ),
-          Container(
-            width: 1,
-            height: 10,
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            color: Colors.white.withValues(alpha: 0.3),
-          ),
-          Expanded(
-            child: Text(
-              exerciseName,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            prStr,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: prKg != null ? FontWeight.w700 : FontWeight.w400,
-              color: prKg != null
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.6),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LabelHeroCard extends StatelessWidget {
-  const _LabelHeroCard({required this.label, required this.isDeload});
-  final String label;
-  final bool isDeload;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      decoration: BoxDecoration(
-        color: context.colors.glassBg,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: context.colors.glassBorder, width: 0.5),
-        boxShadow: context.colors.glassShadow,
-      ),
-      padding: const EdgeInsets.all(22),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: context.colors.accentTint,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  isDeload ? l10n.plannedDeloadBadge : l10n.plannedBadge,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.08,
-                    color: context.colors.accentDeep,
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.timer_outlined,
+                        size: 12,
+                        color: colors.ink500,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        FormatUtils.duration(session.durationMin),
+                        style: TextStyle(fontSize: 12, color: colors.ink500),
+                      ),
+                      const SizedBox(width: 14),
+                      Icon(
+                        Icons.fitness_center,
+                        size: 12,
+                        color: colors.ink500,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        FormatUtils.volume(session.volumeKg),
+                        style: TextStyle(fontSize: 12, color: colors.ink500),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                l10n.todayLabel,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: context.colors.ink400,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.06,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(
-                isPresetSlotLabel(context, label)
-                    ? Icons.spa_outlined
-                    : Icons.fitness_center,
-                size: 28,
-                color: isDark
-                    ? context.colors.ink700
-                    : context.colors.accentDeep,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  localizeSlotLabel(context, label),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: -0.6,
-                    height: 1.05,
-                    color: context.colors.ink900,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            l10n.restDayDescription,
-            style: TextStyle(
-              fontSize: 13,
-              color: context.colors.ink500,
-              height: 1.4,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _EmptyHeroCard extends StatelessWidget {
-  const _EmptyHeroCard({required this.onCreateRoutine});
-  final VoidCallback onCreateRoutine;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return PressableScale(
-      onTap: onCreateRoutine,
-      child: Container(
-        padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-          color: context.colors.glassBg,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: context.colors.glassBorder, width: 0.5),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.noRoutinesYet,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w500,
-                color: context.colors.ink900,
-                letterSpacing: -0.44,
+                ],
               ),
             ),
-            const SizedBox(height: 6),
-            Text(
-              l10n.createFirstOne,
-              style: TextStyle(fontSize: 14, color: context.colors.ink500),
-            ),
-            const SizedBox(height: 18),
-            Row(
-              children: [
-                Icon(
-                  Icons.add_circle_outline,
-                  size: 16,
-                  color: context.colors.accentDeep,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  l10n.createRoutine,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: context.colors.accentDeep,
-                  ),
-                ),
-              ],
+            const SizedBox(width: 8),
+            Icon(
+              Icons.chevron_right,
+              size: 16,
+              color: colors.ink900.withValues(alpha: 0.3),
             ),
           ],
         ),
@@ -1116,12 +1242,8 @@ class _EmptyHeroCard extends StatelessWidget {
   }
 }
 
-/// Soft accent-tinted banner that surfaces a deload suggestion when
-/// [deloadSuggestionProvider] reports both stagnation and/or volume drop.
-/// "Open program" is only shown when the user has an active program — the
-/// CTA navigates to that program's editor so they can mark a deload week.
-class _DeloadBanner extends ConsumerWidget {
-  const _DeloadBanner({required this.suggestion});
+class _DeloadBlock extends ConsumerWidget {
+  const _DeloadBlock({required this.suggestion});
   final DeloadSuggestion suggestion;
 
   @override
@@ -1157,184 +1279,98 @@ class _DeloadBanner extends ConsumerWidget {
       );
     }
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            colors.accentDeep.withValues(alpha: 0.90),
-            colors.accent.withValues(alpha: 0.85),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: colors.accent.withValues(alpha: 0.35),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-            spreadRadius: -4,
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Radial glow behind the icon for extra pop.
-          Positioned(
-            top: -30,
-            right: -20,
-            child: Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    Colors.white.withValues(alpha: 0.25),
-                    Colors.transparent,
-                  ],
-                ),
+    final isEs = Localizations.localeOf(context).languageCode == 'es';
+    return FadeSlideIn(
+      delay: const Duration(milliseconds: 90),
+      child: Container(
+        width: double.infinity,
+        color: colors.accentDeep,
+        padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _Eyebrow(
+              text: isEs ? 'Sugerencia · Deload' : 'Suggested · Deload',
+              color: Colors.white.withValues(alpha: 0.75),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n.deloadBannerTitle,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                height: 1.1,
+                letterSpacing: -0.4,
               ),
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.white.withValues(alpha: 0.25),
-                          Colors.white.withValues(alpha: 0.10),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.30),
-                        width: 0.8,
-                      ),
-                    ),
-                    child: const Icon(
-                      Icons.bedtime_outlined,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          l10n.deloadBannerTitle,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            letterSpacing: -0.3,
-                            height: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          body,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.white.withValues(alpha: 0.85),
-                            height: 1.4,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+            const SizedBox(height: 8),
+            Text(
+              body,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.white.withValues(alpha: 0.85),
+                height: 1.4,
+                fontWeight: FontWeight.w500,
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
+            ),
+            const SizedBox(height: 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                PressableScale(
+                  onTap: dismiss,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 8,
+                    ),
+                    child: Text(
+                      l10n.deloadBannerDismiss.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white.withValues(alpha: 0.75),
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                  ),
+                ),
+                if (active != null) ...[
+                  const SizedBox(width: 14),
                   PressableScale(
-                    onTap: dismiss,
+                    onTap: openProgram,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
+                        horizontal: 16,
+                        vertical: 10,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.25),
-                          width: 0.8,
-                        ),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
                       ),
                       child: Text(
-                        l10n.deloadBannerDismiss,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                        l10n.deloadBannerCta.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: colors.accentDeep,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ),
                   ),
-                  if (active != null) ...[
-                    const SizedBox(width: 8),
-                    PressableScale(
-                      onTap: openProgram,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          l10n.deloadBannerCta,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: colors.accentDeep,
-                            letterSpacing: 0.1,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// Home entry point into the Monthly Recap. Warm dark gradient + radial
-/// accent glow + sparkle dots — visually distinct from the deload banner
-/// (which is accent-tinted) so the two don't compete on the same screen.
-class _RecapHomeBanner extends ConsumerWidget {
-  const _RecapHomeBanner({required this.monthKey});
+class _RecapBlock extends ConsumerWidget {
+  const _RecapBlock({required this.monthKey});
   final MonthKey monthKey;
 
   @override
@@ -1349,174 +1385,56 @@ class _RecapHomeBanner extends ConsumerWidget {
       '${monthKey.month.toString().padLeft(2, '0')}-01',
     );
 
-    return PressableScale(
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => MonthlyRecapScreen(monthKey: monthKey),
+    return FadeSlideIn(
+      delay: const Duration(milliseconds: 80),
+      child: PressableScale(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => MonthlyRecapScreen(monthKey: monthKey),
+          ),
         ),
-      ),
         child: Container(
-          height: 80,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                const Color(0xFF0E0B07),
-                Color.lerp(
-                  const Color(0xFF0E0B07),
-                  colors.accentDeep,
-                  0.35,
-                )!,
-                Color.lerp(
-                  const Color(0xFF0E0B07),
-                  colors.accentDeep,
-                  0.55,
-                )!,
-              ],
-              stops: const [0.0, 0.45, 1.0],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: colors.accentDeep.withValues(alpha: 0.25),
-                blurRadius: 22,
-                offset: const Offset(0, 8),
+          width: double.infinity,
+          color: const Color(0xFF0E0B07),
+          padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _Eyebrow(
+                      text: l10n.recapHomeBannerEyebrow(monthLabel),
+                      color: colors.accentLight,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      l10n.recapHomeBannerTitle(
+                        recap.sessionsCount,
+                        FormatUtils.volume(recap.totalVolumeKg),
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFF5EFE2),
+                        letterSpacing: -0.3,
+                        height: 1.25,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 22,
+                color: Color(0xFFF5EFE2),
               ),
             ],
           ),
-        child: Stack(
-          clipBehavior: Clip.hardEdge,
-          children: [
-            // Radial accent glow in the top-right corner.
-            Positioned(
-              right: -40,
-              top: -50,
-              child: Container(
-                width: 180,
-                height: 180,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      colors.accent.withValues(alpha: 0.55),
-                      Colors.transparent,
-                    ],
-                    stops: const [0.0, 0.65],
-                  ),
-                ),
-              ),
-            ),
-            // Sparkle dots bottom-right.
-            Positioned(
-              right: 14,
-              bottom: 10,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _Sparkle(size: 3, color: colors.accentLight),
-                  const SizedBox(width: 4),
-                  _Sparkle(size: 5, color: colors.accentLight),
-                  const SizedBox(width: 4),
-                  _Sparkle(size: 3, color: colors.accentLight),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
-              child: Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          colors.accentLight,
-                          colors.accent,
-                          colors.accentDeep,
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: colors.accentDeep.withValues(alpha: 0.45),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.trending_up_rounded,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.recapHomeBannerEyebrow(monthLabel),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.6,
-                            color: colors.accentLight,
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          l10n.recapHomeBannerTitle(
-                            recap.sessionsCount,
-                            FormatUtils.volume(recap.totalVolumeKg),
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFFF5EFE2),
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    size: 20,
-                    color: const Color(0xFFF5EFE2).withValues(alpha: 0.6),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
-      ),
-    );
-  }
-}
-
-class _Sparkle extends StatelessWidget {
-  const _Sparkle({required this.size, required this.color});
-  final double size;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(size / 2),
       ),
     );
   }

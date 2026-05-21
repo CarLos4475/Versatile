@@ -369,7 +369,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ScreenHeader(
-                    title: l10n.settings,
+                    prefix: Localizations.localeOf(context).languageCode == 'es'
+                        ? 'Hecho'
+                        : 'Made',
+                    accent: Localizations.localeOf(context).languageCode == 'es'
+                        ? 'a tu medida.'
+                        : 'yours.',
+                    eyebrow: l10n.settings,
                     onBack: () => Navigator.of(context).pop(),
                     accentBack: true,
                   ),

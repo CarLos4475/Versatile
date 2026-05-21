@@ -71,8 +71,13 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ScreenHeader(
-              title: l10n.shareWorkout,
-              subtitle: l10n.sharePreviewSubtitle,
+              prefix: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'Comparte'
+                  : 'Share',
+              accent: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'el entreno.'
+                  : 'your workout.',
+              eyebrow: l10n.sharePreviewSubtitle,
               onBack: () => Navigator.of(context).pop(),
               accentBack: true,
             ),

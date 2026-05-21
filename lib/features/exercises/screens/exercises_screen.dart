@@ -125,8 +125,13 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ScreenHeader(
-                  title: l10n.exercises,
-                  subtitle: l10n.inLibrary(allExercises.length),
+                  prefix: Localizations.localeOf(context).languageCode == 'es'
+                      ? 'La'
+                      : 'The',
+                  accent: Localizations.localeOf(context).languageCode == 'es'
+                      ? 'librería.'
+                      : 'library.',
+                  eyebrow: l10n.inLibrary(allExercises.length),
                   trailing: state.tab == ExercisesTab.mine && myCount > 0
                       ? Row(
                           mainAxisSize: MainAxisSize.min,

@@ -375,8 +375,11 @@ class _RoutineDetailScreenState extends ConsumerState<RoutineDetailScreen> {
             child: Column(
               children: [
                 ScreenHeader(
-                  title: routine.name,
-                  subtitle:
+                  prefix: Localizations.localeOf(context).languageCode == 'es'
+                      ? 'Rutina —'
+                      : 'Routine —',
+                  accent: '${routine.name}.',
+                  eyebrow:
                       '${routine.exercises.length} ${l10n.exercisesLabel}',
                   onBack: () => Navigator.of(context).pop(),
                   trailing: trailing,

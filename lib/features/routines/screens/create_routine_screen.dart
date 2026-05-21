@@ -87,8 +87,13 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ScreenHeader(
-              title: l10n.newRoutine,
-              subtitle: l10n.nameItAndPickColor,
+              prefix: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'Nueva'
+                  : 'New',
+              accent: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'rutina.'
+                  : 'routine.',
+              eyebrow: l10n.nameItAndPickColor,
               onBack: () => Navigator.of(context).pop(),
               accentBack: true,
             ),

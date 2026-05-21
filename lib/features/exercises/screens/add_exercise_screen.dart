@@ -98,8 +98,13 @@ class _AddExerciseScreenState extends ConsumerState<AddExerciseScreen> {
         child: Column(
           children: [
             ScreenHeader(
-              title: l10n.newExercise,
-              subtitle: l10n.addCustomExercise,
+              prefix: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'Nuevo'
+                  : 'New',
+              accent: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'ejercicio.'
+                  : 'exercise.',
+              eyebrow: l10n.addCustomExercise,
               onBack: () => Navigator.of(context).pop(),
               accentBack: true,
             ),

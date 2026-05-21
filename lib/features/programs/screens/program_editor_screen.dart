@@ -250,10 +250,13 @@ class _ProgramEditorScreenState extends ConsumerState<ProgramEditorScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ScreenHeader(
-              title: widget.programId == null
-                  ? l10n.newProgramTitle
-                  : l10n.editProgram,
-              subtitle: l10n.newProgramSubtitle,
+              prefix: Localizations.localeOf(context).languageCode == 'es'
+                  ? (widget.programId == null ? 'Nuevo' : 'Edita')
+                  : (widget.programId == null ? 'New' : 'Edit'),
+              accent: Localizations.localeOf(context).languageCode == 'es'
+                  ? 'programa.'
+                  : 'program.',
+              eyebrow: l10n.newProgramSubtitle,
               onBack: () => Navigator.of(context).pop(),
               accentBack: true,
               trailing: _SaveButton(
