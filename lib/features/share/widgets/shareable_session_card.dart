@@ -1,291 +1,366 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import '../../../core/utils/format_utils.dart';
 import '../../../domain/entities/monthly_recap.dart';
 import '../../../domain/entities/session.dart';
 
+/// Editorial magazine-style share card. Fixed bone background regardless of
+/// app theme — the design is intentional, not user-themed, so it looks the
+/// same when posted regardless of whether the user shares from light/dark.
+/// Routine color is the only personalized accent.
+///
+/// Optional [userPhotoPath] and [userQuote] let the user enrich their share.
+/// The photo slots between the workout content and the VERSATILE wordmark
+/// footer; the quote sits right below the photo as a caption (or stands
+/// alone in that slot when there's no photo). Both extras grow the card
+/// vertically rather than compressing the workout content above.
 class ShareableSessionCard extends StatelessWidget {
-  const ShareableSessionCard({super.key, required this.session, this.pr});
+  const ShareableSessionCard({
+    super.key,
+    required this.session,
+    this.pr,
+    this.userPhotoPath,
+    this.userQuote,
+    this.photoAlignX = 0.0,
+    this.photoAlignY = 0.0,
+    this.photoScale = 1.0,
+  });
 
   final Session session;
   final RecapPersonalRecord? pr;
+  final String? userPhotoPath;
+  final String? userQuote;
+  final double photoAlignX;
+  final double photoAlignY;
+  final double photoScale;
 
-  static const double logicalSize = 360;
+  /// Width of the card in logical pixels. Height grows dynamically via
+  /// [logicalHeightFor] when a photo or quote is added.
+  static const double logicalWidth = 360;
+  static const double _photoSectionHeight = 180;
+  static const double _quoteExtraHeight = 36;
+  static const double _baseHeight = 360;
+
+  /// Computes the card's logical height for the given extras. The screen
+  /// uses the same formula to size the preview container so the FittedBox
+  /// can scale the card without distortion.
+  static double logicalHeightFor({
+    required bool hasPhoto,
+    required bool hasQuote,
+  }) {
+    var h = _baseHeight;
+    if (hasQuote) h += _quoteExtraHeight;
+    if (hasPhoto) h += _photoSectionHeight;
+    return h;
+  }
+
+  // Fixed palette — does not follow theme.
+  static const _bg = Color(0xFFEBE3D2);
+  static const _ink = Color(0xFF1A1A1F);
+  static const _mute = Color(0x8A1A1A1F);
+  static const _hairlineStrong = Color(0x551A1A1F);
+  static const _hairlineSoft = Color(0x331A1A1F);
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
+    final routineColor = Color(session.colorValue);
     final totalSets =
         session.exercises?.fold<int>(0, (s, e) => s + e.sets.length) ?? 0;
     final totalExercises = session.exercises?.length ?? 0;
 
+    final dateFormatted = _formatDate(session.date);
+    final hasPR = pr != null;
+    final hasPhoto = userPhotoPath != null &&
+        userPhotoPath!.isNotEmpty &&
+        File(userPhotoPath!).existsSync();
+    final hasQuote = userQuote != null && userQuote!.trim().isNotEmpty;
+    final height =
+        logicalHeightFor(hasPhoto: hasPhoto, hasQuote: hasQuote);
+
     return SizedBox(
-      width: logicalSize,
-      height: logicalSize,
+      width: logicalWidth,
+      height: height,
       child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              const Color(0xFF15161A),
-              colors.accentDeep,
+        color: _bg,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 18, 22, 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _TopBar(
+                dateLabel: dateFormatted,
+                routineColor: routineColor,
+                iconCode: session.iconCode,
+              ),
+              const SizedBox(height: 12),
+              const _Hairline(color: _hairlineStrong, height: 0.8),
+              const SizedBox(height: 16),
+              _Headline(routineName: session.routineName),
+              const SizedBox(height: 14),
+              Expanded(
+                child: _HeroVolume(volumeKg: session.volumeKg),
+              ),
+              _StatsBar(
+                durationMin: session.durationMin,
+                totalSets: totalSets,
+                totalExercises: totalExercises,
+              ),
+              if (hasPR) ...[
+                const SizedBox(height: 10),
+                _PrRow(pr: pr!, routineColor: routineColor),
+              ],
+              if (hasPhoto) ...[
+                const SizedBox(height: 14),
+                _UserPhoto(
+                  path: userPhotoPath!,
+                  alignX: photoAlignX,
+                  alignY: photoAlignY,
+                  scale: photoScale,
+                ),
+              ],
+              if (hasQuote) ...[
+                SizedBox(height: hasPhoto ? 8 : 14),
+                _UserQuote(text: userQuote!.trim()),
+              ],
+              const SizedBox(height: 14),
+              const _Hairline(color: _hairlineSoft),
+              const SizedBox(height: 10),
+              const _Wordmark(),
             ],
           ),
         ),
-        child: Stack(
+      ),
+    );
+  }
+
+  static String _formatDate(String iso) {
+    try {
+      final dt = DateTime.parse(iso);
+      final wd = DateFormat.E('en').format(dt).toUpperCase();
+      final mon = DateFormat.MMM('en').format(dt).toUpperCase();
+      return '$wd · $mon ${dt.day.toString().padLeft(2, '0')}';
+    } catch (_) {
+      return iso.toUpperCase();
+    }
+  }
+}
+
+class _TopBar extends StatelessWidget {
+  const _TopBar({
+    required this.dateLabel,
+    required this.routineColor,
+    required this.iconCode,
+  });
+
+  final String dateLabel;
+  final Color routineColor;
+  final int iconCode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 22,
+          height: 22,
+          alignment: Alignment.center,
+          color: routineColor,
+          child: Icon(
+            IconData(iconCode, fontFamily: 'MaterialIcons'),
+            color: Colors.white,
+            size: 12,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          dateLabel,
+          style: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.2,
+            color: ShareableSessionCard._ink,
+          ),
+        ),
+        const Spacer(),
+        Text(
+          'No. ${_issueNumber()}',
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 0.4,
+            color: ShareableSessionCard._mute,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _issueNumber() {
+    // Stable per-session 3-digit "issue" derived from the date label hash.
+    final h = dateLabel.codeUnits.fold<int>(0, (a, b) => a + b);
+    final n = (h % 999) + 1;
+    return n.toString().padLeft(3, '0');
+  }
+}
+
+class _Headline extends StatelessWidget {
+  const _Headline({required this.routineName});
+
+  final String routineName;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: routineName,
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 38,
+              fontWeight: FontWeight.w500,
+              height: 1.02,
+              letterSpacing: -0.6,
+              color: ShareableSessionCard._ink,
+            ),
+          ),
+          TextSpan(
+            text: '.',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 38,
+              fontWeight: FontWeight.w500,
+              fontStyle: FontStyle.italic,
+              color: ShareableSessionCard._ink,
+            ),
+          ),
+        ],
+      ),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+class _HeroVolume extends StatelessWidget {
+  const _HeroVolume({required this.volumeKg});
+
+  final double volumeKg;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Positioned(
-              top: -60,
-              right: -60,
-              child: Container(
-                width: 240,
-                height: 240,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      colors.accentLight.withValues(alpha: 0.45),
-                      colors.accentLight.withValues(alpha: 0),
-                    ],
-                  ),
-                ),
+            Container(
+              width: 22,
+              height: 1,
+              color: ShareableSessionCard._ink,
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'TOTAL VOLUME',
+              style: TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.6,
+                color: ShareableSessionCard._ink,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(28, 28, 28, 22),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(session.colorValue).withValues(alpha: 0.9),
-                              Color(session.colorValue),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(session.colorValue)
-                                  .withValues(alpha: 0.35),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          IconData(
-                            session.iconCode,
-                            fontFamily: 'MaterialIcons',
-                          ),
-                          color: Colors.white,
-                          size: 22,
-                        ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: FormatUtils.volume(volumeKg),
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 58,
+                        fontWeight: FontWeight.w500,
+                        height: 0.95,
+                        letterSpacing: -1.6,
+                        color: ShareableSessionCard._ink,
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              session.routineName.toUpperCase(),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: 0.4,
-                                height: 1.0,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              FormatUtils.date(session.date),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white.withValues(alpha: 0.65),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'TOTAL VOLUME',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.18,
-                            color: Colors.white.withValues(alpha: 0.65),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            FormatUtils.volume(session.volumeKg),
-                            style: const TextStyle(
-                              fontSize: 72,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -2.2,
-                              height: 0.95,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _MiniStat(
-                          value: FormatUtils.duration(session.durationMin),
-                          label: 'TIME',
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _MiniStat(
-                          value: '$totalSets',
-                          label: 'SETS',
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _MiniStat(
-                          value: '$totalExercises',
-                          label: 'EXERCISES',
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (pr != null) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          width: 0.5,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 28,
-                            height: 28,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [colors.accentLight, colors.accent],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(
-                              Icons.workspace_premium_rounded,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'NEW PR',
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.2,
-                                    color:
-                                        Colors.white.withValues(alpha: 0.7),
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${FormatUtils.weight(pr!.weightKg)} kg × ${pr!.reps} · ${pr!.exerciseName}',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                    letterSpacing: -0.1,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                    TextSpan(
+                      text: ' kg',
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w400,
+                        fontStyle: FontStyle.italic,
+                        color: ShareableSessionCard._mute,
                       ),
                     ),
                   ],
-                  const SizedBox(height: 18),
-                  Row(
-                    children: [
-                      Container(
-                        width: 22,
-                        height: 22,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              colors.accentLight,
-                              colors.accent,
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Icon(
-                          Icons.bolt_rounded,
-                          color: Colors.white,
-                          size: 14,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Versatile',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white.withValues(alpha: 0.85),
-                          letterSpacing: -0.2,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatsBar extends StatelessWidget {
+  const _StatsBar({
+    required this.durationMin,
+    required this.totalSets,
+    required this.totalExercises,
+  });
+
+  final int durationMin;
+  final int totalSets;
+  final int totalExercises;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: ShareableSessionCard._hairlineStrong,
+            width: 0.8,
+          ),
+          bottom: BorderSide(
+            color: ShareableSessionCard._hairlineStrong,
+            width: 0.8,
+          ),
+        ),
+      ),
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            Expanded(
+              child: _StatCell(
+                value: FormatUtils.duration(durationMin),
+                label: 'TIME',
+              ),
+            ),
+            Container(
+              width: 0.8,
+              color: ShareableSessionCard._hairlineSoft,
+            ),
+            Expanded(
+              child: _StatCell(value: '$totalSets', label: 'SETS'),
+            ),
+            Container(
+              width: 0.8,
+              color: ShareableSessionCard._hairlineSoft,
+            ),
+            Expanded(
+              child: _StatCell(value: '$totalExercises', label: 'EXERCISES'),
             ),
           ],
         ),
@@ -294,39 +369,29 @@ class ShareableSessionCard extends StatelessWidget {
   }
 }
 
-class _MiniStat extends StatelessWidget {
-  const _MiniStat({required this.value, required this.label});
+class _StatCell extends StatelessWidget {
+  const _StatCell({required this.value, required this.label});
 
   final String value;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.16),
-          width: 0.5,
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           FittedBox(
             fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 22,
+                fontWeight: FontWeight.w500,
                 height: 1.0,
                 letterSpacing: -0.4,
+                color: ShareableSessionCard._ink,
               ),
             ),
           ),
@@ -335,14 +400,209 @@ class _MiniStat extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.12,
-              color: Colors.white.withValues(alpha: 0.6),
+            style: const TextStyle(
+              fontSize: 8.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.4,
+              color: ShareableSessionCard._mute,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PrRow extends StatelessWidget {
+  const _PrRow({required this.pr, required this.routineColor});
+
+  final RecapPersonalRecord pr;
+  final Color routineColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 18,
+          height: 18,
+          alignment: Alignment.center,
+          color: ShareableSessionCard._ink,
+          child: const Icon(
+            Icons.workspace_premium_rounded,
+            color: ShareableSessionCard._bg,
+            size: 11,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          'NEW PR',
+          style: const TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.6,
+            color: ShareableSessionCard._ink,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: pr.exerciseName,
+                  style: GoogleFonts.playfairDisplay(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    fontStyle: FontStyle.italic,
+                    color: ShareableSessionCard._ink,
+                  ),
+                ),
+                TextSpan(
+                  text: ' — ${FormatUtils.weight(pr.weightKg)} kg × ${pr.reps}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: ShareableSessionCard._ink,
+                  ),
+                ),
+              ],
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Wordmark extends StatelessWidget {
+  const _Wordmark();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          'VERSATILE',
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            letterSpacing: 4.5,
+            color: ShareableSessionCard._ink,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          width: 4,
+          height: 4,
+          color: ShareableSessionCard._ink,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          'TRAINING JOURNAL',
+          style: TextStyle(
+            fontSize: 8,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.6,
+            color: ShareableSessionCard._mute,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Hairline extends StatelessWidget {
+  const _Hairline({required this.color, this.height = 0.6});
+
+  final Color color;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(height: height, color: color);
+  }
+}
+
+class _UserPhoto extends StatelessWidget {
+  const _UserPhoto({
+    required this.path,
+    required this.alignX,
+    required this.alignY,
+    required this.scale,
+  });
+
+  final String path;
+  final double alignX;
+  final double alignY;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 16 / 9,
+      child: ClipRect(
+        child: Transform.scale(
+          scale: scale,
+          child: Image.file(
+            File(path),
+            fit: BoxFit.cover,
+            alignment: Alignment(alignX, alignY),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UserQuote extends StatelessWidget {
+  const _UserQuote({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: '“',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 22,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w500,
+                height: 0.6,
+                color: ShareableSessionCard._mute,
+              ),
+            ),
+            TextSpan(
+              text: text,
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 14,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w400,
+                height: 1.3,
+                color: ShareableSessionCard._ink,
+              ),
+            ),
+            TextSpan(
+              text: '”',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 22,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w500,
+                height: 0.6,
+                color: ShareableSessionCard._mute,
+              ),
+            ),
+          ],
+        ),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }

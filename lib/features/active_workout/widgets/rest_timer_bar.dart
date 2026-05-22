@@ -1,6 +1,6 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart'
-    show GlassContainer, GlassQuality, LiquidGlassSettings, LiquidRoundedSuperellipse;
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/format_utils.dart';
@@ -24,103 +24,104 @@ class RestTimerBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.colors;
 
     return FadeSlideIn(
       offset: const Offset(0, 0.1),
-      child: Container(
-        key: barKey,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.14),
-              blurRadius: 24,
-              spreadRadius: -4,
-              offset: const Offset(0, 8),
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+          child: Container(
+            key: barKey,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: colors.accent.withValues(alpha: 0.45),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.35),
+                width: 0.8,
+              ),
             ),
-          ],
-        ),
-        child: GlassContainer(
-          useOwnLayer: true,
-          quality: GlassQuality.standard,
-          shape: const LiquidRoundedSuperellipse(borderRadius: 24),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          settings: LiquidGlassSettings(
-            thickness: 20,
-            blur: 4,
-            refractiveIndex: 1.4,
-            lightIntensity: 0.7,
-            chromaticAberration: 0.3,
-            glassColor: isDark
-                ? Colors.white.withValues(alpha: 0.08)
-                : Colors.white.withValues(alpha: 0.20),
-          ),
-          child: Row(
-            children: [
-              _CircularProgress(progress: restTimer.progress),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '${FormatUtils.timer(restTimer.remaining)} ${l10n.rest}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: context.colors.ink900,
-                        fontFeatures: const [FontFeature.tabularFigures()],
+            child: Row(
+              children: [
+                _CircularProgress(progress: restTimer.progress),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '${FormatUtils.timer(restTimer.remaining)} ${l10n.rest}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                      Text(
+                        restTimer.exerciseName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white.withValues(alpha: 0.78),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                PressableScale(
+                  onTap: onAddTime,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.20),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.35),
+                        width: 0.6,
                       ),
                     ),
-                    Text(
-                      restTimer.exerciseName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 12, color: context.colors.ink500),
-                    ),
-                  ],
-                ),
-              ),
-              PressableScale(
-                onTap: onAddTime,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: context.colors.accentTint,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '+15s',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: context.colors.accentDeep,
+                    child: const Text(
+                      '+15s',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              PressableScale(
-                onTap: onSkip,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: context.colors.fieldBg,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    l10n.skip,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: context.colors.ink700,
+                const SizedBox(width: 8),
+                PressableScale(
+                  onTap: onSkip,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.12),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.30),
+                        width: 0.6,
+                      ),
+                    ),
+                    child: Text(
+                      l10n.skip,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white.withValues(alpha: 0.92),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -148,13 +149,13 @@ class _CircularProgress extends StatelessWidget {
           circumference: circumference,
           radius: radius,
           stroke: stroke,
-          color: context.colors.accentSoft,
+          color: Colors.white,
         ),
-        child: Center(
+        child: const Center(
           child: Icon(
             Icons.timer_outlined,
             size: 16,
-            color: context.colors.accentSoft,
+            color: Colors.white,
           ),
         ),
       ),

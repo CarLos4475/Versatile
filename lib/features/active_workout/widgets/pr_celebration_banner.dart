@@ -1,9 +1,8 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:liquid_glass_widgets/liquid_glass_widgets.dart'
-    show GlassContainer, GlassQuality, LiquidGlassSettings, LiquidRoundedSuperellipse;
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/format_utils.dart';
@@ -119,69 +118,63 @@ class _PRBadgeWithSparkles extends StatelessWidget {
             ),
           ),
         ),
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 24),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: colors.accentDeep.withValues(alpha: 0.45),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: GlassContainer(
-            useOwnLayer: true,
-            quality: GlassQuality.standard,
-            shape: const LiquidRoundedSuperellipse(borderRadius: 20),
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-            settings: LiquidGlassSettings(
-              thickness: 22,
-              blur: 3,
-              refractiveIndex: 1.45,
-              lightIntensity: 0.85,
-              chromaticAberration: 0.4,
-              glassColor: colors.accent.withValues(alpha: 0.55),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.emoji_events_rounded,
-                  color: Colors.white,
-                  size: 22,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
                 ),
-                const SizedBox(width: 10),
-                Flexible(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.recapPRTitle,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: -0.2,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${pr.exerciseName} · ${FormatUtils.weight(pr.weightKg)} kg × ${pr.reps}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white.withValues(alpha: 0.92),
-                        ),
-                      ),
-                    ],
+                decoration: BoxDecoration(
+                  color: colors.accent.withValues(alpha: 0.78),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.45),
+                    width: 0.8,
                   ),
                 ),
-              ],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.emoji_events_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.recapPRTitle,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${pr.exerciseName} · ${FormatUtils.weight(pr.weightKg)} kg × ${pr.reps}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white.withValues(alpha: 0.92),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

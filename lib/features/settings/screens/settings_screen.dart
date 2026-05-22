@@ -10,13 +10,14 @@ import 'package:versatile/core/providers/accent_provider.dart';
 import 'package:versatile/core/providers/repository_providers.dart';
 import 'package:versatile/core/providers/theme_provider.dart';
 import 'package:versatile/core/providers/locale_provider.dart';
+import 'package:versatile/core/providers/editorial_photos_provider.dart';
 import 'package:versatile/core/services/data_service.dart';
 import 'package:versatile/core/services/sound_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/database/database_helper.dart';
 import '../../../shared/widgets/coachmark_overlay.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
+import '../../../shared/widgets/photo_reposition_dialog.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../exercises/view_models/exercises_view_model.dart';
 import '../../home/view_models/home_view_model.dart';
@@ -299,6 +300,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ref.invalidate(profileStatsProvider);
     ref.invalidate(activeProgramProvider);
     ref.invalidate(programsListProvider);
+    ref.invalidate(editorialPhotosProvider);
   }
 
   void _showError(String msg) {
@@ -349,11 +351,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isEs = Localizations.localeOf(context).languageCode == 'es';
     final userName = ref.watch(userNameProvider).value ?? 'there';
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
     final accent = ref.watch(accentProvider);
     final stats = ref.watch(profileStatsProvider).value;
+    final editorialState = ref.watch(editorialPhotosProvider);
     final displayName = (userName == 'there' || userName.isEmpty)
         ? l10n.userName
         : userName;
@@ -369,19 +373,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ScreenHeader(
-                    prefix: Localizations.localeOf(context).languageCode == 'es'
-                        ? 'Hecho'
-                        : 'Made',
-                    accent: Localizations.localeOf(context).languageCode == 'es'
-                        ? 'a tu medida.'
-                        : 'yours.',
+                    prefix: isEs ? 'Hecho' : 'Made',
+                    accent: isEs ? 'a tu medida.' : 'yours.',
                     eyebrow: l10n.settings,
                     onBack: () => Navigator.of(context).pop(),
                     accentBack: true,
                   ),
 
-                  // Profile hero
-                  const SizedBox(height: 20),
+                  // ── Profile ─────────────────────────────────────
+                  const SizedBox(height: 18),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
@@ -393,15 +393,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         prCount: stats?.prCount,
                         onEdit: _changeName,
                         profileLabel: l10n.profile,
-                        sessionsLabel: l10n.profileSessionsLabel.toUpperCase(),
-                        timeLabel: l10n.profileTimeLabel.toUpperCase(),
-                        prsLabel: l10n.profilePrsLabel.toUpperCase(),
+                        sessionsLabel: l10n.profileSessionsLabel,
+                        timeLabel: l10n.profileTimeLabel,
+                        prsLabel: l10n.profilePrsLabel,
                       ),
                     ),
                   ),
 
-                  // Plan activo
-                  _SectionLabel(l10n.planActiveSection),
+                  // ── Active Plan ─────────────────────────────────
+                  const _SectionSpacer(),
+                  _SectionEyebrow(label: l10n.planActiveSection),
+                  const SizedBox(height: 12),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
@@ -409,333 +411,213 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       child: _ActivePlanSection(),
                     ),
                   ),
-
-                  // Past recaps row (kept for discoverability)
                   const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
                       delay: const Duration(milliseconds: 95),
-                      child: PressableScale(
+                      child: _RecapsRow(
+                        title: l10n.recapPastRecaps,
+                        subtitle: l10n.recapPastRecapsSubtitle,
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (_) => const PastRecapsScreen(),
-                          ),
-                        ),
-                        child: GlassContainer(
-                          radius: 14,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 12,
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 32,
-                                height: 32,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: context.colors.accentTint,
-                                ),
-                                child: Icon(
-                                  Icons.auto_awesome_outlined,
-                                  size: 16,
-                                  color: context.colors.accentDeep,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      l10n.recapPastRecaps,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: context.colors.ink900,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 1),
-                                    Text(
-                                      l10n.recapPastRecapsSubtitle,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: context.colors.ink500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Icon(
-                                Icons.chevron_right,
-                                size: 16,
-                                color: context.colors.ink300,
-                              ),
-                            ],
                           ),
                         ),
                       ),
                     ),
                   ),
 
-                  // Appearance
-                  _SectionLabel(l10n.appearance),
+                  // ── Appearance ──────────────────────────────────
+                  const _SectionSpacer(),
+                  _SectionEyebrow(label: l10n.appearance),
+                  const SizedBox(height: 12),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
                       delay: const Duration(milliseconds: 110),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          GlassContainer(
-                            radius: 16,
-                            padding: const EdgeInsets.all(14),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.theme,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0.6,
-                                    color: context.colors.ink500,
-                                  ),
+                          _MagSubLabel(label: l10n.theme),
+                          const SizedBox(height: 10),
+                          ThemeModePicker(
+                            value: themeMode,
+                            onChanged: (m) => ref
+                                .read(themeModeProvider.notifier)
+                                .setThemeMode(m),
+                            labelLight: l10n.themeLight,
+                            labelDark: l10n.themeDark,
+                            labelSystem: l10n.themeSystem,
+                          ),
+                          const SizedBox(height: 18),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _MagSubLabel(label: l10n.accentColor),
+                              ),
+                              Text(
+                                accent.displayName(l10n),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.18,
+                                  color: context.colors.accentDeep,
                                 ),
-                                const SizedBox(height: 10),
-                                ThemeModePicker(
-                                  value: themeMode,
-                                  onChanged: (m) => ref
-                                      .read(themeModeProvider.notifier)
-                                      .setThemeMode(m),
-                                  labelLight: l10n.themeLight,
-                                  labelDark: l10n.themeDark,
-                                  labelSystem: l10n.themeSystem,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 14,
-                                    bottom: 10,
-                                  ),
-                                  child: Divider(
-                                    color: context.colors.hairline.withValues(
-                                      alpha: 0.4,
-                                    ),
-                                    height: 0.5,
-                                  ),
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      l10n.accentColor,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 0.6,
-                                        color: context.colors.ink500,
-                                      ),
-                                    ),
-                                    Text(
-                                      accent.displayName(l10n),
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: context.colors.accentDeep,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                KeyedSubtree(
-                                  key: _colorSectionKey,
-                                  child: AccentSwatchRail(
-                                    selected: accent,
-                                    onChanged: (opt) => ref
-                                        .read(accentProvider.notifier)
-                                        .setAccent(opt),
-                                  ),
-                                ),
-                              ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          KeyedSubtree(
+                            key: _colorSectionKey,
+                            child: AccentSwatchRail(
+                              selected: accent,
+                              onChanged: (opt) => ref
+                                  .read(accentProvider.notifier)
+                                  .setAccent(opt),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          GlassContainer(
-                            radius: 16,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 10,
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 32,
-                                  height: 32,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: context.colors.accentTint,
-                                  ),
-                                  child: Icon(
-                                    Icons.language_outlined,
-                                    size: 16,
-                                    color: context.colors.accentDeep,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    l10n.language,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.ink900,
-                                    ),
-                                  ),
-                                ),
-                                DropdownButtonHideUnderline(
-                                  child: DropdownButton<Locale>(
-                                    value: locale,
-                                    icon: Icon(
-                                      Icons.expand_more,
-                                      size: 16,
-                                      color: context.colors.ink400,
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.ink700,
-                                    ),
-                                    dropdownColor: context.colors.bgFrame,
-                                    borderRadius: BorderRadius.circular(12),
-                                    onChanged: (Locale? v) {
-                                      if (v != null) {
-                                        ref
-                                            .read(localeProvider.notifier)
-                                            .setLocale(v);
-                                      }
-                                    },
-                                    items: [
-                                      DropdownMenuItem(
-                                        value: const Locale('en'),
-                                        child: Text(l10n.languageEn),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: const Locale('es'),
-                                        child: Text(l10n.languageEs),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
+                          const SizedBox(height: 16),
+                          _LanguageRow(
+                            label: l10n.language,
+                            locale: locale,
+                            labelEn: l10n.languageEn,
+                            labelEs: l10n.languageEs,
+                            onChanged: (v) => ref
+                                .read(localeProvider.notifier)
+                                .setLocale(v),
                           ),
                         ],
                       ),
                     ),
                   ),
 
-                  // Sound
-                  _SectionLabel(l10n.sound),
+                  // ── Editorial Photos ────────────────────────────
+                  const _SectionSpacer(),
+                  _SectionEyebrow(label: l10n.editorialSection),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
+                    child: FadeSlideIn(
+                      delay: const Duration(milliseconds: 120),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _EditorialToggleRow(
+                            title: l10n.editorialEnable,
+                            value: editorialState.enabled,
+                            onChanged: (v) {
+                              ref.read(editorialPhotosProvider.notifier).setEnabled(v);
+                            },
+                          ),
+                          if (editorialState.enabled) ...[
+                            const SizedBox(height: 16),
+                            _EditorialPhotoPickerTile(
+                              label: l10n.editorialMoodboardLabel,
+                              imagePath: editorialState.moodboardPath,
+                              quote: editorialState.moodboardQuote,
+                              defaultQuote: l10n.editorialDefaultMoodboardQuote,
+                              maxQuoteLength: 50,
+                              alignX: editorialState.moodboardAlignX,
+                              alignY: editorialState.moodboardAlignY,
+                              scale: editorialState.moodboardScale,
+                              aspectRatio: (MediaQuery.of(context).size.width * 0.6) / 180.0,
+                              onPick: () async {
+                                final result = await FilePicker.platform.pickFiles(type: FileType.image);
+                                if (result != null && result.files.isNotEmpty) {
+                                  await ref.read(editorialPhotosProvider.notifier).saveMoodboardPhoto(result.files.single);
+                                }
+                              },
+                              onRemove: () {
+                                ref.read(editorialPhotosProvider.notifier).removeMoodboardPhoto();
+                              },
+                              onQuoteChanged: (val) {
+                                ref.read(editorialPhotosProvider.notifier).setMoodboardQuote(val);
+                              },
+                              onTransformChanged: (x, y, scale) {
+                                ref.read(editorialPhotosProvider.notifier).setMoodboardTransform(x, y, scale);
+                              },
+                              l10n: l10n,
+                            ),
+                            const SizedBox(height: 16),
+                            _EditorialPhotoPickerTile(
+                              label: l10n.editorialBackCoverLabel,
+                              imagePath: editorialState.backCoverPath,
+                              quote: editorialState.backCoverQuote,
+                              defaultQuote: l10n.editorialDefaultBackCoverQuote,
+                              maxQuoteLength: 80,
+                              alignX: editorialState.backCoverAlignX,
+                              alignY: editorialState.backCoverAlignY,
+                              scale: editorialState.backCoverScale,
+                              aspectRatio: MediaQuery.of(context).size.width / 260.0,
+                              onPick: () async {
+                                final result = await FilePicker.platform.pickFiles(type: FileType.image);
+                                if (result != null && result.files.isNotEmpty) {
+                                  await ref.read(editorialPhotosProvider.notifier).saveBackCoverPhoto(result.files.single);
+                                }
+                              },
+                              onRemove: () {
+                                ref.read(editorialPhotosProvider.notifier).removeBackCoverPhoto();
+                              },
+                              onQuoteChanged: (val) {
+                                ref.read(editorialPhotosProvider.notifier).setBackCoverQuote(val);
+                              },
+                              onTransformChanged: (x, y, scale) {
+                                ref.read(editorialPhotosProvider.notifier).setBackCoverTransform(x, y, scale);
+                              },
+                              l10n: l10n,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // ── Sound ───────────────────────────────────────
+                  const _SectionSpacer(),
+                  _SectionEyebrow(label: l10n.sound),
+                  const SizedBox(height: 12),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
                       delay: const Duration(milliseconds: 130),
                       child: KeyedSubtree(
                         key: _soundSectionKey,
-                        child: GlassContainer(
-                          radius: 16,
-                          padding: const EdgeInsets.all(14),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 36,
-                                    height: 36,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(11),
-                                      color: context.colors.accentTint,
-                                    ),
-                                    child: Icon(
-                                      Icons.notifications_active_outlined,
-                                      size: 18,
-                                      color: context.colors.accentDeep,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          l10n.restTimerAlert,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: context.colors.ink900,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          l10n.notificationSubtitle,
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: context.colors.ink500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  GlassSwitch(
-                                    value: _restAlertEnabled,
-                                    activeColor: context.colors.accent,
-                                    onChanged: (v) {
-                                      setState(() => _restAlertEnabled = v);
-                                      _soundService.setAlertEnabled(v);
-                                    },
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                                child: Divider(
-                                  color: context.colors.hairline.withValues(
-                                    alpha: 0.4,
-                                  ),
-                                  height: 0.5,
-                                ),
-                              ),
-                              SoundChipGrid(
-                                selected: _soundType,
-                                onChanged: _onSoundTypeChanged,
-                                defaultLabel: l10n.defaultSound,
-                                customLabel: l10n.customSound,
-                                customFileName: _soundType == 'custom'
-                                    ? (_customPath?.split(
-                                            RegExp(r'[\\/]'),
-                                          ).last ??
-                                          l10n.pickSoundFile)
-                                    : null,
-                              ),
-                            ],
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _AlertRow(
+                              title: l10n.restTimerAlert,
+                              subtitle: l10n.notificationSubtitle,
+                              value: _restAlertEnabled,
+                              onChanged: (v) {
+                                setState(() => _restAlertEnabled = v);
+                                _soundService.setAlertEnabled(v);
+                              },
+                            ),
+                            const SizedBox(height: 10),
+                            SoundChipGrid(
+                              selected: _soundType,
+                              onChanged: _onSoundTypeChanged,
+                              defaultLabel: l10n.defaultSound,
+                              customLabel: l10n.customSound,
+                              customFileName: _soundType == 'custom'
+                                  ? (_customPath?.split(
+                                          RegExp(r'[\\/]'),
+                                        ).last ??
+                                        l10n.pickSoundFile)
+                                  : null,
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
 
-                  // Data
-                  _SectionLabel(l10n.data),
+                  // ── Data ────────────────────────────────────────
+                  const _SectionSpacer(),
+                  _SectionEyebrow(label: l10n.data),
+                  const SizedBox(height: 12),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: FadeSlideIn(
@@ -744,28 +626,41 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         key: _dataSectionKey,
                         child: Column(
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: DataAction(
-                                    icon: Icons.upload_outlined,
-                                    label: l10n.exportData,
-                                    sublabel: l10n.exportSubtitle,
-                                    onTap: _busy ? null : _exportData,
-                                  ),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: context.colors.hairline,
+                                  width: 0.5,
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: DataAction(
-                                    icon: Icons.download_outlined,
-                                    label: l10n.importData,
-                                    sublabel: l10n.importSubtitle,
-                                    onTap: _busy ? null : _importData,
-                                  ),
+                              ),
+                              child: IntrinsicHeight(
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: DataAction(
+                                        icon: Icons.upload_outlined,
+                                        label: l10n.exportData,
+                                        sublabel: l10n.exportSubtitle,
+                                        onTap: _busy ? null : _exportData,
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 0.5,
+                                      color: context.colors.hairline,
+                                    ),
+                                    Expanded(
+                                      child: DataAction(
+                                        icon: Icons.download_outlined,
+                                        label: l10n.importData,
+                                        sublabel: l10n.importSubtitle,
+                                        onTap: _busy ? null : _importData,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 10),
                             DestructiveDataAction(
                               icon: Icons.delete_outline,
                               label: l10n.wipeAllData,
@@ -778,49 +673,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ),
 
-                  // About footer
-                  const SizedBox(height: 28),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 22),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          l10n.appName,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: context.colors.ink500,
-                          ),
-                        ),
-                        _Sep(),
-                        Text(
-                          'v1.0.0',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: context.colors.ink400,
-                            fontFeatures: const [FontFeature.tabularFigures()],
-                          ),
-                        ),
-                        _Sep(),
-                        Text(
-                          '${l10n.aboutBy} ',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: context.colors.ink400,
-                          ),
-                        ),
-                        Text(
-                          'Carlos',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: context.colors.accentDeep,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
+                  // ── About footer ────────────────────────────────
+                  const SizedBox(height: 36),
+                  _AboutFooter(
+                    appName: l10n.appName,
+                    by: l10n.aboutBy,
                   ),
+                  const SizedBox(height: 12),
                 ],
               ),
             ),
@@ -842,38 +701,351 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.label);
+// ═══════════════════════════════════════════════════════════════
+// Section helpers
+// ═══════════════════════════════════════════════════════════════
+
+class _SectionSpacer extends StatelessWidget {
+  const _SectionSpacer();
+  @override
+  Widget build(BuildContext context) => const SizedBox(height: 30);
+}
+
+class _SectionEyebrow extends StatelessWidget {
+  const _SectionEyebrow({required this.label});
   final String label;
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(26, 22, 24, 10),
-      child: Text(
-        label.toUpperCase(),
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 1.1,
-          color: context.colors.ink400,
+      padding: const EdgeInsets.symmetric(horizontal: 22),
+      child: Row(
+        children: [
+          Container(
+            width: 22,
+            height: 1,
+            color: colors.ink400.withValues(alpha: 0.55),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.18,
+              color: colors.ink500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MagSubLabel extends StatelessWidget {
+  const _MagSubLabel({required this.label});
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      label.toUpperCase(),
+      style: TextStyle(
+        fontSize: 10,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 0.18,
+        color: context.colors.ink500,
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Rows
+// ═══════════════════════════════════════════════════════════════
+
+class _RecapsRow extends StatelessWidget {
+  const _RecapsRow({
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return PressableScale(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        decoration: BoxDecoration(
+          border: Border.all(color: colors.hairline, width: 0.5),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 34,
+              height: 34,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: colors.accent),
+              child: const Icon(
+                Icons.auto_awesome_outlined,
+                size: 16,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: colors.ink900,
+                      letterSpacing: -0.18,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 11, color: colors.ink500),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              size: 16,
+              color: colors.ink900.withValues(alpha: 0.3),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _Sep extends StatelessWidget {
+class _LanguageRow extends StatelessWidget {
+  const _LanguageRow({
+    required this.label,
+    required this.locale,
+    required this.labelEn,
+    required this.labelEs,
+    required this.onChanged,
+  });
+
+  final String label;
+  final Locale locale;
+  final String labelEn;
+  final String labelEs;
+  final ValueChanged<Locale> onChanged;
+
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: colors.hairline, width: 0.5),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: colors.ink900.withValues(alpha: 0.04),
+              border: Border.all(color: colors.hairline, width: 0.6),
+            ),
+            child: Icon(
+              Icons.language_outlined,
+              size: 16,
+              color: colors.ink700,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: colors.ink900,
+              ),
+            ),
+          ),
+          DropdownButtonHideUnderline(
+            child: DropdownButton<Locale>(
+              value: locale,
+              icon: Icon(
+                Icons.expand_more,
+                size: 16,
+                color: colors.ink500,
+              ),
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: colors.ink700,
+              ),
+              dropdownColor: colors.bgFrame,
+              borderRadius: BorderRadius.zero,
+              onChanged: (Locale? v) {
+                if (v != null) onChanged(v);
+              },
+              items: [
+                DropdownMenuItem(
+                  value: const Locale('en'),
+                  child: Text(labelEn),
+                ),
+                DropdownMenuItem(
+                  value: const Locale('es'),
+                  child: Text(labelEs),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AlertRow extends StatelessWidget {
+  const _AlertRow({
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String title;
+  final String subtitle;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      decoration: BoxDecoration(
+        border: Border.all(color: colors.hairline, width: 0.5),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: colors.accent),
+            child: const Icon(
+              Icons.notifications_active_outlined,
+              size: 16,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: colors.ink900,
+                    letterSpacing: -0.18,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(fontSize: 11, color: colors.ink500),
+                ),
+              ],
+            ),
+          ),
+          GlassSwitch(
+            value: value,
+            activeColor: colors.accent,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AboutFooter extends StatelessWidget {
+  const _AboutFooter({required this.appName, required this.by});
+  final String appName;
+  final String by;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: Text(
-        '·',
-        style: TextStyle(
-          fontSize: 12,
-          color: context.colors.ink400,
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 32,
+            height: 1,
+            color: colors.ink400.withValues(alpha: 0.4),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            appName.toUpperCase(),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.4,
+              color: colors.ink500,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'v1.0.0',
+            style: TextStyle(
+              fontSize: 10,
+              color: colors.ink400,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: '$by ',
+                  style: TextStyle(fontSize: 11, color: colors.ink400),
+                ),
+                TextSpan(
+                  text: 'Carlos',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontStyle: FontStyle.italic,
+                    color: colors.accentDeep,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -923,6 +1095,313 @@ class _ActivePlanSection extends ConsumerWidget {
       weekProgressLabel: l10n.programWeekProgress(
         weekIndex + 1,
         active.program.weeksCount,
+      ),
+    );
+  }
+}
+
+class _EditorialToggleRow extends StatelessWidget {
+  const _EditorialToggleRow({
+    required this.title,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String title;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      decoration: BoxDecoration(
+        border: Border.all(color: colors.hairline, width: 0.5),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: colors.accent),
+            child: const Icon(
+              Icons.camera_alt_outlined,
+              size: 16,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: colors.ink900,
+                letterSpacing: -0.18,
+              ),
+            ),
+          ),
+          GlassSwitch(
+            value: value,
+            activeColor: colors.accent,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EditorialPhotoPickerTile extends StatefulWidget {
+  const _EditorialPhotoPickerTile({
+    required this.label,
+    required this.imagePath,
+    required this.quote,
+    required this.defaultQuote,
+    required this.maxQuoteLength,
+    required this.alignX,
+    required this.alignY,
+    required this.scale,
+    required this.aspectRatio,
+    required this.onPick,
+    required this.onRemove,
+    required this.onQuoteChanged,
+    required this.onTransformChanged,
+    required this.l10n,
+  });
+
+  final String label;
+  final String? imagePath;
+  final String quote;
+  final String defaultQuote;
+  final int maxQuoteLength;
+  final double alignX;
+  final double alignY;
+  final double scale;
+  final double aspectRatio;
+  final VoidCallback onPick;
+  final VoidCallback onRemove;
+  final ValueChanged<String> onQuoteChanged;
+  final void Function(double x, double y, double scale) onTransformChanged;
+  final AppLocalizations l10n;
+
+  @override
+  State<_EditorialPhotoPickerTile> createState() => _EditorialPhotoPickerTileState();
+}
+
+class _EditorialPhotoPickerTileState extends State<_EditorialPhotoPickerTile> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.quote);
+  }
+
+  @override
+  void didUpdateWidget(covariant _EditorialPhotoPickerTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.quote != widget.quote && _controller.text != widget.quote) {
+      _controller.text = widget.quote;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _openReposition() async {
+    if (widget.imagePath == null) return;
+
+    final result = await showDialog<Map<String, double>>(
+      context: context,
+      builder: (ctx) => PhotoRepositionDialog(
+        imagePath: widget.imagePath!,
+        initialAlignX: widget.alignX,
+        initialAlignY: widget.alignY,
+        initialScale: widget.scale,
+        aspectRatio: widget.aspectRatio,
+      ),
+    );
+
+    if (result != null) {
+      widget.onTransformChanged(
+        result['x']!,
+        result['y']!,
+        result['scale']!,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final fileExists = widget.imagePath != null && File(widget.imagePath!).existsSync();
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: colors.hairline, width: 0.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: colors.ink900.withValues(alpha: 0.04),
+              border: Border(bottom: BorderSide(color: colors.hairline, width: 0.5)),
+            ),
+            child: Text(
+              widget.label.toUpperCase(),
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.18,
+                color: colors.ink700,
+              ),
+            ),
+          ),
+          if (fileExists)
+            Stack(
+              children: [
+                AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: ClipRect(
+                    child: Transform.scale(
+                      scale: widget.scale,
+                      child: Image.file(
+                        File(widget.imagePath!),
+                        fit: BoxFit.cover,
+                        alignment: Alignment(widget.alignX, widget.alignY),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: PressableScale(
+                    onTap: _openReposition,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: colors.accent,
+                      ),
+                      child: const Icon(
+                        Icons.edit_outlined,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        PressableScale(
+                          onTap: widget.onPick,
+                          child: Text(
+                            widget.l10n.editorialChangeImage.toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                        PressableScale(
+                          onTap: widget.onRemove,
+                          child: Text(
+                            widget.l10n.editorialRemoveImage.toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.redAccent,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            )
+          else
+            PressableScale(
+              onTap: widget.onPick,
+              child: Container(
+                height: 100,
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add_photo_alternate_outlined,
+                      size: 24,
+                      color: colors.ink400,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      widget.l10n.editorialNoImage,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: colors.ink500,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          if (fileExists) ...[
+            Container(height: 0.5, color: colors.hairline),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
+              child: TextField(
+                controller: _controller,
+                maxLength: widget.maxQuoteLength,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: colors.ink900,
+                ),
+                decoration: InputDecoration(
+                  hintText: widget.defaultQuote,
+                  hintStyle: TextStyle(
+                    color: colors.ink400,
+                    fontStyle: FontStyle.italic,
+                  ),
+                  counterStyle: TextStyle(
+                    fontSize: 9,
+                    color: colors.ink400,
+                  ),
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 6),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: colors.hairline, width: 0.5),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: colors.accent, width: 1.0),
+                  ),
+                ),
+                onChanged: widget.onQuoteChanged,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

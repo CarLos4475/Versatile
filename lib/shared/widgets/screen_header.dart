@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/theme/app_colors.dart';
 import 'motion.dart';
 
@@ -110,9 +111,9 @@ class ScreenHeader extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: '$prefix\n',
-                    style: TextStyle(
+                    style: GoogleFonts.playfairDisplay(
                       fontSize: size,
-                      height: 0.94,
+                      height: 0.92,
                       fontWeight: FontWeight.w500,
                       letterSpacing: -0.05,
                       color: colors.ink900,

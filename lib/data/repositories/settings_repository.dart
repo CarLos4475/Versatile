@@ -64,4 +64,59 @@ class SettingsRepository {
 
   Future<void> setDeloadDismissedUntil(DateTime date) =>
       set('deload_dismissed_until', date.toIso8601String().substring(0, 10));
+
+  Future<bool> getEditorialPhotosEnabled() async =>
+      (await get('editorial_photos_enabled')) == '1';
+  Future<void> setEditorialPhotosEnabled(bool enabled) =>
+      set('editorial_photos_enabled', enabled ? '1' : '0');
+
+  Future<String?> getEditorialPhotoMoodboardPath() =>
+      get('editorial_photo_moodboard_path');
+  Future<void> setEditorialPhotoMoodboardPath(String? path) =>
+      set('editorial_photo_moodboard_path', path ?? '');
+
+  Future<String?> getEditorialPhotoBackCoverPath() =>
+      get('editorial_photo_back_cover_path');
+  Future<void> setEditorialPhotoBackCoverPath(String? path) =>
+      set('editorial_photo_back_cover_path', path ?? '');
+
+  Future<String?> getEditorialQuoteMoodboard() =>
+      get('editorial_quote_moodboard');
+  Future<void> setEditorialQuoteMoodboard(String quote) =>
+      set('editorial_quote_moodboard', quote);
+
+  Future<String?> getEditorialQuoteBackCover() =>
+      get('editorial_quote_back_cover');
+  Future<void> setEditorialQuoteBackCover(String quote) =>
+      set('editorial_quote_back_cover', quote);
+
+  Future<double> getEditorialMoodboardAlignX() async =>
+      double.tryParse(await get('editorial_moodboard_align_x') ?? '0.0') ?? 0.0;
+  Future<void> setEditorialMoodboardAlignX(double val) =>
+      set('editorial_moodboard_align_x', val.toString());
+
+  Future<double> getEditorialMoodboardAlignY() async =>
+      double.tryParse(await get('editorial_moodboard_align_y') ?? '0.0') ?? 0.0;
+  Future<void> setEditorialMoodboardAlignY(double val) =>
+      set('editorial_moodboard_align_y', val.toString());
+
+  Future<double> getEditorialBackCoverAlignX() async =>
+      double.tryParse(await get('editorial_back_cover_align_x') ?? '0.0') ?? 0.0;
+  Future<void> setEditorialBackCoverAlignX(double val) =>
+      set('editorial_back_cover_align_x', val.toString());
+
+  Future<double> getEditorialBackCoverAlignY() async =>
+      double.tryParse(await get('editorial_back_cover_align_y') ?? '0.0') ?? 0.0;
+  Future<void> setEditorialBackCoverAlignY(double val) =>
+      set('editorial_back_cover_align_y', val.toString());
+
+  Future<double> getEditorialMoodboardScale() async =>
+      double.tryParse(await get('editorial_moodboard_scale') ?? '1.0') ?? 1.0;
+  Future<void> setEditorialMoodboardScale(double val) =>
+      set('editorial_moodboard_scale', val.toString());
+
+  Future<double> getEditorialBackCoverScale() async =>
+      double.tryParse(await get('editorial_back_cover_scale') ?? '1.0') ?? 1.0;
+  Future<void> setEditorialBackCoverScale(double val) =>
+      set('editorial_back_cover_scale', val.toString());
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 
 class DataAction extends StatelessWidget {
@@ -23,35 +22,41 @@ class DataAction extends StatelessWidget {
     final colors = context.colors;
     return PressableScale(
       onTap: onTap,
-      child: GlassContainer(
-        radius: 14,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+        color: colors.bgFrame,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 32,
-              height: 32,
+              width: 34,
+              height: 34,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: colors.accentTint,
+                color: colors.ink900.withValues(alpha: 0.04),
+                border: Border.all(color: colors.hairline, width: 0.6),
               ),
-              child: Icon(icon, size: 18, color: colors.accentDeep),
+              child: Icon(icon, size: 16, color: colors.ink700),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
-              label,
+              label.toUpperCase(),
               style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: colors.ink900,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.18,
+                color: colors.ink500,
               ),
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 5),
             Text(
               sublabel,
-              style: TextStyle(fontSize: 11, color: colors.ink500),
+              style: TextStyle(
+                fontSize: 12,
+                color: colors.ink700,
+                height: 1.3,
+              ),
             ),
           ],
         ),
@@ -77,33 +82,31 @@ class DestructiveDataAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    const danger = Color(0xFFD93B3B);
     return PressableScale(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: Colors.red.withValues(alpha: 0.06),
           border: Border.all(
-            color: Colors.red.withValues(alpha: 0.25),
-            width: 0.5,
+            color: danger.withValues(alpha: 0.35),
+            width: 0.6,
           ),
         ),
         child: Row(
           children: [
             Container(
-              width: 36,
-              height: 36,
+              width: 34,
+              height: 34,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(11),
-                color: Colors.red.withValues(alpha: 0.18),
+                color: danger.withValues(alpha: 0.10),
+                border: Border.all(
+                  color: danger.withValues(alpha: 0.35),
+                  width: 0.6,
+                ),
               ),
-              child: const Icon(
-                Icons.delete_outline,
-                size: 16,
-                color: Color(0xFFFF8A75),
-              ),
+              child: Icon(icon, size: 16, color: danger),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -112,14 +115,15 @@ class DestructiveDataAction extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    label,
+                    label.toUpperCase(),
                     style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFFFF8A75),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.18,
+                      color: danger,
                     ),
                   ),
-                  const SizedBox(height: 1),
+                  const SizedBox(height: 3),
                   Text(
                     sublabel,
                     style: TextStyle(fontSize: 11, color: colors.ink500),
@@ -127,10 +131,10 @@ class DestructiveDataAction extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right,
               size: 16,
-              color: Color(0xCCFF8A75),
+              color: danger.withValues(alpha: 0.7),
             ),
           ],
         ),

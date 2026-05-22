@@ -36,76 +36,57 @@ class ProfileHero extends StatelessWidget {
     final showStats =
         sessionCount != null && totalHours != null && prCount != null;
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: colors.glassBg,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: colors.glassBorder, width: 0.5),
-        ),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(minHeight: 168),
-          child: IntrinsicHeight(
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.bgFrame,
+        border: Border.all(color: colors.hairline, width: 0.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _OrangeBand(initial: initial),
+                _InitialBlock(initial: initial),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 18, 16),
+                    padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        Text(
+                          profileLabel.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.18,
+                            color: colors.ink500,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    profileLabel.toUpperCase(),
-                                    style: TextStyle(
-                                      fontSize: 9.5,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 1.5,
-                                      color: colors.accentDeep,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    name,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w500,
-                                      letterSpacing: -0.6,
-                                      height: 1.1,
-                                      color: colors.ink900,
-                                    ),
-                                  ),
-                                ],
+                              child: Text(
+                                name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: -0.55,
+                                  height: 1.05,
+                                  color: colors.ink900,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 10),
                             _EditButton(onTap: onEdit),
                           ],
                         ),
-                        if (showStats) ...[
-                          const Spacer(),
-                          const SizedBox(height: 12),
-                          _StatTriplet(
-                            sessions: sessionCount!.toString(),
-                            time: '${totalHours}h',
-                            prs: prCount!.toString(),
-                            sessionsLabel: sessionsLabel,
-                            timeLabel: timeLabel,
-                            prsLabel: prsLabel,
-                          ),
-                        ],
                       ],
                     ),
                   ),
@@ -113,14 +94,48 @@ class ProfileHero extends StatelessWidget {
               ],
             ),
           ),
-        ),
+          if (showStats)
+            DecoratedBox(
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: colors.hairline, width: 0.5),
+                ),
+              ),
+              child: IntrinsicHeight(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _StatCell(
+                        value: sessionCount!.toString(),
+                        label: sessionsLabel,
+                      ),
+                    ),
+                    Container(width: 0.5, color: colors.hairline),
+                    Expanded(
+                      child: _StatCell(
+                        value: '${totalHours}h',
+                        label: timeLabel,
+                      ),
+                    ),
+                    Container(width: 0.5, color: colors.hairline),
+                    Expanded(
+                      child: _StatCell(
+                        value: prCount!.toString(),
+                        label: prsLabel,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
 }
 
-class _OrangeBand extends StatelessWidget {
-  const _OrangeBand({required this.initial});
+class _InitialBlock extends StatelessWidget {
+  const _InitialBlock({required this.initial});
 
   final String initial;
 
@@ -128,69 +143,38 @@ class _OrangeBand extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     return SizedBox(
-      width: 108,
-      child: ClipRect(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: const Alignment(0.34, -1),
-              end: const Alignment(-0.34, 1),
-              colors: [colors.accentLight, colors.accent, colors.accentDeep],
-              stops: const [0.0, 0.55, 1.0],
+      width: 92,
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: colors.accent),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -10,
+              bottom: -22,
+              child: Text(
+                initial,
+                style: TextStyle(
+                  fontSize: 150,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -9,
+                  height: 1,
+                  color: Colors.white.withValues(alpha: 0.10),
+                ),
+              ),
             ),
-          ),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.white.withValues(alpha: 0.18),
-                        Colors.transparent,
-                      ],
-                      stops: const [0.0, 0.40],
-                    ),
-                  ),
+            Center(
+              child: Text(
+                initial,
+                style: const TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: -1.4,
+                  color: Colors.white,
+                  height: 1,
                 ),
               ),
-              Positioned(
-                top: -20,
-                left: -16,
-                child: Text(
-                  initial,
-                  style: TextStyle(
-                    fontSize: 160,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: -9.6,
-                    height: 1,
-                    color: Colors.white.withValues(alpha: 0.10),
-                  ),
-                ),
-              ),
-              Center(
-                child: Text(
-                  initial,
-                  style: const TextStyle(
-                    fontSize: 56,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: -1.68,
-                    color: Colors.white,
-                    height: 1,
-                    shadows: [
-                      Shadow(
-                        color: Color(0x38000000),
-                        blurRadius: 12,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -208,75 +192,17 @@ class _EditButton extends StatelessWidget {
     return PressableScale(
       onTap: onTap,
       child: Container(
-        width: 32,
-        height: 32,
+        width: 34,
+        height: 34,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(11),
-          color: colors.ink900.withValues(alpha: 0.05),
-          border: Border.all(
-            color: colors.ink900.withValues(alpha: 0.06),
-            width: 0.5,
-          ),
+          color: colors.ink900.withValues(alpha: 0.04),
+          border: Border.all(color: colors.hairline, width: 0.6),
         ),
         child: Icon(
           Icons.edit_outlined,
-          size: 13,
-          color: colors.ink500,
-        ),
-      ),
-    );
-  }
-}
-
-class _StatTriplet extends StatelessWidget {
-  const _StatTriplet({
-    required this.sessions,
-    required this.time,
-    required this.prs,
-    required this.sessionsLabel,
-    required this.timeLabel,
-    required this.prsLabel,
-  });
-
-  final String sessions;
-  final String time;
-  final String prs;
-  final String sessionsLabel;
-  final String timeLabel;
-  final String prsLabel;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    final divider = colors.hairline.withValues(alpha: 0.5);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: divider, width: 0.5)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: _StatCell(value: sessions, label: sessionsLabel),
-            ),
-            Container(width: 0.5, height: 36, color: divider),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: _StatCell(value: time, label: timeLabel),
-              ),
-            ),
-            Container(width: 0.5, height: 36, color: divider),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 16),
-                child: _StatCell(value: prs, label: prsLabel),
-              ),
-            ),
-          ],
+          size: 14,
+          color: colors.ink700,
         ),
       ),
     );
@@ -292,32 +218,35 @@ class _StatCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.w500,
-            letterSpacing: -0.55,
-            height: 1,
-            color: colors.ink900,
-            fontFeatures: const [FontFeature.tabularFigures()],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.18,
+              color: colors.ink500,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 9.5,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 1.14,
-            color: colors.ink500,
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w500,
+              letterSpacing: -0.55,
+              height: 1,
+              color: colors.ink900,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

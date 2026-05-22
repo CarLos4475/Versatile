@@ -19,7 +19,7 @@ class AccentSwatchRail extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return SizedBox(
-      height: 68,
+      height: 70,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: AccentColors.options.length,
@@ -56,45 +56,37 @@ class _Swatch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final swatch = Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: option.color,
-      ),
-    );
     return PressableScale(
       onTap: onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            width: 42,
-            height: 42,
+            width: 44,
+            height: 44,
             child: Center(
               child: active
                   ? Container(
-                      width: 42,
-                      height: 42,
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(color: option.color, width: 1.5),
                       ),
                       alignment: Alignment.center,
-                      child: swatch,
+                      child: Container(width: 32, height: 32, color: option.color),
                     )
-                  : swatch,
+                  : Container(width: 32, height: 32, color: option.color),
             ),
           ),
-          const SizedBox(height: 7),
+          const SizedBox(height: 8),
           Text(
-            name,
+            name.toUpperCase(),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
+              fontSize: 9,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.18,
               height: 1.0,
               color: active ? colors.accentDeep : colors.ink500,
             ),

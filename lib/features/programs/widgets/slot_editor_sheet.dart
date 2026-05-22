@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/color_utils.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/program.dart';
 import '../../../domain/entities/routine.dart';
@@ -168,6 +167,7 @@ class _SlotEditorSheetState extends ConsumerState<_SlotEditorSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isEs = Localizations.localeOf(context).languageCode == 'es';
     final colors = context.colors;
     final routines = ref.watch(routinesProvider).value ?? <Routine>[];
     final mq = MediaQuery.of(context);
@@ -176,67 +176,67 @@ class _SlotEditorSheetState extends ConsumerState<_SlotEditorSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: mq.viewInsets.bottom),
       child: Container(
-        constraints: BoxConstraints(maxHeight: mq.size.height * 0.85),
+        constraints: BoxConstraints(maxHeight: mq.size.height * 0.88),
         decoration: BoxDecoration(
-          color: colors.bgFrame,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          color: colors.bgApp,
+          border: Border(
+            top: BorderSide(color: colors.hairline, width: 0.5),
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 10),
             Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: colors.hairline,
-                borderRadius: BorderRadius.circular(2),
-              ),
+              width: 40,
+              height: 3,
+              color: colors.hairline,
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             Padding(
-              padding: const EdgeInsets.fromLTRB(22, 0, 16, 14),
+              padding: const EdgeInsets.fromLTRB(22, 0, 22, 6),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
                       children: [
-                        Text(
-                          l10n
-                              .editDayEyebrow(widget.weekIndex + 1, dayName)
-                              .toUpperCase(),
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.1,
-                            color: colors.accentDeep,
-                          ),
+                        Container(
+                          width: 22,
+                          height: 1,
+                          color: colors.ink400.withValues(alpha: 0.55),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          l10n.whatTodayQuestion(dayName),
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: -0.44,
-                            color: colors.ink900,
+                        const SizedBox(width: 10),
+                        Flexible(
+                          child: Text(
+                            l10n
+                                .editDayEyebrow(widget.weekIndex + 1, dayName)
+                                .toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.18,
+                              color: colors.ink500,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
                   PressableScale(
                     onTap: () => Navigator.of(context).pop(),
                     child: Container(
-                      width: 32,
-                      height: 32,
+                      width: 34,
+                      height: 34,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: colors.ink900.withValues(alpha: 0.08),
+                        color: colors.ink900.withValues(alpha: 0.04),
+                        border: Border.all(
+                          color: colors.hairline,
+                          width: 0.6,
+                        ),
                       ),
                       child: Icon(
                         Icons.close,
@@ -248,13 +248,45 @@ class _SlotEditorSheetState extends ConsumerState<_SlotEditorSheet> {
                 ],
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 8, 22, 14),
+              child: SizedBox(
+                width: double.infinity,
+                child: Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '${isEs ? '¿Qué hoy' : 'What today'}\n',
+                        style: TextStyle(
+                          fontSize: 32,
+                          height: 0.96,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.05,
+                          color: colors.ink900,
+                        ),
+                      ),
+                      TextSpan(
+                        text: '$dayName?',
+                        style: TextStyle(
+                          fontSize: 32,
+                          height: 0.96,
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.italic,
+                          letterSpacing: -0.045,
+                          color: colors.accentLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             Flexible(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(22, 0, 22, 22),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Quick rest day CTA
                     _RestDayCta(
                       selected: _pending?.kind == SlotKind.label &&
                           (_pending?.labelText ?? '').toLowerCase() == 'rest',
@@ -262,15 +294,18 @@ class _SlotEditorSheetState extends ConsumerState<_SlotEditorSheet> {
                       subtitle: l10n.restDayCtaSubtitle,
                       onTap: () => _pickLabel('Rest'),
                     ),
-                    const SizedBox(height: 20),
-                    _DividerLabel(text: l10n.orPickRoutine),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 24),
+                    _SectionEyebrow(text: l10n.orPickRoutine),
+                    const SizedBox(height: 12),
                     if (routines.isEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         child: Text(
                           l10n.noRoutinesYet,
-                          style: TextStyle(color: colors.ink400),
+                          style: TextStyle(
+                            color: colors.ink400,
+                            fontSize: 13,
+                          ),
                         ),
                       )
                     else
@@ -297,12 +332,12 @@ class _SlotEditorSheetState extends ConsumerState<_SlotEditorSheet> {
                           ),
                         );
                       }),
-                    const SizedBox(height: 16),
-                    _DividerLabel(text: l10n.orUseLabel),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 22),
+                    _SectionEyebrow(text: l10n.orUseLabel),
+                    const SizedBox(height: 12),
                     Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
+                      spacing: 8,
+                      runSpacing: 8,
                       children: [
                         for (final entry in <(String, String)>[
                           ('Cardio', l10n.labelCardio),
@@ -312,8 +347,7 @@ class _SlotEditorSheetState extends ConsumerState<_SlotEditorSheet> {
                         ])
                           _LabelChip(
                             label: entry.$2,
-                            color: _kLabelColors[entry.$1] ??
-                                colors.accent,
+                            color: _kLabelColors[entry.$1] ?? colors.accent,
                             selected: _pending?.kind == SlotKind.label &&
                                 (_pending?.labelText ?? '').toLowerCase() ==
                                     entry.$1.toLowerCase(),
@@ -331,41 +365,27 @@ class _SlotEditorSheetState extends ConsumerState<_SlotEditorSheet> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 24),
                     PressableScale(
                       onTap: _save,
                       child: Container(
-                        height: 50,
+                        height: 52,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              lightenColor(colors.accent, 0.06),
-                              colors.accent,
-                              darkenColor(colors.accent, 0.12),
-                            ],
+                          color: colors.accent,
+                          border: Border.all(
+                            color: colors.accentDeep.withValues(alpha: 0.6),
+                            width: 0.6,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: darkenColor(colors.accent, 0.12)
-                                  .withValues(alpha: 0.40),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
                         ),
                         child: Text(
-                          _hasPending
-                              ? l10n.saveSelection
-                              : l10n.clear,
+                          (_hasPending ? l10n.saveSelection : l10n.clear)
+                              .toUpperCase(),
                           style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
                             color: Colors.white,
-                            letterSpacing: -0.15,
+                            letterSpacing: 1.4,
                           ),
                         ),
                       ),
@@ -402,6 +422,35 @@ class _SlotEditorSheetState extends ConsumerState<_SlotEditorSheet> {
   }
 }
 
+class _SectionEyebrow extends StatelessWidget {
+  const _SectionEyebrow({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Row(
+      children: [
+        Container(
+          width: 22,
+          height: 1,
+          color: colors.ink400.withValues(alpha: 0.55),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          text.toUpperCase(),
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.18,
+            color: colors.ink500,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _RestDayCta extends StatelessWidget {
   final bool selected;
   final String title;
@@ -418,41 +467,29 @@ class _RestDayCta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    const oliveLight = Color(0xFF7A8C5B);
-    const oliveDark = Color(0xFF4A5A38);
+    const olive = Color(0xFF7A8C5B);
     return PressableScale(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              oliveLight.withValues(alpha: selected ? 0.30 : 0.18),
-              oliveDark.withValues(alpha: selected ? 0.20 : 0.10),
-            ],
-          ),
+          color: selected ? olive.withValues(alpha: 0.08) : Colors.transparent,
           border: Border.all(
-            color: oliveLight.withValues(alpha: selected ? 0.55 : 0.3),
+            color: selected ? olive : colors.hairline,
             width: selected ? 1 : 0.5,
           ),
         ),
         child: Row(
           children: [
             Container(
-              width: 36,
-              height: 36,
+              width: 38,
+              height: 38,
               alignment: Alignment.center,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(11),
-                color: oliveLight.withValues(alpha: 0.30),
-              ),
+              decoration: BoxDecoration(color: olive),
               child: const Icon(
                 Icons.bedtime_outlined,
                 size: 18,
-                color: Color(0xFFB8CE93),
+                color: Colors.white,
               ),
             ),
             const SizedBox(width: 12),
@@ -464,12 +501,13 @@ class _RestDayCta extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: colors.ink900,
+                      letterSpacing: -0.18,
                     ),
                   ),
-                  const SizedBox(height: 1),
+                  const SizedBox(height: 2),
                   Text(
                     subtitle,
                     style: TextStyle(fontSize: 11, color: colors.ink500),
@@ -478,54 +516,22 @@ class _RestDayCta extends StatelessWidget {
               ),
             ),
             if (selected)
-              Icon(Icons.check_circle, color: oliveLight, size: 20)
+              Container(
+                width: 22,
+                height: 22,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: olive),
+                child: const Icon(Icons.check, size: 14, color: Colors.white),
+              )
             else
               Icon(
                 Icons.chevron_right,
                 size: 16,
-                color: colors.ink400,
+                color: colors.ink900.withValues(alpha: 0.3),
               ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _DividerLabel extends StatelessWidget {
-  final String text;
-  const _DividerLabel({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.colors;
-    return Row(
-      children: [
-        SizedBox(
-          width: 24,
-          child: Divider(
-            height: 0.5,
-            color: colors.hairline.withValues(alpha: 0.5),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          text.toUpperCase(),
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 1.1,
-            color: colors.ink400,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Divider(
-            height: 0.5,
-            color: colors.hairline.withValues(alpha: 0.5),
-          ),
-        ),
-      ],
     );
   }
 }
@@ -549,40 +555,25 @@ class _LabelChip extends StatelessWidget {
     return PressableScale(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              color.withValues(alpha: selected ? 0.30 : 0.20),
-              color.withValues(alpha: selected ? 0.16 : 0.10),
-            ],
-          ),
+          color: selected ? color.withValues(alpha: 0.12) : Colors.transparent,
           border: Border.all(
-            color: color.withValues(alpha: selected ? 0.6 : 0.33),
+            color: selected ? color : colors.hairline,
             width: selected ? 1 : 0.5,
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 6,
-              height: 6,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: color,
-              ),
-            ),
-            const SizedBox(width: 6),
+            Container(width: 8, height: 8, color: color),
+            const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: colors.ink900,
+                color: selected ? colors.ink900 : colors.ink700,
               ),
             ),
           ],
@@ -609,18 +600,14 @@ class _CustomChip extends StatelessWidget {
     return PressableScale(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
           color: selected
-              ? colors.accentTint
+              ? colors.accent.withValues(alpha: 0.12)
               : Colors.transparent,
           border: Border.all(
-            color: selected
-                ? colors.accent.withValues(alpha: 0.6)
-                : colors.hairline.withValues(alpha: 0.5),
-            width: 1,
-            style: selected ? BorderStyle.solid : BorderStyle.solid,
+            color: selected ? colors.accent : colors.hairline,
+            width: selected ? 1 : 0.5,
           ),
         ),
         child: Row(
@@ -628,16 +615,16 @@ class _CustomChip extends StatelessWidget {
           children: [
             Icon(
               Icons.add,
-              size: 11,
+              size: 12,
               color: selected ? colors.accentDeep : colors.ink500,
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 5),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: selected ? colors.accentDeep : colors.ink500,
+                color: selected ? colors.accentDeep : colors.ink700,
               ),
             ),
           ],

@@ -1530,4 +1530,46 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get vsPrevious => 'vs anterior';
+
+  @override
+  String get editorialSection => 'FOTOGRAFÍA EDITORIAL';
+
+  @override
+  String get editorialEnable => 'Habilitar fotos en inicio';
+
+  @override
+  String get editorialMoodboardLabel => 'Foto de Galería (Moodboard)';
+
+  @override
+  String get editorialBackCoverLabel => 'Foto de Contraportada';
+
+  @override
+  String get editorialQuoteHint => 'Escribe una frase...';
+
+  @override
+  String get editorialDefaultMoodboardQuote => 'Enfócate en el proceso';
+
+  @override
+  String get editorialDefaultBackCoverQuote =>
+      'La mente lo es todo. Te conviertes en lo que piensas.';
+
+  @override
+  String get editorialNoImage => 'Sin imagen seleccionada';
+
+  @override
+  String get editorialChangeImage => 'Cambiar';
+
+  @override
+  String get editorialRemoveImage => 'Eliminar';
+
+  @override
+  String editorialCharLimit(Object limit) {
+    return 'Máx $limit caracteres';
+  }
+
+  @override
+  String get editorialReposition => 'Ajustar Foto';
+
+  @override
+  String get editorialDragInstructions => 'ARRASTRA PARA ENCUADRAR';
 }

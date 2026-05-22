@@ -6,8 +6,6 @@ import '../../../core/services/workout_notification_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/coachmark_overlay.dart';
 import '../../../core/utils/format_utils.dart';
-import '../../../shared/widgets/glass_button.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../view_models/active_workout_view_model.dart';
 import '../widgets/exercise_card.dart';
@@ -299,186 +297,173 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
             Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                  child: GlassContainer(
-                    strong: true,
-                    radius: 22,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    child: Row(
-                      children: [
-                        PressableScale(
-                          onTap: () => Navigator.of(context).pop(),
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: context.colors.press,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              Icons.chevron_left,
-                              size: 18,
-                              color: context.colors.ink700,
-                            ),
+                  padding: const EdgeInsets.fromLTRB(22, 10, 22, 14),
+                  child: Row(
+                    children: [
+                      PressableScale(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          color: context.colors.accent,
+                          child: const Icon(
+                            Icons.chevron_left,
+                            size: 18,
+                            color: Colors.white,
                           ),
                         ),
-                        const SizedBox(width: 6),
-                        PressableScale(
-                          onTap: () => _confirmDiscard(context, ref, l10n),
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: context.colors.press,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              Icons.close_rounded,
-                              size: 18,
-                              color: context.colors.ink500,
-                            ),
+                      ),
+                      const SizedBox(width: 6),
+                      PressableScale(
+                        onTap: () => _confirmDiscard(context, ref, l10n),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          color: context.colors.accent,
+                          child: const Icon(
+                            Icons.close_rounded,
+                            size: 18,
+                            color: Colors.white,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  _PulseDot(),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '${l10n.active} · ${state.routine.name.toUpperCase()}',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: 0.08,
-                                      color: context.colors.accent,
-                                    ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                _PulseDot(),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '${l10n.active} · ${state.routine.name.toUpperCase()}',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.08,
+                                    color: context.colors.accent,
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 2),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.baseline,
-                                textBaseline: TextBaseline.alphabetic,
-                                children: [
-                                  Text(
-                                    FormatUtils.timer(state.elapsedSeconds),
-                                    style: TextStyle(
-                                      fontSize: 26,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: -0.52,
-                                      color: context.colors.ink900,
-                                      height: 1,
-                                      fontFeatures: const [
-                                        FontFeature.tabularFigures(),
-                                      ],
-                                    ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  FormatUtils.timer(state.elapsedSeconds),
+                                  style: TextStyle(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: -0.52,
+                                    color: context.colors.ink900,
+                                    height: 1,
+                                    fontFeatures: const [
+                                      FontFeature.tabularFigures(),
+                                    ],
                                   ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    '${state.completedSets}/${state.totalSets} ${l10n.sets}'
-                                    ' · ${FormatUtils.volume(state.totalVolume)}',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: context.colors.ink500,
-                                    ),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  '${state.completedSets}/${state.totalSets} ${l10n.sets}'
+                                  ' · ${FormatUtils.volume(state.totalVolume)}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: context.colors.ink500,
                                   ),
-                                ],
+                                ),
+                              ],
                               ),
                             ],
                           ),
                         ),
-                        PressableScale(
-                          onTap: notifier.togglePause,
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: context.colors.accentTint,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              state.isRunning
-                                  ? Icons.pause_rounded
-                                  : Icons.play_arrow_rounded,
-                              size: 18,
-                              color: context.colors.accentDeep,
+                      PressableScale(
+                        onTap: notifier.togglePause,
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: context.colors.accentTint,
+                            border: Border.all(
+                              color: context.colors.accent.withValues(alpha: 0.4),
+                              width: 0.6,
                             ),
                           ),
+                          child: Icon(
+                            state.isRunning
+                                ? Icons.pause_rounded
+                                : Icons.play_arrow_rounded,
+                            size: 18,
+                            color: context.colors.accentDeep,
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
-                    child: LinearProgressIndicator(
-                      value: state.totalSets > 0
-                          ? state.completedSets / state.totalSets
-                          : 0,
-                      backgroundColor: context.colors.hairline,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        context.colors.accent,
                       ),
-                      minHeight: 3,
-                    ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                LinearProgressIndicator(
+                  value: state.totalSets > 0
+                      ? state.completedSets / state.totalSets
+                      : 0,
+                  backgroundColor: context.colors.hairline,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    context.colors.accent,
+                  ),
+                  minHeight: 2,
+                ),
+                Container(height: 0.5, color: context.colors.hairline),
                 Expanded(
                   child: ListView(
                     padding: EdgeInsets.fromLTRB(
-                      16,
                       0,
-                      16,
+                      0,
+                      0,
                       state.restTimer != null ? 130 : 100,
                     ),
                     children: [
-                      ...state.exerciseStates.asMap().entries.map((entry) {
-                        final i = entry.key;
-                        final e = entry.value;
-                        final ex = state.findExercise(e.exerciseId);
-                        if (ex == null) return const SizedBox.shrink();
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: ExerciseCard(
-                            index: i,
-                            data: e,
-                            exercise: ex,
-                            prevSets: e.prevSets,
-                            onToggle: () => notifier.toggleExpand(i),
-                            onFinishSet: () => notifier.finishSet(i),
+                      for (final entry
+                          in state.exerciseStates.asMap().entries) ...[
+                        if (state.findExercise(entry.value.exerciseId) != null)
+                          ExerciseCard(
+                            index: entry.key,
+                            data: entry.value,
+                            exercise:
+                                state.findExercise(entry.value.exerciseId)!,
+                            prevSets: entry.value.prevSets,
+                            onToggle: () => notifier.toggleExpand(entry.key),
+                            onFinishSet: () => notifier.finishSet(entry.key),
                             onWeightChanged: (kg) =>
-                                notifier.updateWeight(i, kg),
+                                notifier.updateWeight(entry.key, kg),
                             onRepsChanged: (reps) =>
-                                notifier.updateReps(i, reps),
-                            onToggleSplit: e.isUnilateral
-                                ? () => notifier.toggleSplitMode(i)
+                                notifier.updateReps(entry.key, reps),
+                            onToggleSplit: entry.value.isUnilateral
+                                ? () => notifier.toggleSplitMode(entry.key)
                                 : null,
                             onLeftWeightChanged: (kg) =>
-                                notifier.updateLeftWeight(i, kg),
+                                notifier.updateLeftWeight(entry.key, kg),
                             onLeftRepsChanged: (reps) =>
-                                notifier.updateLeftReps(i, reps),
-                            onSkip: () => _confirmSkip(context, i, l10n),
+                                notifier.updateLeftReps(entry.key, reps),
+                            onSkip: () =>
+                                _confirmSkip(context, entry.key, l10n),
                           ),
-                        );
-                      }),
-                      GlassButton(
-                        label: _finishing ? l10n.saving : l10n.finishWorkout,
-                        variant: GlassButtonVariant.primary,
-                        size: GlassButtonSize.md,
-                        expand: true,
-                        loading: _finishing,
-                        onPressed: _finishing ? null : _finish,
+                        Container(
+                          height: 0.5,
+                          color: context.colors.hairline,
+                        ),
+                      ],
+                      const SizedBox(height: 22),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 22),
+                        child: _MagazineFinishButton(
+                          label: _finishing
+                              ? l10n.saving
+                              : l10n.finishWorkout,
+                          loading: _finishing,
+                          onPressed: _finishing ? null : _finish,
+                        ),
                       ),
                     ],
                   ),
@@ -573,6 +558,53 @@ class _PulseDotState extends State<_PulseDot>
           color: context.colors.accent,
           shape: BoxShape.circle,
         ),
+      ),
+    );
+  }
+}
+
+class _MagazineFinishButton extends StatelessWidget {
+  const _MagazineFinishButton({
+    required this.label,
+    required this.loading,
+    required this.onPressed,
+  });
+
+  final String label;
+  final bool loading;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final enabled = onPressed != null;
+    return PressableScale(
+      onTap: enabled ? onPressed : () {},
+      child: Container(
+        width: double.infinity,
+        height: 52,
+        alignment: Alignment.center,
+        color: enabled
+            ? colors.accent
+            : colors.accent.withValues(alpha: 0.4),
+        child: loading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Text(
+                label.toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.18,
+                  color: Colors.white,
+                ),
+              ),
       ),
     );
   }

@@ -678,5 +678,18 @@
   "viewAll": "Ver todas",
   "formulaEpley": "Fórmula Epley",
   "formulaEpleyDescription": "El 1RM estimado se calcula basándose en la fórmula Epley:",
-  "vsPrevious": "vs anterior"
+  "vsPrevious": "vs anterior",
+  "editorialSection": "FOTOGRAFÍA EDITORIAL",
+  "editorialEnable": "Habilitar fotos en inicio",
+  "editorialMoodboardLabel": "Foto de Galería (Moodboard)",
+  "editorialBackCoverLabel": "Foto de Contraportada",
+  "editorialQuoteHint": "Escribe una frase...",
+  "editorialDefaultMoodboardQuote": "Enfócate en el proceso",
+  "editorialDefaultBackCoverQuote": "La mente lo es todo. Te conviertes en lo que piensas.",
+  "editorialNoImage": "Sin imagen seleccionada",
+  "editorialChangeImage": "Cambiar",
+  "editorialRemoveImage": "Eliminar",
+  "editorialCharLimit": "Máx {limit} caracteres",
+  "editorialReposition": "Ajustar Foto",
+  "editorialDragInstructions": "ARRASTRA PARA ENCUADRAR"
 }

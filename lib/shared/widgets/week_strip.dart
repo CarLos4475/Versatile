@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/color_utils.dart';
+import '../../core/theme/color_utils.dart' show darkenColor, lightenColor;
 
 class WeekStripCell {
   final String? label;
@@ -143,9 +143,8 @@ class _LargeCell extends StatelessWidget {
         ],
         AspectRatio(
           aspectRatio: 1,
-          child: _GlossyCell(
+          child: _FlatCell(
             cell: cell,
-            radius: 12,
             isToday: isToday,
             todayAccent: accent,
             centerChild: cell.isRest
@@ -170,16 +169,14 @@ class _LargeCell extends StatelessWidget {
   }
 }
 
-class _GlossyCell extends StatelessWidget {
+class _FlatCell extends StatelessWidget {
   final WeekStripCell cell;
-  final double radius;
   final bool isToday;
   final Color todayAccent;
   final Widget centerChild;
 
-  const _GlossyCell({
+  const _FlatCell({
     required this.cell,
-    required this.radius,
     required this.isToday,
     required this.todayAccent,
     required this.centerChild,
@@ -189,48 +186,26 @@ class _GlossyCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final isRest = cell.isRest;
     final base = cell.color;
-    final r = radius + 2;
     final colors = context.colors;
     return Container(
       decoration: BoxDecoration(
-        gradient: isRest ? null : cellGradient(base!),
-        color: isRest ? colors.ink900.withValues(alpha: 0.06) : null,
-        borderRadius: BorderRadius.circular(r),
-        border: isRest
-            ? Border.all(
-                color: colors.hairline,
-                width: 0.5,
-              )
-            : null,
+        color: isRest ? colors.ink900.withValues(alpha: 0.06) : base,
+        border: Border.all(
+          color: isRest
+              ? colors.hairline
+              : base!.withValues(alpha: 0.85),
+          width: 0.6,
+        ),
       ),
       foregroundDecoration: isToday
           ? BoxDecoration(
-              borderRadius: BorderRadius.circular(r),
               border: Border.all(
-                color: todayAccent.withValues(alpha: 0.7),
+                color: todayAccent,
                 width: 2,
               ),
             )
           : null,
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        alignment: Alignment.center,
-        fit: StackFit.expand,
-        children: [
-          if (!isRest) const Positioned.fill(child: glossyOverlay),
-          if (!isRest)
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 0,
-              child: Container(
-                height: 1,
-                color: Colors.white.withValues(alpha: 0.55),
-              ),
-            ),
-          Center(child: centerChild),
-        ],
-      ),
+      child: Center(child: centerChild),
     );
   }
 }
@@ -252,9 +227,8 @@ class _CompactCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _GlossyCell(
+    return _FlatCell(
       cell: cell,
-      radius: 12,
       isToday: isToday,
       todayAccent: accent,
       centerChild: Column(

@@ -54,17 +54,9 @@ class ExerciseCard extends StatelessWidget {
               key: const ValueKey(true),
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
-              decoration: BoxDecoration(
-                color: context.colors.accent.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: context.colors.accent.withValues(alpha: 0.55),
-                  width: 1.5,
-                ),
-                boxShadow: context.colors.glassShadow,
-              ),
+              color: context.colors.accent.withValues(alpha: 0.10),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
+                padding: const EdgeInsets.fromLTRB(22, 16, 22, 22),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,49 +88,32 @@ class ExerciseCard extends StatelessWidget {
                 ),
               ),
             )
-          : Stack(
+          : Column(
               key: const ValueKey(false),
+              mainAxisSize: MainAxisSize.min,
               children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  decoration: BoxDecoration(
-                    color: context.colors.bgFrame,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: context.colors.glassBorder,
-                      width: 0.5,
-                    ),
-                    boxShadow: context.colors.glassShadow,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _CardHeader(
-                        index: index,
-                        data: data,
-                        exercise: exercise,
-                        onToggle: onToggle,
-                        onToggleSplit: onToggleSplit,
-                        onSkip: onSkip,
-                      ),
-                      AnimatedSize(
-                        duration: const Duration(milliseconds: 280),
-                        curve: Curves.easeOutCubic,
-                        child: data.isExpanded && !data.skipped
-                            ? _CardBody(
-                                data: data,
-                                prevSets: prevSets,
-                                onFinishSet: onFinishSet,
-                                onWeightChanged: onWeightChanged,
-                                onRepsChanged: onRepsChanged,
-                                onLeftWeightChanged: onLeftWeightChanged,
-                                onLeftRepsChanged: onLeftRepsChanged,
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                    ],
-                  ),
+                _CardHeader(
+                  index: index,
+                  data: data,
+                  exercise: exercise,
+                  onToggle: onToggle,
+                  onToggleSplit: onToggleSplit,
+                  onSkip: onSkip,
+                ),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 280),
+                  curve: Curves.easeOutCubic,
+                  child: data.isExpanded && !data.skipped
+                      ? _CardBody(
+                          data: data,
+                          prevSets: prevSets,
+                          onFinishSet: onFinishSet,
+                          onWeightChanged: onWeightChanged,
+                          onRepsChanged: onRepsChanged,
+                          onLeftWeightChanged: onLeftWeightChanged,
+                          onLeftRepsChanged: onLeftRepsChanged,
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ],
             ),
@@ -169,7 +144,7 @@ class _CardHeader extends StatelessWidget {
     return PressableScale(
       onTap: onToggle,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(22, 16, 22, 16),
         child: Row(
           children: [
             _IndexBadge(
@@ -208,12 +183,9 @@ class _CardHeader extends StatelessWidget {
                 child: PressableScale(
                   onTap: onSkip,
                   child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: context.colors.accentTint,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    width: 32,
+                    height: 32,
+                    color: context.colors.accentTint,
                     child: Icon(
                       Icons.skip_next_rounded,
                       size: 18,
@@ -236,7 +208,12 @@ class _CardHeader extends StatelessWidget {
                       color: data.isSplitMode
                           ? context.colors.accentTint
                           : context.colors.fieldBg,
-                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: data.isSplitMode
+                            ? context.colors.accent.withValues(alpha: 0.5)
+                            : context.colors.hairline,
+                        width: 0.6,
+                      ),
                     ),
                     child: Text(
                       l10n.split_label,
@@ -286,11 +263,14 @@ class _CardBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.fromLTRB(22, 0, 22, 18),
       child: Column(
         children: [
-          Divider(color: context.colors.hairline, thickness: 0.5, height: 14),
-
+          Container(
+            height: 0.5,
+            color: context.colors.hairline,
+            margin: const EdgeInsets.only(bottom: 12),
+          ),
           const _ColumnHeaders(),
           const SizedBox(height: 2),
 
@@ -415,11 +395,8 @@ class _CompletedSetRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        decoration: BoxDecoration(
-          color: context.colors.doneTint,
-          borderRadius: BorderRadius.circular(10),
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+        color: context.colors.doneTint,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -482,10 +459,7 @@ class _CompletedSetRow extends StatelessWidget {
             Container(
               width: 22,
               height: 22,
-              decoration: BoxDecoration(
-                color: context.colors.doneIconBg.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(6),
-              ),
+              color: context.colors.doneIconBg.withValues(alpha: 0.15),
               child: Icon(
                 Icons.check,
                 size: 13,
@@ -619,13 +593,12 @@ class _ActiveSetRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
         decoration: BoxDecoration(
-          color: context.colors.accent.withValues(alpha: 0.25),
-          borderRadius: BorderRadius.circular(12),
+          color: context.colors.accent.withValues(alpha: 0.18),
           border: Border.all(
             color: context.colors.accent.withValues(alpha: 0.7),
-            width: 1.2,
+            width: 0.8,
           ),
         ),
         child: Row(
@@ -688,21 +661,7 @@ class _ActiveSetRow extends StatelessWidget {
               child: Container(
                 width: 32,
                 height: 32,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [context.colors.accentLight, context.colors.accent],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: context.colors.accentDeep.withValues(alpha: 0.25),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
+                color: context.colors.accent,
                 child: const Icon(
                   Icons.check_rounded,
                   size: 16,
@@ -837,36 +796,26 @@ class _IndexBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final bg = isDone
+        ? const Color(0xFF3A6E48)
+        : hasProgress
+        ? colors.accentDeep
+        : colors.accent;
     return Container(
       width: 32,
       height: 32,
-      decoration: BoxDecoration(
-        gradient: isDone
-            ? const LinearGradient(
-                colors: [Color(0xFF4A8A5A), Color(0xFF3A6E48)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
-        color: isDone
-            ? null
-            : hasProgress
-            ? context.colors.accent.withValues(alpha: 0.15)
-            : context.colors.fieldBg,
-        borderRadius: BorderRadius.circular(10),
-      ),
+      color: bg,
       child: isDone
           ? const Icon(Icons.check, size: 16, color: Colors.white)
           : Center(
               child: Text(
                 '${index + 1}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: hasProgress
-                      ? context.colors.accent
-                      : context.colors.ink500,
-                  fontFeatures: const [FontFeature.tabularFigures()],
+                  color: Colors.white,
+                  fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
             ),

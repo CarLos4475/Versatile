@@ -24,7 +24,10 @@
       "PowerShell($path = \"C:\\\\Users\\\\PC\\\\Documents\\\\PROYECTOS\\\\androidStudio\\\\versatile\\\\html_components\\\\plan_ajustes_redesign.html\"; $content = [System.IO.File]::ReadAllText\\($path\\); $start = 249841; $end = 290526; $section = $content.Substring\\($start, $end - $start\\); $outPath = \"C:\\\\Users\\\\PC\\\\Documents\\\\PROYECTOS\\\\androidStudio\\\\versatile\\\\html_components\\\\_redesign_settings.js\"; [System.IO.File]::WriteAllText\\($outPath, $section\\); $section.Length)",
       "Bash(findstr *)",
       "Bash(grep *)",
-      "Bash(flutter gen-l10n *)"
+      "Bash(flutter gen-l10n *)",
+      "Bash(codegraph_explore --help)",
+      "Bash(awk 'NR<1409 || NR>1645' lib/features/settings/screens/settings_screen.dart)",
+      "Bash(mv /tmp/settings_screen_trimmed.dart lib/features/settings/screens/settings_screen.dart)"
     ]
   }
 }

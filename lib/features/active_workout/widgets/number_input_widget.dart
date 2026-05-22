@@ -90,7 +90,7 @@ class _NumberInputWidgetState extends State<NumberInputWidget> {
       height: 32,
       decoration: BoxDecoration(
         color: context.colors.fieldBg,
-        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: context.colors.hairline, width: 0.6),
       ),
       child: Row(
         children: [
@@ -157,10 +157,7 @@ class _Btn extends StatelessWidget {
         width: 24,
         height: 24,
         margin: const EdgeInsets.all(2),
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
-        ),
+        color: Colors.transparent,
         child: Icon(icon, size: 14, color: context.colors.ink400),
       ),
     );

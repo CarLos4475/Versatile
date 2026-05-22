@@ -1524,4 +1524,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get vsPrevious => 'vs previous';
+
+  @override
+  String get editorialSection => 'EDITORIAL PHOTOS';
+
+  @override
+  String get editorialEnable => 'Enable photos on home';
+
+  @override
+  String get editorialMoodboardLabel => 'Moodboard Photo';
+
+  @override
+  String get editorialBackCoverLabel => 'Back Cover Photo';
+
+  @override
+  String get editorialQuoteHint => 'Write custom caption...';
+
+  @override
+  String get editorialDefaultMoodboardQuote => 'Focus on the process';
+
+  @override
+  String get editorialDefaultBackCoverQuote =>
+      'The mind is everything. What you think you become.';
+
+  @override
+  String get editorialNoImage => 'No image selected';
+
+  @override
+  String get editorialChangeImage => 'Change';
+
+  @override
+  String get editorialRemoveImage => 'Remove';
+
+  @override
+  String editorialCharLimit(Object limit) {
+    return 'Max $limit characters';
+  }
+
+  @override
+  String get editorialReposition => 'Reposition Photo';
+
+  @override
+  String get editorialDragInstructions => 'DRAG TO REPOSITION';
 }

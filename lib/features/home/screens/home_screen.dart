@@ -12,6 +12,8 @@ import '../../programs/screens/program_editor_screen.dart';
 import '../../programs/view_models/programs_view_model.dart';
 import '../../recap/screens/monthly_recap_screen.dart';
 import '../../recap/view_models/recap_view_model.dart';
+import 'dart:io';
+import '../../../core/providers/editorial_photos_provider.dart';
 import '../view_models/deload_view_model.dart';
 import '../view_models/home_view_model.dart';
 import '../../active_workout/screens/active_workout_screen.dart';
@@ -176,6 +178,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final recapBanner = ref.watch(unseenLastRecapProvider).value;
     final deloadSuggestion = ref.watch(deloadSuggestionProvider);
+    final editorialState = ref.watch(editorialPhotosProvider);
 
     return Scaffold(
       backgroundColor: context.colors.bgApp,
@@ -253,6 +256,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 avgTimeLabel: l10n.avgTime,
               ),
               const _GridDivider(),
+              if (editorialState.enabled) ...[
+                _HomeMoodboardBlock(
+                  imagePath: editorialState.moodboardPath,
+                  quote: editorialState.moodboardQuote,
+                  defaultQuote: l10n.editorialDefaultMoodboardQuote,
+                  alignX: editorialState.moodboardAlignX,
+                  alignY: editorialState.moodboardAlignY,
+                  scale: editorialState.moodboardScale,
+                ),
+                const _GridDivider(),
+              ],
               _ActivityBlock(
                 workoutDays: state.workoutDays,
                 sessionCount: state.sessions.length,
@@ -265,6 +279,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   sessions: state.sessions,
                   recentLabel: l10n.recentSessions,
                   totalLabel: l10n.total,
+                ),
+              ],
+              if (editorialState.enabled) ...[
+                const _GridDivider(),
+                _HomeBackCoverBlock(
+                  imagePath: editorialState.backCoverPath,
+                  quote: editorialState.backCoverQuote,
+                  defaultQuote: l10n.editorialDefaultBackCoverQuote,
+                  alignX: editorialState.backCoverAlignX,
+                  alignY: editorialState.backCoverAlignY,
+                  scale: editorialState.backCoverScale,
                 ),
               ],
               const _GridDivider(),
@@ -559,11 +584,19 @@ class _HomeHeroBlock extends StatelessWidget {
     ];
     final todayPrefix = isEs ? 'Hoy —' : 'Today —';
 
+    final hairlineStrong = colors.ink900.withValues(alpha: 0.35);
+
     return FadeSlideIn(
       delay: const Duration(milliseconds: 60),
       child: Container(
         width: double.infinity,
-        color: colors.bgFrame,
+        decoration: BoxDecoration(
+          color: colors.bgFrame,
+          border: Border(
+            top: BorderSide(color: hairlineStrong, width: 0.8),
+            bottom: BorderSide(color: hairlineStrong, width: 0.8),
+          ),
+        ),
         padding: const EdgeInsets.fromLTRB(22, 26, 22, 26),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -883,51 +916,57 @@ class _StatCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 16, 14, 18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label.toUpperCase(),
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w800,
-              color: colors.ink500,
-              letterSpacing: 0.18,
+    return ClipRect(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: value,
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w500,
+                        height: 1.0,
+                        letterSpacing: -0.4,
+                        color: accent ? colors.accentDeep : colors.ink900,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' $unit',
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        fontStyle: FontStyle.italic,
+                        color: colors.ink400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 6),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Flexible(
-                child: Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: -0.55,
-                    color: accent ? colors.accentDeep : colors.ink900,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 3),
-              Text(
-                unit,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: colors.ink400,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+          const SizedBox(height: 5),
+          Text(
+            label.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 8.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.4,
+              color: colors.ink500,
+            ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -1147,7 +1186,7 @@ class _HomeSessionRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final locale = Localizations.localeOf(context).languageCode;
-    final accentColor = Color(session.colorValue);
+    final routineColor = Color(session.colorValue);
     return PressableScale(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
@@ -1158,71 +1197,57 @@ class _HomeSessionRow extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
         child: Row(
           children: [
-            Container(width: 3, height: 38, color: accentColor),
-            const SizedBox(width: 14),
+            Container(
+              width: 26,
+              height: 26,
+              alignment: Alignment.center,
+              color: routineColor,
+              child: Icon(
+                IconData(session.iconCode, fontFamily: 'MaterialIcons'),
+                color: Colors.white,
+                size: 14,
+              ),
+            ),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          session.routineName,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: colors.ink900,
-                            letterSpacing: -0.15,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        FormatUtils.date(session.date, locale: locale),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: colors.ink400,
-                          fontFeatures: const [FontFeature.tabularFigures()],
-                        ),
-                      ),
-                    ],
+                  Text(
+                    session.routineName,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500,
+                      fontStyle: FontStyle.italic,
+                      letterSpacing: -0.2,
+                      color: colors.ink900,
+                    ),
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.timer_outlined,
-                        size: 12,
-                        color: colors.ink500,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        FormatUtils.duration(session.durationMin),
-                        style: TextStyle(fontSize: 12, color: colors.ink500),
-                      ),
-                      const SizedBox(width: 14),
-                      Icon(
-                        Icons.fitness_center,
-                        size: 12,
-                        color: colors.ink500,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        FormatUtils.volume(session.volumeKg),
-                        style: TextStyle(fontSize: 12, color: colors.ink500),
-                      ),
-                    ],
+                  const SizedBox(height: 3),
+                  Text(
+                    '${FormatUtils.duration(session.durationMin)}  ·  ${FormatUtils.volume(session.volumeKg)} kg',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: colors.ink500,
+                      fontWeight: FontWeight.w500,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            Icon(
-              Icons.chevron_right,
-              size: 16,
-              color: colors.ink900.withValues(alpha: 0.3),
+            Text(
+              FormatUtils.date(session.date, locale: locale),
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.4,
+                color: colors.ink400,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
             ),
           ],
         ),
@@ -1423,6 +1448,245 @@ class _RecapBlock extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _HomeMoodboardBlock extends StatelessWidget {
+  const _HomeMoodboardBlock({
+    required this.imagePath,
+    required this.quote,
+    required this.defaultQuote,
+    required this.alignX,
+    required this.alignY,
+    required this.scale,
+  });
+
+  final String? imagePath;
+  final String quote;
+  final String defaultQuote;
+  final double alignX;
+  final double alignY;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final fileExists = imagePath != null && File(imagePath!).existsSync();
+    final displayQuote = quote.trim().isEmpty ? defaultQuote : quote;
+    final isEs = Localizations.localeOf(context).languageCode == 'es';
+    final techTag = isEs ? 'VOL. 1 / EDITORIAL' : 'VOL. 1 / EDITORIAL';
+
+    return Container(
+      height: 180,
+      width: double.infinity,
+      color: colors.bgFrame,
+      child: Row(
+        children: [
+          Expanded(
+            flex: 4,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    techTag,
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                      color: colors.ink400,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        displayQuote,
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.italic,
+                          height: 1.15,
+                          letterSpacing: -0.05,
+                          color: colors.ink900,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 5,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const _VGridDivider(),
+          Expanded(
+            flex: 6,
+            child: PressableScale(
+              onTap: () {
+                Navigator.of(context).push(
+                  AppRoute(page: const SettingsScreen()),
+                );
+              },
+              child: SizedBox.expand(
+                child: fileExists
+                    ? ClipRect(
+                        child: Transform.scale(
+                          scale: scale,
+                          child: Image.file(
+                            File(imagePath!),
+                            fit: BoxFit.cover,
+                            alignment: Alignment(alignX, alignY),
+                          ),
+                        ),
+                      )
+                    : Container(
+                        color: colors.ink900.withValues(alpha: 0.04),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add_photo_alternate_outlined,
+                              size: 24,
+                              color: colors.ink400,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              AppLocalizations.of(context)!.editorialNoImage.toUpperCase(),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                color: colors.ink500,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeBackCoverBlock extends StatelessWidget {
+  const _HomeBackCoverBlock({
+    required this.imagePath,
+    required this.quote,
+    required this.defaultQuote,
+    required this.alignX,
+    required this.alignY,
+    required this.scale,
+  });
+
+  final String? imagePath;
+  final String quote;
+  final String defaultQuote;
+  final double alignX;
+  final double alignY;
+  final double scale;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final fileExists = imagePath != null && File(imagePath!).existsSync();
+    final displayQuote = quote.trim().isEmpty ? defaultQuote : quote;
+    final isEs = Localizations.localeOf(context).languageCode == 'es';
+    final techTag = isEs ? 'VOL. 1 / CONTRAPORTADA' : 'VOL. 1 / BACK COVER';
+
+    return Container(
+      color: colors.bgFrame,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          PressableScale(
+            onTap: () {
+              Navigator.of(context).push(
+                AppRoute(page: const SettingsScreen()),
+              );
+            },
+            child: SizedBox(
+              height: 260,
+              width: double.infinity,
+              child: fileExists
+                  ? ClipRect(
+                      child: Transform.scale(
+                        scale: scale,
+                        child: Image.file(
+                          File(imagePath!),
+                          fit: BoxFit.cover,
+                          alignment: Alignment(alignX, alignY),
+                        ),
+                      ),
+                    )
+                  : Container(
+                      color: colors.ink900.withValues(alpha: 0.04),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_photo_alternate_outlined,
+                            size: 32,
+                            color: colors.ink400,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            AppLocalizations.of(context)!.editorialNoImage.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: colors.ink500,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+            ),
+          ),
+          const _GridDivider(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 12, 22, 14),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  techTag,
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    color: colors.ink400,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    displayQuote,
+                    textAlign: TextAlign.right,
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      fontStyle: FontStyle.italic,
+                      height: 1.1,
+                      color: colors.ink900,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

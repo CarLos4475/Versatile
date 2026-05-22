@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/utils/exercise_category.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../core/providers/repository_providers.dart';
@@ -185,39 +184,28 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                   onChanged: notifier.setQuery,
                 ),
                 const _GridDivider(),
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: 32,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 22),
-                    itemCount: _kMuscleGroups.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(width: 6),
-                    itemBuilder: (context, i) {
-                      final m = _kMuscleGroups[i];
-                      final dummy = Exercise(id: '', name: '', muscle: m, equipment: '');
-                      return _MagChip(
-                        label: dummy.getLocalizedMuscle(context),
-                        isActive: state.selectedMuscle == m,
-                        onTap: () => notifier.setMuscle(m),
-                      );
-                    },
-                  ),
-                ),
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 240),
-                  curve: Curves.easeOutCubic,
-                  alignment: Alignment.topLeft,
-                  child: _subMuscleRow(state, notifier),
-                ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 SizedBox(
                   height: 32,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 22),
                     children: [
+                      for (int i = 0; i < _kMuscleGroups.length; i++) ...[
+                        _MagChip(
+                          label: Exercise(
+                            id: '',
+                            name: '',
+                            muscle: _kMuscleGroups[i],
+                            equipment: '',
+                          ).getLocalizedMuscle(context),
+                          isActive: state.selectedMuscle == _kMuscleGroups[i],
+                          onTap: () => notifier.setMuscle(_kMuscleGroups[i]),
+                        ),
+                        if (i < _kMuscleGroups.length - 1)
+                          const SizedBox(width: 6),
+                      ],
+                      const _ChipGroupSeparator(),
                       _MagChip(
                         label: l10n.all,
                         isActive: state.laterality == ExerciseLaterality.all,
@@ -240,43 +228,16 @@ class _ExercisesScreenState extends ConsumerState<ExercisesScreen> {
                         onTap: () => notifier
                             .setLaterality(ExerciseLaterality.unilateral),
                       ),
-                      const SizedBox(width: 14),
-                      Container(
-                        width: 1,
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        color: context.colors.hairline,
-                      ),
-                      const SizedBox(width: 14),
-                      _MagChip(
-                        label: l10n.categoryPush,
-                        isActive:
-                            state.selectedCategory == ExerciseCategory.push,
-                        onTap: () =>
-                            notifier.setCategory(ExerciseCategory.push),
-                        outline: true,
-                      ),
-                      const SizedBox(width: 6),
-                      _MagChip(
-                        label: l10n.categoryPull,
-                        isActive:
-                            state.selectedCategory == ExerciseCategory.pull,
-                        onTap: () =>
-                            notifier.setCategory(ExerciseCategory.pull),
-                        outline: true,
-                      ),
-                      const SizedBox(width: 6),
-                      _MagChip(
-                        label: l10n.categoryLegs,
-                        isActive:
-                            state.selectedCategory == ExerciseCategory.legs,
-                        onTap: () =>
-                            notifier.setCategory(ExerciseCategory.legs),
-                        outline: true,
-                      ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 10),
+                AnimatedSize(
+                  duration: const Duration(milliseconds: 240),
+                  curve: Curves.easeOutCubic,
+                  alignment: Alignment.topLeft,
+                  child: _subMuscleRow(state, notifier),
+                ),
+                const SizedBox(height: 12),
                 const _GridDivider(),
                 Expanded(
                   child: allAsync.isLoading
@@ -344,6 +305,21 @@ class _GridDivider extends StatelessWidget {
   }
 }
 
+class _ChipGroupSeparator extends StatelessWidget {
+  const _ChipGroupSeparator();
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      child: Container(
+        width: 1.4,
+        margin: const EdgeInsets.symmetric(vertical: 2),
+        color: context.colors.ink900.withValues(alpha: 0.35),
+      ),
+    );
+  }
+}
+
 class _MagIconButton extends StatelessWidget {
   const _MagIconButton({
     required this.icon,
@@ -405,7 +381,7 @@ class _MagTabSwitcher extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     return SizedBox(
-      height: 48,
+      height: 40,
       child: Row(
         children: [
           _MagTab(
@@ -450,10 +426,10 @@ class _MagTab extends StatelessWidget {
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOutCubic,
           color: isActive ? colors.accent : Colors.transparent,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 220),
@@ -461,19 +437,26 @@ class _MagTab extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 0.18,
-                  color: isActive ? Colors.white : colors.ink400,
+                  letterSpacing: 1.4,
+                  color: isActive ? Colors.white : colors.ink500,
                 ),
                 child: Text(label.toUpperCase()),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(width: 8),
+              Container(
+                width: 3,
+                height: 3,
+                color: (isActive ? Colors.white : colors.ink500)
+                    .withValues(alpha: 0.55),
+              ),
+              const SizedBox(width: 8),
               AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 220),
                 curve: Curves.easeOutCubic,
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  letterSpacing: -0.55,
+                  letterSpacing: -0.3,
                   color: isActive ? Colors.white : colors.ink400,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
@@ -561,13 +544,11 @@ class _MagChip extends StatelessWidget {
     required this.label,
     required this.isActive,
     required this.onTap,
-    this.outline = false,
   });
 
   final String label;
   final bool isActive;
   final VoidCallback onTap;
-  final bool outline;
 
   @override
   Widget build(BuildContext context) {
@@ -578,13 +559,9 @@ class _MagChip extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive
-              ? (outline ? colors.accent.withValues(alpha: 0.14) : colors.accentDeep)
-              : Colors.transparent,
+          color: isActive ? colors.accentDeep : Colors.transparent,
           border: Border.all(
-            color: isActive
-                ? (outline ? colors.accent : Colors.transparent)
-                : colors.hairline,
+            color: isActive ? Colors.transparent : colors.hairline,
             width: 0.8,
           ),
         ),
@@ -593,9 +570,7 @@ class _MagChip extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: isActive
-                ? (outline ? colors.accentDeep : Colors.white)
-                : colors.ink700,
+            color: isActive ? Colors.white : colors.ink700,
           ),
         ),
       ),

@@ -678,5 +678,18 @@
   "viewAll": "View all",
   "formulaEpley": "Epley formula",
   "formulaEpleyDescription": "Estimated 1RM is calculated using the Epley formula:",
-  "vsPrevious": "vs previous"
+  "vsPrevious": "vs previous",
+  "editorialSection": "EDITORIAL PHOTOS",
+  "editorialEnable": "Enable photos on home",
+  "editorialMoodboardLabel": "Moodboard Photo",
+  "editorialBackCoverLabel": "Back Cover Photo",
+  "editorialQuoteHint": "Write custom caption...",
+  "editorialDefaultMoodboardQuote": "Focus on the process",
+  "editorialDefaultBackCoverQuote": "The mind is everything. What you think you become.",
+  "editorialNoImage": "No image selected",
+  "editorialChangeImage": "Change",
+  "editorialRemoveImage": "Remove",
+  "editorialCharLimit": "Max {limit} characters",
+  "editorialReposition": "Reposition Photo",
+  "editorialDragInstructions": "DRAG TO REPOSITION"
 }

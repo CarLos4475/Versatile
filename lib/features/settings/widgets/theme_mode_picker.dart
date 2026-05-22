@@ -90,30 +90,29 @@ class _ThemeCard extends StatelessWidget {
     final colors = context.colors;
     return PressableScale(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(10),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: active
-              ? colors.accentTint
-              : colors.ink900.withValues(alpha: 0.04),
+          color: active ? colors.accent : Colors.transparent,
           border: Border.all(
-            color: active
-                ? colors.accent.withValues(alpha: 0.45)
-                : colors.hairline.withValues(alpha: 0.5),
-            width: 0.5,
+            color: active ? colors.accent : colors.hairline,
+            width: active ? 1.0 : 0.5,
           ),
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: [
             AspectRatio(
               aspectRatio: 2.4,
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
                   gradient: preview,
                   border: Border.all(
-                    color: colors.hairline.withValues(alpha: 0.4),
+                    color: active
+                        ? Colors.white.withValues(alpha: 0.4)
+                        : colors.hairline.withValues(alpha: 0.6),
                     width: 0.5,
                   ),
                 ),
@@ -125,10 +124,7 @@ class _ThemeCard extends StatelessWidget {
                       child: Container(
                         width: 14,
                         height: 3,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(1.5),
-                          color: Colors.white.withValues(alpha: 0.35),
-                        ),
+                        color: Colors.white.withValues(alpha: 0.35),
                       ),
                     ),
                     Positioned(
@@ -137,10 +133,7 @@ class _ThemeCard extends StatelessWidget {
                       child: Container(
                         width: 24,
                         height: 2,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(1),
-                          color: Colors.white.withValues(alpha: 0.25),
-                        ),
+                        color: Colors.white.withValues(alpha: 0.25),
                       ),
                     ),
                   ],
@@ -153,16 +146,17 @@ class _ThemeCard extends StatelessWidget {
               children: [
                 Icon(
                   icon,
-                  size: 14,
-                  color: active ? colors.accentDeep : colors.ink500,
+                  size: 13,
+                  color: active ? Colors.white : colors.ink500,
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  label,
+                  label.toUpperCase(),
                   style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: active ? colors.accentDeep : colors.ink700,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.18,
+                    color: active ? Colors.white : colors.ink500,
                   ),
                 ),
               ],

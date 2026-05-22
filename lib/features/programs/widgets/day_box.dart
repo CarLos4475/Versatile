@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/color_utils.dart';
 import '../../../shared/widgets/motion.dart';
 
 class DayBox extends StatelessWidget {
@@ -31,111 +30,77 @@ class DayBox extends StatelessWidget {
         Text(
           dayLabel,
           style: TextStyle(
-            fontSize: 9,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.18,
             color: colors.ink500,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 6),
         PressableScale(
           onTap: onTap,
           child: AspectRatio(
-            aspectRatio: 0.75,
+            aspectRatio: 0.78,
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                gradient: isRest ? null : cellGradient(routineColor!),
-                color: isRest
-                    ? colors.ink900.withValues(alpha: 0.04)
-                    : null,
-                border: isRest
-                    ? Border.all(
-                        color: colors.hairline.withValues(alpha: 0.4),
-                        width: 0.5,
-                      )
-                    : null,
-                boxShadow: isRest
-                    ? null
-                    : [
-                        BoxShadow(
-                          color: routineColor!.withValues(alpha: 0.32),
-                          blurRadius: 18,
-                          spreadRadius: -2,
-                        ),
-                        BoxShadow(
-                          color: darkenColor(routineColor!, 0.22)
-                              .withValues(alpha: 0.55),
-                          blurRadius: 14,
-                          offset: const Offset(0, 7),
-                        ),
-                      ],
+                color: isRest ? Colors.transparent : routineColor,
+                border: Border.all(
+                  color: isRest
+                      ? colors.hairline
+                      : routineColor!.withValues(alpha: 0.85),
+                  width: 0.6,
+                ),
               ),
               clipBehavior: Clip.antiAlias,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (!isRest) const Positioned.fill(child: glossyOverlay),
-                  if (!isRest)
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      top: 0,
-                      child: Container(
-                        height: 1,
-                        color: Colors.white.withValues(alpha: 0.55),
-                      ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.all(4),
-                    child: isRest
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.bedtime_outlined,
-                                size: 14,
-                                color: colors.ink400,
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                restShortLabel,
-                                style: TextStyle(
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.w600,
-                                  color: colors.ink400,
-                                ),
-                              ),
-                            ],
-                          )
-                        : Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                routineLabel!.substring(0, 1).toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                routineLabel!.toUpperCase(),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.4,
-                                  color:
-                                      Colors.white.withValues(alpha: 0.85),
-                                ),
-                              ),
-                            ],
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: isRest
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.bedtime_outlined,
+                            size: 14,
+                            color: colors.ink400,
                           ),
-                  ),
-                ],
+                          const SizedBox(height: 3),
+                          Text(
+                            restShortLabel,
+                            style: TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.18,
+                              color: colors.ink400,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            routineLabel!.substring(0, 1).toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              height: 1,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            routineLabel!.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 8,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.18,
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                          ),
+                        ],
+                      ),
               ),
             ),
           ),

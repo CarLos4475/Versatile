@@ -3,11 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/providers/repository_providers.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/color_utils.dart';
 import '../../../core/utils/l10n_utils.dart';
 import '../../../domain/entities/program.dart';
 import '../../../domain/entities/routine.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../../shared/widgets/week_strip.dart';
@@ -22,6 +20,7 @@ class ProgramsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final isEs = Localizations.localeOf(context).languageCode == 'es';
     final programsAsync = ref.watch(programsListProvider);
     final activeAsync = ref.watch(activeProgramProvider);
     final routines = ref.watch(routinesProvider).value ?? const <Routine>[];
@@ -36,12 +35,8 @@ class ProgramsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ScreenHeader(
-                  prefix: Localizations.localeOf(context).languageCode == 'es'
-                      ? 'Plan de'
-                      : 'Training',
-                  accent: Localizations.localeOf(context).languageCode == 'es'
-                      ? 'entrenamiento.'
-                      : 'plan.',
+                  prefix: isEs ? 'Plan de' : 'Training',
+                  accent: isEs ? 'entrenamiento.' : 'plan.',
                   eyebrow: l10n.programsSubtitle,
                   onBack: () => Navigator.of(context).pop(),
                   accentBack: true,
@@ -67,59 +62,49 @@ class ProgramsScreen extends ConsumerWidget {
                       if (programs.isEmpty) {
                         return _EmptyState(
                           onCreate: () => _openEditor(context, null),
-                          onTemplate: (t) => _createFromTemplate(context, ref, t),
+                          onTemplate: (t) =>
+                              _createFromTemplate(context, ref, t),
                         );
                       }
                       return ListView(
-                        padding: const EdgeInsets.fromLTRB(22, 8, 22, 110),
+                        padding: const EdgeInsets.fromLTRB(22, 14, 22, 110),
                         children: [
                           if (activeAsync.value != null) ...[
                             _ThisWeekHero(
                               active: activeAsync.value!,
                               routines: routines,
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 28),
                           ],
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              left: 4,
-                              right: 4,
-                              bottom: 10,
-                            ),
-                            child: Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  l10n.yourProgramsSection.toUpperCase(),
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 1.1,
-                                    color: context.colors.ink400,
-                                  ),
-                                ),
-                                Text(
-                                  l10n.programsTotalCount(programs.length),
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: context.colors.ink500,
-                                  ),
-                                ),
-                              ],
+                          _SectionEyebrow(
+                            label: l10n.yourProgramsSection,
+                            trailing: Text(
+                              l10n.programsTotalCount(programs.length),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: context.colors.ink500,
+                                fontFeatures: const [
+                                  FontFeature.tabularFigures(),
+                                ],
+                              ),
                             ),
                           ),
-                          for (final p in programs)
+                          const SizedBox(height: 12),
+                          for (var i = 0; i < programs.length; i++)
                             Padding(
-                              padding: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.only(bottom: 10),
                               child: _ProgramCard(
-                                program: p,
-                                isActive: p.id == activeId,
+                                program: programs[i],
+                                isActive: programs[i].id == activeId,
                                 routines: routines,
-                                onTap: () => _openEditor(context, p.id),
-                                onActivate: () => _activate(context, ref, p),
+                                onTap: () =>
+                                    _openEditor(context, programs[i].id),
+                                onActivate: () =>
+                                    _activate(context, ref, programs[i]),
                                 onDeactivate: () => _deactivate(ref),
-                                onDelete: () => _delete(context, ref, p),
+                                onDelete: () =>
+                                    _delete(context, ref, programs[i]),
                               ),
                             ),
                         ],
@@ -129,7 +114,6 @@ class ProgramsScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            // FAB
             programsAsync.maybeWhen(
               data: (programs) {
                 if (programs.isEmpty) return const SizedBox.shrink();
@@ -172,17 +156,15 @@ class ProgramsScreen extends ConsumerWidget {
             Container(
               width: 30,
               height: 30,
-              decoration: BoxDecoration(
-                color: context.colors.accentTint,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: context.colors.accent),
+              child: const Icon(
                 Icons.help_outline_rounded,
-                color: context.colors.accentDeep,
-                size: 18,
+                color: Colors.white,
+                size: 16,
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 l10n.programsHelpTitle,
@@ -203,21 +185,21 @@ class ProgramsScreen extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               for (var i = 0; i < sections.length; i++) ...[
-                if (i > 0) const SizedBox(height: 14),
+                if (i > 0) const SizedBox(height: 16),
                 Text(
-                  sections[i].$1,
+                  sections[i].$1.toUpperCase(),
                   style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.18,
                     color: context.colors.accentDeep,
-                    letterSpacing: -0.1,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 5),
                 Text(
                   sections[i].$2,
                   style: TextStyle(
-                    fontSize: 13.5,
+                    fontSize: 13,
                     color: context.colors.ink500,
                     height: 1.45,
                   ),
@@ -343,6 +325,49 @@ class ProgramsScreen extends ConsumerWidget {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// Section helpers
+// ═══════════════════════════════════════════════════════════════
+
+class _SectionEyebrow extends StatelessWidget {
+  const _SectionEyebrow({required this.label, this.trailing});
+  final String label;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Row(
+      children: [
+        Container(
+          width: 22,
+          height: 1,
+          color: colors.ink400.withValues(alpha: 0.55),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            label.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.18,
+              color: colors.ink500,
+            ),
+          ),
+        ),
+        if (trailing != null) trailing!,
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// This Week Hero
+// ═══════════════════════════════════════════════════════════════
+
 class _ThisWeekHero extends StatelessWidget {
   final ActiveProgramInfo active;
   final List<Routine> routines;
@@ -376,7 +401,10 @@ class _ThisWeekHero extends StatelessWidget {
       if (slot.kind == SlotKind.routine) {
         final r = routinesById[slot.routineId];
         if (r == null) return const WeekStripCell.rest();
-        return WeekStripCell.routine(label: r.name, color: Color(r.colorValue));
+        return WeekStripCell.routine(
+          label: r.name,
+          color: Color(r.colorValue),
+        );
       }
       final label = slot.labelText ?? '';
       if (label.isEmpty || label.toLowerCase() == 'rest') {
@@ -389,7 +417,8 @@ class _ThisWeekHero extends StatelessWidget {
     });
 
     final todaySlot = program.slotAt(weekIndex, today.weekday);
-    final todayRoutine = todaySlot != null && todaySlot.kind == SlotKind.routine
+    final todayRoutine =
+        todaySlot != null && todaySlot.kind == SlotKind.routine
         ? routinesById[todaySlot.routineId]
         : null;
     final todayLabelText = todaySlot?.labelText ?? '';
@@ -411,82 +440,48 @@ class _ThisWeekHero extends StatelessWidget {
       todayAccent = localizeSlotLabel(context, todayLabelText);
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 4, right: 4, bottom: 10),
-            child: Text(
-              l10n.thisWeekSection.toUpperCase(),
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 1.1,
-                color: colors.ink400,
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionEyebrow(
+          label: l10n.thisWeekSection,
+          trailing: Text(
+            l10n.programWeekProgress(weekIndex + 1, program.weeksCount),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: colors.ink500,
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
-          GlassContainer(
-            radius: 22,
-            padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
-            child: IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Container(
-                    width: 4,
-                    decoration: BoxDecoration(
-                      color: colors.accent,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
+        ),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: colors.bgFrame,
+            border: Border.all(color: colors.hairline, width: 0.5),
+          ),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(width: 3, color: colors.accent),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 3,
-                              ),
-                              decoration: BoxDecoration(
-                                color: colors.accentTint,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                l10n
-                                    .programWeekProgress(
-                                      weekIndex + 1,
-                                      program.weeksCount,
-                                    )
-                                    .toUpperCase(),
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.8,
-                                  color: colors.accentDeep,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                program.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                  color: colors.ink500,
-                                ),
-                              ),
-                            ),
-                          ],
+                        Text(
+                          program.name.toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.18,
+                            color: colors.accentDeep,
+                          ),
                         ),
                         const SizedBox(height: 6),
                         RichText(
@@ -495,19 +490,22 @@ class _ThisWeekHero extends StatelessWidget {
                               fontSize: 26,
                               fontWeight: FontWeight.w500,
                               letterSpacing: -0.52,
-                              color: colors.ink900,
                               height: 1.1,
+                              color: colors.ink900,
                             ),
                             children: [
                               TextSpan(text: '$todayPrefix '),
                               TextSpan(
                                 text: todayAccent,
-                                style: TextStyle(color: colors.accentDeep),
+                                style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: colors.accentLight,
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 18),
                         WeekStrip(
                           cells: cells,
                           todayIndex: today.weekday - 1,
@@ -517,15 +515,19 @@ class _ThisWeekHero extends StatelessWidget {
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// Program Card
+// ═══════════════════════════════════════════════════════════════
 
 class _ProgramCard extends StatelessWidget {
   const _ProgramCard({
@@ -560,7 +562,10 @@ class _ProgramCard extends StatelessWidget {
       if (slot.kind == SlotKind.routine) {
         final r = routinesById[slot.routineId];
         if (r == null) return const WeekStripCell.rest();
-        return WeekStripCell.routine(label: r.name, color: Color(r.colorValue));
+        return WeekStripCell.routine(
+          label: r.name,
+          color: Color(r.colorValue),
+        );
       }
       final label = slot.labelText ?? '';
       if (label.isEmpty || label.toLowerCase() == 'rest') {
@@ -571,72 +576,92 @@ class _ProgramCard extends StatelessWidget {
 
     return PressableScale(
       onTap: onTap,
-      child: GlassContainer(
-        radius: 18,
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 4,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(2),
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [color, darkenColor(color, 0.14)],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+          color: colors.bgFrame,
+          border: Border.all(color: colors.hairline, width: 0.5),
+        ),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(width: 3, color: color),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 14, 6, 14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Row(
                         children: [
-                          Flexible(
+                          Expanded(
                             child: Text(
                               program.name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: 15,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: colors.ink900,
-                                letterSpacing: -0.16,
+                                letterSpacing: -0.18,
                               ),
                             ),
                           ),
-                          if (isActive) ...[
-                            const SizedBox(width: 8),
+                          if (isActive)
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 7,
-                                vertical: 2,
+                                horizontal: 6,
+                                vertical: 3,
                               ),
-                              decoration: BoxDecoration(
-                                color: colors.accentTint,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
+                              decoration: BoxDecoration(color: colors.accent),
                               child: Text(
-                                l10n.activeBadge,
-                                style: TextStyle(
+                                l10n.activeBadge.toUpperCase(),
+                                style: const TextStyle(
                                   fontSize: 9,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.8,
-                                  color: colors.accentDeep,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.6,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
-                          ],
+                          PopupMenuButton<String>(
+                            icon: Icon(
+                              Icons.more_horiz,
+                              color: colors.ink500,
+                              size: 18,
+                            ),
+                            color: colors.bgFrame,
+                            iconSize: 18,
+                            padding: EdgeInsets.zero,
+                            splashRadius: 18,
+                            onSelected: (v) {
+                              if (v == 'activate') onActivate();
+                              if (v == 'deactivate') onDeactivate();
+                              if (v == 'delete') onDelete();
+                            },
+                            itemBuilder: (ctx) => [
+                              if (!isActive)
+                                PopupMenuItem(
+                                  value: 'activate',
+                                  child: Text(l10n.activateProgram),
+                                ),
+                              if (isActive)
+                                PopupMenuItem(
+                                  value: 'deactivate',
+                                  child: Text(l10n.deactivateProgram),
+                                ),
+                              PopupMenuItem(
+                                value: 'delete',
+                                child: Text(
+                                  l10n.delete,
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 3),
                       Text(
                         l10n.programWeeksSummary(
                           program.weeksCount,
@@ -648,57 +673,23 @@ class _ProgramCard extends StatelessWidget {
                           fontFeatures: const [FontFeature.tabularFigures()],
                         ),
                       ),
+                      const SizedBox(height: 14),
+                      WeekStrip(cells: cells, variant: WeekStripVariant.mini),
                     ],
                   ),
                 ),
-                PopupMenuButton<String>(
-                  icon: Icon(
-                    Icons.more_horiz,
-                    color: colors.ink500,
-                    size: 18,
-                  ),
-                  color: colors.bgFrame,
-                  iconSize: 18,
-                  padding: EdgeInsets.zero,
-                  splashRadius: 18,
-                  onSelected: (v) {
-                    if (v == 'activate') onActivate();
-                    if (v == 'deactivate') onDeactivate();
-                    if (v == 'delete') onDelete();
-                  },
-                  itemBuilder: (ctx) => [
-                    if (!isActive)
-                      PopupMenuItem(
-                        value: 'activate',
-                        child: Text(l10n.activateProgram),
-                      ),
-                    if (isActive)
-                      PopupMenuItem(
-                        value: 'deactivate',
-                        child: Text(l10n.deactivateProgram),
-                      ),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Text(
-                        l10n.delete,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            WeekStrip(
-              cells: cells,
-              variant: WeekStripVariant.mini,
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// FAB
+// ═══════════════════════════════════════════════════════════════
 
 class _FabButton extends StatelessWidget {
   final String label;
@@ -708,36 +699,31 @@ class _FabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = context.colors.accent;
+    final colors = context.colors;
     return PressableScale(
       onTap: onTap,
       child: Container(
-        height: 54,
+        height: 52,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              lightenColor(accent, 0.06),
-              accent,
-              darkenColor(accent, 0.12),
-            ],
+          color: colors.accent,
+          border: Border.all(
+            color: colors.accentDeep.withValues(alpha: 0.6),
+            width: 0.6,
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.add, color: Colors.white, size: 18),
+            const Icon(Icons.add, color: Colors.white, size: 16),
             const SizedBox(width: 8),
             Text(
-              label,
+              label.toUpperCase(),
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.16,
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.4,
               ),
             ),
           ],
@@ -747,6 +733,10 @@ class _FabButton extends StatelessWidget {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// Help button
+// ═══════════════════════════════════════════════════════════════
+
 class _HelpButton extends StatelessWidget {
   const _HelpButton({required this.tooltip, required this.onTap});
 
@@ -755,6 +745,7 @@ class _HelpButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return Tooltip(
       message: tooltip,
       child: PressableScale(
@@ -762,18 +753,14 @@ class _HelpButton extends StatelessWidget {
         child: Container(
           width: 38,
           height: 38,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: context.colors.glassBg,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: context.colors.glassBorder,
-              width: 0.5,
-            ),
-            boxShadow: context.colors.glassShadow,
+            color: colors.ink900.withValues(alpha: 0.04),
+            border: Border.all(color: colors.hairline, width: 0.6),
           ),
           child: Icon(
             Icons.help_outline_rounded,
-            color: context.colors.ink700,
+            color: colors.ink700,
             size: 20,
           ),
         ),
@@ -781,6 +768,10 @@ class _HelpButton extends StatelessWidget {
     );
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// Empty State
+// ═══════════════════════════════════════════════════════════════
 
 class _EmptyState extends StatelessWidget {
   const _EmptyState({required this.onCreate, required this.onTemplate});
@@ -792,7 +783,7 @@ class _EmptyState extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final colors = context.colors;
     return ListView(
-      padding: const EdgeInsets.fromLTRB(22, 16, 22, 40),
+      padding: const EdgeInsets.fromLTRB(22, 18, 22, 40),
       children: [
         SizedBox(
           height: 160,
@@ -803,22 +794,23 @@ class _EmptyState extends StatelessWidget {
           l10n.designYourWeek,
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 28,
             fontWeight: FontWeight.w500,
-            letterSpacing: -0.48,
+            letterSpacing: -0.55,
+            height: 1.05,
             color: colors.ink900,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 8),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 22),
           child: Text(
             l10n.designYourWeekBody,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
               color: colors.ink500,
-              height: 1.45,
+              height: 1.5,
             ),
           ),
         ),
@@ -827,18 +819,14 @@ class _EmptyState extends StatelessWidget {
           child: PressableScale(
             onTap: onCreate,
             child: Container(
-              height: 50,
-              padding: const EdgeInsets.symmetric(horizontal: 22),
+              height: 52,
+              padding: const EdgeInsets.symmetric(horizontal: 26),
+              alignment: Alignment.center,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    lightenColor(colors.accent, 0.06),
-                    colors.accent,
-                    darkenColor(colors.accent, 0.12),
-                  ],
+                color: colors.accent,
+                border: Border.all(
+                  color: colors.accentDeep.withValues(alpha: 0.6),
+                  width: 0.6,
                 ),
               ),
               child: Row(
@@ -847,11 +835,12 @@ class _EmptyState extends StatelessWidget {
                   const Icon(Icons.add, color: Colors.white, size: 16),
                   const SizedBox(width: 8),
                   Text(
-                    l10n.createFromScratch,
+                    l10n.createFromScratch.toUpperCase(),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.4,
                     ),
                   ),
                 ],
@@ -859,32 +848,12 @@ class _EmptyState extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 32),
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 10),
-          child: Row(
-            children: [
-              Icon(
-                Icons.auto_awesome,
-                size: 13,
-                color: colors.ink400,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                l10n.orStartFromTemplate.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.1,
-                  color: colors.ink400,
-                ),
-              ),
-            ],
-          ),
-        ),
+        const SizedBox(height: 36),
+        _SectionEyebrow(label: l10n.orStartFromTemplate),
+        const SizedBox(height: 12),
         for (final t in kProgramTemplates)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.only(bottom: 10),
             child: _TemplateCard(template: t, onTap: () => onTemplate(t)),
           ),
       ],
@@ -914,18 +883,10 @@ class _EmptyHero extends StatelessWidget {
                 height: 100,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      const Color(0xFF7AA0CC).withValues(alpha: 0.35),
-                      const Color(0xFF4A6E94).withValues(alpha: 0.20),
-                    ],
-                  ),
+                  color: const Color(0xFF5B7A8C),
                   border: Border.all(
-                    color: const Color(0xFF7AA0CC).withValues(alpha: 0.30),
-                    width: 0.5,
+                    color: Colors.white.withValues(alpha: 0.25),
+                    width: 0.6,
                   ),
                 ),
                 child: const Align(
@@ -952,24 +913,16 @@ class _EmptyHero extends StatelessWidget {
                 height: 100,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF8DA4B5),
-                      Color(0xFF5B7A8C),
-                    ],
-                  ),
+                  color: const Color(0xFF7A8C5B),
                   border: Border.all(
-                    color: const Color(0xFF5B7A8C).withValues(alpha: 0.35),
-                    width: 0.5,
+                    color: Colors.white.withValues(alpha: 0.25),
+                    width: 0.6,
                   ),
                 ),
                 child: Icon(
                   Icons.bedtime_outlined,
                   size: 28,
-                  color: Colors.white.withValues(alpha: 0.75),
+                  color: Colors.white.withValues(alpha: 0.8),
                 ),
               ),
             ),
@@ -983,17 +936,7 @@ class _EmptyHero extends StatelessWidget {
                 width: 86,
                 height: 110,
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      lightenColor(accent, 0.04),
-                      darkenColor(accent, 0.12),
-                    ],
-                  ),
-                ),
+                decoration: BoxDecoration(color: accent),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
@@ -1002,11 +945,11 @@ class _EmptyHero extends StatelessWidget {
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 9,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
                         letterSpacing: 1.0,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    SizedBox(height: 6),
                     Text(
                       'U',
                       style: TextStyle(
@@ -1047,93 +990,103 @@ class _TemplateCard extends StatelessWidget {
 
     return PressableScale(
       onTap: onTap,
-      child: GlassContainer(
-        radius: 16,
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    template.color,
-                    darkenColor(template.color, 0.18),
-                  ],
-                ),
-              ),
-              child: const Icon(
-                Icons.calendar_month_outlined,
-                size: 18,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: colors.hairline, width: 0.5),
+        ),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(width: 3, color: template.color),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+                  child: Row(
                     children: [
-                      Flexible(
-                        child: Text(
-                          template.name(l10n),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: colors.ink900,
-                            letterSpacing: -0.07,
-                          ),
+                      Container(
+                        width: 40,
+                        height: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(color: template.color),
+                        child: const Icon(
+                          Icons.calendar_month_outlined,
+                          size: 18,
+                          color: Colors.white,
                         ),
                       ),
-                      if (template.recommended) ...[
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 5,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colors.accentTint,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            l10n.recommendedBadge,
-                            style: TextStyle(
-                              fontSize: 8,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.8,
-                              color: colors.accentDeep,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    template.name(l10n),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: colors.ink900,
+                                      letterSpacing: -0.18,
+                                    ),
+                                  ),
+                                ),
+                                if (template.recommended) ...[
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 5,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: colors.accent,
+                                    ),
+                                    child: Text(
+                                      l10n.recommendedBadge.toUpperCase(),
+                                      style: const TextStyle(
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.6,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
-                          ),
+                            const SizedBox(height: 3),
+                            Text(
+                              template.sub(l10n),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: colors.ink500,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            WeekStrip(
+                              cells: cells,
+                              variant: WeekStripVariant.mini,
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
+                      const SizedBox(width: 6),
+                      Icon(
+                        Icons.chevron_right,
+                        size: 16,
+                        color: colors.ink900.withValues(alpha: 0.3),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    template.sub(l10n),
-                    style: TextStyle(fontSize: 11, color: colors.ink500),
-                  ),
-                  const SizedBox(height: 8),
-                  WeekStrip(cells: cells, variant: WeekStripVariant.mini),
-                ],
+                ),
               ),
-            ),
-            Icon(
-              Icons.chevron_right,
-              size: 16,
-              color: colors.ink400,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

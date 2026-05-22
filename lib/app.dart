@@ -566,7 +566,7 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                             fontWeight: FontWeight.w700,
                             color: isDark
                                 ? Colors.white
-                                : const Color(0xFF3D1A08),
+                                : context.colors.bgApp,
                             letterSpacing: -0.13,
                           ),
                           maxLines: 1,
@@ -578,9 +578,7 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                             fontSize: 11,
                             color: isDark
                                 ? Colors.white.withValues(alpha: 0.75)
-                                : const Color(
-                                    0xFF3D1A08,
-                                  ).withValues(alpha: 0.65),
+                                : context.colors.bgApp.withValues(alpha: 0.85),
                           ),
                         ),
                       ],
@@ -601,7 +599,7 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                         letterSpacing: -0.3,
                         color: isDark
                             ? Colors.white
-                            : const Color(0xFF3D1A08),
+                            : context.colors.bgApp,
                         fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                     ),
@@ -625,7 +623,7 @@ class _ActiveWorkoutOverlay extends ConsumerWidget {
                     child: Icon(
                       Icons.chevron_right,
                       size: 18,
-                      color: isDark ? Colors.white : const Color(0xFF3D1A08),
+                      color: isDark ? Colors.white : context.colors.bgApp,
                     ),
                   ),
                 ],
@@ -680,7 +678,7 @@ class _IslandPulseDotState extends State<_IslandPulseDot>
         width: 7,
         height: 7,
         decoration: BoxDecoration(
-          color: isDark ? Colors.white : const Color(0xFF3D1A08),
+          color: isDark ? Colors.white : context.colors.bgApp,
           shape: BoxShape.circle,
         ),
       ),

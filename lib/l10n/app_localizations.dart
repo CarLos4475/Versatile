@@ -2833,6 +2833,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'vs previous'**
   String get vsPrevious;
+
+  /// No description provided for @editorialSection.
+  ///
+  /// In en, this message translates to:
+  /// **'EDITORIAL PHOTOS'**
+  String get editorialSection;
+
+  /// No description provided for @editorialEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable photos on home'**
+  String get editorialEnable;
+
+  /// No description provided for @editorialMoodboardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Moodboard Photo'**
+  String get editorialMoodboardLabel;
+
+  /// No description provided for @editorialBackCoverLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Back Cover Photo'**
+  String get editorialBackCoverLabel;
+
+  /// No description provided for @editorialQuoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write custom caption...'**
+  String get editorialQuoteHint;
+
+  /// No description provided for @editorialDefaultMoodboardQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus on the process'**
+  String get editorialDefaultMoodboardQuote;
+
+  /// No description provided for @editorialDefaultBackCoverQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'The mind is everything. What you think you become.'**
+  String get editorialDefaultBackCoverQuote;
+
+  /// No description provided for @editorialNoImage.
+  ///
+  /// In en, this message translates to:
+  /// **'No image selected'**
+  String get editorialNoImage;
+
+  /// No description provided for @editorialChangeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get editorialChangeImage;
+
+  /// No description provided for @editorialRemoveImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get editorialRemoveImage;
+
+  /// No description provided for @editorialCharLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Max {limit} characters'**
+  String editorialCharLimit(Object limit);
+
+  /// No description provided for @editorialReposition.
+  ///
+  /// In en, this message translates to:
+  /// **'Reposition Photo'**
+  String get editorialReposition;
+
+  /// No description provided for @editorialDragInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'DRAG TO REPOSITION'**
+  String get editorialDragInstructions;
 }
 
 class _AppLocalizationsDelegate
