@@ -154,15 +154,29 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen>
         recap.volumeByMuscle.values.fold<double>(0, (s, v) => s + v) > 0;
     final hasVolume = recap.weeklyVolumeKg.any((v) => v > 0);
 
-    return [
-      CoverSlide(recap: recap),
-      SessionsSlide(recap: recap),
-      if (hasVolume) VolumeSlide(recap: recap),
-      CalendarSlide(recap: recap),
-      if (recap.topLift != null) TopLiftSlide(recap: recap),
-      if (hasMuscleData) MuscleBalanceSlide(recap: recap),
-      OutroSlide(recap: recap, onClose: _markSeenAndClose),
-    ];
+    // Count interior pages (everything except cover + outro) so the masthead
+    // can show "PAGE X / N" with N stable across the issue.
+    var interiorTotal = 1; // sessions always
+    if (hasVolume) interiorTotal += 1;
+    interiorTotal += 1; // calendar
+    if (recap.topLift != null) interiorTotal += 1;
+    if (hasMuscleData) interiorTotal += 1;
+
+    final pages = <Widget>[CoverSlide(recap: recap)];
+    var p = 1;
+    pages.add(SessionsSlide(recap: recap, page: p++, total: interiorTotal));
+    if (hasVolume) {
+      pages.add(VolumeSlide(recap: recap, page: p++, total: interiorTotal));
+    }
+    pages.add(CalendarSlide(recap: recap, page: p++, total: interiorTotal));
+    if (recap.topLift != null) {
+      pages.add(TopLiftSlide(recap: recap, page: p++, total: interiorTotal));
+    }
+    if (hasMuscleData) {
+      pages.add(MuscleBalanceSlide(recap: recap, page: p++, total: interiorTotal));
+    }
+    pages.add(OutroSlide(recap: recap, onClose: _markSeenAndClose));
+    return pages;
   }
 
   @override
@@ -190,12 +204,9 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen>
     final clamped = _current.clamp(0, slides.length - 1);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0E0B07),
-      // The Stories layout is a takeover — force a bone DefaultTextStyle so
-      // child Text widgets without an explicit color don't inherit the
-      // ambient theme's dark text color (the Scaffold sits inside a Material
-      // whose textTheme follows the app theme, which is dark text in light
-      // mode and would render invisible on this warm-dark backdrop).
+      backgroundColor: RecapBackdrop.paperBg,
+      // Editorial magazine takeover — force an ink DefaultTextStyle so child
+      // Text widgets without an explicit color render dark on the bone paper.
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -215,7 +226,7 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen>
             onLongPressCancel: _resume,
               child: DefaultTextStyle(
                 style: const TextStyle(
-                  color: Color(0xFFF5EFE2),
+                  color: Color(0xFF1A1A1F),
                   decoration: TextDecoration.none,
                 ),
                 child: KeyedSubtree(
@@ -282,36 +293,33 @@ class _ProgressBars extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.only(right: i < total - 1 ? 4 : 0),
             child: SizedBox(
-              height: 2.5,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(2),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Container(color: Colors.white.withValues(alpha: 0.16)),
-                    AnimatedBuilder(
-                      animation: controller,
-                      builder: (context, _) {
-                        double fill;
-                        if (i < current) {
-                          fill = 1;
-                        } else if (i == current) {
-                          fill = controller.value;
-                        } else {
-                          fill = 0;
-                        }
-                        return Align(
-                          alignment: Alignment.centerLeft,
-                          child: FractionallySizedBox(
-                            widthFactor: fill,
-                            heightFactor: 1,
-                            child: Container(color: const Color(0xFFF5EFE2)),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+              height: 2,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(color: const Color(0x331A1A1F)),
+                  AnimatedBuilder(
+                    animation: controller,
+                    builder: (context, _) {
+                      double fill;
+                      if (i < current) {
+                        fill = 1;
+                      } else if (i == current) {
+                        fill = controller.value;
+                      } else {
+                        fill = 0;
+                      }
+                      return Align(
+                        alignment: Alignment.centerLeft,
+                        child: FractionallySizedBox(
+                          widthFactor: fill,
+                          heightFactor: 1,
+                          child: Container(color: const Color(0xFF1A1A1F)),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ),
@@ -331,16 +339,17 @@ class _CloseButton extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        width: 32,
-        height: 32,
+        width: 30,
+        height: 30,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.10),
-          borderRadius: BorderRadius.circular(10),
+          color: const Color(0x111A1A1F),
+          border: Border.all(color: const Color(0x331A1A1F), width: 0.6),
         ),
         child: const Icon(
           Icons.close_rounded,
-          size: 16,
-          color: Color(0xFFF5EFE2),
+          size: 14,
+          color: Color(0xFF1A1A1F),
         ),
       ),
     );
@@ -358,27 +367,28 @@ class _ShareButton extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        width: 32,
-        height: 32,
+        width: 30,
+        height: 30,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.10),
-          borderRadius: BorderRadius.circular(10),
+          color: const Color(0x111A1A1F),
+          border: Border.all(color: const Color(0x331A1A1F), width: 0.6),
         ),
         child: loading
             ? const Center(
                 child: SizedBox(
-                  width: 14,
-                  height: 14,
+                  width: 12,
+                  height: 12,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Color(0xFFF5EFE2),
+                    color: Color(0xFF1A1A1F),
                   ),
                 ),
               )
             : const Icon(
                 Icons.ios_share_rounded,
-                size: 16,
-                color: Color(0xFFF5EFE2),
+                size: 14,
+                color: Color(0xFF1A1A1F),
               ),
       ),
     );

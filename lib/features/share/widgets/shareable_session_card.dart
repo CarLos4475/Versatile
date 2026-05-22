@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../core/utils/format_utils.dart';
 import '../../../domain/entities/monthly_recap.dart';
 import '../../../domain/entities/session.dart';
+import '../../../l10n/app_localizations.dart';
 
 /// Editorial magazine-style share card. Fixed bone background regardless of
 /// app theme — the design is intentional, not user-themed, so it looks the
@@ -66,12 +67,14 @@ class ShareableSessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
     final routineColor = Color(session.colorValue);
     final totalSets =
         session.exercises?.fold<int>(0, (s, e) => s + e.sets.length) ?? 0;
     final totalExercises = session.exercises?.length ?? 0;
 
-    final dateFormatted = _formatDate(session.date);
+    final dateFormatted = _formatDate(session.date, locale);
     final hasPR = pr != null;
     final hasPhoto = userPhotoPath != null &&
         userPhotoPath!.isNotEmpty &&
@@ -94,6 +97,8 @@ class ShareableSessionCard extends StatelessWidget {
                 dateLabel: dateFormatted,
                 routineColor: routineColor,
                 iconCode: session.iconCode,
+                issueAbbrev: l10n.shareIssueAbbrev,
+                journalLabel: l10n.shareTrainingJournal,
               ),
               const SizedBox(height: 12),
               const _Hairline(color: _hairlineStrong, height: 0.8),
@@ -101,16 +106,26 @@ class ShareableSessionCard extends StatelessWidget {
               _Headline(routineName: session.routineName),
               const SizedBox(height: 14),
               Expanded(
-                child: _HeroVolume(volumeKg: session.volumeKg),
+                child: _HeroVolume(
+                  volumeKg: session.volumeKg,
+                  label: l10n.volumeTotal.toUpperCase(),
+                ),
               ),
               _StatsBar(
                 durationMin: session.durationMin,
                 totalSets: totalSets,
                 totalExercises: totalExercises,
+                timeLabel: l10n.duration.toUpperCase(),
+                setsLabel: l10n.sets.toUpperCase(),
+                exercisesLabel: l10n.exercisesLabel.toUpperCase(),
               ),
               if (hasPR) ...[
                 const SizedBox(height: 10),
-                _PrRow(pr: pr!, routineColor: routineColor),
+                _PrRow(
+                  pr: pr!,
+                  routineColor: routineColor,
+                  badgeLabel: l10n.sharePRBadge,
+                ),
               ],
               if (hasPhoto) ...[
                 const SizedBox(height: 14),
@@ -128,7 +143,7 @@ class ShareableSessionCard extends StatelessWidget {
               const SizedBox(height: 14),
               const _Hairline(color: _hairlineSoft),
               const SizedBox(height: 10),
-              const _Wordmark(),
+              _Wordmark(tagline: l10n.shareTrainingJournal),
             ],
           ),
         ),
@@ -136,11 +151,11 @@ class ShareableSessionCard extends StatelessWidget {
     );
   }
 
-  static String _formatDate(String iso) {
+  static String _formatDate(String iso, String locale) {
     try {
       final dt = DateTime.parse(iso);
-      final wd = DateFormat.E('en').format(dt).toUpperCase();
-      final mon = DateFormat.MMM('en').format(dt).toUpperCase();
+      final wd = DateFormat.E(locale).format(dt).toUpperCase();
+      final mon = DateFormat.MMM(locale).format(dt).toUpperCase();
       return '$wd · $mon ${dt.day.toString().padLeft(2, '0')}';
     } catch (_) {
       return iso.toUpperCase();
@@ -153,11 +168,15 @@ class _TopBar extends StatelessWidget {
     required this.dateLabel,
     required this.routineColor,
     required this.iconCode,
+    required this.issueAbbrev,
+    required this.journalLabel,
   });
 
   final String dateLabel;
   final Color routineColor;
   final int iconCode;
+  final String issueAbbrev;
+  final String journalLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +205,7 @@ class _TopBar extends StatelessWidget {
         ),
         const Spacer(),
         Text(
-          'No. ${_issueNumber()}',
+          '$issueAbbrev ${_issueNumber()}',
           style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w500,
@@ -245,9 +264,10 @@ class _Headline extends StatelessWidget {
 }
 
 class _HeroVolume extends StatelessWidget {
-  const _HeroVolume({required this.volumeKg});
+  const _HeroVolume({required this.volumeKg, required this.label});
 
   final double volumeKg;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
@@ -262,9 +282,9 @@ class _HeroVolume extends StatelessWidget {
               color: ShareableSessionCard._ink,
             ),
             const SizedBox(width: 8),
-            const Text(
-              'TOTAL VOLUME',
-              style: TextStyle(
+            Text(
+              label,
+              style: const TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.6,
@@ -318,11 +338,17 @@ class _StatsBar extends StatelessWidget {
     required this.durationMin,
     required this.totalSets,
     required this.totalExercises,
+    required this.timeLabel,
+    required this.setsLabel,
+    required this.exercisesLabel,
   });
 
   final int durationMin;
   final int totalSets;
   final int totalExercises;
+  final String timeLabel;
+  final String setsLabel;
+  final String exercisesLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -345,7 +371,7 @@ class _StatsBar extends StatelessWidget {
             Expanded(
               child: _StatCell(
                 value: FormatUtils.duration(durationMin),
-                label: 'TIME',
+                label: timeLabel,
               ),
             ),
             Container(
@@ -353,14 +379,15 @@ class _StatsBar extends StatelessWidget {
               color: ShareableSessionCard._hairlineSoft,
             ),
             Expanded(
-              child: _StatCell(value: '$totalSets', label: 'SETS'),
+              child: _StatCell(value: '$totalSets', label: setsLabel),
             ),
             Container(
               width: 0.8,
               color: ShareableSessionCard._hairlineSoft,
             ),
             Expanded(
-              child: _StatCell(value: '$totalExercises', label: 'EXERCISES'),
+              child:
+                  _StatCell(value: '$totalExercises', label: exercisesLabel),
             ),
           ],
         ),
@@ -414,10 +441,15 @@ class _StatCell extends StatelessWidget {
 }
 
 class _PrRow extends StatelessWidget {
-  const _PrRow({required this.pr, required this.routineColor});
+  const _PrRow({
+    required this.pr,
+    required this.routineColor,
+    required this.badgeLabel,
+  });
 
   final RecapPersonalRecord pr;
   final Color routineColor;
+  final String badgeLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -436,7 +468,7 @@ class _PrRow extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          'NEW PR',
+          badgeLabel,
           style: const TextStyle(
             fontSize: 9,
             fontWeight: FontWeight.w800,
@@ -478,7 +510,9 @@ class _PrRow extends StatelessWidget {
 }
 
 class _Wordmark extends StatelessWidget {
-  const _Wordmark();
+  const _Wordmark({required this.tagline});
+
+  final String tagline;
 
   @override
   Widget build(BuildContext context) {
@@ -500,13 +534,17 @@ class _Wordmark extends StatelessWidget {
           color: ShareableSessionCard._ink,
         ),
         const SizedBox(width: 8),
-        Text(
-          'TRAINING JOURNAL',
-          style: TextStyle(
-            fontSize: 8,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.6,
-            color: ShareableSessionCard._mute,
+        Expanded(
+          child: Text(
+            tagline,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 8,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.6,
+              color: ShareableSessionCard._mute,
+            ),
           ),
         ),
       ],
@@ -573,7 +611,6 @@ class _UserQuote extends StatelessWidget {
               text: '“',
               style: GoogleFonts.playfairDisplay(
                 fontSize: 22,
-                fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.w500,
                 height: 0.6,
                 color: ShareableSessionCard._mute,
@@ -583,7 +620,6 @@ class _UserQuote extends StatelessWidget {
               text: text,
               style: GoogleFonts.playfairDisplay(
                 fontSize: 14,
-                fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.w400,
                 height: 1.3,
                 color: ShareableSessionCard._ink,
@@ -593,7 +629,6 @@ class _UserQuote extends StatelessWidget {
               text: '”',
               style: GoogleFonts.playfairDisplay(
                 fontSize: 22,
-                fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.w500,
                 height: 0.6,
                 color: ShareableSessionCard._mute,

@@ -2911,6 +2911,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'DRAG TO REPOSITION'**
   String get editorialDragInstructions;
+
+  /// No description provided for @sharePRBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW PR'**
+  String get sharePRBadge;
+
+  /// No description provided for @shareTrainingJournal.
+  ///
+  /// In en, this message translates to:
+  /// **'TRAINING JOURNAL'**
+  String get shareTrainingJournal;
+
+  /// No description provided for @shareIssueAbbrev.
+  ///
+  /// In en, this message translates to:
+  /// **'No.'**
+  String get shareIssueAbbrev;
 }
 
 class _AppLocalizationsDelegate

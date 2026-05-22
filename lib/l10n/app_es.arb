@@ -691,5 +691,8 @@
   "editorialRemoveImage": "Eliminar",
   "editorialCharLimit": "Máx {limit} caracteres",
   "editorialReposition": "Ajustar Foto",
-  "editorialDragInstructions": "ARRASTRA PARA ENCUADRAR"
+  "editorialDragInstructions": "ARRASTRA PARA ENCUADRAR",
+  "sharePRBadge": "NUEVO PR",
+  "shareTrainingJournal": "DIARIO DE ENTRENAMIENTO",
+  "shareIssueAbbrev": "N.º"
 }

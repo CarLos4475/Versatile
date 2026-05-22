@@ -451,14 +451,12 @@ class _CustomizePanel extends StatelessWidget {
               ],
               style: GoogleFonts.playfairDisplay(
                 fontSize: 14,
-                fontStyle: FontStyle.italic,
                 color: colors.ink900,
               ),
               decoration: InputDecoration(
                 hintText: quoteHint,
                 hintStyle: GoogleFonts.playfairDisplay(
                   fontSize: 14,
-                  fontStyle: FontStyle.italic,
                   color: colors.ink400,
                 ),
                 counterStyle: TextStyle(

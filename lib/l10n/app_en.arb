@@ -691,5 +691,8 @@
   "editorialRemoveImage": "Remove",
   "editorialCharLimit": "Max {limit} characters",
   "editorialReposition": "Reposition Photo",
-  "editorialDragInstructions": "DRAG TO REPOSITION"
+  "editorialDragInstructions": "DRAG TO REPOSITION",
+  "sharePRBadge": "NEW PR",
+  "shareTrainingJournal": "TRAINING JOURNAL",
+  "shareIssueAbbrev": "No."
 }

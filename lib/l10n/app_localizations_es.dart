@@ -1572,4 +1572,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get editorialDragInstructions => 'ARRASTRA PARA ENCUADRAR';
+
+  @override
+  String get sharePRBadge => 'NUEVO PR';
+
+  @override
+  String get shareTrainingJournal => 'DIARIO DE ENTRENAMIENTO';
+
+  @override
+  String get shareIssueAbbrev => 'N.º';
 }

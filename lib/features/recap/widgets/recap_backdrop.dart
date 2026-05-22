@@ -1,72 +1,41 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
-
-/// Static dark backdrop for the Stories-style recap. Two soft radial
-/// accent glows (top-right + bottom-left) painted over a deep base, plus a
-/// faint pixel-grid noise texture for tactile feel. Deliberately not
-/// animated — the slides themselves carry all motion.
+/// Editorial bone backdrop for the recap — like reading a printed magazine.
+/// Fixed bone color (not theme-aware) so each page reads as paper regardless
+/// of the user's theme. A faint pixel-grid texture adds tactile paper feel.
 class RecapBackdrop extends StatelessWidget {
   const RecapBackdrop({super.key});
 
-  static const Color _base = Color(0xFF0E0B07);
+  static const Color paperBg = Color(0xFFEBE3D2);
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
     return Stack(
       fit: StackFit.expand,
-      children: [
-        Container(color: _base),
-        // Top-right warm glow.
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              center: const Alignment(0.6, -0.7),
-              radius: 0.85,
-              colors: [
-                colors.accent.withValues(alpha: 0.35),
-                Colors.transparent,
-              ],
-              stops: const [0.0, 1.0],
-            ),
-          ),
-          child: const SizedBox.expand(),
-        ),
-        // Bottom-left deeper glow.
-        DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              center: const Alignment(-0.7, 0.9),
-              radius: 0.75,
-              colors: [
-                colors.accentDeep.withValues(alpha: 0.30),
-                Colors.transparent,
-              ],
-              stops: const [0.0, 1.0],
-            ),
-          ),
-          child: const SizedBox.expand(),
-        ),
-        // Grain noise — painted once, isolated under RepaintBoundary.
-        const RepaintBoundary(
-          child: CustomPaint(painter: _GrainPainter()),
+      children: const [
+        DecoratedBox(decoration: BoxDecoration(color: paperBg)),
+        // Subtle paper grain — painted once, isolated under RepaintBoundary.
+        RepaintBoundary(
+          child: CustomPaint(painter: _PaperGrainPainter()),
         ),
       ],
     );
   }
 }
 
-class _GrainPainter extends CustomPainter {
-  const _GrainPainter();
+class _PaperGrainPainter extends CustomPainter {
+  const _PaperGrainPainter();
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = const Color(0x07FFFFFF); // ~2.5% white
-    const step = 3.0;
+    // Two-tone grain: very faint dark specks for paper fiber feel.
+    final dark = Paint()..color = const Color(0x0A1A1A1F); // ~4% ink
+    const step = 4.0;
     for (var y = 0.0; y < size.height; y += step) {
-      for (var x = 0.0; x < size.width; x += step) {
-        canvas.drawRect(Rect.fromLTWH(x, y, 1, 1), paint);
+      for (var x = (y / step).floor().isEven ? 0.0 : step / 2;
+          x < size.width;
+          x += step) {
+        canvas.drawRect(Rect.fromLTWH(x, y, 1, 1), dark);
       }
     }
   }
