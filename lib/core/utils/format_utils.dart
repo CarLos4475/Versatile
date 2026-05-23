@@ -16,8 +16,8 @@ class FormatUtils {
   }
 
   static String volume(double kg) {
-    if (kg >= 1000) return '${(kg / 1000).toStringAsFixed(1)}K kg';
-    return '${kg.toStringAsFixed(0)} kg';
+    if (kg >= 1000) return '${(kg / 1000).toStringAsFixed(1)}K';
+    return kg.toStringAsFixed(0);
   }
 
   static String timer(int seconds) {

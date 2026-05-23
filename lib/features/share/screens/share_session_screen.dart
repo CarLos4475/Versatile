@@ -22,6 +22,7 @@ import '../../../shared/widgets/screen_header.dart';
 import '../../recap/view_models/recap_view_model.dart';
 import '../widgets/magazine_collage_share_card.dart';
 import '../widgets/magazine_cover_share_card.dart';
+import '../widgets/pop_art_share_card.dart';
 import '../widgets/shareable_session_card.dart';
 
 class ShareSessionScreen extends ConsumerStatefulWidget {
@@ -80,6 +81,11 @@ const List<_ShareVariantSpec> _kVariants = [
     requiresPhoto: true,
     requiresPhoto2: true,
   ),
+  _ShareVariantSpec(
+    id: 'popart',
+    labelEn: 'POP ART',
+    labelEs: 'POP ART',
+  ),
 ];
 
 class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
@@ -92,6 +98,7 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
   int _variantIndex = 0;
   int _selectedPRIndex = 0;
   bool _sharing = false;
+  double? _cardHue;
   String? _userPhotoPath; // volatile temp file
   String? _userPhoto2Path; // volatile temp file (collage secondary)
   String _userQuote = '';
@@ -288,6 +295,10 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
         return MagazineCoverShareCard.logicalHeight;
       case 'collage':
         return MagazineCollageShareCard.logicalHeight;
+      case 'popart':
+        return PopArtShareCard.logicalHeightFor(
+          hasPhoto: _userPhotoPath != null,
+        );
       case 'issue':
       default:
         return ShareableSessionCard.logicalHeightFor(
@@ -308,9 +319,22 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
     return prs[_selectedPRIndex.clamp(0, prs.length - 1)];
   }
 
+  Color _getCardColor(BuildContext context) {
+    if (_cardHue != null) {
+      return HSVColor.fromAHSV(1, _cardHue!, 0.85, 0.95).toColor();
+    }
+    return Theme.of(context).extension<AppColors>()!.accent;
+  }
+
+  double _getDisplayHue(BuildContext context) {
+    if (_cardHue != null) return _cardHue!;
+    final accent = Theme.of(context).extension<AppColors>()!.accent;
+    return HSVColor.fromColor(accent).hue;
+  }
+
   Widget _buildVariantCard(int idx) {
     final pr = _selectedPR;
-    final accent = Theme.of(context).extension<AppColors>()!.accent;
+    final accent = _getCardColor(context);
     switch (_kVariants[idx].id) {
       case 'cover':
         return MagazineCoverShareCard(
@@ -336,6 +360,16 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
           secondaryAlignY: _photo2AlignY,
           secondaryScale: _photo2Scale,
         );
+      case 'popart':
+        return PopArtShareCard(
+          session: widget.session,
+          cardColor: accent,
+          pr: pr,
+          userPhotoPath: _userPhotoPath,
+          photoAlignX: _photoAlignX,
+          photoAlignY: _photoAlignY,
+          photoScale: _photoScale,
+        );
       case 'issue':
       default:
         return ShareableSessionCard(
@@ -357,6 +391,8 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
         return MagazineCoverShareCard.logicalWidth;
       case 'collage':
         return MagazineCollageShareCard.logicalWidth;
+      case 'popart':
+        return PopArtShareCard.logicalWidth;
       case 'issue':
       default:
         return ShareableSessionCard.logicalWidth;
@@ -476,6 +512,17 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
                             : 'Volatile · this share only',
                         quoteHint: isEs ? 'Frase opcional…' : 'Optional quote…',
                         quoteMaxLen: _quoteMaxLen,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    FadeSlideIn(
+                      delay: const Duration(milliseconds: 140),
+                      child: _ColorPickerSection(
+                        hue: _getDisplayHue(context),
+                        color: _getCardColor(context),
+                        onHueChanged: (h) =>
+                            setState(() => _cardHue = h),
+                        label: isEs ? 'COLOR' : 'COLOR',
                       ),
                     ),
                     if (_prs.length > 1) ...[
@@ -1040,4 +1087,163 @@ class _PRSelectorRow extends StatelessWidget {
       ),
     );
   }
+}
+
+class _ColorPickerSection extends StatelessWidget {
+  const _ColorPickerSection({
+    required this.hue,
+    required this.color,
+    required this.onHueChanged,
+    required this.label,
+  });
+
+  final double hue;
+  final Color color;
+  final ValueChanged<double> onHueChanged;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: colors.hairline, width: 0.5),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 16,
+                  height: 16,
+                  color: color,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.6,
+                    color: colors.ink700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: 130,
+            height: 130,
+            child: _HueRingPicker(
+              hue: hue,
+              onHueChanged: onHueChanged,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HueRingPicker extends StatelessWidget {
+  const _HueRingPicker({
+    required this.hue,
+    required this.onHueChanged,
+  });
+
+  final double hue;
+  final ValueChanged<double> onHueChanged;
+
+  void _update(Offset local, double size) {
+    final center = Offset(size / 2, size / 2);
+    final angle = (local - center).direction;
+    final h = ((angle * 180 / math.pi) + 90) % 360;
+    onHueChanged(h);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, constraints) {
+      final size = math.min(constraints.maxWidth, constraints.maxHeight);
+      return GestureDetector(
+        onPanDown: (d) => _update(d.localPosition, size),
+        onPanUpdate: (d) => _update(d.localPosition, size),
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: CustomPaint(
+            painter: _HueRingPainter(hue: hue),
+          ),
+        ),
+      );
+    });
+  }
+}
+
+class _HueRingPainter extends CustomPainter {
+  _HueRingPainter({required this.hue});
+  final double hue;
+
+  static const double _ringW = 18;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final outerR = size.width / 2;
+    final midR = outerR - _ringW / 2;
+    final innerR = outerR - _ringW;
+
+    final hueColors = List.generate(
+      13,
+      (i) => HSVColor.fromAHSV(1, (i * 30.0) % 360, 0.85, 0.95).toColor(),
+    );
+
+    final ringPaint = Paint()
+      ..shader = SweepGradient(
+        startAngle: -math.pi / 2,
+        endAngle: 3 * math.pi / 2,
+        colors: hueColors,
+      ).createShader(Rect.fromCircle(center: center, radius: outerR))
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = _ringW;
+    canvas.drawCircle(center, midR, ringPaint);
+
+    final selected =
+        HSVColor.fromAHSV(1, hue, 0.85, 0.95).toColor();
+    canvas.drawCircle(
+      center,
+      innerR - 6,
+      Paint()..color = selected,
+    );
+
+    final angle = (hue - 90) * math.pi / 180;
+    final indicatorPos = center +
+        Offset(math.cos(angle) * midR, math.sin(angle) * midR);
+    canvas.drawCircle(
+      indicatorPos,
+      _ringW / 2 + 2,
+      Paint()..color = Colors.white,
+    );
+    canvas.drawCircle(
+      indicatorPos,
+      _ringW / 2 + 2,
+      Paint()
+        ..color = Colors.black
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
+    canvas.drawCircle(
+      indicatorPos,
+      _ringW / 2 - 2,
+      Paint()..color = selected,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _HueRingPainter old) => old.hue != hue;
 }

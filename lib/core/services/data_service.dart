@@ -88,6 +88,34 @@ class DataService {
 
     final logRows = await db.query('workout_log');
 
+    final programRows = await db.query('programs');
+    final programs = <Map<String, dynamic>>[];
+    for (final p in programRows) {
+      final pId = p['id'] as String;
+      final slotRows = await db.query(
+        'program_slots',
+        where: 'program_id = ?',
+        whereArgs: [pId],
+      );
+      programs.add({
+        'id': pId,
+        'name': p['name'],
+        'colorValue': p['color_value'],
+        'iconCode': p['icon_code'],
+        'weeksCount': p['weeks_count'],
+        'deloadWeeks': p['deload_weeks'],
+        'createdAt': p['created_at'],
+        'slots': slotRows.map((s) => {
+          'id': s['id'],
+          'weekIndex': s['week_index'],
+          'weekday': s['weekday'],
+          'slotKind': s['slot_kind'],
+          'routineId': s['routine_id'],
+          'labelText': s['label_text'],
+        }).toList(),
+      });
+    }
+
     return jsonEncode({
       'version': '1.0',
       'exportedAt': DateTime.now().toIso8601String(),
@@ -102,6 +130,7 @@ class DataService {
       'routines': routines,
       'sessions': sessions,
       'workoutLog': logRows.map((r) => r['date']).toList(),
+      'programs': programs,
     });
   }
 
@@ -121,48 +150,47 @@ class DataService {
     final db = await DatabaseHelper.instance.database;
 
     await db.transaction((txn) async {
+      // Wipe all user data
+      await txn.delete('session_sets');
+      await txn.delete('session_exercises');
+      await txn.delete('sessions');
+      await txn.delete('routine_exercises');
+      await txn.delete('routines');
+      await txn.delete('program_slots');
+      await txn.delete('programs');
+      await txn.delete('workout_log');
+      await txn.delete('exercises', where: 'is_custom = ?', whereArgs: [1]);
+      await txn.delete('settings');
+
       // Settings
       final settings = data['settings'] as Map<String, dynamic>?;
       final name = settings?['userName'] as String?;
       if (name != null && name.isNotEmpty) {
-        await txn.insert(
-          'settings',
-          {'key': 'user_name', 'value': name},
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
+        await txn.insert('settings', {'key': 'user_name', 'value': name});
       }
 
       // Custom exercises
       final exercises = data['exercises'] as List<dynamic>? ?? [];
       for (final e in exercises) {
-        await txn.insert(
-          'exercises',
-          {
-            'id': e['id'],
-            'name': e['name'],
-            'muscle': e['muscle'],
-            'equipment': e['equipment'],
-            'is_custom': 1,
-            'is_unilateral': (e['isUnilateral'] as bool? ?? false) ? 1 : 0,
-          },
-          conflictAlgorithm: ConflictAlgorithm.ignore,
-        );
+        await txn.insert('exercises', {
+          'id': e['id'],
+          'name': e['name'],
+          'muscle': e['muscle'],
+          'equipment': e['equipment'],
+          'is_custom': 1,
+          'is_unilateral': (e['isUnilateral'] as bool? ?? false) ? 1 : 0,
+        });
       }
 
       // Routines
       final routines = data['routines'] as List<dynamic>? ?? [];
       for (final r in routines) {
-        final inserted = await txn.insert(
-          'routines',
-          {
-            'id': r['id'],
-            'name': r['name'],
-            'color_value': r['colorValue'],
-            'icon_code': r['iconCode'] ?? 58713,
-          },
-          conflictAlgorithm: ConflictAlgorithm.ignore,
-        );
-        if (inserted == 0) continue; // already exists
+        await txn.insert('routines', {
+          'id': r['id'],
+          'name': r['name'],
+          'color_value': r['colorValue'],
+          'icon_code': r['iconCode'] ?? 58713,
+        });
         final rExercises = r['exercises'] as List<dynamic>? ?? [];
         for (var i = 0; i < rExercises.length; i++) {
           final re = rExercises[i];
@@ -180,21 +208,16 @@ class DataService {
       // Sessions
       final sessions = data['sessions'] as List<dynamic>? ?? [];
       for (final s in sessions) {
-        final inserted = await txn.insert(
-          'sessions',
-          {
-            'id': s['id'],
-            'routine_id': s['routineId'],
-            'routine_name': s['routineName'],
-            'color_value': s['colorValue'] ?? 0xFFD97757,
-            'icon_code': s['iconCode'] ?? 58713,
-            'date': s['date'],
-            'duration_min': s['durationMin'],
-            'volume_kg': s['volumeKg'],
-          },
-          conflictAlgorithm: ConflictAlgorithm.ignore,
-        );
-        if (inserted == 0) continue;
+        await txn.insert('sessions', {
+          'id': s['id'],
+          'routine_id': s['routineId'],
+          'routine_name': s['routineName'],
+          'color_value': s['colorValue'] ?? 0xFFD97757,
+          'icon_code': s['iconCode'] ?? 58713,
+          'date': s['date'],
+          'duration_min': s['durationMin'],
+          'volume_kg': s['volumeKg'],
+        });
         final sExercises = s['exercises'] as List<dynamic>? ?? [];
         for (var i = 0; i < sExercises.length; i++) {
           final se = sExercises[i];
@@ -223,11 +246,33 @@ class DataService {
       // Workout log
       final workoutLog = data['workoutLog'] as List<dynamic>? ?? [];
       for (final day in workoutLog) {
-        await txn.insert(
-          'workout_log',
-          {'date': day},
-          conflictAlgorithm: ConflictAlgorithm.ignore,
-        );
+        await txn.insert('workout_log', {'date': day});
+      }
+
+      // Programs
+      final programs = data['programs'] as List<dynamic>? ?? [];
+      for (final p in programs) {
+        await txn.insert('programs', {
+          'id': p['id'],
+          'name': p['name'],
+          'color_value': p['colorValue'],
+          'icon_code': p['iconCode'] ?? 58713,
+          'weeks_count': p['weeksCount'],
+          'deload_weeks': p['deloadWeeks'] ?? '',
+          'created_at': p['createdAt'],
+        });
+        final slots = p['slots'] as List<dynamic>? ?? [];
+        for (final s in slots) {
+          await txn.insert('program_slots', {
+            'id': s['id'],
+            'program_id': p['id'],
+            'week_index': s['weekIndex'],
+            'weekday': s['weekday'],
+            'slot_kind': s['slotKind'],
+            'routine_id': s['routineId'],
+            'label_text': s['labelText'],
+          });
+        }
       }
     });
   }

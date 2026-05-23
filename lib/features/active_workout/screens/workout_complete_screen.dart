@@ -98,12 +98,20 @@ class WorkoutCompleteScreen extends StatelessWidget {
                         exercisesLabel: l10n.exercisesLabel.toUpperCase(),
                       ),
                     ),
-                    if (precomputedPRs.isNotEmpty) ...[
-                      const SizedBox(height: 18),
+                    for (var i = 0; i < precomputedPRs.length; i++) ...[
+                      if (i == 0)
+                        const SizedBox(height: 18)
+                      else ...[
+                        const SizedBox(height: 8),
+                        _Hairline(
+                          color: colors.ink900.withValues(alpha: 0.10),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                       FadeSlideIn(
-                        delay: const Duration(milliseconds: 480),
+                        delay: Duration(milliseconds: 480 + i * 80),
                         child: _PrCallout(
-                          pr: precomputedPRs.first,
+                          pr: precomputedPRs[i],
                           ink: colors.ink900,
                           bg: colors.bgApp,
                         ),

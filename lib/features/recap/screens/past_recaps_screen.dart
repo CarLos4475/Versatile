@@ -153,7 +153,7 @@ class _PastRecapCard extends ConsumerWidget {
                   Text(
                     l10n.recapEntryCardSubtitle(
                       recap.sessionsCount,
-                      FormatUtils.volume(recap.totalVolumeKg),
+                      '${FormatUtils.volume(recap.totalVolumeKg)} kg',
                     ),
                     style: TextStyle(
                       fontSize: 11,

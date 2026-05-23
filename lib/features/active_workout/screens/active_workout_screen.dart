@@ -367,7 +367,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                                 const SizedBox(width: 12),
                                 Text(
                                   '${state.completedSets}/${state.totalSets} ${l10n.sets}'
-                                  ' · ${FormatUtils.volume(state.totalVolume)}',
+                                  ' · ${FormatUtils.volume(state.totalVolume)} kg',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,

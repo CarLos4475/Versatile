@@ -1448,7 +1448,7 @@ class _RecapBlock extends ConsumerWidget {
                     Text(
                       l10n.recapHomeBannerTitle(
                         recap.sessionsCount,
-                        FormatUtils.volume(recap.totalVolumeKg),
+                        '${FormatUtils.volume(recap.totalVolumeKg)} kg',
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
