@@ -49,8 +49,8 @@ class MagazineCollageShareCard extends StatelessWidget {
   // Hero photo occupies the upper-right quadrant; secondary overlaps the
   // hero's lower-left for visual tension. Coordinates are logical pixels
   // relative to the 360×540 canvas.
-  static const Rect _heroRect = Rect.fromLTWH(126, 110, 218, 250);
-  static const Rect _secondaryRect = Rect.fromLTWH(30, 286, 158, 198);
+  static const Rect _heroRect = Rect.fromLTWH(118, 95, 230, 270);
+  static const Rect _secondaryRect = Rect.fromLTWH(22, 270, 170, 218);
 
   static bool hasUsablePhoto(String? path) =>
       path != null && path.isNotEmpty && File(path).existsSync();
@@ -96,6 +96,26 @@ class MagazineCollageShareCard extends StatelessWidget {
           children: [
             // 1. Accent field
             ColoredBox(color: accent),
+
+            // 1.5. Floating accent-shade blocks
+            Positioned(
+              bottom: 44,
+              right: 24,
+              width: 200,
+              height: 360,
+              child: ColoredBox(
+                color: Color.lerp(accent, Colors.black, 0.18) ?? accent,
+              ),
+            ),
+            Positioned(
+              top: 30,
+              left: 18,
+              width: 260,
+              height: 200,
+              child: ColoredBox(
+                color: Color.lerp(accent, Colors.black, 0.18) ?? accent,
+              ),
+            ),
 
             // 2. Top-left editorial title
             Positioned(
@@ -232,9 +252,9 @@ class _CollageTitle extends StatelessWidget {
           routineName.toUpperCase(),
           maxLines: 3,
           overflow: TextOverflow.ellipsis,
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 30,
-            fontWeight: FontWeight.w600,
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 34,
+              fontWeight: FontWeight.w600,
             color: ink,
             height: 0.94,
             letterSpacing: -0.8,
@@ -244,7 +264,7 @@ class _CollageTitle extends StatelessWidget {
         Text(
           dateLabel,
           style: TextStyle(
-            fontSize: 9,
+            fontSize: 10,
             fontWeight: FontWeight.w700,
             letterSpacing: 1.4,
             color: mute,
