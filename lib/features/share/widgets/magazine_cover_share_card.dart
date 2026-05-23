@@ -371,10 +371,13 @@ class _PrRibbon extends StatelessWidget {
   final RecapPersonalRecord pr;
   final String label;
 
+  static const _cream = Color(0xFFEBE3D2);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 6, 12, 7),
+      constraints: const BoxConstraints(maxWidth: 220),
       decoration: const BoxDecoration(color: Color(0xFF1A1A1F)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -382,7 +385,7 @@ class _PrRibbon extends StatelessWidget {
           const Icon(
             Icons.workspace_premium_rounded,
             size: 12,
-            color: Color(0xFFEBE3D2),
+            color: _cream,
           ),
           const SizedBox(width: 6),
           Text(
@@ -391,18 +394,22 @@ class _PrRibbon extends StatelessWidget {
               fontSize: 9,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.6,
-              color: Color(0xFFEBE3D2),
+              color: _cream,
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            '${FormatUtils.weight(pr.weightKg)} × ${pr.reps}',
-            style: const TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.4,
-              color: Color(0xFFEBE3D2),
-              fontFeatures: [FontFeature.tabularFigures()],
+          Flexible(
+            child: Text(
+              '${pr.exerciseName} · ${FormatUtils.weight(pr.weightKg)} × ${pr.reps}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.4,
+                color: _cream,
+                fontFeatures: [FontFeature.tabularFigures()],
+              ),
             ),
           ),
         ],

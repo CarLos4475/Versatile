@@ -106,12 +106,14 @@ class ActiveWorkoutState {
   final List<ExerciseWorkoutState> exerciseStates;
   final RestTimerState? restTimer;
   final bool autoFinish;
-  /// Best PR detected so far in this session (highest estimated 1RM).
-  /// Passed to the share card to skip recomputation.
-  final RecapPersonalRecord? bestPRInSession;
+  /// All PRs detected so far in this session, one per exercise (best weight).
+  final List<RecapPersonalRecord> allPRsInSession;
   /// One-shot signal for the celebration UI. Cleared back to null is not
   /// necessary — consumers observe `eventId` changes.
   final PREvent? lastPREvent;
+
+  RecapPersonalRecord? get bestPRInSession =>
+      allPRsInSession.isEmpty ? null : allPRsInSession.first;
 
   const ActiveWorkoutState({
     required this.routine,
@@ -121,7 +123,7 @@ class ActiveWorkoutState {
     required this.exerciseStates,
     this.restTimer,
     this.autoFinish = false,
-    this.bestPRInSession,
+    this.allPRsInSession = const [],
     this.lastPREvent,
   });
 
@@ -148,7 +150,7 @@ class ActiveWorkoutState {
     RestTimerState? restTimer,
     bool clearRestTimer = false,
     bool? autoFinish,
-    RecapPersonalRecord? bestPRInSession,
+    List<RecapPersonalRecord>? allPRsInSession,
     PREvent? lastPREvent,
   }) {
     return ActiveWorkoutState(
@@ -159,7 +161,7 @@ class ActiveWorkoutState {
       exerciseStates: exerciseStates ?? this.exerciseStates,
       restTimer: clearRestTimer ? null : (restTimer ?? this.restTimer),
       autoFinish: autoFinish ?? this.autoFinish,
-      bestPRInSession: bestPRInSession ?? this.bestPRInSession,
+      allPRsInSession: allPRsInSession ?? this.allPRsInSession,
       lastPREvent: lastPREvent ?? this.lastPREvent,
     );
   }
@@ -478,13 +480,19 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
       set: setToSave,
       priorInSessionSets: e.completedSets,
     );
-    RecapPersonalRecord? newBestPR = state.bestPRInSession;
+    List<RecapPersonalRecord>? updatedPRs;
     PREvent? newPREvent = state.lastPREvent;
     if (pr != null) {
       HapticFeedback.mediumImpact();
-      if (newBestPR == null || pr.estimatedOneRm > newBestPR.estimatedOneRm) {
-        newBestPR = pr;
+      final prs = List<RecapPersonalRecord>.from(state.allPRsInSession);
+      final idx = prs.indexWhere((p) => p.exerciseId == pr.exerciseId);
+      if (idx >= 0) {
+        if (pr.weightKg > prs[idx].weightKg) prs[idx] = pr;
+      } else {
+        prs.add(pr);
       }
+      prs.sort((a, b) => b.weightKg.compareTo(a.weightKg));
+      updatedPRs = prs;
       newPREvent = (
         pr: pr,
         eventId: (state.lastPREvent?.eventId ?? 0) + 1,
@@ -498,7 +506,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
         exerciseStates: list,
         clearRestTimer: true,
         autoFinish: true,
-        bestPRInSession: newBestPR,
+        allPRsInSession: updatedPRs,
         lastPREvent: newPREvent,
       );
       _restTicker?.cancel();
@@ -514,7 +522,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
         remaining: e.restSec,
         exerciseName: exerciseName,
       ),
-      bestPRInSession: newBestPR,
+      allPRsInSession: updatedPRs,
       lastPREvent: newPREvent,
     );
     _startRestTimer();
@@ -555,7 +563,7 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
     }
     if (right == null) return left;
     if (left == null) return right;
-    return right.estimatedOneRm >= left.estimatedOneRm ? right : left;
+    return right.weightKg >= left.weightKg ? right : left;
   }
 
   void _startRestTimer() {

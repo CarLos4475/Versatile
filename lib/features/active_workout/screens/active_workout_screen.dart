@@ -160,10 +160,9 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
     setState(() => _finishing = true);
     await WorkoutNotificationService.stop();
     final notifier = ref.read(activeWorkoutProvider(widget.routineId).notifier);
-    // Capture the realtime-detected PR before the provider is disposed.
-    final cachedPR = ref
+    final cachedPRs = ref
         .read(activeWorkoutProvider(widget.routineId))
-        .bestPRInSession;
+        .allPRsInSession;
     final session = await notifier.finishWorkout();
     if (!mounted) return;
     ref.read(activeWorkoutRoutineIdProvider.notifier).state = null;
@@ -171,7 +170,7 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) =>
-              WorkoutCompleteScreen(session: session, precomputedPR: cachedPR),
+              WorkoutCompleteScreen(session: session, precomputedPRs: cachedPRs),
         ),
       );
     } else {

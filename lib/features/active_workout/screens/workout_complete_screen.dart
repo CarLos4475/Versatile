@@ -13,15 +13,15 @@ class WorkoutCompleteScreen extends StatelessWidget {
   const WorkoutCompleteScreen({
     super.key,
     required this.session,
-    this.precomputedPR,
+    this.precomputedPRs = const [],
   });
 
   final Session session;
 
-  /// PR detected during the active workout. Pre-supplied to the share card so
-  /// it doesn't re-iterate session history. Null when this screen is reached
+  /// PRs detected during the active workout. Pre-supplied to the share card so
+  /// it doesn't re-iterate session history. Empty when this screen is reached
   /// without a realtime detection (e.g., legacy state).
-  final RecapPersonalRecord? precomputedPR;
+  final List<RecapPersonalRecord> precomputedPRs;
 
   @override
   Widget build(BuildContext context) {
@@ -98,12 +98,12 @@ class WorkoutCompleteScreen extends StatelessWidget {
                         exercisesLabel: l10n.exercisesLabel.toUpperCase(),
                       ),
                     ),
-                    if (precomputedPR != null) ...[
+                    if (precomputedPRs.isNotEmpty) ...[
                       const SizedBox(height: 18),
                       FadeSlideIn(
                         delay: const Duration(milliseconds: 480),
                         child: _PrCallout(
-                          pr: precomputedPR!,
+                          pr: precomputedPRs.first,
                           ink: colors.ink900,
                           bg: colors.bgApp,
                         ),
@@ -133,7 +133,7 @@ class WorkoutCompleteScreen extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (_) => ShareSessionScreen(
                       session: session,
-                      precomputedPR: precomputedPR,
+                      precomputedPRs: precomputedPRs,
                     ),
                   ),
                 ),

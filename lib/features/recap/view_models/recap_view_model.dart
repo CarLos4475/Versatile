@@ -394,14 +394,14 @@ MonthKey lastFinishedMonth(DateTime now) {
 }
 
 /// Real-time PR detection used during the active workout. Given a set the
-/// user just closed, returns a [RecapPersonalRecord] if its estimated 1RM
-/// beats every prior result for that exercise — both historical sessions
-/// strictly before [today] and sets already completed earlier in the
-/// current session. Returns null if there's no PR.
+/// user just closed, returns a [RecapPersonalRecord] if its weight beats
+/// every prior result for that exercise — both historical sessions strictly
+/// before [today] and sets already completed earlier in the current session.
+/// Returns null if there's no PR.
 ///
 /// Callers for unilateral exercises should invoke this twice (main side and
 /// `leftKg`/`leftReps`) and keep the higher PR, mirroring the behaviour of
-/// [_computeSessionPR] which considers each side independently.
+/// [_computeAllSessionPRs] which considers each side independently.
 RecapPersonalRecord? detectRealtimePR({
   required List<Session> previousSessions,
   required List<WorkoutSet> currentSessionSetsForExercise,
@@ -412,67 +412,55 @@ RecapPersonalRecord? detectRealtimePR({
   required String today,
 }) {
   if (kg <= 0 || reps <= 0) return null;
-  final newOrm = epleyOneRm(kg, reps);
 
-  double bestSoFar = 0;
+  double bestWeight = 0;
   for (final s in previousSessions) {
     if (s.date.compareTo(today) >= 0) continue;
     for (final e in s.exercises ?? const <SessionExercise>[]) {
       if (e.exerciseId != exerciseId) continue;
       for (final set in e.sets) {
-        if (set.kg > 0 && set.reps > 0) {
-          final orm = epleyOneRm(set.kg, set.reps);
-          if (orm > bestSoFar) bestSoFar = orm;
-        }
-        if (set.leftKg != null && set.leftReps != null &&
-            set.leftKg! > 0 && set.leftReps! > 0) {
-          final orm = epleyOneRm(set.leftKg!, set.leftReps!);
-          if (orm > bestSoFar) bestSoFar = orm;
+        if (set.kg > bestWeight) bestWeight = set.kg;
+        if (set.leftKg != null && set.leftKg! > bestWeight) {
+          bestWeight = set.leftKg!;
         }
       }
     }
   }
   for (final set in currentSessionSetsForExercise) {
-    if (set.kg > 0 && set.reps > 0) {
-      final orm = epleyOneRm(set.kg, set.reps);
-      if (orm > bestSoFar) bestSoFar = orm;
-    }
-    if (set.leftKg != null && set.leftReps != null &&
-        set.leftKg! > 0 && set.leftReps! > 0) {
-      final orm = epleyOneRm(set.leftKg!, set.leftReps!);
-      if (orm > bestSoFar) bestSoFar = orm;
+    if (set.kg > bestWeight) bestWeight = set.kg;
+    if (set.leftKg != null && set.leftKg! > bestWeight) {
+      bestWeight = set.leftKg!;
     }
   }
 
-  if (newOrm <= bestSoFar) return null;
+  if (kg <= bestWeight) return null;
   return RecapPersonalRecord(
     exerciseId: exerciseId,
     exerciseName: exerciseName,
     weightKg: kg,
     reps: reps,
-    estimatedOneRm: newOrm,
+    estimatedOneRm: epleyOneRm(kg, reps),
     date: today,
   );
 }
 
-/// PR detection for a single session: returns the most impressive new 1RM
-/// achieved in `target` compared to all sessions strictly before its date.
-/// Returns null if no exercise in this session beat its previous best.
-RecapPersonalRecord? _computeSessionPR(List<Session> sessions, Session target) {
+/// PR detection for a single session: returns every exercise in `target`
+/// whose heaviest weight beat its previous best across all sessions strictly
+/// before its date. Sorted by weight descending.
+List<RecapPersonalRecord> _computeAllSessionPRs(
+    List<Session> sessions, Session target) {
   final targetExercises = target.exercises ?? const <SessionExercise>[];
-  if (targetExercises.isEmpty) return null;
+  if (targetExercises.isEmpty) return const [];
 
   final targetMax =
-      <String, ({double orm, double kg, int reps, String name})>{};
+      <String, ({double kg, int reps, String name})>{};
   for (final e in targetExercises) {
     for (final set in e.sets) {
       void consider(double kg, int reps) {
         if (kg <= 0 || reps <= 0) return;
-        final orm = epleyOneRm(kg, reps);
         final cur = targetMax[e.exerciseId];
-        if (cur == null || orm > cur.orm) {
-          targetMax[e.exerciseId] =
-              (orm: orm, kg: kg, reps: reps, name: e.name);
+        if (cur == null || kg > cur.kg) {
+          targetMax[e.exerciseId] = (kg: kg, reps: reps, name: e.name);
         }
       }
 
@@ -482,7 +470,7 @@ RecapPersonalRecord? _computeSessionPR(List<Session> sessions, Session target) {
       }
     }
   }
-  if (targetMax.isEmpty) return null;
+  if (targetMax.isEmpty) return const [];
 
   final prevMax = <String, double>{};
   for (final s in sessions) {
@@ -490,44 +478,37 @@ RecapPersonalRecord? _computeSessionPR(List<Session> sessions, Session target) {
     if (s.date.compareTo(target.date) >= 0) continue;
     for (final e in s.exercises ?? const <SessionExercise>[]) {
       for (final set in e.sets) {
-        void consider(double kg, int reps) {
-          if (kg <= 0 || reps <= 0) return;
-          final orm = epleyOneRm(kg, reps);
-          final cur = prevMax[e.exerciseId] ?? 0;
-          if (orm > cur) prevMax[e.exerciseId] = orm;
-        }
-
-        consider(set.kg, set.reps);
-        if (set.leftKg != null && set.leftReps != null) {
-          consider(set.leftKg!, set.leftReps!);
+        final cur = prevMax[e.exerciseId] ?? 0;
+        if (set.kg > cur) prevMax[e.exerciseId] = set.kg;
+        if (set.leftKg != null && set.leftKg! > cur) {
+          prevMax[e.exerciseId] = set.leftKg!;
         }
       }
     }
   }
 
-  RecapPersonalRecord? best;
+  final results = <RecapPersonalRecord>[];
   for (final entry in targetMax.entries) {
     final prev = prevMax[entry.key] ?? 0;
-    if (entry.value.orm > prev) {
-      if (best == null || entry.value.orm > best.estimatedOneRm) {
-        best = RecapPersonalRecord(
-          exerciseId: entry.key,
-          exerciseName: entry.value.name,
-          weightKg: entry.value.kg,
-          reps: entry.value.reps,
-          estimatedOneRm: entry.value.orm,
-          date: target.date,
-        );
-      }
+    if (entry.value.kg > prev) {
+      results.add(RecapPersonalRecord(
+        exerciseId: entry.key,
+        exerciseName: entry.value.name,
+        weightKg: entry.value.kg,
+        reps: entry.value.reps,
+        estimatedOneRm: epleyOneRm(entry.value.kg, entry.value.reps),
+        date: target.date,
+      ));
     }
   }
-  return best;
+  results.sort((a, b) => b.weightKg.compareTo(a.weightKg));
+  return results;
 }
 
-/// PR (if any) achieved by the session identified by `sessionId`. Returns
-/// null if the session isn't found or no exercise beat its previous best.
-final sessionPRProvider =
-    Provider.family<RecapPersonalRecord?, String>((ref, sessionId) {
+/// All PRs achieved by the session identified by `sessionId`. Returns an
+/// empty list if the session isn't found or no exercise beat its previous best.
+final sessionPRsProvider =
+    Provider.family<List<RecapPersonalRecord>, String>((ref, sessionId) {
   final sessions =
       ref.watch(sessionsAsyncProvider).value ?? const <Session>[];
   Session? target;
@@ -537,8 +518,8 @@ final sessionPRProvider =
       break;
     }
   }
-  if (target == null) return null;
-  return _computeSessionPR(sessions, target);
+  if (target == null) return const [];
+  return _computeAllSessionPRs(sessions, target);
 });
 
 /// Returns the MonthKey of last finished month if its recap is unseen and has

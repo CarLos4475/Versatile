@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/format_utils.dart';
 import '../../../domain/entities/monthly_recap.dart';
 import '../../../domain/entities/session.dart';
 import '../../../l10n/app_localizations.dart';
@@ -27,14 +28,14 @@ class ShareSessionScreen extends ConsumerStatefulWidget {
   const ShareSessionScreen({
     super.key,
     required this.session,
-    this.precomputedPR,
+    this.precomputedPRs = const [],
   });
   final Session session;
 
-  /// If supplied, used directly instead of recomputing via [sessionPRProvider].
+  /// If supplied, used directly instead of recomputing via [sessionPRsProvider].
   /// Set when reaching this screen from the finish-workout flow, where the
-  /// active workout already detected the PR in realtime.
-  final RecapPersonalRecord? precomputedPR;
+  /// active workout already detected PRs in realtime.
+  final List<RecapPersonalRecord> precomputedPRs;
 
   @override
   ConsumerState<ShareSessionScreen> createState() => _ShareSessionScreenState();
@@ -89,6 +90,7 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
   final _quoteCtrl = TextEditingController();
   final _pageController = PageController();
   int _variantIndex = 0;
+  int _selectedPRIndex = 0;
   bool _sharing = false;
   String? _userPhotoPath; // volatile temp file
   String? _userPhoto2Path; // volatile temp file (collage secondary)
@@ -295,9 +297,19 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
     }
   }
 
+  List<RecapPersonalRecord> get _prs {
+    if (widget.precomputedPRs.isNotEmpty) return widget.precomputedPRs;
+    return ref.watch(sessionPRsProvider(widget.session.id));
+  }
+
+  RecapPersonalRecord? get _selectedPR {
+    final prs = _prs;
+    if (prs.isEmpty) return null;
+    return prs[_selectedPRIndex.clamp(0, prs.length - 1)];
+  }
+
   Widget _buildVariantCard(int idx) {
-    final pr = widget.precomputedPR ??
-        ref.watch(sessionPRProvider(widget.session.id));
+    final pr = _selectedPR;
     final accent = Theme.of(context).extension<AppColors>()!.accent;
     switch (_kVariants[idx].id) {
       case 'cover':
@@ -466,6 +478,21 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
                         quoteMaxLen: _quoteMaxLen,
                       ),
                     ),
+                    if (_prs.length > 1) ...[
+                      const SizedBox(height: 10),
+                      FadeSlideIn(
+                        delay: const Duration(milliseconds: 150),
+                        child: _PRSelector(
+                          prs: _prs,
+                          selectedIndex: _selectedPRIndex,
+                          onSelected: (i) =>
+                              setState(() => _selectedPRIndex = i),
+                          headerLabel: isEs
+                              ? 'ELIGE TU PR'
+                              : 'CHOOSE YOUR PR',
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -879,6 +906,138 @@ class _VariantIndicator extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PRSelector extends StatelessWidget {
+  const _PRSelector({
+    required this.prs,
+    required this.selectedIndex,
+    required this.onSelected,
+    required this.headerLabel,
+  });
+
+  final List<RecapPersonalRecord> prs;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+  final String headerLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: colors.hairline, width: 0.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 6),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.workspace_premium_rounded,
+                  size: 14,
+                  color: colors.accent,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  headerLabel,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.6,
+                    color: colors.ink700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(height: 0.5, color: colors.hairline),
+          for (var i = 0; i < prs.length; i++) ...[
+            if (i > 0) Container(height: 0.5, color: colors.hairline),
+            _PRSelectorRow(
+              pr: prs[i],
+              selected: i == selectedIndex,
+              onTap: () => onSelected(i),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _PRSelectorRow extends StatelessWidget {
+  const _PRSelectorRow({
+    required this.pr,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final RecapPersonalRecord pr;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    return PressableScale(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        color: selected ? colors.accentTint : null,
+        child: Row(
+          children: [
+            Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: selected ? colors.accent : colors.ink400,
+                  width: selected ? 2 : 1,
+                ),
+                color: selected ? colors.accent : Colors.transparent,
+              ),
+              child: selected
+                  ? const Icon(Icons.check, size: 10, color: Colors.white)
+                  : null,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: pr.exerciseName,
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        fontStyle: FontStyle.italic,
+                        color: colors.ink900,
+                      ),
+                    ),
+                    TextSpan(
+                      text:
+                          ' — ${FormatUtils.weight(pr.weightKg)} kg × ${pr.reps}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: colors.ink700,
+                      ),
+                    ),
+                  ],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

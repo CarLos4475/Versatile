@@ -408,23 +408,42 @@ class _CollagePrBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 6, 12, 7),
+      constraints: const BoxConstraints(maxWidth: 180),
       decoration: BoxDecoration(color: ink),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.workspace_premium_rounded,
-            size: 12,
-            color: accent,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.workspace_premium_rounded,
+                size: 12,
+                color: accent,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.6,
+                  color: accent,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 6),
+          const SizedBox(height: 4),
           Text(
-            label.toUpperCase(),
+            '${pr.exerciseName} · ${FormatUtils.weight(pr.weightKg)} × ${pr.reps}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.6,
-              color: accent,
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.4,
+              color: accent.withValues(alpha: 0.85),
             ),
           ),
         ],
