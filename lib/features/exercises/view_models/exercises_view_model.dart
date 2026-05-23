@@ -8,10 +8,10 @@ import '../../../domain/entities/exercise.dart';
 import '../../routines/view_models/routines_view_model.dart';
 
 const kArmsSubMuscles = ['Biceps', 'Triceps', 'Forearms'];
-const kLegsSubMuscles = ['Quadriceps', 'Hamstrings', 'Glutes', 'Calves'];
+const kLegsSubMuscles = ['Quadriceps', 'Hamstrings', 'Glutes', 'Calves', 'Abductors', 'Adductors'];
 
 const kArmsSet = {'Biceps', 'Triceps', 'Forearms'};
-const kLegsSet = {'Quadriceps', 'Hamstrings', 'Glutes', 'Calves'};
+const kLegsSet = {'Quadriceps', 'Hamstrings', 'Glutes', 'Calves', 'Abductors', 'Adductors'};
 
 enum ExercisesTab { all, mine }
 

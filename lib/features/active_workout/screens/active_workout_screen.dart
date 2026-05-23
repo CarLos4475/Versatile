@@ -447,6 +447,8 @@ class _WorkoutBodyState extends ConsumerState<_WorkoutBody>
                                 notifier.updateLeftReps(entry.key, reps),
                             onSkip: () =>
                                 _confirmSkip(context, entry.key, l10n),
+                            onDismissOverload: () =>
+                                notifier.dismissOverloadSuggestion(entry.key),
                           ),
                         Container(
                           height: 0.5,

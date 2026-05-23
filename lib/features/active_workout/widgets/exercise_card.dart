@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:versatile/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/overload_suggestion.dart';
 import '../../../domain/entities/exercise.dart';
 import '../../../domain/entities/workout_set.dart';
 import '../../../core/utils/format_utils.dart';
@@ -24,6 +26,7 @@ class ExerciseCard extends StatelessWidget {
     this.onLeftWeightChanged,
     this.onLeftRepsChanged,
     this.onSkip,
+    this.onDismissOverload,
   });
 
   final int index;
@@ -38,6 +41,7 @@ class ExerciseCard extends StatelessWidget {
   final ValueChanged<double>? onLeftWeightChanged;
   final ValueChanged<int>? onLeftRepsChanged;
   final VoidCallback? onSkip;
+  final VoidCallback? onDismissOverload;
 
   @override
   Widget build(BuildContext context) {
@@ -106,12 +110,14 @@ class ExerciseCard extends StatelessWidget {
                   child: data.isExpanded && !data.skipped
                       ? _CardBody(
                           data: data,
+                          exercise: exercise,
                           prevSets: prevSets,
                           onFinishSet: onFinishSet,
                           onWeightChanged: onWeightChanged,
                           onRepsChanged: onRepsChanged,
                           onLeftWeightChanged: onLeftWeightChanged,
                           onLeftRepsChanged: onLeftRepsChanged,
+                          onDismissOverload: onDismissOverload,
                         )
                       : const SizedBox.shrink(),
                 ),
@@ -243,21 +249,25 @@ class _CardHeader extends StatelessWidget {
 class _CardBody extends StatelessWidget {
   const _CardBody({
     required this.data,
+    required this.exercise,
     required this.prevSets,
     required this.onFinishSet,
     required this.onWeightChanged,
     required this.onRepsChanged,
     this.onLeftWeightChanged,
     this.onLeftRepsChanged,
+    this.onDismissOverload,
   });
 
   final ExerciseWorkoutState data;
+  final Exercise exercise;
   final List<WorkoutSet> prevSets;
   final VoidCallback onFinishSet;
   final ValueChanged<double> onWeightChanged;
   final ValueChanged<int> onRepsChanged;
   final ValueChanged<double>? onLeftWeightChanged;
   final ValueChanged<int>? onLeftRepsChanged;
+  final VoidCallback? onDismissOverload;
 
   @override
   Widget build(BuildContext context) {
@@ -273,6 +283,23 @@ class _CardBody extends StatelessWidget {
           ),
           const _ColumnHeaders(),
           const SizedBox(height: 2),
+
+          // Overload suggestion
+          if (!data.isDone && !data.overloadDismissed && data.completedSets.isEmpty)
+            Builder(builder: (_) {
+              final suggestion = computeOverloadSuggestion(
+                prevSets: prevSets,
+                muscle: exercise.muscle,
+                equipment: exercise.equipment,
+                isSplitMode: data.isSplitMode,
+                currentInputKg: data.currentInput?.kg ?? 0,
+              );
+              if (suggestion == null) return const SizedBox.shrink();
+              return _OverloadBanner(
+                suggestedKg: suggestion.suggestedKg,
+                onDismiss: onDismissOverload,
+              );
+            }),
 
           // Completed sets
           ...data.completedSets.asMap().entries.map(
@@ -848,6 +875,84 @@ class _SideValueRow extends StatelessWidget {
         const SizedBox(width: 4),
         Text(text, style: style),
       ],
+    );
+  }
+}
+
+class _OverloadBanner extends StatelessWidget {
+  const _OverloadBanner({
+    required this.suggestedKg,
+    this.onDismiss,
+  });
+
+  final double suggestedKg;
+  final VoidCallback? onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final isEs = Localizations.localeOf(context).languageCode == 'es';
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: PressableScale(
+        onTap: onDismiss,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: colors.accentTint,
+            border: Border.all(color: colors.accent.withValues(alpha: 0.3), width: 0.6),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.trending_up_rounded,
+                size: 16,
+                color: colors.accentDeep,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          isEs ? 'PODRÍAS SUBIR' : 'YOU COULD GO UP',
+                          style: GoogleFonts.playfairDisplay(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.4,
+                            color: colors.accentDeep,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${FormatUtils.weight(suggestedKg)} kg',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        fontStyle: FontStyle.italic,
+                        letterSpacing: -0.4,
+                        color: colors.accentDeep,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.close_rounded,
+                size: 14,
+                color: colors.accentDeep.withValues(alpha: 0.5),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

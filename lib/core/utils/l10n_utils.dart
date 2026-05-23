@@ -86,6 +86,8 @@ extension ExerciseL10n on Exercise {
         case 'Hamstrings': return 'Isquiotibiales';
         case 'Glutes': return 'Glúteos';
         case 'Calves': return 'Gemelos';
+        case 'Abductors': return 'Abductores';
+        case 'Adductors': return 'Aductores';
         case 'Core': return 'Core';
         case 'Arms': return 'Brazos';
         case 'Legs': return 'Piernas';

@@ -25,6 +25,8 @@ ExerciseCategory categoryForMuscle(String muscle) {
     case 'Hamstrings':
     case 'Glutes':
     case 'Calves':
+    case 'Abductors':
+    case 'Adductors':
       return ExerciseCategory.legs;
     default:
       return ExerciseCategory.other;

@@ -26,6 +26,7 @@ class ExerciseWorkoutState {
   final bool isUnilateral;
   final bool isSplitMode;
   final bool skipped;
+  final bool overloadDismissed;
 
   const ExerciseWorkoutState({
     required this.exerciseId,
@@ -39,6 +40,7 @@ class ExerciseWorkoutState {
     this.isUnilateral = false,
     this.isSplitMode = false,
     this.skipped = false,
+    this.overloadDismissed = false,
   });
 
   bool get isDone => completedSets.length >= targetSets;
@@ -51,6 +53,7 @@ class ExerciseWorkoutState {
     bool clearCurrentInput = false,
     bool? isSplitMode,
     bool? skipped,
+    bool? overloadDismissed,
   }) {
     return ExerciseWorkoutState(
       exerciseId: exerciseId,
@@ -66,6 +69,7 @@ class ExerciseWorkoutState {
       isUnilateral: isUnilateral,
       isSplitMode: isSplitMode ?? this.isSplitMode,
       skipped: skipped ?? this.skipped,
+      overloadDismissed: overloadDismissed ?? this.overloadDismissed,
     );
   }
 }
@@ -391,6 +395,12 @@ class ActiveWorkoutNotifier extends StateNotifier<ActiveWorkoutState> {
   void toggleExpand(int index) {
     final list = [...state.exerciseStates];
     list[index] = list[index].copyWith(isExpanded: !list[index].isExpanded);
+    state = state.copyWith(exerciseStates: list);
+  }
+
+  void dismissOverloadSuggestion(int index) {
+    final list = [...state.exerciseStates];
+    list[index] = list[index].copyWith(overloadDismissed: true);
     state = state.copyWith(exerciseStates: list);
   }
 

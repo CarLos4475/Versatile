@@ -61,6 +61,8 @@ String? _muscleAsset(String muscle) => switch (muscle) {
   'Hamstrings' => 'assets/assets/Piernas/femoral_edit_24694965504563.png',
   'Glutes' => 'assets/assets/Piernas/glutes_edit_24675899562379.png',
   'Calves' => 'assets/assets/Piernas/calf_edit_24757805204033.png',
+  'Abductors' => 'assets/assets/Piernas/cuadriceps.png',
+  'Adductors' => 'assets/assets/Piernas/cuadriceps.png',
   _ => null,
 };
 
