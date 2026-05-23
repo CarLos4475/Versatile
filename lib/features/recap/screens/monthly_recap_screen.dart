@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -76,11 +77,20 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen>
     final key = _slideKeys[clamped];
     if (key?.currentContext == null) return;
     setState(() => _sharing = true);
+    ui.Image? rawImage;
+    ui.Image? trimmedImage;
     try {
+      const pixelRatio = 3.0;
       final boundary = key!.currentContext!.findRenderObject()
           as RenderRepaintBoundary;
-      final image = await boundary.toImage(pixelRatio: 3.0);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      rawImage = await boundary.toImage(pixelRatio: pixelRatio);
+      final trimmed = await _autoTrimPaperMargins(
+        rawImage,
+        pixelRatio: pixelRatio,
+      );
+      trimmedImage = trimmed;
+      final byteData =
+          await trimmed.toByteData(format: ui.ImageByteFormat.png);
       final bytes = byteData!.buffer.asUint8List();
       final dir = await getTemporaryDirectory();
       final file = File(
@@ -91,8 +101,83 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen>
         [XFile(file.path, mimeType: 'image/png')],
       );
     } finally {
+      rawImage?.dispose();
+      trimmedImage?.dispose();
       if (mounted) setState(() => _sharing = false);
     }
+  }
+
+  /// Detects the bounding box of non-paper content (text, hairlines, ink fills)
+  /// in a captured slide image and returns a fresh image cropped to those
+  /// bounds plus a small magazine margin. Paper grain (4% ink on bone) and the
+  /// pure paper background stay above the brightness threshold, so they don't
+  /// pollute the detection.
+  Future<ui.Image> _autoTrimPaperMargins(
+    ui.Image source, {
+    required double pixelRatio,
+  }) async {
+    final byteData =
+        await source.toByteData(format: ui.ImageByteFormat.rawRgba);
+    if (byteData == null) return source;
+    final bytes = byteData.buffer.asUint8List();
+    final w = source.width;
+    final h = source.height;
+
+    // RGB-sum threshold: paper ≈ 672, grain ≈ 649, hairlineSoft ≈ 554,
+    // hairlineStrong ≈ 478, ink text ≈ 83. 600 separates real content from
+    // paper + grain without missing soft hairlines.
+    const sumThreshold = 600;
+    const sampleStep = 4;
+    const minDarkRatio = 0.004;
+
+    bool rowHasContent(int y) {
+      final rowStart = y * w * 4;
+      var dark = 0;
+      var sampled = 0;
+      for (var x = 0; x < w; x += sampleStep) {
+        sampled++;
+        final i = rowStart + x * 4;
+        final sum = bytes[i] + bytes[i + 1] + bytes[i + 2];
+        if (sum < sumThreshold) dark++;
+      }
+      return sampled > 0 && dark / sampled > minDarkRatio;
+    }
+
+    var firstContent = -1;
+    for (var y = 0; y < h; y++) {
+      if (rowHasContent(y)) {
+        firstContent = y;
+        break;
+      }
+    }
+    if (firstContent < 0) return source; // nothing detected, leave as-is
+
+    var lastContent = h - 1;
+    for (var y = h - 1; y >= firstContent; y--) {
+      if (rowHasContent(y)) {
+        lastContent = y;
+        break;
+      }
+    }
+
+    final marginPx = (44 * pixelRatio).round();
+    final cropTop = math.max(0, firstContent - marginPx);
+    final cropBottom = math.min(h - 1, lastContent + marginPx);
+    final cropHeight = cropBottom - cropTop + 1;
+    if (cropHeight <= 0 || cropHeight >= h) return source;
+
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    canvas.drawImageRect(
+      source,
+      Rect.fromLTWH(0, cropTop.toDouble(), w.toDouble(), cropHeight.toDouble()),
+      Rect.fromLTWH(0, 0, w.toDouble(), cropHeight.toDouble()),
+      Paint(),
+    );
+    final picture = recorder.endRecording();
+    final cropped = await picture.toImage(w, cropHeight);
+    picture.dispose();
+    return cropped;
   }
 
   void _startSlide() {
@@ -210,7 +295,10 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          const RecapBackdrop(),
+          // Captured layer: paper + grain + slide live together inside the
+          // boundary so the share PNG carries the magazine background. Buttons
+          // and progress bars are positioned ABOVE this layer and stay out of
+          // the capture.
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTapDown: (d) {
@@ -224,19 +312,25 @@ class _MonthlyRecapScreenState extends ConsumerState<MonthlyRecapScreen>
             onLongPressStart: (_) => _pause(),
             onLongPressEnd: (_) => _resume(),
             onLongPressCancel: _resume,
-              child: DefaultTextStyle(
-                style: const TextStyle(
-                  color: Color(0xFF1A1A1F),
-                  decoration: TextDecoration.none,
-                ),
-                child: KeyedSubtree(
-                  key: ValueKey(clamped),
-                  child: RepaintBoundary(
-                    key: _keyForSlide(clamped),
-                    child: slides[clamped],
+            child: DefaultTextStyle(
+              style: const TextStyle(
+                color: Color(0xFF1A1A1F),
+                decoration: TextDecoration.none,
+              ),
+              child: KeyedSubtree(
+                key: ValueKey(clamped),
+                child: RepaintBoundary(
+                  key: _keyForSlide(clamped),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      const RecapBackdrop(),
+                      slides[clamped],
+                    ],
                   ),
                 ),
               ),
+            ),
           ),
           Positioned(
             top: 0,

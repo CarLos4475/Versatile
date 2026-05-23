@@ -255,17 +255,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 volumeLabel: l10n.volume,
                 avgTimeLabel: l10n.avgTime,
               ),
-              const _GridDivider(),
-              if (editorialState.enabled) ...[
-                _HomeMoodboardBlock(
-                  imagePath: editorialState.moodboardPath,
-                  quote: editorialState.moodboardQuote,
-                  defaultQuote: l10n.editorialDefaultMoodboardQuote,
-                  alignX: editorialState.moodboardAlignX,
-                  alignY: editorialState.moodboardAlignY,
-                  scale: editorialState.moodboardScale,
-                ),
+              if (editorialState.enabled)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: _GridDivider(),
+                )
+              else
                 const _GridDivider(),
+              if (editorialState.enabled) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: _HomeMoodboardBlock(
+                    imagePath: editorialState.moodboardPath,
+                    quote: editorialState.moodboardQuote,
+                    defaultQuote: l10n.editorialDefaultMoodboardQuote,
+                    alignX: editorialState.moodboardAlignX,
+                    alignY: editorialState.moodboardAlignY,
+                    scale: editorialState.moodboardScale,
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: _GridDivider(),
+                ),
               ],
               _ActivityBlock(
                 workoutDays: state.workoutDays,
@@ -282,17 +294,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ],
               if (editorialState.enabled) ...[
-                const _GridDivider(),
-                _HomeBackCoverBlock(
-                  imagePath: editorialState.backCoverPath,
-                  quote: editorialState.backCoverQuote,
-                  defaultQuote: l10n.editorialDefaultBackCoverQuote,
-                  alignX: editorialState.backCoverAlignX,
-                  alignY: editorialState.backCoverAlignY,
-                  scale: editorialState.backCoverScale,
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: _GridDivider(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: _HomeBackCoverBlock(
+                    imagePath: editorialState.backCoverPath,
+                    quote: editorialState.backCoverQuote,
+                    defaultQuote: l10n.editorialDefaultBackCoverQuote,
+                    alignX: editorialState.backCoverAlignX,
+                    alignY: editorialState.backCoverAlignY,
+                    scale: editorialState.backCoverScale,
+                  ),
                 ),
               ],
-              const _GridDivider(),
+              if (editorialState.enabled)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: _GridDivider(),
+                )
+              else
+                const _GridDivider(),
             ],
           ),
         ),
@@ -1537,6 +1561,7 @@ class _HomeMoodboardBlock extends StatelessWidget {
                     ? ClipRect(
                         child: Transform.scale(
                           scale: scale,
+                          alignment: Alignment(alignX, alignY),
                           child: Image.file(
                             File(imagePath!),
                             fit: BoxFit.cover,
@@ -1620,6 +1645,7 @@ class _HomeBackCoverBlock extends StatelessWidget {
                   ? ClipRect(
                       child: Transform.scale(
                         scale: scale,
+                        alignment: Alignment(alignX, alignY),
                         child: Image.file(
                           File(imagePath!),
                           fit: BoxFit.cover,

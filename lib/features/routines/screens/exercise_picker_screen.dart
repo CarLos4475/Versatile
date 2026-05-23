@@ -5,8 +5,6 @@ import '../../../core/navigation/app_page_transitions.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../domain/entities/routine.dart';
 import '../../../core/utils/l10n_utils.dart';
-import '../../../shared/widgets/glass_button.dart';
-import '../../../shared/widgets/glass_container.dart';
 import '../../../shared/widgets/motion.dart';
 import '../../../shared/widgets/screen_header.dart';
 import '../../exercises/screens/add_exercise_screen.dart';
@@ -347,32 +345,41 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                 child: Container(
                   width: 38,
                   height: 38,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: context.colors.accentTint,
-                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: context.colors.accent.withValues(alpha: 0.3),
+                      color: context.colors.hairline,
                       width: 0.5,
                     ),
                   ),
                   child: Icon(
                     Icons.add,
-                    size: 20,
+                    size: 18,
                     color: context.colors.accentDeep,
                   ),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-              child: GlassContainer(
-                radius: 14,
+              padding: const EdgeInsets.fromLTRB(22, 14, 22, 12),
+              child: Container(
                 height: 44,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: context.colors.hairline,
+                    width: 0.5,
+                  ),
+                ),
                 child: Row(
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.only(left: 12),
-                      child: Icon(Icons.search, size: 16, color: Colors.grey),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: Icon(
+                        Icons.search,
+                        size: 16,
+                        color: context.colors.ink400,
+                      ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -416,29 +423,37 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                         }
                       });
                     },
-                    child: GlassContainer(
-                      radius: 16,
+                    child: Container(
                       padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: isSelected
+                              ? context.colors.accent.withValues(alpha: 0.55)
+                              : context.colors.hairline,
+                          width: 0.5,
+                        ),
+                      ),
                       child: Row(
                         children: [
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 150),
                             width: 20,
                             height: 20,
+                            alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? context.colors.accent
-                                  : context.colors.fieldBg,
-                              borderRadius: BorderRadius.circular(6),
+                                  : Colors.transparent,
                               border: Border.all(
                                 color: isSelected
-                                    ? Colors.transparent
-                                    : context.colors.glassBorder,
+                                    ? context.colors.accent
+                                    : context.colors.hairline,
+                                width: 0.8,
                               ),
                             ),
                             child: isSelected
                                 ? const Icon(Icons.check,
-                                    size: 14, color: Colors.white)
+                                    size: 13, color: Colors.white)
                                 : null,
                           ),
                           const SizedBox(width: 12),
@@ -447,7 +462,6 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                             height: 38,
                             decoration: BoxDecoration(
                               color: context.colors.accentTint,
-                              borderRadius: BorderRadius.circular(11),
                             ),
                             child: asset != null
                                 ? Padding(
@@ -474,9 +488,10 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                                       child: Text(
                                         ex.getLocalizedName(context),
                                         style: TextStyle(
-                                          fontSize: 15,
+                                          fontSize: 14,
                                           fontWeight: FontWeight.w600,
                                           color: context.colors.ink900,
+                                          letterSpacing: -0.18,
                                         ),
                                       ),
                                     ),
@@ -487,27 +502,27 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
                                           horizontal: 5,
                                           vertical: 1,
                                         ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0x1A5E7BA7),
-                                          borderRadius: BorderRadius.circular(4),
+                                        decoration: const BoxDecoration(
+                                          color: Color(0x1A5E7BA7),
                                         ),
                                         child: Text(
-                                          l10n.unilateral_label,
+                                          l10n.unilateral_label.toUpperCase(),
                                           style: const TextStyle(
                                             fontSize: 9,
-                                            fontWeight: FontWeight.w700,
+                                            fontWeight: FontWeight.w800,
                                             color: Color(0xFF5E7BA7),
-                                            letterSpacing: 0.05,
+                                            letterSpacing: 0.18,
                                           ),
                                         ),
                                       ),
                                     ],
                                   ],
                                 ),
+                                const SizedBox(height: 2),
                                 Text(
                                   ex.getLocalizedMuscle(context),
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     color: context.colors.ink500,
                                   ),
                                 ),
@@ -522,14 +537,11 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(22),
-              child: GlassButton(
+              padding: const EdgeInsets.fromLTRB(22, 14, 22, 22),
+              child: _MagazineDoneButton(
                 label: _selectedIds.isEmpty
-                    ? l10n.done
-                    : '${l10n.done} (${_selectedIds.length})',
-                variant: GlassButtonVariant.primary,
-                size: GlassButtonSize.lg,
-                expand: true,
+                    ? l10n.done.toUpperCase()
+                    : '${l10n.done.toUpperCase()} · ${_selectedIds.length}',
                 onPressed: _selectedIds.isEmpty
                     ? null
                     : () async {
@@ -584,6 +596,37 @@ class _ExercisePickerScreenState extends ConsumerState<ExercisePickerScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MagazineDoneButton extends StatelessWidget {
+  const _MagazineDoneButton({required this.label, required this.onPressed});
+
+  final String label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+    final enabled = onPressed != null;
+    return PressableScale(
+      onTap: enabled ? onPressed : () {},
+      child: Container(
+        width: double.infinity,
+        height: 56,
+        alignment: Alignment.center,
+        color: enabled ? colors.accent : colors.accent.withValues(alpha: 0.35),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.18,
+            color: Colors.white,
+          ),
         ),
       ),
     );

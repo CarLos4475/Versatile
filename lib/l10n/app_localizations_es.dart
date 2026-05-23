@@ -1581,4 +1581,24 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get shareIssueAbbrev => 'N.º';
+
+  @override
+  String get shareVariantIssue => 'Número';
+
+  @override
+  String get shareVariantCover => 'Portada';
+
+  @override
+  String get shareMagazineEmptyTitle => 'Añade una foto';
+
+  @override
+  String get shareMagazineEmptyBody =>
+      'Esta variante de portada usa tu foto como protagonista. Elige una foto debajo para poder compartirla.';
+
+  @override
+  String get shareNeedsPhoto => 'Añade una foto para compartir esta variante';
+
+  @override
+  String get shareNeedsTwoPhotos =>
+      'Añade ambas fotos para compartir esta variante';
 }

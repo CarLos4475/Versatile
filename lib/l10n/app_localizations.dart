@@ -2929,6 +2929,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No.'**
   String get shareIssueAbbrev;
+
+  /// No description provided for @shareVariantIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue'**
+  String get shareVariantIssue;
+
+  /// No description provided for @shareVariantCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover'**
+  String get shareVariantCover;
+
+  /// No description provided for @shareMagazineEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a photo to unlock'**
+  String get shareMagazineEmptyTitle;
+
+  /// No description provided for @shareMagazineEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This cover variant features your moodboard photo as the protagonist. Pick a photo below to share it.'**
+  String get shareMagazineEmptyBody;
+
+  /// No description provided for @shareNeedsPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a photo to share this layout'**
+  String get shareNeedsPhoto;
+
+  /// No description provided for @shareNeedsTwoPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Add both photos to share this layout'**
+  String get shareNeedsTwoPhotos;
 }
 
 class _AppLocalizationsDelegate

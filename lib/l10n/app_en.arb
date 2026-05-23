@@ -694,5 +694,11 @@
   "editorialDragInstructions": "DRAG TO REPOSITION",
   "sharePRBadge": "NEW PR",
   "shareTrainingJournal": "TRAINING JOURNAL",
-  "shareIssueAbbrev": "No."
+  "shareIssueAbbrev": "No.",
+  "shareVariantIssue": "Issue",
+  "shareVariantCover": "Cover",
+  "shareMagazineEmptyTitle": "Add a photo to unlock",
+  "shareMagazineEmptyBody": "This cover variant features your moodboard photo as the protagonist. Pick a photo below to share it.",
+  "shareNeedsPhoto": "Add a photo to share this layout",
+  "shareNeedsTwoPhotos": "Add both photos to share this layout"
 }

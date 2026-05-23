@@ -56,7 +56,46 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     super.initState();
     _soundService = SoundService(ref.read(settingsRepositoryProvider));
     _loadSoundSettings();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkCoachmark());
+    // Wait for Navigator.push slide (~300ms) + FadeSlideIn entrance (~420ms)
+    // to settle. localToGlobal otherwise reads the in-progress AnimatedSlide
+    // offset and the spotlight renders shifted.
+    Future.delayed(const Duration(milliseconds: 620), () {
+      if (mounted) _checkCoachmark();
+    });
+  }
+
+  Future<void> _showSectionCoachmark({
+    required GlobalKey key,
+    required String title,
+    required String body,
+    required VoidCallback onDone,
+    VoidCallback? onSkipAll,
+  }) async {
+    if (!mounted) return;
+    final ctx = key.currentContext;
+    if (ctx == null) return;
+
+    await Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.15,
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+    );
+    if (!mounted) return;
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+
+    final l10n = AppLocalizations.of(context)!;
+    CoachmarkOverlay.show(
+      context: context,
+      targetKey: key,
+      title: title,
+      body: body,
+      gotItLabel: l10n.coachmarkGotIt,
+      skipLabel: l10n.coachmarkSkipAll,
+      onDone: onDone,
+      onSkipAll: onSkipAll,
+    );
   }
 
   Future<void> _checkCoachmark() async {
@@ -66,13 +105,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final shouldColors = await service.shouldShow('settings_colors');
     if (shouldColors && mounted) {
       final l10n = AppLocalizations.of(context)!;
-      CoachmarkOverlay.show(
-        context: context,
-        targetKey: _colorSectionKey,
+      _showSectionCoachmark(
+        key: _colorSectionKey,
         title: l10n.coachmarkSettingsColorsTitle,
         body: l10n.coachmarkSettingsColorsBody,
-        gotItLabel: l10n.coachmarkGotIt,
-        skipLabel: l10n.coachmarkSkipAll,
         onDone: () async {
           await service.markSeen('settings_colors');
           if (mounted) _checkSoundCoachmark();
@@ -94,13 +130,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final should = await service.shouldShow('settings_sound');
     if (should && mounted) {
       final l10n = AppLocalizations.of(context)!;
-      CoachmarkOverlay.show(
-        context: context,
-        targetKey: _soundSectionKey,
+      _showSectionCoachmark(
+        key: _soundSectionKey,
         title: l10n.coachmarkSettingsSoundTitle,
         body: l10n.coachmarkSettingsSoundBody,
-        gotItLabel: l10n.coachmarkGotIt,
-        skipLabel: l10n.coachmarkSkipAll,
         onDone: () async {
           await service.markSeen('settings_sound');
           if (mounted) _checkDataCoachmark();
@@ -121,13 +154,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final should = await service.shouldShow('settings_data');
     if (!should || !mounted) return;
     final l10n = AppLocalizations.of(context)!;
-    CoachmarkOverlay.show(
-      context: context,
-      targetKey: _dataSectionKey,
+    _showSectionCoachmark(
+      key: _dataSectionKey,
       title: l10n.coachmarkSettingsDataTitle,
       body: l10n.coachmarkSettingsDataBody,
-      gotItLabel: l10n.coachmarkGotIt,
-      skipLabel: l10n.coachmarkSkipAll,
       onDone: () => service.markSeen('settings_data'),
     );
   }
@@ -1274,6 +1304,7 @@ class _EditorialPhotoPickerTileState extends State<_EditorialPhotoPickerTile> {
                   child: ClipRect(
                     child: Transform.scale(
                       scale: widget.scale,
+                      alignment: Alignment(widget.alignX, widget.alignY),
                       child: Image.file(
                         File(widget.imagePath!),
                         fit: BoxFit.cover,

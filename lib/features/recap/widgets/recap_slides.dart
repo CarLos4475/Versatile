@@ -323,6 +323,10 @@ class _MagazinePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Top-anchored body so vertical dead space accumulates in a single region
+    // (below the footer) instead of being split between masthead↔body and
+    // body↔footer. Cleaner magazine flow live, and lets the share capture
+    // crop the dead zone in one pass.
     return _SlideShell(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -333,15 +337,9 @@ class _MagazinePage extends StatelessWidget {
             total: total,
             section: section,
           ),
-          Expanded(
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: SingleChildScrollView(
-                physics: const NeverScrollableScrollPhysics(),
-                child: body,
-              ),
-            ),
-          ),
+          const SizedBox(height: 24),
+          body,
+          const SizedBox(height: 24),
           _PageFooter(byline: byline),
         ],
       ),

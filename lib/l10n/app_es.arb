@@ -694,5 +694,11 @@
   "editorialDragInstructions": "ARRASTRA PARA ENCUADRAR",
   "sharePRBadge": "NUEVO PR",
   "shareTrainingJournal": "DIARIO DE ENTRENAMIENTO",
-  "shareIssueAbbrev": "N.º"
+  "shareIssueAbbrev": "N.º",
+  "shareVariantIssue": "Número",
+  "shareVariantCover": "Portada",
+  "shareMagazineEmptyTitle": "Añade una foto",
+  "shareMagazineEmptyBody": "Esta variante de portada usa tu foto como protagonista. Elige una foto debajo para poder compartirla.",
+  "shareNeedsPhoto": "Añade una foto para compartir esta variante",
+  "shareNeedsTwoPhotos": "Añade ambas fotos para compartir esta variante"
 }

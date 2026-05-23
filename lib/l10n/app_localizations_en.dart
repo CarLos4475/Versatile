@@ -1575,4 +1575,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shareIssueAbbrev => 'No.';
+
+  @override
+  String get shareVariantIssue => 'Issue';
+
+  @override
+  String get shareVariantCover => 'Cover';
+
+  @override
+  String get shareMagazineEmptyTitle => 'Add a photo to unlock';
+
+  @override
+  String get shareMagazineEmptyBody =>
+      'This cover variant features your moodboard photo as the protagonist. Pick a photo below to share it.';
+
+  @override
+  String get shareNeedsPhoto => 'Add a photo to share this layout';
+
+  @override
+  String get shareNeedsTwoPhotos => 'Add both photos to share this layout';
 }

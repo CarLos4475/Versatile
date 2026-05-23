@@ -163,6 +163,10 @@ class _PhotoRepositionDialogState extends State<PhotoRepositionDialog> {
                 clipBehavior: Clip.hardEdge,
                 child: Transform.scale(
                   scale: _scale,
+                  // Anchor the zoom at the chosen align point so X panning
+                  // also works for photos that already fit the container's
+                  // width at scale=1 (typical phone photos in a 16:9 strip).
+                  alignment: Alignment(_alignX, _alignY),
                   child: Image.file(
                     File(widget.imagePath),
                     fit: BoxFit.cover,

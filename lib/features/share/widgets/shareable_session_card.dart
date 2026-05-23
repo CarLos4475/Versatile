@@ -584,6 +584,7 @@ class _UserPhoto extends StatelessWidget {
       child: ClipRect(
         child: Transform.scale(
           scale: scale,
+          alignment: Alignment(alignX, alignY),
           child: Image.file(
             File(path),
             fit: BoxFit.cover,
