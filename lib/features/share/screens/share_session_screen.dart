@@ -298,10 +298,12 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
   Widget _buildVariantCard(int idx) {
     final pr = widget.precomputedPR ??
         ref.watch(sessionPRProvider(widget.session.id));
+    final accent = Theme.of(context).extension<AppColors>()!.accent;
     switch (_kVariants[idx].id) {
       case 'cover':
         return MagazineCoverShareCard(
           session: widget.session,
+          accentColor: accent,
           pr: pr,
           userPhotoPath: _userPhotoPath,
           photoAlignX: _photoAlignX,
@@ -311,6 +313,7 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
       case 'collage':
         return MagazineCollageShareCard(
           session: widget.session,
+          accentColor: accent,
           pr: pr,
           heroPhotoPath: _userPhotoPath,
           heroAlignX: _photoAlignX,
@@ -325,6 +328,7 @@ class _ShareSessionScreenState extends ConsumerState<ShareSessionScreen> {
       default:
         return ShareableSessionCard(
           session: widget.session,
+          accentColor: accent,
           pr: pr,
           userPhotoPath: _userPhotoPath,
           userQuote: _userQuote.trim().isEmpty ? null : _userQuote,

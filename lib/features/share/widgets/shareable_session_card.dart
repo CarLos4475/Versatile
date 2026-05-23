@@ -22,6 +22,7 @@ class ShareableSessionCard extends StatelessWidget {
   const ShareableSessionCard({
     super.key,
     required this.session,
+    required this.accentColor,
     this.pr,
     this.userPhotoPath,
     this.userQuote,
@@ -31,6 +32,7 @@ class ShareableSessionCard extends StatelessWidget {
   });
 
   final Session session;
+  final Color accentColor;
   final RecapPersonalRecord? pr;
   final String? userPhotoPath;
   final String? userQuote;
@@ -69,7 +71,6 @@ class ShareableSessionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context).languageCode;
-    final routineColor = Color(session.colorValue);
     final totalSets =
         session.exercises?.fold<int>(0, (s, e) => s + e.sets.length) ?? 0;
     final totalExercises = session.exercises?.length ?? 0;
@@ -95,7 +96,7 @@ class ShareableSessionCard extends StatelessWidget {
             children: [
               _TopBar(
                 dateLabel: dateFormatted,
-                routineColor: routineColor,
+                routineColor: accentColor,
                 iconCode: session.iconCode,
                 issueAbbrev: l10n.shareIssueAbbrev,
                 journalLabel: l10n.shareTrainingJournal,
@@ -123,7 +124,7 @@ class ShareableSessionCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 _PrRow(
                   pr: pr!,
-                  routineColor: routineColor,
+                  routineColor: accentColor,
                   badgeLabel: l10n.sharePRBadge,
                 ),
               ],

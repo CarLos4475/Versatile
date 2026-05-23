@@ -19,6 +19,7 @@ class MagazineCollageShareCard extends StatelessWidget {
   const MagazineCollageShareCard({
     super.key,
     required this.session,
+    required this.accentColor,
     this.pr,
     this.heroPhotoPath,
     this.heroAlignX = 0.0,
@@ -31,6 +32,7 @@ class MagazineCollageShareCard extends StatelessWidget {
   });
 
   final Session session;
+  final Color accentColor;
   final RecapPersonalRecord? pr;
 
   final String? heroPhotoPath;
@@ -75,7 +77,7 @@ class MagazineCollageShareCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context).languageCode;
-    final accent = Color(session.colorValue);
+    final accent = accentColor;
     // Pick a foreground color that reads on the accent (bone for dark
     // accents, ink for light ones).
     final useLightInk = accent.computeLuminance() > 0.55;

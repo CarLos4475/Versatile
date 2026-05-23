@@ -19,6 +19,7 @@ class MagazineCoverShareCard extends StatelessWidget {
   const MagazineCoverShareCard({
     super.key,
     required this.session,
+    required this.accentColor,
     this.pr,
     this.userPhotoPath,
     this.photoAlignX = 0.0,
@@ -27,6 +28,7 @@ class MagazineCoverShareCard extends StatelessWidget {
   });
 
   final Session session;
+  final Color accentColor;
   final RecapPersonalRecord? pr;
   final String? userPhotoPath;
   final double photoAlignX;
@@ -74,6 +76,7 @@ class MagazineCoverShareCard extends StatelessWidget {
         child: hasPhoto
             ? _CoverWithPhoto(
                 session: session,
+                accentColor: accentColor,
                 pr: pr,
                 photoPath: userPhotoPath!,
                 photoAlignX: photoAlignX,
@@ -106,6 +109,7 @@ class MagazineCoverShareCard extends StatelessWidget {
 class _CoverWithPhoto extends StatelessWidget {
   const _CoverWithPhoto({
     required this.session,
+    required this.accentColor,
     required this.pr,
     required this.photoPath,
     required this.photoAlignX,
@@ -121,6 +125,7 @@ class _CoverWithPhoto extends StatelessWidget {
   });
 
   final Session session;
+  final Color accentColor;
   final RecapPersonalRecord? pr;
   final String photoPath;
   final double photoAlignX;
@@ -136,7 +141,6 @@ class _CoverWithPhoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final routineColor = Color(session.colorValue);
     final totalSets =
         session.exercises?.fold<int>(0, (s, e) => s + e.sets.length) ?? 0;
 
@@ -273,7 +277,7 @@ class _CoverWithPhoto extends StatelessWidget {
             durationMin: session.durationMin,
             totalSets: totalSets,
             issueNumber: issueNumber,
-            routineColor: routineColor,
+            routineColor: accentColor,
             volumeLabel: volumeLabel,
             durationLabel: durationLabel,
             setsLabel: setsLabel,
